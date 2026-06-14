@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="iCAUR News — Latest updates, engineering insights, and announcements from Egypt's next-gen EV company.">
+  <title>News — iCAUR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="is-loading">
+
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+    <feBlend in="SourceGraphic" in2="grey" mode="multiply"/>
+  </filter>
+</svg>
+
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__dot" id="cursorDot"></div>
+  <div class="cursor__ring" id="cursorRing"></div>
+  <div class="cursor__label" id="cursorLabel"></div>
+</div>
+<div class="page-intro" id="pageIntro" aria-hidden="true"><span class="page-intro__logo">iCAUR</span></div>
+
+<nav class="nav" id="nav" role="navigation" aria-label="Main">
+  <div class="nav__inner">
+    <a href="/" class="nav__logo" aria-label="iCAUR home"><svg width="113" height="22" viewBox="0 0 15338 2974" fill="none" aria-hidden="true"><path d="M0 29.3487V1372.87C0 1384.28 13.4613 1392.43 23.5573 1385.91L1445.41 534.798C1499.25 502.189 1532.9 445.122 1532.9 383.164V29.3487C1532.9 13.0439 1519.44 0 1502.62 0H30.2879C13.4613 0 0 13.0439 0 29.3487Z" fill="currentColor"/><path d="M1502.62 1486.99H30.2879C13.4613 1486.99 0 1500.03 0 1516.34V2943.01C0 2959.32 13.4613 2972.36 30.2879 2972.36H1164.4C1368.01 2972.36 1532.9 2812.57 1532.9 2615.28V1516.34C1532.9 1500.03 1519.44 1486.99 1502.62 1486.99Z" fill="currentColor"/><path d="M14036.8 2088.65L14698 1692.44C14807.5 1627.22 14873 1513.09 14873 1389.17V357.076C14871.4 159.788 14706.5 0 14502.9 0H12576.2C12439.9 0 12305.3 37.5012 12189.2 105.981L11258.7 663.606L11048.4 789.153C11034.9 797.305 11041.6 816.87 11056.8 816.87H13420.9V1297.86L13108 1485.37H10735.4V357.076C10735.4 159.788 10570.5 0 10366.9 0H8463.82C8327.53 0 8192.91 37.5012 8076.81 105.981L4657.61 2153.87H3429.27V816.87H5509.04C5645.34 816.87 5779.95 779.37 5896.05 710.893L6237.64 505.45L7035.24 27.7182C7048.69 19.5658 7041.94 1.16621e-05 7026.8 1.16621e-05H2263.18C2059.58 1.16621e-05 1894.68 159.788 1894.68 357.076V2615.3C1894.68 2812.58 2059.58 2972.37 2263.18 2972.37H4977.32C5113.61 2972.37 5248.23 2934.87 5364.33 2866.39L6303.26 2303.87H8436.88C8573.18 2303.87 8707.79 2266.37 8823.9 2197.89L9200.79 1971.26V2913.67C9200.79 2946.28 9227.73 2974 9263.06 2974H9409.43C9545.73 2974 9680.34 2936.5 9796.45 2868.02L10735.4 2305.5H12241.4L13180.3 2868.02C13296.4 2938.13 13431 2974 13567.3 2974H15322.3C15337.5 2974 15344.2 2954.44 15330.8 2946.28L14036.8 2088.65ZM9202.48 1485.37H7669.6L9202.48 567.406V1485.37Z" fill="currentColor"/></svg></a>
+    <ul class="nav__links" role="list">
+      <li><a href="/about"    class="nav__link">About</a></li>
+      <li><a href="/models"   class="nav__link">Models</a></li>
+      <li><a href="/services" class="nav__link">Services</a></li>
+      <li><a href="/news"     class="nav__link" aria-current="page">News</a></li>
+      <li><a href="/contact"  class="nav__link">Contact Us</a></li>
+    </ul>
+    <div class="nav__actions">
+      <a href="/reserve" class="btn btn--reserve btn--sm">Reserve</a>
+      <a href="/signin"  class="nav__signin">Sign In</a>
+    </div>
+    <button class="nav__hamburger" id="navHamburger" aria-expanded="false" aria-label="Toggle menu"><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <button class="mobile-menu__close" id="mobileClose" aria-label="Close">✕</button>
+  <nav class="mobile-menu__nav" aria-label="Mobile"><ul role="list">
+    <li><a href="/about">About</a></li><li><a href="/models">Models</a></li>
+    <li><a href="/services">Services</a></li><li><a href="/news">News</a></li>
+    <li><a href="/contact">Contact Us</a></li>
+  </ul></nav>
+  <div class="mobile-menu__actions">
+    <a href="/reserve" class="btn btn--filled btn--lg">Reserve Your iCAUR</a>
+    <a href="/signin"  class="btn btn--outline-dark btn--lg">Sign In</a>
+  </div>
+</div>
+
+<main id="main">
+
+<!-- ═══════ HERO + FEATURED ═══════ -->
+<section class="section news-hero" id="hero">
+  <div class="container">
+    <nav class="breadcrumb breadcrumb--dark reveal reveal--up" data-delay="0" aria-label="Breadcrumb">
+      <a href="/">Home</a><span>›</span><span aria-current="page">News</span>
+    </nav>
+    <div class="news-featured reveal reveal--up" data-delay="1">
+      <a class="news-featured__img" href="/news/v27-studio-reveal" data-cursor-label="Read">
+        <img src="../assets/images/news-v27-reveal.jpg" alt="iCAUR V27 Studio Design Revealed" loading="eager" width="800" height="500">
+      </a>
+      <div class="news-featured__text">
+        <div class="news-featured__meta">
+          <span class="news-featured__tag">Design</span>
+          <time datetime="2026-05-28">May 28, 2026</time>
+        </div>
+        <h2 style="margin-bottom:var(--sp-8)">iCAUR V27 Studio Design Revealed</h2>
+        <p style="font-size:16px;line-height:1.75;color:var(--text-mid);margin-bottom:var(--sp-12)">A first look at the design philosophy behind Egypt's most anticipated electric vehicle — how proportions, surfaces, and intent come together into one bold statement.</p>
+        <a href="/news/v27-studio-reveal" class="btn btn--dark btn--arrow btn--magnetic">Read Article <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FILTERS + GRID ═══════ -->
+<section class="section news-filters" id="filters" style="padding:0">
+  <div class="container">
+    <nav class="news-filters__inner" aria-label="Article categories">
+      <button class="filter-btn is-active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="design">Design</button>
+      <button class="filter-btn" data-filter="engineering">Engineering</button>
+      <button class="filter-btn" data-filter="technology">Technology</button>
+      <button class="filter-btn" data-filter="company">Company</button>
+      <button class="filter-btn" data-filter="test-drive">Test Drive</button>
+    </nav>
+  </div>
+</section>
+
+<section class="section news-grid-full" id="articles" style="padding-top:var(--sp-24)">
+  <div class="container">
+    <div class="news__grid">
+      <article class="news-card reveal reveal--up" data-delay="0" data-category="engineering">
+        <a href="/news/electric-wiring" class="news-card__img" data-cursor-label="Read">
+          <img src="../assets/images/news-engineering.jpg" alt="Electric Wiring Matrix" loading="lazy" width="400" height="250">
+          <span class="news-card__tag">Engineering</span>
+        </a>
+        <div class="news-card__body">
+          <h4>Electric Wiring Matrix Optimized for Egypt</h4>
+          <p>How iCAUR's engineers rebuilt the EV powertrain for Egypt's unique climate and roads.</p>
+          <footer>
+            <time datetime="2026-05-20">May 20, 2026</time>
+            <a href="/news/electric-wiring" class="link-arrow">Read <span class="arrow">→</span></a>
+          </footer>
+        </div>
+      </article>
+      <article class="news-card reveal reveal--up" data-delay="1" data-category="test-drive">
+        <a href="/news/wanderer-campaign" class="news-card__img" data-cursor-label="Read">
+          <img src="../assets/images/news-test-drive.jpg" alt="Test Drive: The Wanderer Campaign" loading="lazy" width="400" height="250">
+          <span class="news-card__tag">Test Drive</span>
+        </a>
+        <div class="news-card__body">
+          <h4>Test Drive: The Wanderer Campaign</h4>
+          <p>We drove the V27 across three terrains — desert, coastal highway, and city traffic. Here's everything we discovered.</p>
+          <footer>
+            <time datetime="2026-05-12">May 12, 2026</time>
+            <a href="/news/wanderer-campaign" class="link-arrow">Read <span class="arrow">→</span></a>
+          </footer>
+        </div>
+      </article>
+      <article class="news-card reveal reveal--up" data-delay="2" data-category="technology">
+        <a href="/news/ai-cabin" class="news-card__img" data-cursor-label="Read">
+          <img src="../assets/images/news-tech.jpg" alt="AI Cabin Technology" loading="lazy" width="400" height="250">
+          <span class="news-card__tag">Technology</span>
+        </a>
+        <div class="news-card__body">
+          <h4>Inside the AI-Powered iCAUR Cabin</h4>
+          <p>How iCAUR's intelligent cockpit learns your habits, predicts your needs, and makes every drive personal.</p>
+          <footer>
+            <time datetime="2026-04-30">Apr 30, 2026</time>
+            <a href="/news/ai-cabin" class="link-arrow">Read <span class="arrow">→</span></a>
+          </footer>
+        </div>
+      </article>
+      <article class="news-card reveal reveal--up" data-delay="0" data-category="company">
+        <a href="/news/egypt-ev-future" class="news-card__img" data-cursor-label="Read">
+          <img src="../assets/images/news-company.jpg" alt="Egypt's EV Future" loading="lazy" width="400" height="250">
+          <span class="news-card__tag">Company</span>
+        </a>
+        <div class="news-card__body">
+          <h4>Egypt's Electric Future Starts in 2026</h4>
+          <p>iCAUR CEO Ahmed Kamal on why now is the right time, the biggest challenges, and what comes next.</p>
+          <footer>
+            <time datetime="2026-04-14">Apr 14, 2026</time>
+            <a href="/news/egypt-ev-future" class="link-arrow">Read <span class="arrow">→</span></a>
+          </footer>
+        </div>
+      </article>
+      <article class="news-card reveal reveal--up" data-delay="1" data-category="design">
+        <a href="/news/v23-design" class="news-card__img" data-cursor-label="Read">
+          <img src="../assets/images/news-v23.jpg" alt="V23 Design Language" loading="lazy" width="400" height="250">
+          <span class="news-card__tag">Design</span>
+        </a>
+        <div class="news-card__body">
+          <h4>The V23: Designing for the City</h4>
+          <p>A deeper look at the design choices behind iCAUR's more urban model — its sleek proportions and bold surfaces.</p>
+          <footer>
+            <time datetime="2026-03-28">Mar 28, 2026</time>
+            <a href="/news/v23-design" class="link-arrow">Read <span class="arrow">→</span></a>
+          </footer>
+        </div>
+      </article>
+      <article class="news-card reveal reveal--up" data-delay="2" data-category="engineering">
+        <a href="/news/battery-tech" class="news-card__img" data-cursor-label="Read">
+          <img src="../assets/images/news-battery.jpg" alt="iCAUR Battery Technology" loading="lazy" width="400" height="250">
+          <span class="news-card__tag">Engineering</span>
+        </a>
+        <div class="news-card__body">
+          <h4>Built for Egypt's Heat: Our Battery Story</h4>
+          <p>How iCAUR's thermal management system was purpose-built to maintain peak performance in 45°C+ summer heat.</p>
+          <footer>
+            <time datetime="2026-03-10">Mar 10, 2026</time>
+            <a href="/news/battery-tech" class="link-arrow">Read <span class="arrow">→</span></a>
+          </footer>
+        </div>
+      </article>
+    </div>
+
+    <!-- Load more -->
+    <div style="text-align:center;margin-top:var(--sp-32)" class="reveal reveal--up">
+      <button class="btn btn--ghost btn--lg btn--magnetic">Load More Articles</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ NEWSLETTER ═══════ -->
+<section class="section" id="newsletter" style="background:var(--cream);padding:var(--sp-24) 0">
+  <div class="container">
+    <div class="news__newsletter reveal reveal--up">
+      <p><strong style="color:var(--black)">Stay in the loop.</strong> Get iCAUR news, launch updates, and behind-the-scenes stories delivered to your inbox.</p>
+      <form class="newsletter-form" aria-label="Newsletter signup" style="display:flex;gap:var(--sp-4)">
+        <input type="email" placeholder="Your email address" aria-label="Email" required style="flex:1;padding:13px 16px;border:1.5px solid rgba(0,0,0,.15);border-radius:100px;background:var(--white);font-family:var(--f-body);font-size:14px;outline:none;color:var(--black)">
+        <button type="submit" class="btn btn--dark btn--magnetic">Sign Up →</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer" role="contentinfo">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <a href="/" class="footer__mark" aria-label="iCAUR home">iCAUR</a>
+      <div class="footer__models"><a href="/models/v27">V27</a><a href="/models/v23">V23</a></div>
+    </div>
+    <div class="footer__cols">
+      <div class="footer__col"><h6>Models</h6><ul><li><a href="/models/v27">iCAUR V27</a></li><li><a href="/models/v23">iCAUR V23</a></li><li><a href="/models">Compare Models</a></li><li><a href="/reserve">Reserve Now</a></li></ul></div>
+      <div class="footer__col"><h6>Company</h6><ul><li><a href="/about">About iCAUR</a></li><li><a href="/about#innovation">Innovation</a></li><li><a href="/about#careers">Careers</a></li><li><a href="/news">Press</a></li></ul></div>
+      <div class="footer__col"><h6>Support</h6><ul><li><a href="/services">Services</a></li><li><a href="/contact">Contact Us</a></li><li><a href="/#faq">FAQ</a></li><li><a href="/contact#locations">Find a Location</a></li></ul></div>
+      <div class="footer__col footer__col--nl">
+        <h6>Join Our Newsletter</h6><p>Be first to know about launches, news, and exclusive events.</p>
+        <form class="nl-form newsletter-form" aria-label="Newsletter signup">
+          <input type="email" placeholder="Your email address" aria-label="Email" required>
+          <button type="submit" aria-label="Subscribe"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </form>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <div class="footer__social" aria-label="Social media">
+        <a href="#" class="social-link" aria-label="Instagram"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.7"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+        <a href="#" class="social-link" aria-label="X"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M4 4l16 16M4 20L20 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></a>
+        <a href="#" class="social-link" aria-label="YouTube"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" stroke-width="1.7"/><path d="M10 9l5 3-5 3V9z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></a>
+      </div>
+      <p class="footer__legal">© 2026 iCAUR. All rights reserved. &nbsp;·&nbsp; <a href="/privacy">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms">Terms of Use</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+<script>
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.news-card').forEach(card => {
+      const show = filter === 'all' || card.dataset.category === filter;
+      card.style.display = show ? '' : 'none';
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1149 @@
+'use strict';
+
+/* ============================================================
+   iCAUR — main.js  v2
+   Page Intro · Custom Cursor · Nav · Mobile Menu
+   Scroll Reveals · Magnetic Buttons · FAQ · Spec Counters
+   Newsletter Form
+============================================================ */
+
+// ─── Helpers ──────────────────────────────────────────────
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+
+
+// ============================================================
+// PAGE INTRO — branded logo flash on load
+// ============================================================
+(function initPageIntro() {
+  const intro = $('#pageIntro');
+  if (!intro) return;
+
+  // After fonts/styles settle (~750 ms), fade out intro
+  const dismiss = () => {
+    intro.classList.add('is-done');
+    document.body.classList.remove('is-loading');
+    // Trigger hero word reveals right after intro exits
+    setTimeout(triggerHeroWords, 300);
+  };
+
+  if (document.readyState === 'complete') {
+    setTimeout(dismiss, 750);
+  } else {
+    window.addEventListener('load', () => setTimeout(dismiss, 750), { once: true });
+  }
+})();
+
+
+// ============================================================
+// HERO WORD REVEALS — animate words in sequence after intro
+// ============================================================
+function triggerHeroWords() {
+  $$('.reveal-word').forEach(word => {
+    const delay = parseFloat(word.dataset.delay ?? 0) * 90;
+    setTimeout(() => word.classList.add('in-view'), delay);
+  });
+
+  // Also fire any hero .reveal elements marked data-delay <= 1
+  $$('.hero .reveal').forEach(el => {
+    const delay = parseFloat(el.dataset.delay ?? 0) * 90 + 400;
+    setTimeout(() => el.classList.add('in-view'), delay);
+  });
+}
+
+
+// ============================================================
+// CUSTOM CURSOR — dot + ring with spring-physics lag
+// ============================================================
+(function initCursor() {
+  const cursor = $('#cursor');
+  const dot    = $('#cursorDot');
+  const ring   = $('#cursorRing');
+  const label  = $('#cursorLabel');
+  if (!cursor || !dot || !ring) return;
+
+  // Only on devices with a fine pointer (mouse)
+  if (!window.matchMedia('(pointer: fine)').matches) {
+    cursor.style.display = 'none';
+    document.body.style.cursor = 'auto';
+    return;
+  }
+
+  let mouseX = -100, mouseY = -100;
+  let ringX  = -100, ringY  = -100;
+  const RING_SPRING = 0.18;  // lower = more lag
+  let hoverEl = null;        // element the ring should fit/snap to
+
+  // RAF loop — spring physics
+  function rafLoop() {
+    let targetX = mouseX, targetY = mouseY;
+
+    if (hoverEl) {
+      const r = hoverEl.getBoundingClientRect();
+      targetX = r.left + r.width / 2;
+      targetY = r.top + r.height / 2;
+      ring.style.width  = `${r.width}px`;
+      ring.style.height = `${r.height}px`;
+      ring.style.borderRadius = getComputedStyle(hoverEl).borderRadius;
+    } else {
+      ring.style.width  = '';
+      ring.style.height = '';
+      ring.style.borderRadius = '';
+    }
+
+    // Ease ring toward target
+    ringX += (targetX - ringX) * RING_SPRING;
+    ringY += (targetY - ringY) * RING_SPRING;
+
+    // Dot and label always share the ring's position — perfectly centered
+    const transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+    dot.style.transform   = transform;
+    ring.style.transform  = transform;
+    label.style.transform = transform;
+
+    requestAnimationFrame(rafLoop);
+  }
+  requestAnimationFrame(rafLoop);
+
+  // Track mouse position
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    cursor.classList.add('is-visible');
+  }, { passive: true });
+
+  document.addEventListener('mouseleave', () => cursor.classList.remove('is-visible'));
+  document.addEventListener('mouseenter', () => cursor.classList.add('is-visible'));
+
+  // Hover states
+  function addHoverListeners() {
+    // Grow on links / buttons — ring morphs to fit the element
+    $$('a, button, [role="button"], .btn, label, input, textarea, select').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.classList.add('is-hover');
+        if (el.matches('.btn, button, [role="button"]')) {
+          cursor.classList.add('is-fit');
+          hoverEl = el;
+        }
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.classList.remove('is-hover');
+        if (hoverEl === el) {
+          cursor.classList.remove('is-fit');
+          hoverEl = null;
+        }
+      });
+    });
+
+    // Image hover — show label
+    $$('[data-cursor-label]').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        const txt = el.dataset.cursorLabel || '';
+        label.textContent = txt;
+        cursor.classList.add('is-label');
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.classList.remove('is-label');
+        label.textContent = '';
+      });
+    });
+
+    // Active / press state
+    document.addEventListener('mousedown', () => cursor.classList.add('is-pressed'));
+    document.addEventListener('mouseup',   () => cursor.classList.remove('is-pressed'));
+  }
+  addHoverListeners();
+
+  // Real-time cursor contrast — sample background luminance under cursor
+  function parseBgRgb(str) {
+    const m = str.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    return m ? [+m[1], +m[2], +m[3]] : null;
+  }
+  function luminance(r, g, b) {
+    return [r, g, b].reduce((acc, c, i) => {
+      const s = c / 255;
+      const lin = s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      return acc + lin * [0.2126, 0.7152, 0.0722][i];
+    }, 0);
+  }
+  function bgLumAt(x, y) {
+    let el = document.elementFromPoint(x, y);
+    while (el && el !== document.documentElement) {
+      const bg = getComputedStyle(el).backgroundColor;
+      if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+        const rgb = parseBgRgb(bg);
+        if (rgb) return luminance(...rgb);
+      }
+      el = el.parentElement;
+    }
+    return 1;
+  }
+  let lastLumMs = 0;
+  document.addEventListener('mousemove', e => {
+    const now = Date.now();
+    if (now - lastLumMs < 80) return;
+    lastLumMs = now;
+    const lum = bgLumAt(e.clientX, e.clientY);
+    cursor.classList.toggle('is-dark', lum < 0.35);
+  }, { passive: true });
+})();
+
+
+// ============================================================
+// HERO MASK REVEAL — scroll-driven BORN TO PLAY text mask
+// ============================================================
+(function initHeroMask() {
+  const driver  = $('#heroScrollDriver');
+  const mask    = $('#heroMaskReveal');
+  const overlay = $('#heroOverlay');
+  const inner   = $('.hero__inner');
+  if (!driver || !mask) return;
+
+  function tick() {
+    const rect      = driver.getBoundingClientRect();
+    const scrolled  = Math.max(0, -rect.top);
+    const scrollable = Math.max(driver.offsetHeight - window.innerHeight, 1);
+    const p = Math.min(scrolled / scrollable, 1); // 0 → 1
+
+    // Fade in quickly over first 15% of scroll
+    const appear = Math.min(p / 0.15, 1);
+
+    // Reach full scale by 85% of scroll, then hold at scale 1 for the
+    // remaining 15% — gives the user a moment to read "BORN TO PLAY"
+    // before the hero releases and the page continues scrolling.
+    const pScale = Math.min(p / 0.85, 1);
+
+    // Scale: 15 (whole viewport = letter stroke = pure video) → 1 (black frame + letter windows)
+    const scale = Math.max(15 - pScale * 14, 1);
+
+    mask.style.opacity   = appear;
+    mask.style.transform = `scale(${scale})`;
+
+    // Fade out the headline as the BORN/TO PLAY reveal takes over, so they
+    // never visually overlap mid-scroll
+    if (inner) {
+      const heroFade = 1 - Math.min(p / 0.12, 1);
+      inner.style.opacity = String(heroFade);
+      inner.style.pointerEvents = heroFade < 0.05 ? 'none' : '';
+    }
+
+    // Overlay stays light — the mask black handles the darkening
+    if (overlay) overlay.style.opacity = '0.28';
+  }
+
+  window.addEventListener('scroll', tick, { passive: true });
+  tick(); // run once on load
+})();
+
+
+// ============================================================
+// HERO TEXT FIT — calibrate BORN / TO PLAY to fill viewport width
+// Runs after fonts load + on every resize so it's always perfect
+// ============================================================
+(function initHeroTextFit() {
+  const mask = $('#heroMaskReveal');
+  if (!mask) return;
+
+  function fit() {
+    const lines = $$('.hero__mask-line', mask);
+    if (lines.length < 2) return;
+
+    // Build an off-screen clone that isn't affected by scale() transform
+    const probe = document.createElement('div');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = [
+      'position:fixed', 'top:-9999px', 'left:0',
+      'visibility:hidden', 'pointer-events:none',
+      'white-space:nowrap',
+      `font-family:${getComputedStyle(mask).fontFamily}`,
+      'font-weight:900', 'letter-spacing:-0.04em', 'word-spacing:-0.12em',
+      'font-size:200px',              // large reference size
+      'text-transform:uppercase',
+    ].join(';');
+
+    const b = document.createElement('span');
+    b.textContent = lines[0].textContent;
+    const t = document.createElement('span');
+    t.style.display = 'block';
+    t.textContent = lines[1].textContent;
+
+    probe.appendChild(b);
+    probe.appendChild(t);
+    document.body.appendChild(probe);
+
+    const vw       = window.innerWidth;
+    const ref      = 200; // px — our probe font-size
+    const bornW    = b.getBoundingClientRect().width;
+    const toplayW  = t.getBoundingClientRect().width;
+    document.body.removeChild(probe);
+
+    if (!bornW || !toplayW) return;
+
+    // Scale so each line fills exactly 100vw (both independently)
+    let bornFs   = ref * (vw / bornW);         // px at current vw
+    const ratio  = toplayW ? (bornW / toplayW) : 1; // toplayFs / bornFs
+
+    // Cap by viewport height too, so on wide/ultrawide screens the two
+    // stacked lines never exceed the viewport — keeps the same scale
+    // and centred position from laptops up to large wide screens.
+    const vh = window.innerHeight;
+    const lineHeight = 0.88;
+    const maxBornFsByHeight = (vh * 0.86) / ((1 + ratio) * lineHeight);
+    bornFs = Math.min(bornFs, maxBornFsByHeight);
+
+    const toplayFs = bornFs * ratio;
+
+    mask.style.fontSize = bornFs + 'px';
+    lines[1].style.fontSize = toplayFs + 'px';
+  }
+
+  // Run once fonts are ready, then on every resize
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(fit);
+  } else {
+    setTimeout(fit, 500);
+  }
+  window.addEventListener('resize', fit, { passive: true });
+})();
+
+
+// ============================================================
+// NAVIGATION — colour mode on scroll
+// ============================================================
+(function initNav() {
+  const nav    = $('#nav');
+  const driver = $('#heroScrollDriver'); // use driver height for sticky hero
+  const hero   = $('#hero');
+  if (!nav) return;
+
+  const darkIds  = ['hero', 'cta', 'why-icaur'];
+  const lightIds = ['models', 'overview', 'services', 'innovation', 'news', 'faq', 'about'];
+
+  function setNavMode(mode) {
+    nav.classList.remove('nav--on-hero', 'nav--dark', 'nav--light');
+    nav.classList.add(`nav--${mode}`);
+  }
+
+  function updateNav() {
+    const scrollY    = window.scrollY;
+    // Use scroll driver height so nav stays white for the full scroll experience
+    const heroBottom = driver
+      ? driver.offsetHeight - nav.offsetHeight
+      : (hero?.offsetHeight ?? window.innerHeight) - nav.offsetHeight;
+
+    if (scrollY < heroBottom) {
+      setNavMode('on-hero');
+      return;
+    }
+
+    let currentId = '';
+    $$('main > section, main > div').forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top <= nav.offsetHeight + 4) {
+        currentId = el.id || '';
+      }
+    });
+
+    const isDark  = darkIds.some(id  => currentId.includes(id));
+    const isLight = lightIds.some(id => currentId.includes(id));
+
+    if (isDark || (!isDark && !isLight)) {
+      setNavMode('dark');
+    } else {
+      setNavMode('light');
+    }
+  }
+
+  window.addEventListener('scroll', updateNav, { passive: true });
+  updateNav();
+})();
+
+
+// ============================================================
+// MOBILE MENU
+// ============================================================
+(function initMobileMenu() {
+  const hamburger  = $('#navHamburger');
+  const mobileMenu = $('#mobileMenu');
+  const closeBtn   = $('#mobileClose');
+  if (!hamburger || !mobileMenu) return;
+
+  let isOpen = false;
+
+  function open() {
+    isOpen = true;
+    mobileMenu.classList.add('is-open');
+    mobileMenu.setAttribute('aria-hidden', 'false');
+    hamburger.setAttribute('aria-expanded', 'true');
+    hamburger.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function close() {
+    isOpen = false;
+    mobileMenu.classList.remove('is-open');
+    mobileMenu.setAttribute('aria-hidden', 'true');
+    hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+
+  hamburger.addEventListener('click', () => isOpen ? close() : open());
+  closeBtn?.addEventListener('click', close);
+
+  $$('a', mobileMenu).forEach(a => a.addEventListener('click', close));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && isOpen) close();
+  });
+})();
+
+
+// ============================================================
+// SCROLL REVEAL — IntersectionObserver for .reveal elements
+// ============================================================
+(function initReveal() {
+  // Regular reveal elements (up, fade, clip-h, clip-v)
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el    = entry.target;
+      const delay = parseFloat(el.dataset.delay ?? 0) * 100;
+      setTimeout(() => {
+        el.classList.add('in-view');
+
+        // If this is a stagger parent, animate children
+        if (el.dataset.stagger === 'parent') {
+          $$('.reveal', el).forEach((child, i) => {
+            setTimeout(() => child.classList.add('in-view'), i * 80);
+          });
+        }
+      }, delay);
+      obs.unobserve(el);
+    });
+  }, {
+    threshold: 0.08,
+    rootMargin: '0px 0px -48px 0px',
+  });
+
+  $$('.reveal:not(.hero .reveal)').forEach(el => obs.observe(el));
+
+  // Word-mask reveals for non-hero words (section headings etc.)
+  const wordObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      $$('.word', entry.target).forEach((word, i) => {
+        const base  = parseFloat(entry.target.dataset.delay ?? 0) * 100;
+        setTimeout(() => word.classList.add('in-view'), base + i * 60);
+      });
+      wordObs.unobserve(entry.target);
+    });
+  }, { threshold: 0.15 });
+
+  $$('.word-mask:not(.hero .word-mask)').forEach(el => wordObs.observe(el.closest('[data-delay]') || el));
+})();
+
+// ============================================================
+// OVERVIEW VIDEO SCROLL — bounce headline + scroll-synced
+// paragraphs with orange mask-wipe reveals
+// ============================================================
+(function initOverviewScroll() {
+  const driver  = $('#overviewScrollDriver');
+  const section = $('#overview');
+  if (!driver || !section) return;
+
+  const heading = $('.overview__heading', section);
+  const stats   = $('#overviewStats', section);
+  const statValues = stats ? $$('.ov-stat__value', stats) : [];
+  let statsCounted = false;
+  const steps   = $$('.ov-step', section);
+  const n       = steps.length;
+  const video   = $('.overview__video', section);
+  const bgInner = $('#overviewBgInner', section);
+
+  // Video is scroll-scrubbed, not auto-playing
+  let duration = 0;
+  if (video) {
+    video.pause();
+    video.addEventListener('loadedmetadata', () => { duration = video.duration || 0; });
+  }
+
+  const FADE = 0.1; // fraction of each step's range used for cross-fade
+  const FILL_AT = 0.35; // scroll progress at which the video reaches full scale
+
+  // Elastic "ease-out-back" — overshoots past 1 then settles
+  function easeOutBack(t) {
+    const c1 = 1.70158, c3 = c1 + 1;
+    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+  }
+
+  // Gradual, near-linear growth with a small elastic snap at the very end
+  function growElastic(t) {
+    const ramp = 0.85;
+    if (t < ramp) return (t / ramp) * 0.95;
+    return 0.95 + easeOutBack((t - ramp) / (1 - ramp)) * 0.05;
+  }
+
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  // Animate each stat value from 0 up to its target count
+  function countUpStats() {
+    const startTime = performance.now();
+    const duration  = 2200;
+
+    function frame(now) {
+      const t = Math.min((now - startTime) / duration, 1);
+      const eased = easeOutCubic(t);
+      statValues.forEach(el => {
+        const target = parseFloat(el.dataset.count) || 0;
+        el.textContent = Math.round(target * eased).toString();
+      });
+      if (t < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function tick() {
+    const rect       = driver.getBoundingClientRect();
+    const vh         = window.innerHeight;
+    const scrollable = Math.max(driver.offsetHeight - vh, 1);
+    const p          = Math.min(Math.max(-rect.top / scrollable, 0), 1);
+
+    // Scale progress starts as soon as the section enters the viewport
+    // (well before it becomes sticky), so the grow begins earlier.
+    const scaleP = Math.min(Math.max((vh - rect.top) / (vh + scrollable * FILL_AT), 0), 1);
+
+    // Scrub the video by scroll position — plays forward/reverse with scroll
+    if (video && duration) {
+      video.currentTime = p * duration;
+    }
+
+    // Gradual grow from a 60px-inset frame to full viewport width
+    if (bgInner) {
+      const eased  = growElastic(scaleP);
+      const inset  = Math.max(0, 60 * (1 - eased));
+      const radius = Math.max(0, 4 * (1 - eased));
+      bgInner.style.inset = inset + 'px';
+      bgInner.style.borderRadius = radius + 'px';
+    }
+
+    // Subtle parallax drift inside the video frame
+    if (video) {
+      video.style.transform = `translateY(${(p - 0.5) * 12}%)`;
+    }
+
+    // Headline bounces in once the video fills the viewport, and
+    // disappears again if scrolling back up shrinks the video
+    if (heading) {
+      heading.classList.toggle('in-view', scaleP >= 1);
+    }
+
+    // Brand insight stats appear alongside the headline and count up
+    // each time they come into view; they hide again on scroll-up.
+    if (stats) {
+      const visible = scaleP >= 1;
+      stats.classList.toggle('in-view', visible);
+      if (visible && !statsCounted) {
+        statsCounted = true;
+        statValues.forEach(el => { el.textContent = '0'; });
+        countUpStats();
+      } else if (!visible) {
+        statsCounted = false;
+      }
+    }
+
+    // Paragraphs share the range after FILL_AT — the first one appears
+    // alongside the headline, then each subsequent one cross-fades in.
+    const range = 1 - FILL_AT;
+
+    steps.forEach((step, i) => {
+      const segStart = FILL_AT + (i / n) * range;
+      const segEnd   = FILL_AT + ((i + 1) / n) * range;
+
+      let opacity;
+      if (p <= segStart)            opacity = 0;
+      else if (p < segStart + FADE) opacity = (p - segStart) / FADE;
+      else if (i === n - 1)         opacity = 1;
+      else if (p < segEnd - FADE)   opacity = 1;
+      else if (p < segEnd)          opacity = 1 - (p - (segEnd - FADE)) / FADE;
+      else                          opacity = 0;
+
+      step.style.opacity = String(opacity);
+      step.classList.toggle('is-active', opacity > 0.5);
+
+      // Orange mask-wipe tied to the entrance fade
+      let localP;
+      if (p <= segStart)            localP = 0;
+      else if (p < segStart + FADE) localP = (p - segStart) / FADE;
+      else                           localP = 1;
+
+      const mask = $('.ov-mask', step);
+      if (mask) {
+        let left, width;
+        if (localP < 0.45) { left = 0; width = (localP / 0.45) * 100; }
+        else { const t = (localP - 0.45) / 0.55; left = t * 100; width = 100 - t * 100; }
+        mask.style.setProperty('--mask-left', left + '%');
+        mask.style.setProperty('--mask-width', width + '%');
+      }
+    });
+  }
+
+  tick();
+  window.addEventListener('scroll', tick, { passive: true });
+  window.addEventListener('resize', tick);
+})();
+
+
+// ============================================================
+// SERVICES — vertical scroll drives a horizontal track of
+// service cards, like a circular "carousel" reveal
+// ============================================================
+(function initDiffScroll() {
+  const driver = $('#diffScrollDriver');
+  const section = $('#services');
+  const stage  = $('#diffStage', section || document);
+  if (!driver || !section || !stage) return;
+
+  const cards = $$('.diff__panel', stage);
+  const intro = $('#diffIntro', stage);
+  const MOBILE_BREAKPOINT = 760;
+
+  // Play the headline's entrance animation once, when the section
+  // first scrolls into view
+  if (intro) {
+    const introObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          intro.classList.add('in-view');
+          introObs.disconnect();
+        }
+      });
+    }, { threshold: 0.2 });
+    introObs.observe(intro);
+  }
+
+  function tick() {
+    if (window.innerWidth <= MOBILE_BREAKPOINT) {
+      cards.forEach(card => { card.style.transform = ''; card.style.opacity = ''; card.style.zIndex = ''; });
+      return;
+    }
+
+    const rect       = driver.getBoundingClientRect();
+    const vh         = window.innerHeight;
+    const scrollable = Math.max(driver.offsetHeight - vh, 1);
+    const p          = Math.min(Math.max(-rect.top / scrollable, 0), 1);
+
+    // Continuous "virtual index" sweeps from the first card to the last
+    // as the user scrolls — cards glide right -> center -> left in 3D
+    const virtualIndex = p * (cards.length - 1);
+    const spacing      = Math.max(stage.getBoundingClientRect().width * 0.62, 240);
+
+    cards.forEach((card, i) => {
+      const offset = i - virtualIndex;
+      const abs    = Math.abs(offset);
+      const scale  = Math.max(1 - abs * 0.18, 0.55);
+      const opacity = Math.max(1 - abs * 0.55, 0);
+
+      card.style.transform = `translateX(${offset * spacing}px) translateZ(${-abs * 160}px) rotateY(${-offset * 28}deg) scale(${scale})`;
+      card.style.opacity   = opacity.toString();
+      card.style.zIndex    = Math.round(100 - abs * 10).toString();
+    });
+  }
+
+  tick();
+  window.addEventListener('scroll', tick, { passive: true });
+  window.addEventListener('resize', tick);
+})();
+
+
+// ============================================================
+// MAGNETIC BUTTONS — cursor attraction on hover
+// ============================================================
+(function initMagnetic() {
+  $$('.btn--magnetic').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r   = btn.getBoundingClientRect();
+      const cx  = r.left + r.width  / 2;
+      const cy  = r.top  + r.height / 2;
+      const dx  = (e.clientX - cx) * 0.28;
+      const dy  = (e.clientY - cy) * 0.28;
+      btn.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = '';
+    });
+  });
+})();
+
+
+// ============================================================
+// SPEC COUNT-UP ANIMATION
+// ============================================================
+(function initSpecCounters() {
+  function countUp(el, to, isFloat, delay) {
+    const dur = 1000;
+    let start = null;
+
+    setTimeout(() => {
+      function step(ts) {
+        if (!start) start = ts;
+        const p    = Math.min((ts - start) / dur, 1);
+        const ease = 1 - Math.pow(1 - p, 3); // cubic ease-out
+        const val  = isFloat
+          ? (ease * to).toFixed(1)
+          : Math.round(ease * to).toString();
+
+        // Replace text node, preserving <small> child
+        if (el.childNodes[0]?.nodeType === Node.TEXT_NODE) {
+          el.childNodes[0].textContent = val;
+        } else {
+          el.insertBefore(document.createTextNode(val), el.firstChild);
+        }
+
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }, delay);
+  }
+
+  const specObs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+
+      // Support both .spec__value (old) and .spec__n (new)
+      $$('.spec__value, .spec__n', entry.target).forEach((el, i) => {
+        const count   = el.dataset.count;
+        const isFloat = 'float' in el.dataset || (count && count.includes('.'));
+        const num     = parseFloat(count ?? el.textContent.trim());
+        if (isNaN(num)) return;
+
+        // Snapshot initial text node, then reset to zero
+        if (el.childNodes[0]?.nodeType === Node.TEXT_NODE) {
+          el.childNodes[0].textContent = isFloat ? '0.0' : '0';
+        }
+
+        countUp(el, num, isFloat, i * 120);
+      });
+
+      specObs.unobserve(entry.target);
+    });
+  }, { threshold: 0.4 });
+
+  $$('.model-row, .specs-block, .stats-grid').forEach(row => specObs.observe(row));
+})();
+
+
+// ============================================================
+// FAQ ACCORDION — grid-row expand animation
+// ============================================================
+(function initFaq() {
+  $$('.faq-item__q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item     = btn.closest('.faq-item');
+      const answer   = item?.querySelector('.faq-item__a');
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+
+      // Collapse all
+      $$('.faq-item__q').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+        b.closest('.faq-item')
+          ?.querySelector('.faq-item__a')
+          ?.classList.remove('is-open');
+      });
+
+      // Toggle clicked one open
+      if (!expanded) {
+        btn.setAttribute('aria-expanded', 'true');
+        answer?.classList.add('is-open');
+        // Scroll into view softly if needed
+        setTimeout(() => item?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 300);
+      }
+    });
+  });
+})();
+
+
+// ============================================================
+// NEWSLETTER FORM — prevent-default + feedback
+// ============================================================
+(function initNewsletter() {
+  const form = $('.newsletter-form');
+  if (!form) return;
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const input = form.querySelector('input[type="email"]');
+    const btn   = form.querySelector('button[type="submit"]');
+    if (!input?.value) return;
+
+    // Success state
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path d="M3 9L7.5 13.5L15 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+    btn.style.background = '#2d6a4f';
+    input.value = '';
+    input.placeholder = 'Thanks for subscribing!';
+    input.blur();
+
+    setTimeout(() => {
+      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`;
+      btn.style.background = '';
+      input.placeholder = 'Your email address';
+    }, 3500);
+  });
+})();
+
+
+// ============================================================
+// PARALLAX HERO VEHICLE — subtle depth on scroll
+// ============================================================
+(function initHeroParallax() {
+  const vehicle = $('.hero__vehicle');
+  if (!vehicle) return;
+
+  let ticking = false;
+
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    requestAnimationFrame(() => {
+      const y = window.scrollY * 0.18;
+      vehicle.style.transform = `translateY(${y}px)`;
+      ticking = false;
+    });
+    ticking = true;
+  }, { passive: true });
+})();
+
+
+// ============================================================
+// HORIZONTAL SCROLL HINT — fade out after first scroll
+// ============================================================
+(function initScrollHint() {
+  const hint = $('.scroll-hint');
+  if (!hint) return;
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) hint.classList.add('is-hidden');
+  }, { passive: true, once: true });
+})();
+
+
+// ============================================================
+// SECTION MARKS — update "01 / 07" indicator on scroll
+// ============================================================
+(function initSectionMarks() {
+  const mark = $('.hero__mark');
+  if (!mark) return;
+
+  const sections = $$('main > section[id]');
+  const total    = sections.length;
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const idx = sections.indexOf(entry.target) + 1;
+      if (idx > 0) {
+        mark.textContent = `${String(idx).padStart(2,'0')} / ${String(total).padStart(2,'0')}`;
+      }
+    });
+  }, { threshold: 0.5 });
+
+  sections.forEach(s => obs.observe(s));
+})();
+
+
+// ============================================================
+// MODEL ROW HOVER — subtle image scale + info reveal
+// ============================================================
+(function initModelRows() {
+  $$('.model-row').forEach(row => {
+    const card = row.querySelector('.model-card');
+    if (!card) return;
+
+    row.addEventListener('mouseenter', () => card.classList.add('is-hover'));
+    row.addEventListener('mouseleave', () => card.classList.remove('is-hover'));
+  });
+})();
+
+
+// ============================================================
+// VIDEO PLAY — autoplay hero video if present
+// ============================================================
+(function initHeroVideo() {
+  const video = $('video.hero__video');
+  if (!video) return;
+
+  video.muted  = true;
+  video.loop   = true;
+  video.playsinline = true;
+  video.play().catch(() => {/* autoplay blocked — silent fail */});
+})();
+
+
+// ============================================================
+// WHY ICAUR — parallax image on scroll
+// ============================================================
+(function initWhyParallax() {
+  const section  = document.getElementById('why-icaur');
+  const imgInner = document.getElementById('whyImgInner');
+  if (!section || !imgInner) return;
+
+  function tick() {
+    const rect     = section.getBoundingClientRect();
+    const vh       = window.innerHeight;
+    const progress = (vh - rect.top) / (vh + rect.height);
+    const clamped  = Math.min(Math.max(progress, 0), 1);
+    const scale    = 1 + clamped * 0.13;
+    imgInner.style.transform = `scale(${scale})`;
+  }
+
+  tick();
+  window.addEventListener('scroll', tick, { passive: true });
+})();
+
+
+// ============================================================
+// SMOOTH ANCHOR SCROLL — for in-page # links
+// ============================================================
+document.addEventListener('click', e => {
+  const link = e.target.closest('a[href^="#"]');
+  if (!link) return;
+  const id = link.getAttribute('href').slice(1);
+  const target = document.getElementById(id);
+  if (!target) return;
+
+  e.preventDefault();
+  const nav = $('#nav');
+  const offset = (nav?.offsetHeight ?? 72) + 16;
+  const top = target.getBoundingClientRect().top + window.scrollY - offset;
+
+  window.scrollTo({ top, behavior: 'smooth' });
+});
+
+// ============================================================
+// COMPARE TOOL
+// ============================================================
+(function initCompare() {
+  const MAX = 5;
+  let selections = []; // { model, trim, label }
+
+  const SPECS = [
+    { label: 'Range',        key: 'range' },
+    { label: 'Power',        key: 'hp' },
+    { label: 'Acceleration', key: 'accel' },
+  ];
+
+  const FEATURES = [
+    'Fast DC Charging', 'All-Wheel Drive', 'OTA Updates',
+    'Autopilot Suite', 'Heated Seats', 'Panoramic Roof', '360° Camera'
+  ];
+
+  const MODEL_DATA = {
+    v27: {
+      name: 'V27',
+      img:  'assets/images/v27-model-in-homepge-01.png',
+      logo: 'assets/images/V27-logo.svg',
+      trimSpecs: {
+        'Standard Range': { range: '450 km', hp: '380 hp', accel: '4.8s' },
+        'Long Range':     { range: '560 km', hp: '380 hp', accel: '4.8s' },
+        'Performance':    { range: '510 km', hp: '520 hp', accel: '3.5s' },
+      },
+      features: { 'Fast DC Charging': true, 'All-Wheel Drive': true, 'OTA Updates': true, 'Autopilot Suite': false, 'Heated Seats': true, 'Panoramic Roof': true, '360° Camera': false }
+    },
+    o3t: {
+      name: 'O3T',
+      img:  'assets/images/ot3-model-in-homepage-01.png',
+      logo: 'assets/images/T03-logo.svg',
+      trimSpecs: {
+        'Core':  { range: '520 km', hp: '420 hp', accel: '4.2s' },
+        'Plus':  { range: '580 km', hp: '480 hp', accel: '3.8s' },
+        'Ultra': { range: '630 km', hp: '580 hp', accel: '3.1s' },
+      },
+      features: { 'Fast DC Charging': true, 'All-Wheel Drive': false, 'OTA Updates': true, 'Autopilot Suite': true, 'Heated Seats': true, 'Panoramic Roof': false, '360° Camera': true }
+    }
+  };
+
+  const CHECK_SVG = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.5 9.5l4 4 7-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const CROSS_SVG = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M5 5l8 8M13 5l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+
+  const toggleBtn  = document.getElementById('compareToggle');
+  const drawer     = document.getElementById('cmpDrawer');
+  const backdrop   = document.getElementById('cmpBackdrop');
+  const closeBtn   = document.getElementById('cmpClose');
+  const countBadge = document.getElementById('compareCount');
+  const drawerBody = document.getElementById('cmpBody');
+  const modal      = document.getElementById('cmpModal');
+  const modalClose = document.getElementById('cmpModalClose');
+  const modalBd    = document.getElementById('cmpModalBackdrop');
+  const confirmBtn = document.getElementById('cmpConfirm');
+  const selCountEl = document.getElementById('cmpModalSelCount');
+  const checkboxes = modal ? Array.from(modal.querySelectorAll('.cmp-trim input[type="checkbox"]')) : [];
+
+  if (!toggleBtn || !drawer || !modal) return;
+
+  function openDrawer()  { drawer.classList.add('is-open');  drawer.removeAttribute('aria-hidden'); document.body.style.overflow = 'hidden'; }
+  function closeDrawer() { drawer.classList.remove('is-open'); drawer.setAttribute('aria-hidden','true'); if (!modal.classList.contains('is-open')) document.body.style.overflow = ''; }
+  function openModal()   { modal.classList.add('is-open');   modal.removeAttribute('aria-hidden'); }
+  function closeModal()  { modal.classList.remove('is-open'); modal.setAttribute('aria-hidden','true'); }
+
+  function syncCount() {
+    const n = selections.length;
+    countBadge.textContent = n;
+    countBadge.dataset.count = n;
+    if (selCountEl) selCountEl.textContent = n;
+  }
+
+  function syncDimState() {
+    const atMax = selections.length >= MAX;
+    checkboxes.forEach(cb => {
+      cb.closest('.cmp-trim').classList.toggle('is-dimmed', atMax && !cb.checked);
+    });
+  }
+
+  function removeSel(model, trim) {
+    selections = selections.filter(s => !(s.model === model && s.trim === trim));
+    checkboxes.forEach(cb => { if (cb.dataset.model === model && cb.dataset.trim === trim) cb.checked = false; });
+    syncCount(); syncDimState(); renderDrawer();
+  }
+
+  function renderDrawer() {
+    drawerBody.innerHTML = '';
+    // Plus col visible whenever we're under the 5-selection limit
+    const hasPlus = selections.length < MAX;
+
+    if (selections.length === 0) {
+
+      const empty = document.createElement('div');
+      empty.className = 'cmp-empty';
+      empty.innerHTML = `<button class="cmp-add-btn">
+        <span class="cmp-add-btn__icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v14M4 11h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </span><span>Add Model</span></button>`;
+      empty.querySelector('.cmp-add-btn').addEventListener('click', openModal);
+      drawerBody.appendChild(empty);
+      return;
+    }
+
+
+    // Fixed 155px per selection column; feat-name col 140px; plus col 80px
+    const gridCols = `140px ${selections.map(() => '155px').join(' ')}${hasPlus ? ' 80px' : ''}`;
+
+    const table = document.createElement('div');
+    table.className = 'cmp-table';
+    table.style.gridTemplateColumns = gridCols;
+
+    // ── Header row ──────────────────────────────────────────
+    const spacer = document.createElement('div');
+    spacer.className = 'cmp-feat-spacer';
+    table.appendChild(spacer);
+
+    // One column per trim selection
+    selections.forEach(sel => {
+      const data = MODEL_DATA[sel.model];
+      const hcol = document.createElement('div');
+      hcol.className = 'cmp-model-hcol';
+      hcol.innerHTML = `
+        <button class="cmp-model-hcol__remove" aria-label="Remove ${sel.trim}">✕</button>
+        <div class="cmp-model-hcol__img-wrap">
+          <img src="${data.img}" alt="${data.name}" class="cmp-model-hcol__img">
+          <img src="${data.logo}" alt="${data.name}" class="cmp-model-hcol__logo">
+        </div>
+        <p class="cmp-model-hcol__title">${data.name} · ${sel.trim}</p>`;
+      hcol.querySelector('.cmp-model-hcol__remove').addEventListener('click', () => removeSel(sel.model, sel.trim));
+      table.appendChild(hcol);
+    });
+
+    // Plus column: always shown while under max
+    if (hasPlus) {
+      const plusBtn = document.createElement('button');
+      plusBtn.className = 'cmp-plus-hcol';
+      plusBtn.innerHTML = `<span class="cmp-plus-hcol__icon">+</span><span>Add</span>`;
+      plusBtn.addEventListener('click', openModal);
+      table.appendChild(plusBtn);
+    }
+
+    // ── Spec rows (text values) ───────────────────────────────
+    let rowIdx = 0;
+    SPECS.forEach(spec => {
+      const bg = rowIdx % 2 === 1 ? 'rgba(0,0,0,.025)' : '';
+      const nameCell = document.createElement('div');
+      nameCell.className = 'cmp-feat-name';
+      nameCell.style.background = bg;
+      nameCell.textContent = spec.label;
+      table.appendChild(nameCell);
+
+      selections.forEach(sel => {
+        const trimSpecs = MODEL_DATA[sel.model].trimSpecs[sel.trim] || {};
+        const cell = document.createElement('div');
+        cell.className = 'cmp-feat-cell cmp-feat-cell--text';
+        cell.style.background = bg;
+        cell.textContent = trimSpecs[spec.key] || '—';
+        table.appendChild(cell);
+      });
+
+      if (hasPlus) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'cmp-feat-cell cmp-feat-cell--empty';
+        emptyCell.style.background = bg;
+        table.appendChild(emptyCell);
+      }
+      rowIdx++;
+    });
+
+    // ── Feature rows (✓/✗) ───────────────────────────────────
+    FEATURES.forEach(feat => {
+      const bg = rowIdx % 2 === 1 ? 'rgba(0,0,0,.025)' : '';
+      const nameCell = document.createElement('div');
+      nameCell.className = 'cmp-feat-name';
+      nameCell.style.background = bg;
+      nameCell.textContent = feat;
+      table.appendChild(nameCell);
+
+      selections.forEach(sel => {
+        const has  = MODEL_DATA[sel.model].features[feat];
+        const cell = document.createElement('div');
+        cell.className = `cmp-feat-cell cmp-feat-cell--${has ? 'yes' : 'no'}`;
+        cell.style.background = bg;
+        cell.innerHTML = has ? CHECK_SVG : CROSS_SVG;
+        table.appendChild(cell);
+      });
+
+      if (hasPlus) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'cmp-feat-cell cmp-feat-cell--empty';
+        emptyCell.style.background = bg;
+        table.appendChild(emptyCell);
+      }
+      rowIdx++;
+    });
+
+    drawerBody.appendChild(table);
+  }
+
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) {
+        if (selections.length >= MAX) { cb.checked = false; return; }
+        selections.push({ model: cb.dataset.model, trim: cb.dataset.trim, label: cb.dataset.label });
+      } else {
+        selections = selections.filter(s => !(s.model === cb.dataset.model && s.trim === cb.dataset.trim));
+      }
+      syncCount(); syncDimState();
+    });
+  });
+
+  toggleBtn.addEventListener('click', () => { renderDrawer(); openDrawer(); });
+  backdrop.addEventListener('click', closeDrawer);
+  closeBtn.addEventListener('click', closeDrawer);
+  modalClose.addEventListener('click', closeModal);
+  modalBd.addEventListener('click', closeModal);
+  confirmBtn.addEventListener('click', () => { closeModal(); renderDrawer(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeDrawer(); } });
+
+  syncCount();
+})();

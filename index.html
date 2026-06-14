@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="iCAUR — Egypt's next-generation electric vehicle. Built for every road.">
+  <title>iCAUR — Built for Every Road</title>
+
+  <!-- Preload critical fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="is-loading dark-hero-page">
+
+<!-- ─── SVG Filters (grain texture) ─────────────────────── -->
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="linearRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+    <feBlend in="SourceGraphic" in2="grey" mode="multiply" result="blend"/>
+    <feComposite in="blend" in2="SourceGraphic" operator="in"/>
+  </filter>
+</svg>
+
+<!-- ─── Custom Cursor ────────────────────────────────────── -->
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__dot" id="cursorDot"></div>
+  <div class="cursor__ring" id="cursorRing"></div>
+  <div class="cursor__label" id="cursorLabel"></div>
+</div>
+
+<!-- ─── Page Intro Overlay ───────────────────────────────── -->
+<div class="page-intro" id="pageIntro" aria-hidden="true">
+  <span class="page-intro__logo">iCAUR</span>
+</div>
+
+<!-- ─── Navigation ───────────────────────────────────────── -->
+<nav class="nav" id="nav" role="navigation" aria-label="Main">
+  <div class="nav__inner">
+    <a href="/" class="nav__logo" aria-label="iCAUR home">
+      <svg width="113" height="22" viewBox="0 0 15338 2974" fill="none" aria-hidden="true">
+        <path d="M0 29.3487V1372.87C0 1384.28 13.4613 1392.43 23.5573 1385.91L1445.41 534.798C1499.25 502.189 1532.9 445.122 1532.9 383.164V29.3487C1532.9 13.0439 1519.44 0 1502.62 0H30.2879C13.4613 0 0 13.0439 0 29.3487Z" fill="currentColor"/>
+        <path d="M1502.62 1486.99H30.2879C13.4613 1486.99 0 1500.03 0 1516.34V2943.01C0 2959.32 13.4613 2972.36 30.2879 2972.36H1164.4C1368.01 2972.36 1532.9 2812.57 1532.9 2615.28V1516.34C1532.9 1500.03 1519.44 1486.99 1502.62 1486.99Z" fill="currentColor"/>
+        <path d="M14036.8 2088.65L14698 1692.44C14807.5 1627.22 14873 1513.09 14873 1389.17V357.076C14871.4 159.788 14706.5 0 14502.9 0H12576.2C12439.9 0 12305.3 37.5012 12189.2 105.981L11258.7 663.606L11048.4 789.153C11034.9 797.305 11041.6 816.87 11056.8 816.87H13420.9V1297.86L13108 1485.37H10735.4V357.076C10735.4 159.788 10570.5 0 10366.9 0H8463.82C8327.53 0 8192.91 37.5012 8076.81 105.981L4657.61 2153.87H3429.27V816.87H5509.04C5645.34 816.87 5779.95 779.37 5896.05 710.893L6237.64 505.45L7035.24 27.7182C7048.69 19.5658 7041.94 1.16621e-05 7026.8 1.16621e-05H2263.18C2059.58 1.16621e-05 1894.68 159.788 1894.68 357.076V2615.3C1894.68 2812.58 2059.58 2972.37 2263.18 2972.37H4977.32C5113.61 2972.37 5248.23 2934.87 5364.33 2866.39L6303.26 2303.87H8436.88C8573.18 2303.87 8707.79 2266.37 8823.9 2197.89L9200.79 1971.26V2913.67C9200.79 2946.28 9227.73 2974 9263.06 2974H9409.43C9545.73 2974 9680.34 2936.5 9796.45 2868.02L10735.4 2305.5H12241.4L13180.3 2868.02C13296.4 2938.13 13431 2974 13567.3 2974H15322.3C15337.5 2974 15344.2 2954.44 15330.8 2946.28L14036.8 2088.65ZM9202.48 1485.37H7669.6L9202.48 567.406V1485.37Z" fill="currentColor"/>
+      </svg>
+    </a>
+
+    <ul class="nav__links" role="list">
+      <li><a href="/about"    class="nav__link">About</a></li>
+      <li><a href="/models"   class="nav__link">Models</a></li>
+      <li><a href="/services" class="nav__link">Services</a></li>
+      <li><a href="/news"     class="nav__link">News</a></li>
+      <li><a href="/contact"  class="nav__link">Contact Us</a></li>
+    </ul>
+
+    <div class="nav__actions">
+      <a href="/reserve" class="btn btn--reserve btn--sm nav-btn-reserve">Reserve</a>
+      <button class="nav__compare" id="compareToggle" aria-label="Compare models">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M11 2l3 3-3 3M14 5H5M5 14l-3-3 3-3M2 11h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="nav__compare-label">Compare</span>
+        <span class="nav__compare-count" id="compareCount" data-count="0">0</span>
+      </button>
+    </div>
+
+    <button class="nav__hamburger" id="navHamburger" aria-expanded="false" aria-label="Toggle menu">
+      <span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ─── Compare Drawer ───────────────────────────────────── -->
+<div class="cmp-drawer" id="cmpDrawer" aria-hidden="true">
+  <div class="cmp-drawer__backdrop" id="cmpBackdrop"></div>
+  <div class="cmp-drawer__panel">
+    <header class="cmp-drawer__header">
+      <h3>Compare iCAUR Models</h3>
+      <button class="cmp-drawer__close" id="cmpClose" aria-label="Close">✕</button>
+    </header>
+    <div class="cmp-drawer__body" id="cmpBody">
+      <div class="cmp-empty">
+        <button class="cmp-add-btn" id="cmpAddBtn">
+          <span class="cmp-add-btn__icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v14M4 11h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <span>Add Model</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Compare Model Selector Modal ─────────────────────── -->
+<div class="cmp-modal" id="cmpModal" aria-hidden="true">
+  <div class="cmp-modal__backdrop" id="cmpModalBackdrop"></div>
+  <div class="cmp-modal__panel">
+    <header class="cmp-modal__header">
+      <div class="cmp-modal__header-top">
+        <h4>Select Models &amp; Trims</h4>
+        <button class="cmp-modal__close" id="cmpModalClose" aria-label="Close">✕</button>
+      </div>
+      <p>Choose up to 5 trims to compare. <span class="cmp-modal__count">Selected: <em id="cmpModalSelCount">0</em> / 5</span></p>
+    </header>
+    <div class="cmp-modal__grid">
+
+      <!-- V27 -->
+      <div class="cmp-model-col">
+        <div class="cmp-mfc">
+          <img src="assets/images/v27-model-in-homepge-01.png" alt="iCAUR V27" class="cmp-mfc__img cmp-mfc__img--default">
+          <img src="assets/images/v27-model-in-homepge-02.png" alt="iCAUR V27" class="cmp-mfc__img cmp-mfc__img--hover">
+          <img src="assets/images/V27-logo.svg" alt="" class="cmp-mfc__logo" aria-hidden="true">
+          <div class="cmp-mfc__bottom">
+            <span class="cmp-mfc__name">Bold. <em>Capable.</em></span>
+            <div class="cmp-mfc__specs"><span>450 km</span><span>380 hp</span><span>4.8s</span></div>
+          </div>
+        </div>
+        <div class="cmp-trims">
+          <label class="cmp-trim">
+            <input type="checkbox" data-model="v27" data-trim="Standard Range" data-label="V27 Standard Range">
+            <span class="cmp-trim__box"></span>
+            <span class="cmp-trim__name">Standard Range</span>
+            <span class="cmp-trim__price">From 450,000 EGP</span>
+          </label>
+          <label class="cmp-trim">
+            <input type="checkbox" data-model="v27" data-trim="Long Range" data-label="V27 Long Range">
+            <span class="cmp-trim__box"></span>
+            <span class="cmp-trim__name">Long Range</span>
+            <span class="cmp-trim__price">From 520,000 EGP</span>
+          </label>
+          <label class="cmp-trim">
+            <input type="checkbox" data-model="v27" data-trim="Performance" data-label="V27 Performance">
+            <span class="cmp-trim__box"></span>
+            <span class="cmp-trim__name">Performance</span>
+            <span class="cmp-trim__price">From 610,000 EGP</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- O3T -->
+      <div class="cmp-model-col">
+        <div class="cmp-mfc">
+          <img src="assets/images/ot3-model-in-homepage-01.png" alt="iCAUR O3T" class="cmp-mfc__img cmp-mfc__img--default">
+          <img src="assets/images/ot3-model-in-homepage-02.png" alt="iCAUR O3T" class="cmp-mfc__img cmp-mfc__img--hover">
+          <img src="assets/images/T03-logo.svg" alt="" class="cmp-mfc__logo" aria-hidden="true">
+          <div class="cmp-mfc__bottom">
+            <span class="cmp-mfc__name">Smart. <em>Sleek.</em></span>
+            <div class="cmp-mfc__specs"><span>520 km</span><span>420 hp</span><span>4.2s</span></div>
+          </div>
+        </div>
+        <div class="cmp-trims">
+          <label class="cmp-trim">
+            <input type="checkbox" data-model="o3t" data-trim="Core" data-label="O3T Core">
+            <span class="cmp-trim__box"></span>
+            <span class="cmp-trim__name">Core</span>
+            <span class="cmp-trim__price">From 480,000 EGP</span>
+          </label>
+          <label class="cmp-trim">
+            <input type="checkbox" data-model="o3t" data-trim="Plus" data-label="O3T Plus">
+            <span class="cmp-trim__box"></span>
+            <span class="cmp-trim__name">Plus</span>
+            <span class="cmp-trim__price">From 560,000 EGP</span>
+          </label>
+          <label class="cmp-trim">
+            <input type="checkbox" data-model="o3t" data-trim="Ultra" data-label="O3T Ultra">
+            <span class="cmp-trim__box"></span>
+            <span class="cmp-trim__name">Ultra</span>
+            <span class="cmp-trim__price">From 640,000 EGP</span>
+          </label>
+        </div>
+      </div>
+
+    </div><!-- /cmp-modal__grid -->
+    <footer class="cmp-modal__footer">
+      <button class="btn btn--dark btn--arrow btn--magnetic" id="cmpConfirm">Done <span class="arrow">→</span></button>
+    </footer>
+  </div>
+</div>
+
+<!-- ─── Mobile Menu ──────────────────────────────────────── -->
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <button class="mobile-menu__close" id="mobileClose" aria-label="Close">✕</button>
+  <nav class="mobile-menu__nav" aria-label="Mobile">
+    <ul role="list">
+      <li><a href="/about">About</a></li>
+      <li><a href="/models">Models</a></li>
+      <li><a href="/services">Services</a></li>
+      <li><a href="/news">News</a></li>
+      <li><a href="/contact">Contact Us</a></li>
+    </ul>
+  </nav>
+  <div class="mobile-menu__actions">
+    <a href="/reserve" class="btn btn--filled btn--lg">Reserve Your iCAUR</a>
+    <a href="/signin"  class="btn btn--outline-dark btn--lg">Sign In</a>
+  </div>
+</div>
+
+<main id="main">
+
+<!-- ═══════════════════════════════════════════════════════
+     HERO — SCROLL MASK REVEAL
+     320vh scroll driver holds the hero sticky while the
+     "BORN TO PLAY" text scales up revealing the bg image
+     through the letterforms.
+═══════════════════════════════════════════════════════ -->
+<div class="hero-scroll-driver" id="heroScrollDriver">
+<section class="hero" id="hero">
+
+  <!-- Full-screen background video -->
+  <div class="hero__bg" aria-hidden="true">
+    <video
+      class="hero__bg-img"
+      src="assets/images/icaur-homepagehero.mp4"
+      autoplay
+      loop
+      muted
+      playsinline
+      preload="auto"
+    ></video>
+  </div>
+
+  <!-- Dark overlay — dims as BORN TO PLAY scales up -->
+  <div class="hero__overlay" id="heroOverlay" aria-hidden="true"></div>
+
+  <!-- BORN TO PLAY stencil — mix-blend-mode: multiply
+       black bg × video = black (blocks)
+       white text × video = video colour (shows through)
+       Scale 15→1 on scroll: letters huge → all video visible → shrinks to letter-window frame -->
+  <div class="hero__mask-reveal" id="heroMaskReveal" aria-hidden="true">
+    <span class="hero__mask-line">BORN</span>
+    <span class="hero__mask-line">TO PLAY</span>
+  </div>
+
+  <!-- Grain texture -->
+  <div class="hero__grain" aria-hidden="true"></div>
+
+  <!-- Content — bottom left -->
+  <div class="hero__inner">
+    <div class="hero__eyebrow reveal reveal--up" data-delay="0">
+      <span class="dot-pulse" aria-hidden="true"></span>
+      <span>The Future Is Electric</span>
+    </div>
+
+    <h1 class="hero__headline" aria-label="Built for Every Road">
+      <span class="hero__line">
+        <span class="word-mask"><span class="word reveal-word" data-delay="1">Built</span></span>
+        <span class="word-mask"><span class="word reveal-word" data-delay="2">for</span></span>
+      </span>
+      <span class="hero__line">
+        <span class="word-mask"><span class="word reveal-word" data-delay="3">Every</span></span>
+        <span class="word-mask"><span class="word word--accent reveal-word" data-delay="4">Road</span></span>
+      </span>
+    </h1>
+
+    <div class="hero__footer">
+      <p class="hero__sub reveal reveal--up" data-delay="5">
+        Egypt's first next-generation EV — designed for real life,<br>engineered for every road, built to stand out.
+      </p>
+      <div class="hero__ctas reveal reveal--up" data-delay="6">
+        <a href="/models"  class="btn btn--outline-light btn--lg btn--magnetic">Discover Models</a>
+        <a href="/reserve" class="btn btn--filled        btn--lg btn--magnetic">Reserve Yours →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="scroll-hint" aria-hidden="true">
+    <div class="scroll-hint__line"></div>
+    <span>Scroll</span>
+  </div>
+
+</section>
+</div><!-- /hero-scroll-driver -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     MODELS
+═══════════════════════════════════════════════════════ -->
+<section class="section models" id="models">
+  <div class="container">
+    <header class="section-head models__head reveal reveal--up" data-stagger="parent">
+      <p class="eyebrow">iCAUR Models</p>
+      <h2 class="section-title">Not Just Cars,<br><em>Personalities On Wheels</em></h2>
+    </header>
+
+    <!-- Featured models — side by side -->
+    <div class="models-grid models-grid--feature">
+
+      <!-- V27 -->
+      <article class="mfc reveal reveal--up" data-delay="0">
+        <a href="/models/v27" class="mfc__inner" data-cursor-label="Explore">
+          <span class="mfc__glow" aria-hidden="true"></span>
+          <img src="assets/images/v27-model-in-homepge-01.png" alt="" class="mfc__img mfc__img--default" loading="lazy">
+          <img src="assets/images/V27-logo.svg" alt="iCAUR V27" class="mfc__logo">
+          <img src="assets/images/v27-model-in-homepge-02.png" alt="iCAUR V27" class="mfc__img mfc__img--hover" loading="lazy">
+          <div class="mfc__bottom">
+            <h3 class="mfc__name">Bold. <span class="mfc__hl">Capable.</span></h3>
+            <div class="mfc__specs">
+              <span>450 km</span><span>380 hp</span><span>4.8s 0–100</span>
+            </div>
+          </div>
+        </a>
+      </article>
+
+      <!-- O3T -->
+      <article class="mfc reveal reveal--up" data-delay="1">
+        <a href="/models" class="mfc__inner" data-cursor-label="Explore">
+          <span class="mfc__glow" aria-hidden="true"></span>
+          <img src="assets/images/ot3-model-in-homepage-01.png" alt="" class="mfc__img mfc__img--default" loading="lazy">
+          <img src="assets/images/T03-logo.svg" alt="iCAUR O3T" class="mfc__logo">
+          <img src="assets/images/ot3-model-in-homepage-02.png" alt="iCAUR O3T" class="mfc__img mfc__img--hover" loading="lazy">
+          <div class="mfc__bottom">
+            <h3 class="mfc__name">Smart. <span class="mfc__hl">Sleek.</span></h3>
+            <div class="mfc__specs">
+              <span>520 km</span><span>420 hp</span><span>4.2s 0–100</span>
+            </div>
+          </div>
+        </a>
+      </article>
+
+    </div><!-- /models-grid -->
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     OVERVIEW
+═══════════════════════════════════════════════════════ -->
+<div class="overview-scroll-driver" id="overviewScrollDriver">
+<section class="overview" id="overview">
+
+  <!-- Background video — scrubbed by scroll, scales up to fill viewport -->
+  <div class="overview__bg" aria-hidden="true">
+    <div class="overview__bg-inner" id="overviewBgInner">
+      <video
+        class="overview__video"
+        src="assets/images/abouticaurhomepage.mp4"
+        muted
+        playsinline
+        preload="auto"
+      ></video>
+      <!-- Dark overlay for text contrast -->
+      <div class="overview__overlay" aria-hidden="true"></div>
+      <!-- Grain texture -->
+      <span class="overview__grain" aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <!-- Headline — top left, bounce-in -->
+  <div class="overview__heading">
+    <h2 class="overview__title">About iCAUR</h2>
+  </div>
+
+  <!-- Scroll-synced paragraphs — bottom left -->
+  <div class="overview__copy">
+    <div class="ov-step" data-step="0">
+      <div class="ov-mask">
+        <p class="overview__body">Designed for the young and the young-at-heart, iCAUR is about freedom, individuality, and everyday adventures — built for people who refuse to stand still.</p>
+      </div>
+    </div>
+    <div class="ov-step" data-step="1">
+      <div class="ov-mask">
+        <p class="overview__body">Every detail is engineered around the way real life moves — from the cabin to the curves — turning every journey into something more personal, more dynamic, and more memorable.</p>
+      </div>
+    </div>
+    <div class="ov-step" data-step="2">
+      <div class="ov-mask">
+        <p class="overview__body">The result feels effortless, confident, and unmistakably yours: a ride built around you, ready for wherever the road — or the moment — takes you next.</p>
+      </div>
+      <a href="/about" class="link-arrow link-arrow--light ov-cta">Know More <span class="arrow">→</span></a>
+    </div>
+  </div>
+
+  <!-- Brand insight stats — bottom right, count up when the video fills the viewport -->
+  <div class="overview__stats" id="overviewStats">
+    <div class="ov-stat">
+      <span class="ov-stat__num"><span class="ov-stat__prefix">+</span><span class="ov-stat__value" data-count="10">0</span></span>
+      <span class="ov-stat__label">Years in the Market</span>
+    </div>
+    <div class="ov-stat">
+      <span class="ov-stat__num"><span class="ov-stat__prefix">+</span><span class="ov-stat__value" data-count="7">0</span></span>
+      <span class="ov-stat__label">Global Markets</span>
+    </div>
+    <div class="ov-stat">
+      <span class="ov-stat__num"><span class="ov-stat__prefix">+</span><span class="ov-stat__value" data-count="10">0</span><span class="ov-stat__suffix">K</span></span>
+      <span class="ov-stat__label">Vehicles Annually</span>
+    </div>
+  </div>
+
+</section>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     DIFFERENTIATORS
+═══════════════════════════════════════════════════════ -->
+<div class="diff-scroll-driver" id="diffScrollDriver">
+<section class="section diff" id="services">
+
+  <!-- Curved divider echoing the section above -->
+  <div class="diff__curve" aria-hidden="true">
+    <svg viewBox="0 0 1440 140" preserveAspectRatio="none"><path d="M0,100 C360,0 1080,0 1440,100 L1440,140 L0,140 Z"/></svg>
+  </div>
+
+  <!-- Ambient drifting light glows -->
+  <div class="diff__glow diff__glow--1" aria-hidden="true"></div>
+  <div class="diff__glow diff__glow--2" aria-hidden="true"></div>
+  <div class="diff__glow diff__glow--3" aria-hidden="true"></div>
+
+  <!-- Carousel stage — the headline panel and each service card sweep in
+       from the right, pass through center with a 3D perspective, and
+       exit to the left as you scroll -->
+  <div class="diff__viewport">
+  <div class="diff__stage" id="diffStage">
+    <div class="diff__panel diff__panel--intro" id="diffIntro">
+      <div class="diff__intro-content">
+        <p class="eyebrow" style="justify-content:center">iCAUR Services</p>
+        <h2 class="diff__headline">We've Got You <em>Covered</em></h2>
+        <p class="diff__sub">From warranty to maintenance, we handle everything so you can focus on driving.</p>
+      </div>
+    </div>
+
+    <div class="diff-card diff-card--media diff__panel">
+      <div class="diff-card__media" aria-hidden="true"></div>
+      <div class="diff-card__body">
+        <h4>Warranty</h4>
+        <p>Comprehensive coverage that protects your vehicle and gives you complete peace of mind — so you can focus on the drive.</p>
+      </div>
+    </div>
+
+    <div class="diff-card diff-card--media diff__panel">
+      <div class="diff-card__media" aria-hidden="true"></div>
+      <div class="diff-card__body">
+        <h4>Service Center</h4>
+        <p>Expert care from certified technicians, ensuring your iCAUR stays at peak performance every day.</p>
+      </div>
+    </div>
+
+    <div class="diff-card diff-card--media diff__panel">
+      <div class="diff-card__media" aria-hidden="true"></div>
+      <div class="diff-card__body">
+        <h4>Insurance Programs</h4>
+        <p>Flexible insurance solutions built around your lifestyle, offering simple, reliable protection wherever you go.</p>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- Fixed CTA — centered within the section, doesn't sweep with cards -->
+  <a href="/services" class="diff__cta btn btn--amber btn--arrow btn--magnetic">Explore Services <span class="arrow">→</span></a>
+
+</section>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SERVICES — DARK
+═══════════════════════════════════════════════════════ -->
+<section class="section services" id="why-icaur">
+  <div class="services__split">
+    <div class="services__img-col reveal reveal--clip-h" aria-hidden="true">
+      <div class="services__img-inner" id="whyImgInner"></div>
+    </div>
+    <div class="services__content-col">
+      <p class="eyebrow eyebrow--warm reveal reveal--up">Why iCAUR</p>
+      <h2 class="section-title section-title--light reveal reveal--up" data-delay="1">What makes iCAUR<br><em>different</em></h2>
+      <div class="svc-list">
+        <div class="svc-item reveal reveal--up" data-delay="2">
+          <span class="svc-item__n">01</span>
+          <div><h5>Power Without Limits</h5><p>Instant torque, seamless acceleration, and EV performance that redefines what's possible on every road.</p></div>
+        </div>
+        <div class="svc-item reveal reveal--up" data-delay="3">
+          <span class="svc-item__n">02</span>
+          <div><h5>Built for Egypt Roads</h5><p>Engineered for local conditions, from city streets to desert highways.</p></div>
+        </div>
+        <div class="svc-item reveal reveal--up" data-delay="4">
+          <span class="svc-item__n">03</span>
+          <div><h5>Smart Tech Inside</h5><p>Connected cabin, OTA updates, and AI-driven features that get smarter over time.</p></div>
+        </div>
+        <div class="svc-item reveal reveal--up" data-delay="5">
+          <span class="svc-item__n">04</span>
+          <div><h5>Designed to Stand Out</h5><p>Bold proportions and expressive design — a presence that turns heads.</p></div>
+        </div>
+      </div>
+      <a href="/models" class="btn btn--outline-light btn--arrow btn--magnetic reveal reveal--up" data-delay="6">Explore Models <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     INNOVATION
+═══════════════════════════════════════════════════════ -->
+<section class="section innovation" id="innovation">
+  <div class="container">
+    <header class="section-head reveal reveal--up" data-stagger="parent">
+      <p class="eyebrow">Our Innovation</p>
+      <h2 class="section-title">Not Just What We Build.<br>It's <em>How We Think.</em></h2>
+    </header>
+
+    <div class="innov__grid">
+      <div class="innov-card" data-cursor-label="Learn more">
+        <div class="innov-card__bg" style="background-image:url('assets/images/innov-sustainability.jpg')"></div>
+        <div class="innov-card__overlay"></div>
+        <div class="innov-card__tag"><span>Sustainability</span></div>
+        <div class="innov-card__body">
+          <h4>Zero Compromise<br>on the Environment</h4>
+          <p>Built with sustainability in mind — from materials to manufacturing.</p>
+        </div>
+      </div>
+      <div class="innov-card" data-cursor-label="Learn more">
+        <div class="innov-card__bg" style="background-image:url('assets/images/innov-technology.jpg')"></div>
+        <div class="innov-card__overlay"></div>
+        <div class="innov-card__tag"><span>Technology</span></div>
+        <div class="innov-card__body">
+          <h4>Powered by<br>the Future</h4>
+          <p>Cutting-edge battery, OTA updates, and AI-driven systems that evolve with you.</p>
+        </div>
+      </div>
+      <div class="innov-card" data-cursor-label="Learn more">
+        <div class="innov-card__bg" style="background-image:url('assets/images/innov-design.jpg')"></div>
+        <div class="innov-card__overlay"></div>
+        <div class="innov-card__tag"><span>Design</span></div>
+        <div class="innov-card__body">
+          <h4>Form Meets<br>Function</h4>
+          <p>Every curve is intentional. Design as capable as it is beautiful.</p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="innov__footer reveal reveal--up" data-delay="4">
+      <a href="/innovation" class="btn btn--dark btn--arrow btn--magnetic">View More <span class="arrow">→</span></a>
+    </footer>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     NEWS
+═══════════════════════════════════════════════════════ -->
+<section class="section news" id="news">
+  <div class="container">
+    <header class="news__head">
+      <div class="reveal reveal--up" data-stagger="parent">
+        <p class="eyebrow">Media Center</p>
+        <h2 class="section-title">What's Happening Now</h2>
+      </div>
+      <a href="/news" class="btn btn--outline btn--sm news__all reveal reveal--up" data-delay="2">View Media Center</a>
+    </header>
+
+    <div class="news__grid">
+      <article class="news-card reveal reveal--up" data-delay="1">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type">News</span>
+            <div class="news-card__date-loc">
+              <time datetime="2026-05-28">May 28, 2026</time>
+            </div>
+          </div>
+          <h4>iCAUR V27 Studio Design Revealed</h4>
+        </div>
+        <a href="/news/v27-design" class="news-card__img" data-cursor-label="Read">
+          <img src="assets/images/news-1.jpg" alt="iCAUR V27 Studio Design Revealed" loading="lazy">
+        </a>
+        <div class="news-card__body">
+          <p>A first look at the design philosophy behind Egypt's most anticipated EV.</p>
+          <footer>
+            <a href="/news/v27-design" class="btn btn--dark btn--sm btn--arrow">Read <span class="arrow">→</span></a>
+          </footer>
+        </div>
+      </article>
+
+      <article class="news-card reveal reveal--up" data-delay="2">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type news-card__type--blog">Blog</span>
+            <div class="news-card__date-loc">
+              <time datetime="2026-05-20">May 20, 2026</time>
+            </div>
+          </div>
+          <h4>Electric Wiring Matrix Optimized for Egypt</h4>
+        </div>
+        <a href="/news/wiring-matrix" class="news-card__img" data-cursor-label="Read">
+          <img src="assets/images/news-2.jpg" alt="Electric Wiring Matrix Optimized for Egypt" loading="lazy">
+        </a>
+        <div class="news-card__body">
+          <p>How engineers rebuilt the EV powertrain for Egypt's unique climate and roads.</p>
+          <footer>
+            <a href="/news/wiring-matrix" class="btn btn--dark btn--sm btn--arrow">Read <span class="arrow">→</span></a>
+          </footer>
+        </div>
+      </article>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     FAQ
+═══════════════════════════════════════════════════════ -->
+<section class="section faq" id="faq">
+  <div class="container">
+    <div class="faq__layout">
+      <aside class="faq__left reveal reveal--up" data-stagger="parent">
+        <p class="eyebrow">Got Questions?</p>
+        <h2 class="section-title">FAQs</h2>
+        <p class="faq__hint">Everything you need to know about iCAUR — from reservations and charging to ownership and beyond.</p>
+        <a href="/faq" class="btn btn--dark btn--arrow btn--magnetic">View All FAQs <span class="arrow">→</span></a>
+      </aside>
+
+      <div class="faq__list reveal reveal--up" data-delay="1">
+        <div class="faq-item">
+          <button class="faq-item__q" aria-expanded="false">
+            <span>How do I reserve my iCAUR?</span><span class="faq-item__plus" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-item__a"><div><p>Click the Reserve button, choose your model and tier, provide your details, and submit a refundable deposit. Our team confirms within 24 hours.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-item__q" aria-expanded="false">
+            <span>How long does it take to charge iCAUR?</span><span class="faq-item__plus" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-item__a"><div><p>With fast charging, 20% to 80% in ~45 minutes. A full overnight home charge takes 6–8 hours — wake up to a full battery every day.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-item__q" aria-expanded="false">
+            <span>How do I buy iCAUR?</span><span class="faq-item__plus" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-item__a"><div><p>Start online or visit a showroom. Advisors guide you through model selection, configuration, and all financing options.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-item__q" aria-expanded="false">
+            <span>Can I schedule a test drive?</span><span class="faq-item__plus" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-item__a"><div><p>Yes — test drives are available at all iCAUR experience centers. Book online or call our team for a convenient time.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-item__q" aria-expanded="false">
+            <span>What warranty comes with iCAUR?</span><span class="faq-item__plus" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-item__a"><div><p>Every iCAUR includes a 5-year/150,000km vehicle warranty, 8-year battery warranty, and 3 years of complimentary scheduled maintenance.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     CTA SPLIT
+═══════════════════════════════════════════════════════ -->
+<section class="cta-split" id="cta">
+  <div class="cta-split__panel cta-split__panel--dark reveal reveal--clip-h" data-delay="0">
+    <div class="cta-split__bg" style="background-image:url('assets/images/cta-drive.jpg')"></div>
+    <div class="cta-split__overlay"></div>
+    <div class="cta-split__content">
+      <p class="eyebrow eyebrow--warm">Get Started</p>
+      <h2 class="cta-split__h">Ready To Drive<br>Something Different?</h2>
+      <a href="/reserve" class="btn btn--filled btn--lg btn--magnetic">Reserve Your iCAUR</a>
+    </div>
+  </div>
+  <div class="cta-split__panel cta-split__panel--light reveal reveal--clip-h" data-delay="1">
+    <div class="cta-split__content">
+      <p class="eyebrow">Need Help?</p>
+      <h2 class="cta-split__h cta-split__h--dark">Let's find your<br>perfect match.</h2>
+      <p class="cta-split__body">Our team guides you through models, features, and the buying journey — start to finish.</p>
+      <a href="/contact" class="btn btn--dark btn--arrow btn--magnetic">Contact Us <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════ -->
+<footer class="footer" id="footer">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <a href="/" class="footer__mark reveal reveal--up" data-delay="0" aria-label="iCAUR">iCAUR</a>
+      <div class="footer__models reveal reveal--up" data-delay="1">
+        <a href="/models/v27">V27</a>
+        <a href="/models/v23">V23</a>
+      </div>
+    </div>
+
+    <div class="footer__cols">
+      <div class="footer__col reveal reveal--up" data-delay="1">
+        <h6>Models</h6>
+        <ul><li><a href="/models/v27">iCAUR V27</a></li><li><a href="/models/v23">iCAUR V23</a></li><li><a href="/models">Compare Models</a></li><li><a href="/reserve">Reserve Now</a></li></ul>
+      </div>
+      <div class="footer__col reveal reveal--up" data-delay="2">
+        <h6>Company</h6>
+        <ul><li><a href="/about">About iCAUR</a></li><li><a href="/innovation">Innovation</a></li><li><a href="/careers">Careers</a></li><li><a href="/press">Press</a></li></ul>
+      </div>
+      <div class="footer__col reveal reveal--up" data-delay="3">
+        <h6>Support</h6>
+        <ul><li><a href="/services">Services</a></li><li><a href="/contact">Contact Us</a></li><li><a href="/faq">FAQ</a></li><li><a href="/locations">Find a Location</a></li></ul>
+      </div>
+      <div class="footer__col footer__col--nl reveal reveal--up" data-delay="4">
+        <h6>Join Our Newsletter</h6>
+        <p>Be first to know about launches, news, and events.</p>
+        <form class="nl-form" action="#" method="post" novalidate>
+          <input type="email" name="email" placeholder="Your email" required aria-label="Email address">
+          <button type="submit" aria-label="Subscribe">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <div class="footer__social" aria-label="Social media">
+        <a href="#" aria-label="Instagram" class="social-link">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="15" height="15" rx="4.5" stroke="currentColor" stroke-width="1.4"/><circle cx="10" cy="10" r="3.2" stroke="currentColor" stroke-width="1.4"/><circle cx="14.2" cy="5.8" r="0.9" fill="currentColor"/></svg>
+        </a>
+        <a href="#" aria-label="Facebook" class="social-link">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15 2H5C3.3 2 2 3.3 2 5V15C2 16.7 3.3 18 5 18H10.5V12.5H8.5V10H10.5V8.5C10.5 6.6 11.6 5.5 13.3 5.5C14.1 5.5 15 5.6 15 5.6V7.6H14C13 7.6 12.8 8.1 12.8 8.8V10H15L14.7 12.5H12.8V18H15C16.7 18 18 16.7 18 15V5C18 3.3 16.7 2 15 2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#" aria-label="X / Twitter" class="social-link">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </a>
+        <a href="#" aria-label="YouTube" class="social-link">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="4.5" width="16" height="11" rx="3" stroke="currentColor" stroke-width="1.4"/><path d="M8.5 8L13 10L8.5 12V8Z" fill="currentColor"/></svg>
+        </a>
+      </div>
+      <p class="footer__legal">© 2026 iCAUR. All rights reserved. &nbsp;·&nbsp; <a href="/privacy">Privacy</a> &nbsp;·&nbsp; <a href="/terms">Terms</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>

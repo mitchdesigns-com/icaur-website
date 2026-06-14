@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="iCAUR V27 — Bold. Capable. Unstoppable. 450km range, 380hp, 4.8s 0-100. Egypt's most capable electric SUV.">
+  <title>V27 — iCAUR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body class="is-loading dark-hero-page">
+
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+    <feBlend in="SourceGraphic" in2="grey" mode="multiply"/>
+  </filter>
+</svg>
+
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__dot" id="cursorDot"></div>
+  <div class="cursor__ring" id="cursorRing"></div>
+  <div class="cursor__label" id="cursorLabel"></div>
+</div>
+<div class="page-intro" id="pageIntro" aria-hidden="true"><span class="page-intro__logo">iCAUR</span></div>
+
+<nav class="nav" id="nav" role="navigation" aria-label="Main">
+  <div class="nav__inner">
+    <a href="/" class="nav__logo" aria-label="iCAUR home"><svg width="113" height="22" viewBox="0 0 15338 2974" fill="none" aria-hidden="true"><path d="M0 29.3487V1372.87C0 1384.28 13.4613 1392.43 23.5573 1385.91L1445.41 534.798C1499.25 502.189 1532.9 445.122 1532.9 383.164V29.3487C1532.9 13.0439 1519.44 0 1502.62 0H30.2879C13.4613 0 0 13.0439 0 29.3487Z" fill="currentColor"/><path d="M1502.62 1486.99H30.2879C13.4613 1486.99 0 1500.03 0 1516.34V2943.01C0 2959.32 13.4613 2972.36 30.2879 2972.36H1164.4C1368.01 2972.36 1532.9 2812.57 1532.9 2615.28V1516.34C1532.9 1500.03 1519.44 1486.99 1502.62 1486.99Z" fill="currentColor"/><path d="M14036.8 2088.65L14698 1692.44C14807.5 1627.22 14873 1513.09 14873 1389.17V357.076C14871.4 159.788 14706.5 0 14502.9 0H12576.2C12439.9 0 12305.3 37.5012 12189.2 105.981L11258.7 663.606L11048.4 789.153C11034.9 797.305 11041.6 816.87 11056.8 816.87H13420.9V1297.86L13108 1485.37H10735.4V357.076C10735.4 159.788 10570.5 0 10366.9 0H8463.82C8327.53 0 8192.91 37.5012 8076.81 105.981L4657.61 2153.87H3429.27V816.87H5509.04C5645.34 816.87 5779.95 779.37 5896.05 710.893L6237.64 505.45L7035.24 27.7182C7048.69 19.5658 7041.94 1.16621e-05 7026.8 1.16621e-05H2263.18C2059.58 1.16621e-05 1894.68 159.788 1894.68 357.076V2615.3C1894.68 2812.58 2059.58 2972.37 2263.18 2972.37H4977.32C5113.61 2972.37 5248.23 2934.87 5364.33 2866.39L6303.26 2303.87H8436.88C8573.18 2303.87 8707.79 2266.37 8823.9 2197.89L9200.79 1971.26V2913.67C9200.79 2946.28 9227.73 2974 9263.06 2974H9409.43C9545.73 2974 9680.34 2936.5 9796.45 2868.02L10735.4 2305.5H12241.4L13180.3 2868.02C13296.4 2938.13 13431 2974 13567.3 2974H15322.3C15337.5 2974 15344.2 2954.44 15330.8 2946.28L14036.8 2088.65ZM9202.48 1485.37H7669.6L9202.48 567.406V1485.37Z" fill="currentColor"/></svg></a>
+    <ul class="nav__links" role="list">
+      <li><a href="/about"    class="nav__link">About</a></li>
+      <li><a href="/models"   class="nav__link" aria-current="page">Models</a></li>
+      <li><a href="/services" class="nav__link">Services</a></li>
+      <li><a href="/news"     class="nav__link">News</a></li>
+      <li><a href="/contact"  class="nav__link">Contact Us</a></li>
+    </ul>
+    <div class="nav__actions">
+      <a href="/reserve" class="btn btn--reserve btn--sm">Reserve</a>
+      <a href="/signin"  class="nav__signin">Sign In</a>
+    </div>
+    <button class="nav__hamburger" id="navHamburger" aria-expanded="false" aria-label="Toggle menu"><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <button class="mobile-menu__close" id="mobileClose" aria-label="Close">✕</button>
+  <nav class="mobile-menu__nav" aria-label="Mobile"><ul role="list">
+    <li><a href="/about">About</a></li><li><a href="/models">Models</a></li>
+    <li><a href="/services">Services</a></li><li><a href="/news">News</a></li>
+    <li><a href="/contact">Contact Us</a></li>
+  </ul></nav>
+  <div class="mobile-menu__actions">
+    <a href="/reserve" class="btn btn--filled btn--lg">Reserve Your iCAUR</a>
+    <a href="/signin"  class="btn btn--outline-dark btn--lg">Sign In</a>
+  </div>
+</div>
+
+<main id="main">
+
+<!-- ═══════ HERO ═══════ -->
+<section class="page-hero page-hero--dark" id="hero" style="min-height:100vh">
+  <div class="page-hero__bg" style="background-image:url('../../assets/images/v27-hero.jpg')"></div>
+  <div class="page-hero__overlay"></div>
+  <div class="page-hero__inner" style="position:relative;z-index:2;justify-content:flex-end;flex:1;display:flex;flex-direction:column">
+    <nav class="breadcrumb reveal reveal--up" data-delay="0" aria-label="Breadcrumb">
+      <a href="/">Home</a><span>›</span><a href="/models">Models</a><span>›</span><span aria-current="page">V27</span>
+    </nav>
+    <p class="eyebrow eyebrow--warm reveal reveal--up" data-delay="1">iCAUR V27</p>
+    <h1 class="page-hero__h reveal reveal--up" data-delay="2">Bold.<br>Capable.<br>Unstoppable.</h1>
+    <div class="page-hero__ctas reveal reveal--up" data-delay="3">
+      <a href="/reserve" class="btn btn--filled btn--lg btn--magnetic">Reserve V27</a>
+      <a href="#specs"   class="btn btn--outline-light btn--lg btn--magnetic">See Specs →</a>
+    </div>
+  </div>
+  <!-- Stats bar -->
+  <div class="hero-stats" role="list" aria-label="Key specifications">
+    <div class="hero-stat" role="listitem">
+      <span class="hero-stat__val"><span class="spec__n" data-count="450">450</span><sup>km</sup></span>
+      <span class="hero-stat__label">Range</span>
+    </div>
+    <div class="hero-stat" role="listitem">
+      <span class="hero-stat__val"><span class="spec__n" data-count="4.8" data-float>4.8</span><sup>s</sup></span>
+      <span class="hero-stat__label">0–100 km/h</span>
+    </div>
+    <div class="hero-stat" role="listitem">
+      <span class="hero-stat__val"><span class="spec__n" data-count="380">380</span><sup>hp</sup></span>
+      <span class="hero-stat__label">Peak Power</span>
+    </div>
+    <div class="hero-stat" role="listitem">
+      <span class="hero-stat__val"><span class="spec__n" data-count="220">220</span><sup>km/h</sup></span>
+      <span class="hero-stat__label">Top Speed</span>
+    </div>
+    <div class="hero-stat" role="listitem">
+      <span class="hero-stat__val"><span class="spec__n" data-count="95">95</span><sup>kWh</sup></span>
+      <span class="hero-stat__label">Battery</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ RANGE STRIP ═══════ -->
+<section class="range-strip" id="range" aria-label="Range highlight">
+  <div class="container" style="text-align:center">
+    <div class="range-strip__val reveal reveal--up">
+      <span class="spec__n" data-count="450">450</span>
+      <sup>km</sup>
+    </div>
+    <p class="range-strip__label">Real-World Range on a Single Charge</p>
+  </div>
+</section>
+
+<!-- ═══════ EXTERIOR GALLERY ═══════ -->
+<section class="section model-detail-gallery" id="exterior">
+  <div class="container">
+    <header class="section-head reveal reveal--up">
+      <p class="eyebrow">Exterior</p>
+      <h2 class="section-title">Made to Be Seen</h2>
+    </header>
+    <div class="gallery-grid reveal reveal--up" data-delay="1">
+      <div class="gallery-item gallery-item--main" data-cursor-label="View">
+        <img src="../../assets/images/v27-ext-main.jpg" alt="iCAUR V27 front three-quarter view" loading="lazy" width="800" height="1000">
+        <span class="gallery-item__label">Front Profile</span>
+      </div>
+      <div class="gallery-item" data-cursor-label="View">
+        <img src="../../assets/images/v27-ext-rear.jpg" alt="iCAUR V27 rear view" loading="lazy" width="600" height="400">
+        <span class="gallery-item__label">Rear Design</span>
+      </div>
+      <div class="gallery-item" data-cursor-label="View">
+        <img src="../../assets/images/v27-ext-side.jpg" alt="iCAUR V27 side profile" loading="lazy" width="600" height="380">
+        <span class="gallery-item__label">Side Profile</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ INTERIOR ═══════ -->
+<section class="model-interior" id="interior">
+  <div class="model-interior__inner">
+    <div class="model-interior__img reveal reveal--clip-h" data-delay="0">
+      <img src="../../assets/images/v27-interior.jpg" alt="iCAUR V27 interior — digital cockpit" loading="lazy" width="800" height="600">
+    </div>
+    <div class="model-interior__content reveal reveal--up" data-delay="1">
+      <p class="eyebrow eyebrow--warm">Interior</p>
+      <h2>A Cockpit Built<br>for You</h2>
+      <p>The V27's interior is a driver-centric sanctuary — a 15.6" curved display, ambient lighting across 64 colours, sustainable materials, and enough space to take the whole family into the wild.</p>
+      <ul style="display:flex;flex-direction:column;gap:8px;margin:var(--sp-12) 0">
+        <li style="display:flex;gap:8px;align-items:center;font-size:14px;color:rgba(255,255,255,.55)"><span style="color:var(--brown-light);font-weight:700">→</span> 15.6" Curved AMOLED Display</li>
+        <li style="display:flex;gap:8px;align-items:center;font-size:14px;color:rgba(255,255,255,.55)"><span style="color:var(--brown-light);font-weight:700">→</span> 64-Colour Ambient Lighting</li>
+        <li style="display:flex;gap:8px;align-items:center;font-size:14px;color:rgba(255,255,255,.55)"><span style="color:var(--brown-light);font-weight:700">→</span> Vegan Leather + Recycled Materials</li>
+        <li style="display:flex;gap:8px;align-items:center;font-size:14px;color:rgba(255,255,255,.55)"><span style="color:var(--brown-light);font-weight:700">→</span> 7-Seat Configurable Layout</li>
+      </ul>
+      <a href="/reserve" class="btn btn--filled btn--lg btn--magnetic" style="align-self:flex-start">Reserve Now →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ TECHNOLOGY ═══════ -->
+<section class="section model-tech" id="technology">
+  <div class="container">
+    <header class="section-head reveal reveal--up">
+      <p class="eyebrow">Technology</p>
+      <h2 class="section-title">Intelligence<br><em>You Can Feel</em></h2>
+    </header>
+    <div class="tech-grid">
+      <div class="tech-card reveal reveal--up" data-delay="0">
+        <div class="tech-card__icon" aria-hidden="true"><svg fill="none" viewBox="0 0 48 48"><rect x="6" y="10" width="36" height="26" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M16 22h4m4 0h8M24 18v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h4>AI Co-Pilot</h4>
+        <p>Advanced driver assistance, predictive routing, and an AI cabin assistant that learns your preferences over time.</p>
+      </div>
+      <div class="tech-card reveal reveal--up" data-delay="1">
+        <div class="tech-card__icon" aria-hidden="true"><svg fill="none" viewBox="0 0 48 48"><path d="M24 6l4.5 12H42l-11 8 4.5 12L24 30l-11.5 8 4.5-12L6 18h13.5L24 6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <h4>OTA Updates</h4>
+        <p>Your V27 gets smarter automatically. New features, performance improvements, and security updates delivered overnight.</p>
+      </div>
+      <div class="tech-card reveal reveal--up" data-delay="2">
+        <div class="tech-card__icon" aria-hidden="true"><svg fill="none" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" stroke="currentColor" stroke-width="1.8"/><path d="M24 12v12l7 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h4>Thermal Management</h4>
+        <p>Purpose-built for Egypt's climate. Advanced battery cooling maintains peak performance in temperatures exceeding 45°C.</p>
+      </div>
+      <div class="tech-card reveal reveal--up" data-delay="0">
+        <div class="tech-card__icon" aria-hidden="true"><svg fill="none" viewBox="0 0 48 48"><path d="M8 30l8-8 8 8 8-10 8 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="6" y="8" width="36" height="30" rx="3" stroke="currentColor" stroke-width="1.8"/></svg></div>
+        <h4>Connected Cabin</h4>
+        <p>5G connectivity, Spotify and Apple Music integration, and seamless smartphone mirroring for iOS and Android.</p>
+      </div>
+      <div class="tech-card reveal reveal--up" data-delay="1">
+        <div class="tech-card__icon" aria-hidden="true"><svg fill="none" viewBox="0 0 48 48"><path d="M30 14H18a4 4 0 0 0-4 4v14a4 4 0 0 0 4 4h12a4 4 0 0 0 4-4V18a4 4 0 0 0-4-4z" stroke="currentColor" stroke-width="1.8"/><path d="M12 22h24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="24" cy="30" r="2" fill="currentColor"/></svg></div>
+        <h4>360° Surround Camera</h4>
+        <p>High-definition cameras with real-time stitching for zero-blind-spot parking and off-road terrain awareness.</p>
+      </div>
+      <div class="tech-card reveal reveal--up" data-delay="2">
+        <div class="tech-card__icon" aria-hidden="true"><svg fill="none" viewBox="0 0 48 48"><path d="M24 6C14.06 6 6 14.06 6 24s8.06 18 18 18 18-8.06 18-18S33.94 6 24 6z" stroke="currentColor" stroke-width="1.8"/><path d="M24 14v10l6 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h4>Smart Charging</h4>
+        <p>Automatic scheduling charges your V27 during off-peak hours, optimizing for both cost and battery longevity.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ SPECS ═══════ -->
+<section class="section compare-section" id="specs">
+  <div class="container">
+    <header class="section-head reveal reveal--up">
+      <p class="eyebrow">Full Specifications</p>
+      <h2 class="section-title">V27 Specs</h2>
+    </header>
+    <table class="compare-table reveal reveal--up" data-delay="1" role="table" aria-label="V27 specifications">
+      <thead><tr><th>Specification</th><th>V27</th></tr></thead>
+      <tbody>
+        <tr><td>Range (WLTP)</td><td>450 km</td></tr>
+        <tr><td>Battery Capacity</td><td>95 kWh</td></tr>
+        <tr><td>Peak Power</td><td>380 hp (283 kW)</td></tr>
+        <tr><td>Peak Torque</td><td>640 Nm</td></tr>
+        <tr><td>0–100 km/h</td><td>4.8 seconds</td></tr>
+        <tr><td>Top Speed</td><td>220 km/h</td></tr>
+        <tr><td>Drive System</td><td>Dual Motor AWD</td></tr>
+        <tr><td>DC Fast Charging</td><td>150 kW (10–80% in ~38 min)</td></tr>
+        <tr><td>AC Home Charging</td><td>11 kW (full charge ~9 hrs)</td></tr>
+        <tr><td>Ground Clearance</td><td>215 mm</td></tr>
+        <tr><td>Towing Capacity</td><td>3,500 kg</td></tr>
+        <tr><td>Seating</td><td>5 + 2 (7-seat)</td></tr>
+        <tr><td>Cargo Volume</td><td>850 L (rear) + 120 L (frunk)</td></tr>
+        <tr><td>Wheelbase</td><td>2,960 mm</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════ CTA ═══════ -->
+<section class="cta-split" id="cta">
+  <div class="cta-split__panel cta-split__panel--dark reveal reveal--clip-h" data-delay="0">
+    <div class="cta-split__bg" style="background-image:url('../../assets/images/v27-cta.jpg')"></div>
+    <div class="cta-split__overlay"></div>
+    <div class="cta-split__content">
+      <p class="eyebrow eyebrow--warm">iCAUR V27</p>
+      <h2 class="cta-split__h">Your V27<br>Awaits.</h2>
+      <a href="/reserve" class="btn btn--filled btn--lg btn--magnetic">Reserve Now — From 1.8M EGP</a>
+    </div>
+  </div>
+  <div class="cta-split__panel cta-split__panel--light reveal reveal--clip-h" data-delay="1">
+    <div class="cta-split__content">
+      <p class="eyebrow">Compare Models</p>
+      <h2 class="cta-split__h cta-split__h--dark">Not sure which<br>iCAUR is right?</h2>
+      <p class="cta-split__body">See how the V27 stacks up against the V23 — range, power, and personality.</p>
+      <a href="/models" class="btn btn--outline-dark btn--lg btn--magnetic">Compare Models →</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer" role="contentinfo">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <a href="/" class="footer__mark" aria-label="iCAUR home">iCAUR</a>
+      <div class="footer__models"><a href="/models/v27">V27</a><a href="/models/v23">V23</a></div>
+    </div>
+    <div class="footer__cols">
+      <div class="footer__col"><h6>Models</h6><ul><li><a href="/models/v27">iCAUR V27</a></li><li><a href="/models/v23">iCAUR V23</a></li><li><a href="/models">Compare Models</a></li><li><a href="/reserve">Reserve Now</a></li></ul></div>
+      <div class="footer__col"><h6>Company</h6><ul><li><a href="/about">About iCAUR</a></li><li><a href="/about#innovation">Innovation</a></li><li><a href="/about#careers">Careers</a></li><li><a href="/news">Press</a></li></ul></div>
+      <div class="footer__col"><h6>Support</h6><ul><li><a href="/services">Services</a></li><li><a href="/contact">Contact Us</a></li><li><a href="/#faq">FAQ</a></li><li><a href="/contact#locations">Find a Location</a></li></ul></div>
+      <div class="footer__col footer__col--nl">
+        <h6>Join Our Newsletter</h6><p>Be first to know about launches, news, and exclusive events.</p>
+        <form class="nl-form newsletter-form" aria-label="Newsletter signup">
+          <input type="email" placeholder="Your email address" aria-label="Email" required>
+          <button type="submit" aria-label="Subscribe"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </form>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <div class="footer__social" aria-label="Social media">
+        <a href="#" class="social-link" aria-label="Instagram"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.7"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+        <a href="#" class="social-link" aria-label="X"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M4 4l16 16M4 20L20 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></a>
+        <a href="#" class="social-link" aria-label="YouTube"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" stroke-width="1.7"/><path d="M10 9l5 3-5 3V9z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></a>
+      </div>
+      <p class="footer__legal">© 2026 iCAUR. All rights reserved. &nbsp;·&nbsp; <a href="/privacy">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms">Terms of Use</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="../../js/main.js"></script>
+</body>
+</html>
