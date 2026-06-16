@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="How iCAUR's thermal management system was purpose-built to maintain peak performance in 45°C+ summer heat.">
+  <title>Built for Egypt's Heat: Our Battery Story — iCAUR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
+    data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
+    data-endpoint="https://bugger-worker.mitchdesigns.workers.dev/functions/v1/ingest-feedback"
+    data-position="bottom-right" data-button-text="Feedback" data-accent="#4f46e5" async></script>
+</head>
+<body class="is-loading">
+
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+    <feBlend in="SourceGraphic" in2="grey" mode="multiply"/>
+  </filter>
+</svg>
+
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__dot" id="cursorDot"></div>
+  <div class="cursor__ring" id="cursorRing"></div>
+  <div class="cursor__label" id="cursorLabel"></div>
+</div>
+<div class="page-intro" id="pageIntro" aria-hidden="true"><span class="page-intro__logo">iCAUR</span></div>
+
+<div id="site-header"></div>
+
+<main id="main">
+
+<!-- ═══════ POST HERO ═══════ -->
+<section class="post-hero">
+  <div class="post-hero__inner">
+    <nav class="breadcrumb reveal reveal--up" data-delay="0" aria-label="Breadcrumb">
+      <a href="/">Home</a><span>›</span><a href="/news">Media Center</a><span>›</span><span aria-current="page">Article</span>
+    </nav>
+    <h1 class="post-hero__h reveal reveal--up" data-delay="1">Built for Egypt's Heat:<br>Our Battery Story</h1>
+    <div class="post-meta reveal reveal--up" data-delay="2">
+      <span class="post-meta__tag">Blog</span>
+      <span class="post-meta__dot">·</span>
+      <span>5 min read</span>
+      <span class="post-meta__dot">·</span>
+      <time datetime="2026-03-10">10 Mar 2026</time>
+      <div class="post-share" aria-label="Share article">
+        <a href="#" aria-label="Copy link"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></a>
+        <a href="#" aria-label="Share on LinkedIn"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg></a>
+        <a href="#" aria-label="Share on X"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ COVER IMAGE ═══════ -->
+<div class="post-cover reveal reveal--up">
+  <img src="/assets/images/v27/interior-01.jpg" alt="iCAUR battery system" loading="eager">
+</div>
+
+<!-- ═══════ ARTICLE BODY ═══════ -->
+<article class="post-body reveal reveal--up">
+
+  <h2>1. The Problem We Set Out to Solve</h2>
+  <p>When iCAUR's engineers began developing the V27's battery system, they faced a constraint that most EV platforms are never tested against: sustained operation in an environment that regularly exceeds 45°C ambient temperature — with interior cabin temperatures that can climb above 70°C when parked in direct sun.</p>
+  <p>Standard lithium-ion battery packs degrade significantly under these conditions. The chemistry slows, efficiency drops, and if thermal management fails even briefly, permanent capacity loss follows. Building a battery that doesn't just survive Egyptian summers but performs through them required building from a different set of assumptions.</p>
+
+  <div class="post-pullquote">
+    "We tested at 47°C ambient, loaded, on a highway. The results surprised even us."
+  </div>
+
+  <h2>2. Active Thermal Management</h2>
+  <p>The V27 uses a liquid-cooled battery management system with an independent thermal circuit that operates separately from the cabin climate system. This means cooling the battery doesn't compete with cooling the driver — both systems get what they need, independently.</p>
+  <p>The system maintains the battery pack between 20°C and 35°C under normal driving conditions, regardless of ambient temperature. When the car is parked in direct sun, a low-power standby mode keeps the pack within safe bounds using a fraction of the energy a running AC system would consume.</p>
+
+  <div class="post-img">
+    <img src="/assets/images/v27/car-side.jpg" alt="iCAUR V27 exterior" loading="lazy">
+  </div>
+
+  <h2>3. The 500 km Claim</h2>
+  <p>iCAUR's stated range of 500 km is measured under Egyptian driving conditions — not the WLTP European standard, which underestimates real-world range loss in extreme heat. The 500 km figure was achieved in a sustained test at 42°C ambient, motorway speeds of 120 km/h, with full AC active.</p>
+  <p>In typical urban Cairo conditions — stop-and-go, with frequent regenerative braking — real-world range increases beyond 500 km, as the efficiency of electric motors in slow traffic significantly outperforms combustion equivalents.</p>
+
+  <h2>4. Longevity by Design</h2>
+  <p>Battery degradation is the long-term concern that most EV buyers think about but few manufacturers address directly. iCAUR's thermal management system is designed to maintain battery capacity above 85% for 200,000 km of Egyptian driving — a figure derived from three years of accelerated aging tests conducted locally.</p>
+  <p>The software layer plays an equally important role. The BMS (Battery Management System) limits charging to 80% by default for daily use, extends this to 100% only when the driver explicitly requests it for a long journey, and applies a protective buffer at the bottom 10% to prevent deep discharge under any conditions.</p>
+
+  <h2>5. The Goal Was Confidence</h2>
+  <p>Every engineering decision in the V27's battery system was made to eliminate one thing: range anxiety. Not by making the number bigger, but by making it reliable. A battery that consistently delivers its stated range, in Egypt's heat, across five years of ownership, is worth more than a theoretical maximum that degrades after the first summer.</p>
+  <p>That's the engineering philosophy behind the V27 battery story. And it's the reason we're confident in putting a real number — 500 km — on a real car, in the real Egyptian sun.</p>
+
+</article>
+
+<!-- ═══════ READ ALSO ═══════ -->
+<section class="post-read-also">
+  <div class="post-read-also__inner">
+    <h3>Read Also</h3>
+    <div class="post-read-also__grid">
+
+      <article class="news-card reveal reveal--up" data-delay="0">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type news-card__type--blog">Blog</span>
+            <div class="news-card__date-loc"><time datetime="2026-05-20">May 20, 2026</time></div>
+          </div>
+          <h4>Electric Wiring Matrix Optimized for Egypt</h4>
+        </div>
+        <a href="/news/electric-wiring" class="news-card__img" data-cursor-label="Read">
+          <img src="/assets/images/v27/car-side.jpg" alt="Electric Wiring Matrix" loading="lazy" width="400" height="250">
+        </a>
+        <div class="news-card__body">
+          <p>How iCAUR's engineers rebuilt the EV powertrain for Egypt's unique climate and roads.</p>
+          <footer><a href="/news/electric-wiring" class="btn btn--dark btn--sm btn--arrow">Read <span class="arrow">→</span></a></footer>
+        </div>
+      </article>
+
+      <article class="news-card reveal reveal--up" data-delay="1">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type news-card__type--blog">Blog</span>
+            <div class="news-card__date-loc"><time datetime="2026-04-30">Apr 30, 2026</time></div>
+          </div>
+          <h4>Inside the AI-Powered iCAUR Cabin</h4>
+        </div>
+        <a href="/news/ai-cabin" class="news-card__img" data-cursor-label="Read">
+          <img src="/assets/images/v27/interior-display.jpg" alt="AI Cabin" loading="lazy" width="400" height="250">
+        </a>
+        <div class="news-card__body">
+          <p>How iCAUR's intelligent cockpit learns your habits, predicts your needs, and makes every drive personal.</p>
+          <footer><a href="/news/ai-cabin" class="btn btn--dark btn--sm btn--arrow">Read <span class="arrow">→</span></a></footer>
+        </div>
+      </article>
+
+    </div>
+
+    <div style="text-align:center;margin-top:48px">
+      <a href="/news" class="btn btn--ghost btn--lg btn--magnetic">View All <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="/js/components.js" defer></script>
+<script src="/js/main.js" defer></script>
+<script src="/js/game.js" defer></script>
+</body>
+</html>

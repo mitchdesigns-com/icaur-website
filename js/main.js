@@ -39,16 +39,66 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 // HERO WORD REVEALS — animate words in sequence after intro
 // ============================================================
 function triggerHeroWords() {
-  $$('.reveal-word').forEach(word => {
-    const delay = parseFloat(word.dataset.delay ?? 0) * 90;
-    setTimeout(() => word.classList.add('in-view'), delay);
-  });
+  // Per-letter elastic pop + color cycle (matches landing-page SplitText)
+  const headline = $('.hero__headline');
+  if (headline && !headline.dataset.split) {
+    headline.dataset.split = '1';
+    let idx = 0;
+    $$('.hero__word', headline).forEach(word => {
+      const text = word.textContent;
+      word.textContent = '';
+      [...text].forEach(ch => {
+        const span = document.createElement('span');
+        span.className = 'lettre';
+        span.textContent = ch;
+        span.style.setProperty('--ld', (idx * 0.045).toFixed(3) + 's');
+        word.appendChild(span);
+        idx++;
+      });
+    });
+    requestAnimationFrame(() => headline.classList.add('letters-in'));
+  }
 
   // Also fire any hero .reveal elements marked data-delay <= 1
   $$('.hero .reveal').forEach(el => {
     const delay = parseFloat(el.dataset.delay ?? 0) * 90 + 400;
     setTimeout(() => el.classList.add('in-view'), delay);
   });
+}
+
+// Split a headline into per-letter spans (preserving inline accents like <em>)
+// for the elastic pop animation. Letters stay hidden until `.letters-in` is set.
+function splitHeadlineLetters(headline) {
+  if (!headline || headline.dataset.split) return;
+  headline.dataset.split = '1';
+  const counter = { i: 0 };
+  const walk = (root) => {
+    [...root.childNodes].forEach(node => {
+      if (node.nodeType === 3) {                      // text node
+        const frag = document.createDocumentFragment();
+        node.textContent.split(/(\s+)/).forEach(part => {
+          if (part === '') return;
+          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
+          const word = document.createElement('span');
+          word.className = 'split-word';
+          [...part].forEach(ch => {
+            const s = document.createElement('span');
+            s.className = 'lettre';
+            s.textContent = ch;
+            s.style.setProperty('--ld', (counter.i * 0.045).toFixed(3) + 's');
+            counter.i++;
+            word.appendChild(s);
+          });
+          frag.appendChild(word);
+        });
+        root.replaceChild(frag, node);
+      } else if (node.nodeType === 1) {               // element (e.g. <em>)
+        node.classList.add('split-word');
+        walk(node);
+      }
+    });
+  };
+  walk(headline);
 }
 
 
@@ -121,7 +171,7 @@ function triggerHeroWords() {
     $$('a, button, [role="button"], .btn, label, input, textarea, select').forEach(el => {
       el.addEventListener('mouseenter', () => {
         cursor.classList.add('is-hover');
-        if (el.matches('.btn, button, [role="button"]')) {
+        if (el.matches('.btn, button, [role="button"], .v27-cta-btn')) {
           cursor.classList.add('is-fit');
           hoverEl = el;
         }
@@ -613,10 +663,13 @@ function triggerHeroWords() {
   // Play the headline's entrance animation once, when the section
   // first scrolls into view
   if (intro) {
+    const dh = $('.diff__headline', intro);
+    splitHeadlineLetters(dh);   // pre-split so letters start hidden (no flash)
     const introObs = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           intro.classList.add('in-view');
+          if (dh) dh.classList.add('letters-in');
           introObs.disconnect();
         }
       });
@@ -1146,4 +1199,283 @@ document.addEventListener('click', e => {
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeDrawer(); } });
 
   syncCount();
+})();
+
+
+// ============================================================
+// PRE-FOOTER CTA — "lego" boxes assemble when the section is
+// centered, drift apart as you scroll away (up or down)
+// ============================================================
+(function initCtaLego() {
+  const section = $('#cta');
+  if (!section) return;
+  const left  = $('[data-lego="left"]',  section);
+  const right = $('[data-lego="right"]', section);
+  if (!left || !right) return;
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  let ticking = false;
+
+  function update() {
+    ticking = false;
+    if (window.innerWidth <= 900) {           // stacked on mobile — no spread
+      left.style.transform = right.style.transform = '';
+      return;
+    }
+    const rect = section.getBoundingClientRect();
+    const vh   = window.innerHeight;
+    const sectionCenter  = rect.top + rect.height / 2;
+    const viewportCenter = vh / 2;
+    // distance of the section's centre from the viewport centre, normalised so
+    // spread hits 1 once the section is ~0.6 of a viewport away from centred
+    const dist = Math.abs(sectionCenter - viewportCenter) / (vh * 0.6);
+    const spread = Math.max(0, Math.min(1, dist));           // 0 assembled → 1 apart
+    const sign = sectionCenter < viewportCenter ? -1 : 1;    // leaving up vs down
+
+    const x   = spread * 86;
+    const y   = sign * spread * 24;
+    const ry  = spread * 24;   // hinge open in 3D
+    const rx  = spread * 7;    // slight tumble
+    const sc  = 1 - spread * 0.05;
+
+    left.style.transform  = `translate3d(${-x}px, ${y}px, 0) rotateX(${rx}deg) rotateY(${ ry}deg) scale(${sc})`;
+    right.style.transform = `translate3d(${ x}px, ${y}px, 0) rotateX(${rx}deg) rotateY(${-ry}deg) scale(${sc})`;
+  }
+
+  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+})();
+
+
+// ============================================================
+// LANGUAGE SWITCH — Arabic toggle (sets lang + direction).
+// NOTE: text translations are not wired yet; this flips
+// document language/direction as the entry point for i18n.
+// ============================================================
+(function initLangToggle() {
+  const btn = $('#langToggle');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const toAr = document.documentElement.lang !== 'ar';
+    document.documentElement.lang = toAr ? 'ar' : 'en';
+    document.documentElement.dir  = toAr ? 'rtl' : 'ltr';
+    btn.textContent = toAr ? 'EN' : 'ع';
+    btn.setAttribute('data-tooltip', toAr ? 'English' : 'العربية');
+    btn.setAttribute('aria-label', toAr ? 'Switch to English' : 'التبديل إلى العربية');
+  });
+})();
+
+
+// ============================================================
+// VARIABLE PROXIMITY — letter weight reacts to cursor distance
+// (vanilla port of React Bits' VariableProximity, Montserrat wght axis)
+// ============================================================
+(function initVariableProximity() {
+  const heads = $$('.cta-split__h, .mission-statement__text');
+  if (!heads.length) return;
+  if (!window.matchMedia('(pointer: fine)').matches) return;
+
+  const FROM = 400, TO = 900, RADIUS = 130;
+  const letters = [];
+
+  // recurse so inline accents like <em> are preserved (keeps their colour)
+  function split(root) {
+    [...root.childNodes].forEach(node => {
+      if (node.nodeName === 'BR') { root.replaceChild(document.createElement('br'), node); return; }
+      if (node.nodeType === 1) { split(node); return; }       // element → recurse
+      if (node.nodeType !== 3) return;
+      const frag = document.createDocumentFragment();
+      (node.textContent || '').split(/(\s+)/).forEach(part => {
+        if (part === '') return;
+        if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
+        const word = document.createElement('span');
+        word.className = 'vp-word';
+        [...part].forEach(ch => {
+          const s = document.createElement('span');
+          s.className = 'vp-letter';
+          s.textContent = ch;
+          word.appendChild(s);
+          letters.push(s);
+        });
+        frag.appendChild(word);
+      });
+      root.replaceChild(frag, node);
+    });
+  }
+
+  heads.forEach(h => { split(h); h.classList.add('vp-on'); });
+
+  // Collect all words across tracked heads for width-locking
+  const allVpWords = [];
+  heads.forEach(h => h.querySelectorAll('.vp-word').forEach(w => allVpWords.push(w)));
+
+  let mx = -9999, my = -9999;
+  window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; }, { passive: true });
+
+  function loop() {
+    for (const l of letters) {
+      const r = l.getBoundingClientRect();
+      const d = Math.hypot(mx - (r.left + r.width / 2), my - (r.top + r.height / 2));
+      const f = d >= RADIUS ? 0 : (1 - d / RADIUS);   // linear falloff
+      l.style.fontVariationSettings = `'wght' ${Math.round(FROM + (TO - FROM) * f)}`;
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // Measure each word at max weight and lock min-width so heavier glyphs
+  // never cause text to reflow onto an extra line.
+  function startLoop() {
+    letters.forEach(l => { l.style.fontVariationSettings = `'wght' ${TO}`; });
+    requestAnimationFrame(() => {
+      allVpWords.forEach(w => { w.style.minWidth = w.getBoundingClientRect().width + 'px'; });
+      letters.forEach(l => { l.style.fontVariationSettings = `'wght' ${FROM}`; });
+      requestAnimationFrame(loop);
+    });
+  }
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(startLoop);
+  } else {
+    requestAnimationFrame(startLoop);
+  }
+})();
+
+
+// ============================================================
+// FIGURE COUNTERS — count up [data-count-to] numbers on scroll-in
+// ============================================================
+(function initFigureCounters() {
+  const nums = $$('[data-count-to]');
+  if (!nums.length) return;
+
+  function countUp(el) {
+    const target  = parseFloat(el.dataset.countTo) || 0;
+    const suffix  = el.dataset.suffix || '';
+    const dur = 1800, start = performance.now();
+    function frame(now) {
+      const t = Math.min((now - start) / dur, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(target * eased) + suffix;
+      if (t < 1) requestAnimationFrame(frame);
+      else el.textContent = target + suffix;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !e.target.dataset.counted) {
+        e.target.dataset.counted = '1';
+        countUp(e.target);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  nums.forEach(n => io.observe(n));
+})();
+
+
+// ============================================================
+// OUR MISSION — scroll-driven 3D carousel (mirrors the services
+// section) + floating parallax images around the statement
+// ============================================================
+(function initMissionScroll() {
+  const driver  = $('#missionDriver');
+  const section = $('#missionSection');
+  const stage   = $('#missionStage', section || document);
+  if (!driver || !section || !stage) return;
+
+  const cards = $$('.diff__panel', stage);
+  const intro = $('#missionIntro', stage);
+  const MOBILE = 760;
+
+  if (intro) {
+    const dh = $('.diff__headline', intro);
+    splitHeadlineLetters(dh);
+    const io = new IntersectionObserver((es) => {
+      es.forEach(e => { if (e.isIntersecting) { intro.classList.add('in-view'); if (dh) dh.classList.add('letters-in'); io.disconnect(); } });
+    }, { threshold: 0.2 });
+    io.observe(intro);
+  }
+
+  const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+
+  function progress() {
+    const rect = driver.getBoundingClientRect();
+    const scrollable = Math.max(driver.offsetHeight - window.innerHeight, 1);
+    return clamp(-rect.top / scrollable, 0, 1);
+  }
+
+  function tick() {
+    if (window.innerWidth <= MOBILE) {
+      cards.forEach(c => { c.style.transform = ''; c.style.opacity = ''; c.style.zIndex = ''; });
+      return;
+    }
+    const p = progress();
+    const vi = p * (cards.length - 1);
+    const spacing = Math.max(stage.getBoundingClientRect().width * 0.62, 240);
+    cards.forEach((card, i) => {
+      const offset = i - vi, abs = Math.abs(offset);
+      const scale = Math.max(1 - abs * 0.18, 0.62);
+      card.style.transform = `translateX(${offset * spacing}px) translateZ(${-abs * 160}px) rotateY(${-offset * 28}deg) scale(${scale})`;
+      // intro fully fades out before the statement fades in (no overlap)
+      const op = i === 0 ? clamp((0.55 - p) / 0.30, 0, 1) : clamp((p - 0.45) / 0.30, 0, 1);
+      card.style.opacity = op.toString();
+      card.style.zIndex = Math.round(100 - abs * 10).toString();
+    });
+  }
+
+  tick();
+  window.addEventListener('scroll', tick, { passive: true });
+  window.addEventListener('resize', tick);
+
+  // ── Floating images: scale OUT from the statement, parallax drift; curve reveal
+  const floats = $$('.mission-float', section);
+  const curve  = $('.diff__curve', section);
+  const desktop = window.matchMedia('(pointer: fine)').matches;
+  let homes = [];
+
+  function measure() {
+    const sr = section.getBoundingClientRect();
+    const scx = sr.left + sr.width / 2, scy = sr.top + sr.height / 2;
+    homes = floats.map(f => {
+      f.style.transform = '';
+      const r = f.getBoundingClientRect();
+      return { dx: (r.left + r.width / 2) - scx, dy: (r.top + r.height / 2) - scy };
+    });
+  }
+  measure();
+  window.addEventListener('resize', measure);
+
+  let mx = 0, my = 0, cx = 0, cy = 0;
+  if (desktop) window.addEventListener('mousemove', e => {
+    mx = e.clientX / window.innerWidth - 0.5; my = e.clientY / window.innerHeight - 0.5;
+  }, { passive: true });
+
+  (function loop() {
+    const p = progress();
+    const r = clamp((p - 0.5) / 0.32, 0, 1);   // scatter-out reveal (after statement starts)
+    cx += (mx - cx) * 0.06; cy += (my - cy) * 0.06;
+    if (window.innerWidth > MOBILE) {
+      floats.forEach((f, i) => {
+        const h = homes[i] || { dx: 0, dy: 0 };
+        const d = parseFloat(f.dataset.depth) || 0.05;
+        const tx = -h.dx * (1 - r) + cx * d * 800;
+        const ty = -h.dy * (1 - r) + cy * d * 800;
+        f.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${r.toFixed(3)})`;
+        f.style.opacity = r.toFixed(3);
+      });
+    }
+    if (curve) {
+      const sTop = section.getBoundingClientRect().top;
+      const cr = clamp((window.innerHeight - sTop) / (window.innerHeight - 100), 0, 1);
+      curve.style.opacity = cr.toFixed(3);
+      curve.style.transform = `translateY(${((1 - cr) * 30).toFixed(1)}px)`;
+    }
+    requestAnimationFrame(loop);
+  })();
 })();

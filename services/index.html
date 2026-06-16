@@ -3,12 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="iCAUR Services — Complete ownership experience. Warranty, maintenance, charging, and 24/7 support.">
+  <meta name="description" content="iCAUR Services — Maintenance, warranty, service centers, and 24/7 support.">
   <title>Services — iCAUR</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script
+  src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
+  data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
+  data-endpoint="https://bugger-worker.mitchdesigns.workers.dev/functions/v1/ingest-feedback"
+  data-position="bottom-right"
+  data-button-text="Feedback"
+  data-accent="#4f46e5"
+  async></script>
 </head>
 <body class="is-loading dark-hero-page">
 
@@ -27,238 +36,227 @@
 </div>
 <div class="page-intro" id="pageIntro" aria-hidden="true"><span class="page-intro__logo">iCAUR</span></div>
 
-<nav class="nav" id="nav" role="navigation" aria-label="Main">
-  <div class="nav__inner">
-    <a href="/" class="nav__logo" aria-label="iCAUR home"><svg width="113" height="22" viewBox="0 0 15338 2974" fill="none" aria-hidden="true"><path d="M0 29.3487V1372.87C0 1384.28 13.4613 1392.43 23.5573 1385.91L1445.41 534.798C1499.25 502.189 1532.9 445.122 1532.9 383.164V29.3487C1532.9 13.0439 1519.44 0 1502.62 0H30.2879C13.4613 0 0 13.0439 0 29.3487Z" fill="currentColor"/><path d="M1502.62 1486.99H30.2879C13.4613 1486.99 0 1500.03 0 1516.34V2943.01C0 2959.32 13.4613 2972.36 30.2879 2972.36H1164.4C1368.01 2972.36 1532.9 2812.57 1532.9 2615.28V1516.34C1532.9 1500.03 1519.44 1486.99 1502.62 1486.99Z" fill="currentColor"/><path d="M14036.8 2088.65L14698 1692.44C14807.5 1627.22 14873 1513.09 14873 1389.17V357.076C14871.4 159.788 14706.5 0 14502.9 0H12576.2C12439.9 0 12305.3 37.5012 12189.2 105.981L11258.7 663.606L11048.4 789.153C11034.9 797.305 11041.6 816.87 11056.8 816.87H13420.9V1297.86L13108 1485.37H10735.4V357.076C10735.4 159.788 10570.5 0 10366.9 0H8463.82C8327.53 0 8192.91 37.5012 8076.81 105.981L4657.61 2153.87H3429.27V816.87H5509.04C5645.34 816.87 5779.95 779.37 5896.05 710.893L6237.64 505.45L7035.24 27.7182C7048.69 19.5658 7041.94 1.16621e-05 7026.8 1.16621e-05H2263.18C2059.58 1.16621e-05 1894.68 159.788 1894.68 357.076V2615.3C1894.68 2812.58 2059.58 2972.37 2263.18 2972.37H4977.32C5113.61 2972.37 5248.23 2934.87 5364.33 2866.39L6303.26 2303.87H8436.88C8573.18 2303.87 8707.79 2266.37 8823.9 2197.89L9200.79 1971.26V2913.67C9200.79 2946.28 9227.73 2974 9263.06 2974H9409.43C9545.73 2974 9680.34 2936.5 9796.45 2868.02L10735.4 2305.5H12241.4L13180.3 2868.02C13296.4 2938.13 13431 2974 13567.3 2974H15322.3C15337.5 2974 15344.2 2954.44 15330.8 2946.28L14036.8 2088.65ZM9202.48 1485.37H7669.6L9202.48 567.406V1485.37Z" fill="currentColor"/></svg></a>
-    <ul class="nav__links" role="list">
-      <li><a href="/about"    class="nav__link">About</a></li>
-      <li><a href="/models"   class="nav__link">Models</a></li>
-      <li><a href="/services" class="nav__link" aria-current="page">Services</a></li>
-      <li><a href="/news"     class="nav__link">News</a></li>
-      <li><a href="/contact"  class="nav__link">Contact Us</a></li>
-    </ul>
-    <div class="nav__actions">
-      <a href="/reserve" class="btn btn--reserve btn--sm">Reserve</a>
-      <a href="/signin"  class="nav__signin">Sign In</a>
-    </div>
-    <button class="nav__hamburger" id="navHamburger" aria-expanded="false" aria-label="Toggle menu"><span></span><span></span></button>
-  </div>
-</nav>
-
-<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-  <button class="mobile-menu__close" id="mobileClose" aria-label="Close">✕</button>
-  <nav class="mobile-menu__nav" aria-label="Mobile"><ul role="list">
-    <li><a href="/about">About</a></li><li><a href="/models">Models</a></li>
-    <li><a href="/services">Services</a></li><li><a href="/news">News</a></li>
-    <li><a href="/contact">Contact Us</a></li>
-  </ul></nav>
-  <div class="mobile-menu__actions">
-    <a href="/reserve" class="btn btn--filled btn--lg">Reserve Your iCAUR</a>
-    <a href="/signin"  class="btn btn--outline-dark btn--lg">Sign In</a>
-  </div>
-</div>
+<div id="site-header"></div>
 
 <main id="main">
 
-<!-- ═══════ HERO ═══════ -->
-<section class="page-hero page-hero--dark" id="hero">
-  <div class="page-hero__bg" style="background-image:url('../assets/images/services-hero.jpg')"></div>
-  <div class="page-hero__overlay"></div>
-  <div class="page-hero__inner" style="position:relative;z-index:2">
-    <nav class="breadcrumb reveal reveal--up" data-delay="0" aria-label="Breadcrumb">
-      <a href="/">Home</a><span>›</span><span aria-current="page">Services</span>
-    </nav>
-    <p class="eyebrow eyebrow--warm reveal reveal--up" data-delay="1">Complete Ownership</p>
-    <h1 class="page-hero__h reveal reveal--up" data-delay="2">We've Got You<br>Covered.</h1>
-    <p class="page-hero__sub reveal reveal--up" data-delay="3">From day one delivery to 10 years down the road. iCAUR ownership is designed to be completely effortless.</p>
-  </div>
-</section>
+<!-- ══════════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════════ -->
+<section class="svc-hero" id="hero">
+  <div class="svc-hero__bg"></div>
+  <div class="svc-hero__grain" aria-hidden="true"></div>
+  <div class="svc-hero__gradient" aria-hidden="true"></div>
 
-<!-- ═══════ SERVICES GRID ═══════ -->
-<section class="section services-full" id="services">
-  <div class="container">
-    <header class="section-head reveal reveal--up">
-      <p class="eyebrow">What's Included</p>
-      <h2 class="section-title">Every Service,<br><em>Every Time</em></h2>
-    </header>
-    <div class="services-grid-full">
-      <div class="service-card-full reveal reveal--up" data-delay="0">
-        <div class="service-card-full__icon" aria-hidden="true"><svg fill="none" viewBox="0 0 44 44"><path d="M22 4l3.09 8.26L34 14l-7 5.74L29 28l-7-4.5L15 28l2-8.26L10 14l8.91-1.74L22 4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
-        <h4>Warranty Coverage</h4>
-        <p>5-year comprehensive warranty on all major components. Our confidence in every iCAUR is absolute.</p>
+  <div class="svc-hero__inner">
+    <p class="eyebrow eyebrow--warm reveal reveal--up" data-delay="0">Services</p>
+    <h1 class="svc-hero__h reveal reveal--up" data-delay="1">We've Got<br>You <em>Covered</em></h1>
+
+    <!-- Folder download widget — centered below headline -->
+    <div class="svc-hero__folder reveal reveal--up" data-delay="2">
+      <div class="folder-host" data-color="#F37021">
+        <div class="folder-scale" style="transform:scale(2.2);transform-origin:top center">
+          <div class="folder">
+            <div class="folder__back">
+              <div class="paper paper-1">
+                <div class="folder-paper-doc" style="background:#E8510A">
+                  <span class="folder-paper-doc__model">V27</span>
+                  <span class="folder-paper-doc__type">Maintenance<br>Schedule</span>
+                </div>
+              </div>
+              <div class="paper paper-2">
+                <div class="folder-paper-doc" style="background:#C94208">
+                  <span class="folder-paper-doc__model">O3T</span>
+                  <span class="folder-paper-doc__type">Maintenance<br>Schedule</span>
+                </div>
+              </div>
+              <div class="folder__front"></div>
+              <div class="folder__front folder__front--r"></div>
+            </div>
+          </div>
+        </div>
+        <div class="folder-label">
+          Download Maintenance Schedule
+        </div>
       </div>
-      <div class="service-card-full reveal reveal--up" data-delay="1">
-        <div class="service-card-full__icon" aria-hidden="true"><svg fill="none" viewBox="0 0 44 44"><path d="M22 38c8.8 0 16-7.2 16-16S30.8 6 22 6 6 13.2 6 22s7.2 16 16 16z" stroke="currentColor" stroke-width="1.8"/><path d="M22 16v6l4 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-        <h4>Scheduled Maintenance</h4>
-        <p>Free scheduled check-ups and service at no cost. Your iCAUR stays in peak condition, always.</p>
-      </div>
-      <div class="service-card-full reveal reveal--up" data-delay="2">
-        <div class="service-card-full__icon" aria-hidden="true"><svg fill="none" viewBox="0 0 44 44"><rect x="8" y="18" width="28" height="14" rx="2" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 18v-4a8 8 0 0 1 16 0v4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="22" cy="25" r="2" fill="currentColor"/></svg></div>
-        <h4>Home Charging Setup</h4>
-        <p>We install your dedicated home charger, ready from day one. Professional installation included.</p>
-      </div>
-      <div class="service-card-full reveal reveal--up" data-delay="0">
-        <div class="service-card-full__icon" aria-hidden="true"><svg fill="none" viewBox="0 0 44 44"><path d="M22 8a14 14 0 1 0 0 28A14 14 0 0 0 22 8z" stroke="currentColor" stroke-width="1.8"/><path d="M22 14v8l5 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <h4>24/7 Roadside Support</h4>
-        <p>Wherever you are in Egypt, whenever you need it. Emergency assistance is always one call away.</p>
-      </div>
-      <div class="service-card-full reveal reveal--up" data-delay="1">
-        <div class="service-card-full__icon" aria-hidden="true"><svg fill="none" viewBox="0 0 44 44"><rect x="6" y="10" width="32" height="22" rx="3" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 36h16M22 32v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 20h4m4 0h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-        <h4>OTA Software Updates</h4>
-        <p>Your iCAUR gets smarter over time. Automatic over-the-air updates delivered while you sleep.</p>
-      </div>
-      <div class="service-card-full reveal reveal--up" data-delay="2">
-        <div class="service-card-full__icon" aria-hidden="true"><svg fill="none" viewBox="0 0 44 44"><path d="M6 22c0 8.8 7.2 16 16 16s16-7.2 16-16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M14 22l8-8 8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 14v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-        <h4>Battery Health Program</h4>
-        <p>Annual battery diagnostics, health reports, and proactive maintenance to ensure maximum range and longevity.</p>
-      </div>
+
     </div>
   </div>
 </section>
 
-<!-- ═══════ PROCESS ═══════ -->
-<section class="section process" id="how-it-works">
-  <div class="container">
-    <header class="section-head reveal reveal--up">
-      <p class="eyebrow" style="color:var(--brown-light)">How It Works</p>
-      <h2 class="section-title section-title--light">Effortless From<br>Day One</h2>
-    </header>
-    <div class="steps reveal reveal--up" data-delay="1">
-      <div class="step">
-        <p class="step__n">Step 01</p>
-        <h4>Reserve</h4>
-        <p>Secure your iCAUR with a fully refundable deposit. A dedicated specialist is assigned to you immediately.</p>
-      </div>
-      <div class="step">
-        <p class="step__n">Step 02</p>
-        <h4>Configure</h4>
-        <p>Work with your specialist to finalize your model, colours, and options. No pressure — take your time.</p>
-      </div>
-      <div class="step">
-        <p class="step__n">Step 03</p>
-        <h4>Home Setup</h4>
-        <p>We schedule your home charger installation before delivery day — so everything is ready when your car arrives.</p>
-      </div>
-      <div class="step">
-        <p class="step__n">Step 04</p>
-        <h4>Drive</h4>
-        <p>Your iCAUR is delivered to your door, fully charged, with a personal walkthrough from your specialist.</p>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- ═══════ CHARGING ═══════ -->
-<section class="section charging" id="charging">
-  <div class="container">
-    <div class="charging__inner">
-      <div class="reveal reveal--up">
-        <p class="eyebrow">iCAUR Charging Network</p>
-        <h2 class="section-title" style="margin-bottom:var(--sp-8)">Charge Anywhere<br>in <em>Egypt</em></h2>
-        <p class="body-text" style="margin-bottom:var(--sp-6)">Our rapidly expanding charging network covers Egypt's major cities, highways, and travel corridors — so range anxiety is never part of the iCAUR experience.</p>
-        <p class="body-text" style="margin-bottom:var(--sp-16)">Plus, your iCAUR can charge at any standard EV charger nationwide.</p>
-        <div class="charging__stats">
-          <div class="charging__stat"><strong class="spec__n" data-count="120">120</strong><span>Charging Stations</span></div>
-          <div class="charging__stat"><strong class="spec__n" data-count="8">8</strong><span>Major Cities</span></div>
-          <div class="charging__stat"><strong class="spec__n" data-count="30">30</strong><span>Min to 80% Charge</span></div>
-          <div class="charging__stat"><strong class="spec__n" data-count="200">200</strong><span>kW Peak DC Speed</span></div>
-        </div>
-      </div>
-      <div class="charging__map reveal reveal--clip-h" data-delay="1">
-        <img src="../assets/images/charging-map.jpg" alt="iCAUR charging network map — Egypt" loading="lazy" width="700" height="394">
-      </div>
-    </div>
-  </div>
-</section>
+<!-- ══════════════════════════════════════════════════
+     BOOK MAINTENANCE
+══════════════════════════════════════════════════ -->
+<section class="svc-book" id="book">
+  <div class="svc-book__bg" aria-hidden="true"></div>
 
-<!-- ═══════ FAQ ═══════ -->
-<section class="section faq" id="faq">
-  <div class="container">
-    <div class="faq__layout">
-      <div class="faq__left">
-        <p class="eyebrow">Service FAQs</p>
-        <h2 class="section-title">Common<br>Questions</h2>
-        <p class="faq__hint">Can't find your answer? Our service team is standing by.</p>
-        <a href="/contact" class="btn btn--dark btn--magnetic">Contact Support →</a>
-      </div>
-      <div class="faq__list">
-        <div class="faq-item">
-          <button class="faq-item__q" aria-expanded="false">What does the warranty cover?<span class="faq-item__plus" aria-hidden="true">+</span></button>
-          <div class="faq-item__a"><div><p>The 5-year warranty covers all drivetrain components, battery, electronics, and structural elements. Regular wear items (tyres, brake pads) are excluded but we offer maintenance packages to cover these.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-item__q" aria-expanded="false">How do I schedule a service appointment?<span class="faq-item__plus" aria-hidden="true">+</span></button>
-          <div class="faq-item__a"><div><p>Through the iCAUR app, by calling your nearest service centre, or via your dedicated specialist. Most routine services can be completed at your home or office with our mobile service team.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-item__q" aria-expanded="false">What's included in the free maintenance plan?<span class="faq-item__plus" aria-hidden="true">+</span></button>
-          <div class="faq-item__a"><div><p>Annual inspections, software updates, battery health diagnostics, brake fluid top-ups, cabin air filter replacements, and all consumable replacements needed for safety systems.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-item__q" aria-expanded="false">Can I get roadside assistance outside Cairo?<span class="faq-item__plus" aria-hidden="true">+</span></button>
-          <div class="faq-item__a"><div><p>Yes — 24/7 roadside assistance covers all of Egypt. Remote areas may have a longer response time, but our network of partners ensures you're never truly stuck.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-item__q" aria-expanded="false">How long does charging take?<span class="faq-item__plus" aria-hidden="true">+</span></button>
-          <div class="faq-item__a"><div><p>With a 200kW DC fast charger, you can get from 10% to 80% in approximately 30 minutes. Standard home charging (11kW AC) fully charges the battery overnight in 8–10 hours.</p></div></div>
+  <div class="svc-book__inner">
+    <!-- parallax wrapper — JS sets translateY here -->
+    <div id="svcBookCard">
+      <!-- clip zone: all layers + card slide in from left inside this box -->
+      <div class="svc-book__panel-wrap">
+        <div class="svc-book__rl svc-book__rl--1" aria-hidden="true"></div>
+        <div class="svc-book__rl svc-book__rl--2" aria-hidden="true"></div>
+        <div class="svc-book__card">
+          <p class="eyebrow svc-book__eyebrow">Book Maintenance</p>
+          <h2 class="svc-book__h">Schedule In<br>Seconds</h2>
+          <p class="svc-book__body">
+            Download the iCAUR app to schedule your maintenance service instantly or <a href="/contact">Contact&nbsp;Us</a>.
+          </p>
+          <div class="svc-book__badges">
+            <a href="#" class="svc-book__badge btn--magnetic" aria-label="Download on the App Store">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              <div class="svc-book__badge-text">
+                <span class="svc-book__badge-sub">Download on the</span>
+                <span class="svc-book__badge-name">App Store</span>
+              </div>
+            </a>
+            <a href="#" class="svc-book__badge btn--magnetic" aria-label="Get it on Google Play">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M3.18 23.95c.37.2.79.26 1.19.18l11.11-11.11L12 9.59 3.18 23.95zm15.62-13.2L16.11 9.1l-3.08 3.08 3.08 3.07 2.71-1.65c.77-.47.77-1.38-.02-1.85zm-14.44-8.7C4.27 2.2 4 2.66 4 3.2v17.62l9.09-9.09-8.73-9.68zm8.97 8.91L7.69 5.28l9.08 5.24-3.44 3.44z"/></svg>
+              <div class="svc-book__badge-text">
+                <span class="svc-book__badge-sub">Get it on</span>
+                <span class="svc-book__badge-name">Google Play</span>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════ CTA ═══════ -->
-<section class="cta-split" id="cta">
-  <div class="cta-split__panel cta-split__panel--dark reveal reveal--clip-h" data-delay="0">
-    <div class="cta-split__bg" style="background-image:url('../assets/images/cta-service.jpg')"></div>
-    <div class="cta-split__overlay"></div>
-    <div class="cta-split__content">
-      <p class="eyebrow eyebrow--warm">Get Started</p>
-      <h2 class="cta-split__h">Ready for Effortless<br>Ownership?</h2>
-      <a href="/reserve" class="btn btn--filled btn--lg btn--magnetic">Reserve Your iCAUR</a>
+
+<!-- ══════════════════════════════════════════════════
+     FIND US — Interactive Map
+══════════════════════════════════════════════════ -->
+<section id="find-us" class="find-us">
+  <div class="find-us__grid">
+
+    <!-- Left: header + clickable list -->
+    <div class="find-us__left">
+      <div class="find-us__header" id="findUsHeader">
+        <p class="eyebrow eyebrow--warm">Find Us</p>
+        <h2 class="find-us__h">Where To<br><em>Find Us</em></h2>
+      </div>
+      <div class="find-us__list" id="findUsList"></div>
+    </div>
+
+    <!-- Right: Leaflet map -->
+    <div class="find-us-map-wrap" id="findUsMapWrap">
+      <div id="findUsMap"></div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════
+     WARRANTY — ScrollStack
+══════════════════════════════════════════════════ -->
+<div class="warranty-stack" id="warrantyDriver">
+
+  <!-- Card 1 — iCAUR Warranty (no folder, inline PDFs) -->
+  <div class="scroll-stack-card warranty-card__frame svc-enter" id="warrantyCard1">
+    <span class="warranty-card__tag">iCAUR Warranty</span>
+    <h2 class="warranty-card__h">Complete Peace<br>of Mind</h2>
+    <p class="warranty-card__body">Every iCAUR is backed by a comprehensive warranty designed to give you complete peace of mind from day one. From core components to essential systems, your vehicle is protected with coverage that reflects our commitment to quality, reliability, and long-term performance.</p>
+
+    <div class="warranty-card__downloads">
+      <p class="warranty-card__dl-label">Download Warranties</p>
+      <div class="warranty-card__dl-list warranty-card__dl-list--row">
+        <a href="#" class="warranty-dl" aria-label="Download V27 Warranty PDF">
+          <div class="warranty-dl__info">
+            <div class="warranty-dl__pdf">PDF</div>
+            <div>
+              <span class="warranty-dl__name">V27 Warranty</span>
+              <span class="warranty-dl__size">2 MB</span>
+            </div>
+          </div>
+          <svg class="warranty-dl__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
+        </a>
+        <a href="#" class="warranty-dl" aria-label="Download O3T Warranty PDF">
+          <div class="warranty-dl__info">
+            <div class="warranty-dl__pdf">PDF</div>
+            <div>
+              <span class="warranty-dl__name">O3T Warranty</span>
+              <span class="warranty-dl__size">2 MB</span>
+            </div>
+          </div>
+          <svg class="warranty-dl__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
+        </a>
+      </div>
     </div>
   </div>
-  <div class="cta-split__panel cta-split__panel--light reveal reveal--clip-h" data-delay="1">
-    <div class="cta-split__content">
-      <p class="eyebrow">Service Support</p>
-      <h2 class="cta-split__h cta-split__h--dark">Already own<br>an iCAUR?</h2>
-      <p class="cta-split__body">Book a service appointment, contact roadside support, or speak with a specialist directly.</p>
-      <a href="/contact" class="btn btn--outline-dark btn--lg btn--magnetic">Contact Service →</a>
+
+  <!-- Card 2 — Extended Coverage (no background frame) -->
+  <div class="scroll-stack-card warranty-card__frame" id="warrantyCard2">
+    <span class="warranty-card__tag">Extended Coverage</span>
+    <h2 class="warranty-card__h">Coverage Beyond<br>the Standard</h2>
+    <p class="warranty-card__body" style="max-width:680px">For even greater peace of mind, iCAUR offers flexible extended warranty and protection programs designed to keep you covered beyond the standard period. Choose the plan that fits your driving life.</p>
+
+    <div class="warranty-card__perks">
+      <div class="warranty-perk">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Extended drivetrain &amp; battery protection</span>
+      </div>
+      <div class="warranty-perk">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Priority service scheduling at all centers</span>
+      </div>
+      <div class="warranty-perk">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Complimentary loan vehicle during repairs</span>
+      </div>
+      <div class="warranty-perk">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>24/7 dedicated support hotline</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ScrollStack end marker -->
+  <div class="scroll-stack-end" id="warrantyStackEnd"></div>
+
+</div><!-- /warrantyDriver -->
+
+
+<!-- ══════════════════════════════════════════════════
+     CTA
+══════════════════════════════════════════════════ -->
+<section class="cta-split" id="cta" style="background:var(--black)">
+  <div class="cta-split__grid">
+    <div class="cta-split__panel cta-split__brick cta-split__brick--orange cta-split__panel--big" data-lego="left">
+      <div class="cta-split__knobs" aria-hidden="true"></div>
+      <div class="cta-split__content">
+        <h2 class="cta-split__h">Ready To Drive<br>Something Different?</h2>
+        <p class="cta-split__body">The V27 is waiting — let's get you behind the wheel and show you what electric really means.</p>
+        <a href="/reserve" class="btn btn--dark btn--lg btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
+      </div>
+      <div class="cta-split__studs cta-split__studs--right" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    </div>
+    <div class="cta-split__panel cta-split__brick cta-split__brick--white cta-split__panel--small" data-lego="right">
+      <div class="cta-split__knobs" aria-hidden="true"></div>
+      <div class="cta-split__studs cta-split__studs--left" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="cta-split__content">
+        <h2 class="cta-split__h">Need Help?</h2>
+        <p class="cta-split__body">Feel free to get in touch with our support team — we'll guide you start to finish.</p>
+        <a href="/contact" class="btn btn--filled btn--arrow btn--magnetic">Contact Us <span class="arrow">→</span></a>
+      </div>
     </div>
   </div>
 </section>
 
 </main>
 
-<footer class="footer" role="contentinfo">
-  <div class="footer__inner">
-    <div class="footer__top">
-      <a href="/" class="footer__mark" aria-label="iCAUR home">iCAUR</a>
-      <div class="footer__models"><a href="/models/v27">V27</a><a href="/models/v23">V23</a></div>
-    </div>
-    <div class="footer__cols">
-      <div class="footer__col"><h6>Models</h6><ul><li><a href="/models/v27">iCAUR V27</a></li><li><a href="/models/v23">iCAUR V23</a></li><li><a href="/models">Compare Models</a></li><li><a href="/reserve">Reserve Now</a></li></ul></div>
-      <div class="footer__col"><h6>Company</h6><ul><li><a href="/about">About iCAUR</a></li><li><a href="/about#innovation">Innovation</a></li><li><a href="/about#careers">Careers</a></li><li><a href="/news">Press</a></li></ul></div>
-      <div class="footer__col"><h6>Support</h6><ul><li><a href="/services">Services</a></li><li><a href="/contact">Contact Us</a></li><li><a href="/#faq">FAQ</a></li><li><a href="/contact#locations">Find a Location</a></li></ul></div>
-      <div class="footer__col footer__col--nl">
-        <h6>Join Our Newsletter</h6><p>Be first to know about launches, news, and exclusive events.</p>
-        <form class="nl-form newsletter-form" aria-label="Newsletter signup">
-          <input type="email" placeholder="Your email address" aria-label="Email" required>
-          <button type="submit" aria-label="Subscribe"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </form>
-      </div>
-    </div>
-    <div class="footer__bottom">
-      <div class="footer__social" aria-label="Social media">
-        <a href="#" class="social-link" aria-label="Instagram"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.7"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
-        <a href="#" class="social-link" aria-label="X"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M4 4l16 16M4 20L20 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></a>
-        <a href="#" class="social-link" aria-label="YouTube"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" stroke-width="1.7"/><path d="M10 9l5 3-5 3V9z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></a>
-      </div>
-      <p class="footer__legal">© 2026 iCAUR. All rights reserved. &nbsp;·&nbsp; <a href="/privacy">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms">Terms of Use</a></p>
-    </div>
-  </div>
-</footer>
+<div id="site-footer"></div>
 
-<script src="../js/main.js"></script>
+  <script src="/js/components.js" defer></script>
+  <script src="/js/main.js" defer></script>
+  <script src="/js/game.js" defer></script>
+  <script src="/js/doodles.js" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="/js/services.js" defer></script>
 </body>
 </html>

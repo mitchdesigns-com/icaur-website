@@ -7,8 +7,16 @@
   <title>About — iCAUR</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script
+  src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
+  data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
+  data-endpoint="https://bugger-worker.mitchdesigns.workers.dev/functions/v1/ingest-feedback"
+  data-position="bottom-right"
+  data-button-text="Feedback"
+  data-accent="#4f46e5"
+  async></script>
 </head>
 <body class="is-loading">
 
@@ -30,274 +38,175 @@
   <span class="page-intro__logo">iCAUR</span>
 </div>
 
-<nav class="nav" id="nav" role="navigation" aria-label="Main">
-  <div class="nav__inner">
-    <a href="/" class="nav__logo" aria-label="iCAUR home">
-      <svg width="113" height="22" viewBox="0 0 15338 2974" fill="none" aria-hidden="true">
-        <path d="M0 29.3487V1372.87C0 1384.28 13.4613 1392.43 23.5573 1385.91L1445.41 534.798C1499.25 502.189 1532.9 445.122 1532.9 383.164V29.3487C1532.9 13.0439 1519.44 0 1502.62 0H30.2879C13.4613 0 0 13.0439 0 29.3487Z" fill="currentColor"/>
-        <path d="M1502.62 1486.99H30.2879C13.4613 1486.99 0 1500.03 0 1516.34V2943.01C0 2959.32 13.4613 2972.36 30.2879 2972.36H1164.4C1368.01 2972.36 1532.9 2812.57 1532.9 2615.28V1516.34C1532.9 1500.03 1519.44 1486.99 1502.62 1486.99Z" fill="currentColor"/>
-        <path d="M14036.8 2088.65L14698 1692.44C14807.5 1627.22 14873 1513.09 14873 1389.17V357.076C14871.4 159.788 14706.5 0 14502.9 0H12576.2C12439.9 0 12305.3 37.5012 12189.2 105.981L11258.7 663.606L11048.4 789.153C11034.9 797.305 11041.6 816.87 11056.8 816.87H13420.9V1297.86L13108 1485.37H10735.4V357.076C10735.4 159.788 10570.5 0 10366.9 0H8463.82C8327.53 0 8192.91 37.5012 8076.81 105.981L4657.61 2153.87H3429.27V816.87H5509.04C5645.34 816.87 5779.95 779.37 5896.05 710.893L6237.64 505.45L7035.24 27.7182C7048.69 19.5658 7041.94 1.16621e-05 7026.8 1.16621e-05H2263.18C2059.58 1.16621e-05 1894.68 159.788 1894.68 357.076V2615.3C1894.68 2812.58 2059.58 2972.37 2263.18 2972.37H4977.32C5113.61 2972.37 5248.23 2934.87 5364.33 2866.39L6303.26 2303.87H8436.88C8573.18 2303.87 8707.79 2266.37 8823.9 2197.89L9200.79 1971.26V2913.67C9200.79 2946.28 9227.73 2974 9263.06 2974H9409.43C9545.73 2974 9680.34 2936.5 9796.45 2868.02L10735.4 2305.5H12241.4L13180.3 2868.02C13296.4 2938.13 13431 2974 13567.3 2974H15322.3C15337.5 2974 15344.2 2954.44 15330.8 2946.28L14036.8 2088.65ZM9202.48 1485.37H7669.6L9202.48 567.406V1485.37Z" fill="currentColor"/>
-      </svg>
-    </a>
-    <ul class="nav__links" role="list">
-      <li><a href="/about"    class="nav__link" aria-current="page">About</a></li>
-      <li><a href="/models"   class="nav__link">Models</a></li>
-      <li><a href="/services" class="nav__link">Services</a></li>
-      <li><a href="/news"     class="nav__link">News</a></li>
-      <li><a href="/contact"  class="nav__link">Contact Us</a></li>
-    </ul>
-    <div class="nav__actions">
-      <a href="/reserve" class="btn btn--reserve btn--sm">Reserve</a>
-      <a href="/signin"  class="nav__signin">Sign In</a>
-    </div>
-    <button class="nav__hamburger" id="navHamburger" aria-expanded="false" aria-label="Toggle menu">
-      <span></span><span></span>
-    </button>
-  </div>
-</nav>
-
-<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-  <button class="mobile-menu__close" id="mobileClose" aria-label="Close">✕</button>
-  <nav class="mobile-menu__nav" aria-label="Mobile"><ul role="list">
-    <li><a href="/about">About</a></li><li><a href="/models">Models</a></li>
-    <li><a href="/services">Services</a></li><li><a href="/news">News</a></li>
-    <li><a href="/contact">Contact Us</a></li>
-  </ul></nav>
-  <div class="mobile-menu__actions">
-    <a href="/reserve" class="btn btn--filled btn--lg">Reserve Your iCAUR</a>
-    <a href="/signin"  class="btn btn--outline-dark btn--lg">Sign In</a>
-  </div>
-</div>
+<div id="site-header"></div>
 
 <main id="main">
 
 <!-- ═══════ HERO ═══════ -->
-<section class="page-hero" id="hero">
+<section class="page-hero page-hero--image page-hero--center" id="hero">
+  <div class="page-hero__bg-img" style="background-image:url('/assets/images/about-hero.jpg')" aria-hidden="true"></div>
   <div class="page-hero__grain" aria-hidden="true"></div>
   <div class="page-hero__inner">
     <nav class="breadcrumb breadcrumb--dark reveal reveal--up" data-delay="0" aria-label="Breadcrumb">
       <a href="/">Home</a><span>›</span><span aria-current="page">About</span>
     </nav>
     <p class="eyebrow reveal reveal--up" data-delay="1">Our Story</p>
-    <h1 class="page-hero__h reveal reveal--up" data-delay="2">Egypt's EV Story<br><em>Starts Here.</em></h1>
-    <p class="page-hero__sub reveal reveal--up" data-delay="3">We didn't just build a car. We built a new relationship between Egyptians and the road — electric, intelligent, and unmistakably ours.</p>
+    <h1 class="page-hero__h reveal reveal--up" data-delay="2">A New Generation<br><em>Automotive</em></h1>
+    <p class="page-hero__sub reveal reveal--up" data-delay="3">Smarter mobility. Bolder design. Real-world freedom.</p>
   </div>
 </section>
 
-<!-- ═══════ MISSION ═══════ -->
-<section class="section about-mission" id="mission">
-  <div class="container">
-    <blockquote class="about-mission__quote reveal reveal--up">
-      "We believe the future of mobility in Egypt isn't borrowed from somewhere else — it's built right here, for our roads, our climate, and our people."
-    </blockquote>
-    <div class="about-mission__layout">
-      <div class="about-mission__img reveal reveal--clip-v" data-delay="0">
-        <img src="../assets/images/about-factory.jpg" alt="iCAUR manufacturing facility" loading="lazy" width="800" height="600">
+<!-- ═══════ PINNED SCENE — Overview ⇄ iCAUR Story ═══════ -->
+<div class="about-scene" id="aboutScene">
+  <div class="about-scene__pin">
+    <div class="container about-scene__stage">
+
+      <!-- Overview panel -->
+      <div class="scene-panel scene-panel--overview" data-panel="overview">
+        <div class="about-overview__inner">
+          <p class="eyebrow">Overview</p>
+          <h2 class="about-overview__h">The Future<br>Feels Different</h2>
+          <p class="about-overview__lead">iCAUR is a new generation automotive brand redefining intelligent mobility through bold design, advanced technology, and expressive driving experiences. Built for the young and young-at-heart, iCAUR combines rugged character, smart innovation, and lifestyle-driven thinking to create vehicles that feel as exciting as they look.</p>
+          <a href="/reserve" class="btn btn--dark btn--arrow btn--magnetic">Get Your iCAUR <span class="arrow">→</span></a>
+        </div>
       </div>
-      <div class="reveal reveal--up" data-delay="1">
-        <p class="eyebrow">Who We Are</p>
-        <h2 class="section-title" style="margin-bottom:var(--sp-12)">Born from ambition,<br><em>built on purpose.</em></h2>
-        <p class="body-text" style="margin-bottom:var(--sp-8)">iCAUR was founded by a team of Egyptian engineers, designers, and dreamers who believed our country deserved a world-class electric vehicle — one that doesn't compromise on performance, safety, or style.</p>
-        <p class="body-text" style="margin-bottom:var(--sp-12)">From the outset, we designed for Egypt first. The heat, the highways, the city traffic, the desert roads — every spec, every choice, every line of code reflects the realities of Egyptian driving.</p>
-        <a href="/models" class="btn btn--dark btn--arrow btn--magnetic">See Our Models <span class="arrow">→</span></a>
+
+      <!-- Story panel -->
+      <div class="scene-panel scene-panel--story" data-panel="story">
+        <div class="about-saga__inner">
+        <p class="eyebrow">iCAUR Story</p>
+        <div class="about-saga__steps">
+          <div class="saga-step is-active" data-step="0">
+            <p>iCAUR is a new generation automotive brand redefining intelligent mobility through bold design, advanced technology, and expressive driving experiences. Built for the young and young-at-heart, iCAUR combines rugged character, smart innovation, and lifestyle-driven thinking to create vehicles that feel as exciting as they look.</p>
+          </div>
+          <div class="saga-step" data-step="1">
+            <p>Today we design and deliver vehicles that turn heads in Cairo traffic and conquer the dunes outside Alexandria. Every iCAUR is engineered for the heat, dust, and texture of Egypt — and built to last.</p>
+          </div>
+        </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ BRAND FIGURES ═══════ -->
+<section class="section about-figures" id="figures" data-dotfield>
+  <div class="container">
+    <div class="figures-grid">
+      <div class="figure reveal reveal--up" data-delay="0">
+        <span class="figure__num" data-count-to="200" data-suffix="+">0</span>
+        <span class="figure__label">Engineers &amp; Designers</span>
+        <span class="figure__sub">All based in Egypt, building for Egypt.</span>
+      </div>
+      <div class="figure reveal reveal--up" data-delay="1">
+        <span class="figure__num" data-count-to="3" data-suffix="+">0</span>
+        <span class="figure__label">Years of R&amp;D</span>
+        <span class="figure__sub">Prototyping and testing on real roads.</span>
+      </div>
+      <div class="figure reveal reveal--up" data-delay="2">
+        <span class="figure__num" data-count-to="2">0</span>
+        <span class="figure__label">Groundbreaking Models</span>
+        <span class="figure__sub">V27 and O3T — two distinct personalities.</span>
+      </div>
+      <div class="figure reveal reveal--up" data-delay="3">
+        <span class="figure__num" data-count-to="100" data-suffix="%">0</span>
+        <span class="figure__label">Made in Egypt</span>
+        <span class="figure__sub">Designed, engineered, and assembled locally.</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════ STORY / TIMELINE ═══════ -->
-<section class="section about-story" id="story">
-  <div class="container">
-    <header class="section-head reveal reveal--up">
-      <p class="eyebrow">Our Journey</p>
-      <h2 class="section-title">From Vision<br>to <em>Reality</em></h2>
-    </header>
-    <div class="about-mission__layout" style="align-items:start">
-      <div class="timeline reveal reveal--up" data-delay="0">
-        <div class="timeline-item">
-          <p class="timeline-item__year">2020</p>
-          <h4>The Idea</h4>
-          <p>A small team of engineers in Cairo begins sketching the first concepts for an Egyptian-made EV that could handle local roads and conditions.</p>
-        </div>
-        <div class="timeline-item">
-          <p class="timeline-item__year">2021</p>
-          <h4>Research & Development</h4>
-          <p>Prototype R&D begins, partnering with local universities and international EV specialists to develop the core powertrain technology.</p>
-        </div>
-        <div class="timeline-item">
-          <p class="timeline-item__year">2022</p>
-          <h4>First Prototype</h4>
-          <p>The first driveable iCAUR prototype takes to Egypt's roads — proving that local manufacturing of world-class EVs is possible.</p>
-        </div>
-        <div class="timeline-item">
-          <p class="timeline-item__year">2023</p>
-          <h4>Design Finalized</h4>
-          <p>The final V27 and V23 designs are completed after extensive testing, customer research, and refinement of the digital cockpit experience.</p>
-        </div>
-        <div class="timeline-item">
-          <p class="timeline-item__year">2024</p>
-          <h4>Pre-Production</h4>
-          <p>Production facilities established, supply chain secured, and the first batch of pre-production units begin assembly in Alexandria.</p>
-        </div>
-        <div class="timeline-item">
-          <p class="timeline-item__year">2026</p>
-          <h4>Launch Year</h4>
-          <p>The iCAUR V27 and V23 are unveiled to the world. Reservations open. Egypt's electric era begins.</p>
-        </div>
-      </div>
-      <div class="reveal reveal--clip-v" data-delay="1" style="position:sticky;top:calc(var(--nav-h) + 40px)">
-        <img src="../assets/images/about-prototype.jpg" alt="iCAUR prototype testing" loading="lazy" width="600" height="700" style="border-radius:var(--r-xl);width:100%;height:auto;background:var(--cream-deep);aspect-ratio:4/5;object-fit:cover;display:block">
-      </div>
-    </div>
-  </div>
-</section>
+<!-- ═══════ OUR MISSION — carousel ═══════ -->
+<div class="diff-scroll-driver" id="missionDriver">
+<section class="section diff mission-diff" id="missionSection">
 
-<!-- ═══════ VALUES ═══════ -->
-<section class="section about-values" id="values">
-  <div class="container">
-    <header class="section-head reveal reveal--up">
-      <p class="eyebrow" style="color:var(--brown-light)">What Drives Us</p>
-      <h2 class="section-title section-title--light">Four Pillars of<br>Every iCAUR</h2>
-    </header>
-    <div class="values-grid reveal reveal--up" data-delay="1">
-      <div class="value-cell">
-        <p class="value-cell__n">01</p>
-        <h4>Egyptian-First Design</h4>
-        <p>Every decision — from suspension tuning to cabin cooling — is made for Egypt's climate, roads, and culture.</p>
-      </div>
-      <div class="value-cell">
-        <p class="value-cell__n">02</p>
-        <h4>Uncompromised Performance</h4>
-        <p>Sub-5-second 0–100 km/h. 450+ km range. No excuses, no asterisks. Designed to compete with the world's best.</p>
-      </div>
-      <div class="value-cell">
-        <p class="value-cell__n">03</p>
-        <h4>Intelligence Built In</h4>
-        <p>OTA updates, AI-assisted driving, and a connected cabin that learns your habits and improves over time.</p>
-      </div>
-      <div class="value-cell">
-        <p class="value-cell__n">04</p>
-        <h4>Sustainable by Design</h4>
-        <p>Zero tailpipe emissions, locally-sourced materials where possible, and a charging network powered by renewable energy.</p>
-      </div>
-    </div>
+  <div class="diff__curve" aria-hidden="true">
+    <svg viewBox="0 0 1440 140" preserveAspectRatio="none"><path d="M0,100 C360,0 1080,0 1440,100 L1440,140 L0,140 Z"/></svg>
   </div>
-</section>
 
-<!-- ═══════ TEAM ═══════ -->
-<section class="section about-team" id="team">
-  <div class="container">
-    <header class="section-head reveal reveal--up">
-      <p class="eyebrow">The People</p>
-      <h2 class="section-title">The Team Behind<br>the <em>Dream</em></h2>
-    </header>
-    <div class="team-grid">
-      <div class="team-card reveal reveal--up" data-delay="0">
-        <div class="team-card__img"><img src="../assets/images/team-1.jpg" alt="Ahmed Kamal — Founder & CEO" loading="lazy" width="360" height="480"></div>
-        <h5>Ahmed Kamal</h5>
-        <p>Founder & CEO</p>
-      </div>
-      <div class="team-card reveal reveal--up" data-delay="1">
-        <div class="team-card__img"><img src="../assets/images/team-2.jpg" alt="Sara Nour — Chief Design Officer" loading="lazy" width="360" height="480"></div>
-        <h5>Sara Nour</h5>
-        <p>Chief Design Officer</p>
-      </div>
-      <div class="team-card reveal reveal--up" data-delay="2">
-        <div class="team-card__img"><img src="../assets/images/team-3.jpg" alt="Omar Hassan — CTO" loading="lazy" width="360" height="480"></div>
-        <h5>Omar Hassan</h5>
-        <p>Chief Technology Officer</p>
-      </div>
-      <div class="team-card reveal reveal--up" data-delay="3">
-        <div class="team-card__img"><img src="../assets/images/team-4.jpg" alt="Layla Ibrahim — Head of Engineering" loading="lazy" width="360" height="480"></div>
-        <h5>Layla Ibrahim</h5>
-        <p>Head of Engineering</p>
-      </div>
-    </div>
-  </div>
-</section>
+  <div class="diff__glow diff__glow--1" aria-hidden="true"></div>
+  <div class="diff__glow diff__glow--2" aria-hidden="true"></div>
 
-<!-- ═══════ STATS ═══════ -->
-<section class="section" id="stats" style="background:var(--cream)">
-  <div class="container">
-    <div class="diff__grid reveal reveal--up">
-      <div class="diff-card" style="text-align:center">
-        <strong style="font-family:var(--f-display);font-size:52px;font-weight:900;color:var(--black);letter-spacing:-0.04em;display:block">200+</strong>
-        <h5 style="margin-bottom:5px">Engineers & Designers</h5>
-        <p>All based in Egypt, building for Egypt.</p>
-      </div>
-      <div class="diff-card" style="text-align:center">
-        <strong style="font-family:var(--f-display);font-size:52px;font-weight:900;color:var(--black);letter-spacing:-0.04em;display:block">3+</strong>
-        <h5 style="margin-bottom:5px">Years of R&D</h5>
-        <p>Prototyping, testing, refining on real roads.</p>
-      </div>
-      <div class="diff-card" style="text-align:center">
-        <strong style="font-family:var(--f-display);font-size:52px;font-weight:900;color:var(--black);letter-spacing:-0.04em;display:block">2</strong>
-        <h5 style="margin-bottom:5px">Groundbreaking Models</h5>
-        <p>V27 and V23 — two distinct personalities.</p>
-      </div>
-      <div class="diff-card" style="text-align:center">
-        <strong style="font-family:var(--f-display);font-size:52px;font-weight:900;color:var(--black);letter-spacing:-0.04em;display:block">100%</strong>
-        <h5 style="margin-bottom:5px">Made in Egypt</h5>
-        <p>Designed, engineered, and assembled locally.</p>
+  <!-- floating parallax images drifting around the statement -->
+  <div class="mission-floats" aria-hidden="true">
+    <div class="mission-float" data-depth="0.05" style="top:8%;left:1%;width:clamp(80px,10vw,150px)"><div class="mission-float__inner"><img src="/assets/images/ICUAR V27 brochure 03 18.png" alt=""></div></div>
+    <div class="mission-float" data-depth="0.12" style="top:58%;left:2%;width:clamp(65px,8vw,120px)"><div class="mission-float__inner"><img src="/assets/images/ICUAR V27 brochure 03 23.jpg.png" alt=""></div></div>
+    <div class="mission-float" data-depth="0.07" style="top:8%;right:1%;width:clamp(75px,9vw,140px)"><div class="mission-float__inner"><img src="/assets/images/iCAUR INTL_V27 REV_cam027 copy.jpg" alt=""></div></div>
+    <div class="mission-float" data-depth="0.14" style="top:58%;right:2%;width:clamp(60px,7.5vw,110px)"><div class="mission-float__inner"><img src="/assets/images/ICUAR V27 brochure 03 20.png" alt=""></div></div>
+  </div>
+
+  <div class="diff__viewport">
+  <div class="diff__stage" id="missionStage">
+    <div class="diff__panel diff__panel--intro" id="missionIntro">
+      <div class="diff__intro-content">
+        <h2 class="diff__headline mission-headline">Our <em>Mission</em></h2>
       </div>
     </div>
+
+    <div class="diff__panel mission-statement">
+      <p class="mission-statement__text">We exist to put Egypt on the global EV map — engineering world-class electric vehicles at home, for the heat, the highways, and the people who drive them. <em>Mobility, reimagined for real life.</em></p>
+    </div>
   </div>
+  </div>
+
 </section>
+</div>
+
+<!-- ═══════ OUR VISION ═══════ -->
+<div class="vision-driver" id="visionDriver">
+<section class="vision" id="vision">
+
+  <span class="vision__dash" aria-hidden="true"></span>
+  <h2 class="vision__title">Our <em>Vision</em></h2>
+
+  <div class="vision__img-stage">
+    <div class="vision__img-wrap" id="visionImgWrap">
+      <img src="/assets/images/about-hero.jpg" alt="iCAUR Vision" class="vision__img" loading="lazy">
+    </div>
+  </div>
+
+  <div class="vision__body">
+    <p class="vision__statement" id="visionStatement">To put Egypt on the global stage of electric mobility — engineering vehicles that don't just compete with the world's best, but define what's next for an entire generation.</p>
+  </div>
+
+</section>
+</div>
 
 <!-- ═══════ CTA ═══════ -->
-<section class="cta-split" id="cta" aria-label="Call to action">
-  <div class="cta-split__panel cta-split__panel--dark reveal reveal--clip-h" data-delay="0">
-    <div class="cta-split__bg" style="background-image:url('../assets/images/cta-drive.jpg')"></div>
-    <div class="cta-split__overlay"></div>
-    <div class="cta-split__content">
-      <p class="eyebrow eyebrow--warm">Get Started</p>
-      <h2 class="cta-split__h">Ready To Drive<br>Something Different?</h2>
-      <a href="/reserve" class="btn btn--filled btn--lg btn--magnetic">Reserve Your iCAUR</a>
+<section class="cta-split" id="cta" style="background:var(--black)">
+  <div class="cta-split__grid">
+    <div class="cta-split__panel cta-split__brick cta-split__brick--orange cta-split__panel--big" data-lego="left">
+      <div class="cta-split__knobs" aria-hidden="true"></div>
+      <div class="cta-split__content">
+        <h2 class="cta-split__h">Ready To Drive<br>Something Different?</h2>
+        <p class="cta-split__body">The V27 is waiting — let's get you behind the wheel and show you what electric really means.</p>
+        <a href="/reserve" class="btn btn--dark btn--lg btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
+      </div>
+      <div class="cta-split__studs cta-split__studs--right" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     </div>
-  </div>
-  <div class="cta-split__panel cta-split__panel--light reveal reveal--clip-h" data-delay="1">
-    <div class="cta-split__content">
-      <p class="eyebrow">Join the Team</p>
-      <h2 class="cta-split__h cta-split__h--dark">We're building<br>something historic.</h2>
-      <p class="cta-split__body">If you're passionate about mobility, technology, and Egypt — we'd love to hear from you.</p>
-      <a href="/contact" class="btn btn--outline-dark btn--lg btn--magnetic">View Open Roles →</a>
+    <div class="cta-split__panel cta-split__brick cta-split__brick--white cta-split__panel--small" data-lego="right">
+      <div class="cta-split__knobs" aria-hidden="true"></div>
+      <div class="cta-split__studs cta-split__studs--left" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="cta-split__content">
+        <h2 class="cta-split__h">Need Help?</h2>
+        <p class="cta-split__body">Feel free to get in touch with our support team — we'll guide you start to finish.</p>
+        <a href="/contact" class="btn btn--filled btn--arrow btn--magnetic">Contact Us <span class="arrow">→</span></a>
+      </div>
     </div>
   </div>
 </section>
 
 </main>
 
-<footer class="footer" role="contentinfo">
-  <div class="footer__inner">
-    <div class="footer__top">
-      <a href="/" class="footer__mark" aria-label="iCAUR home">iCAUR</a>
-      <div class="footer__models"><a href="/models/v27">V27</a><a href="/models/v23">V23</a></div>
-    </div>
-    <div class="footer__cols">
-      <div class="footer__col"><h6>Models</h6><ul><li><a href="/models/v27">iCAUR V27</a></li><li><a href="/models/v23">iCAUR V23</a></li><li><a href="/models">Compare Models</a></li><li><a href="/reserve">Reserve Now</a></li></ul></div>
-      <div class="footer__col"><h6>Company</h6><ul><li><a href="/about">About iCAUR</a></li><li><a href="/about#innovation">Innovation</a></li><li><a href="/about#careers">Careers</a></li><li><a href="/news">Press</a></li></ul></div>
-      <div class="footer__col"><h6>Support</h6><ul><li><a href="/services">Services</a></li><li><a href="/contact">Contact Us</a></li><li><a href="/#faq">FAQ</a></li><li><a href="/contact#locations">Find a Location</a></li></ul></div>
-      <div class="footer__col footer__col--nl">
-        <h6>Join Our Newsletter</h6>
-        <p>Be first to know about launches, news, and exclusive events.</p>
-        <form class="nl-form newsletter-form" aria-label="Newsletter signup">
-          <input type="email" placeholder="Your email address" aria-label="Email" required>
-          <button type="submit" aria-label="Subscribe"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </form>
-      </div>
-    </div>
-    <div class="footer__bottom">
-      <div class="footer__social" aria-label="Social media">
-        <a href="#" class="social-link" aria-label="Instagram"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.7"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
-        <a href="#" class="social-link" aria-label="Facebook"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></a>
-        <a href="#" class="social-link" aria-label="X"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M4 4l16 16M4 20L20 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></a>
-        <a href="#" class="social-link" aria-label="YouTube"><svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" stroke-width="1.7"/><path d="M10 9l5 3-5 3V9z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></a>
-      </div>
-      <p class="footer__legal">© 2026 iCAUR. All rights reserved. &nbsp;·&nbsp; <a href="/privacy">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms">Terms of Use</a></p>
-    </div>
-  </div>
-</footer>
+<div id="site-footer"></div>
 
-<script src="../js/main.js"></script>
+  <script src="/js/components.js" defer></script>
+  <script src="/js/main.js" defer></script>
+  <script src="/js/game.js" defer></script>
+  <script src="/js/about-car.js" defer></script>
+  <script src="/js/dot-field.js" defer></script>
+  <script src="/js/doodles.js" defer></script>
 </body>
 </html>
