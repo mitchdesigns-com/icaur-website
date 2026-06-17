@@ -15,11 +15,7 @@ const SITE_HEADER = `
 <nav class="nav" id="nav" role="navigation" aria-label="Main">
   <div class="nav__inner">
     <a href="/" class="nav__logo" aria-label="iCAUR home">
-      <svg width="113" height="22" viewBox="0 0 15338 2974" fill="none" aria-hidden="true">
-        <path d="M0 29.3487V1372.87C0 1384.28 13.4613 1392.43 23.5573 1385.91L1445.41 534.798C1499.25 502.189 1532.9 445.122 1532.9 383.164V29.3487C1532.9 13.0439 1519.44 0 1502.62 0H30.2879C13.4613 0 0 13.0439 0 29.3487Z" fill="currentColor"/>
-        <path d="M1502.62 1486.99H30.2879C13.4613 1486.99 0 1500.03 0 1516.34V2943.01C0 2959.32 13.4613 2972.36 30.2879 2972.36H1164.4C1368.01 2972.36 1532.9 2812.57 1532.9 2615.28V1516.34C1532.9 1500.03 1519.44 1486.99 1502.62 1486.99Z" fill="currentColor"/>
-        <path d="M14036.8 2088.65L14698 1692.44C14807.5 1627.22 14873 1513.09 14873 1389.17V357.076C14871.4 159.788 14706.5 0 14502.9 0H12576.2C12439.9 0 12305.3 37.5012 12189.2 105.981L11258.7 663.606L11048.4 789.153C11034.9 797.305 11041.6 816.87 11056.8 816.87H13420.9V1297.86L13108 1485.37H10735.4V357.076C10735.4 159.788 10570.5 0 10366.9 0H8463.82C8327.53 0 8192.91 37.5012 8076.81 105.981L4657.61 2153.87H3429.27V816.87H5509.04C5645.34 816.87 5779.95 779.37 5896.05 710.893L6237.64 505.45L7035.24 27.7182C7048.69 19.5658 7041.94 1.16621e-05 7026.8 1.16621e-05H2263.18C2059.58 1.16621e-05 1894.68 159.788 1894.68 357.076V2615.3C1894.68 2812.58 2059.58 2972.37 2263.18 2972.37H4977.32C5113.61 2972.37 5248.23 2934.87 5364.33 2866.39L6303.26 2303.87H8436.88C8573.18 2303.87 8707.79 2266.37 8823.9 2197.89L9200.79 1971.26V2913.67C9200.79 2946.28 9227.73 2974 9263.06 2974H9409.43C9545.73 2974 9680.34 2936.5 9796.45 2868.02L10735.4 2305.5H12241.4L13180.3 2868.02C13296.4 2938.13 13431 2974 13567.3 2974H15322.3C15337.5 2974 15344.2 2954.44 15330.8 2946.28L14036.8 2088.65ZM9202.48 1485.37H7669.6L9202.48 567.406V1485.37Z" fill="currentColor"/>
-      </svg>
+      <img src="/assets/images/icaur-logo.svg" alt="iCAUR" width="113" height="22" aria-hidden="true">
     </a>
 
     <ul class="nav__links" role="list">
@@ -65,7 +61,7 @@ const SITE_HEADER = `
     </ul>
 
     <div class="nav__actions">
-      <button class="nav__lang" id="langToggle" lang="ar" aria-label="التبديل إلى العربية" data-tooltip="العربية">ع</button>
+      <button class="nav__lang" id="langToggle" lang="ar" aria-label="التبديل إلى العربية">العربية</button>
       <button class="nav__compare" id="compareToggle" aria-label="Compare models">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <path d="M11 2l3 3-3 3M14 5H5M5 14l-3-3 3-3M2 11h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
@@ -221,11 +217,7 @@ const SITE_FOOTER = `
   <!-- Full-width Wordmark -->
   <div class="footer__logo-wrap">
     <a href="/" aria-label="iCAUR home" class="footer__wordmark reveal reveal--logo" data-delay="0">
-      <svg viewBox="0 0 15338 2974" fill="none" aria-hidden="true">
-        <path d="M0 29.3487V1372.87C0 1384.28 13.4613 1392.43 23.5573 1385.91L1445.41 534.798C1499.25 502.189 1532.9 445.122 1532.9 383.164V29.3487C1532.9 13.0439 1519.44 0 1502.62 0H30.2879C13.4613 0 0 13.0439 0 29.3487Z" fill="currentColor"/>
-        <path d="M1502.62 1486.99H30.2879C13.4613 1486.99 0 1500.03 0 1516.34V2943.01C0 2959.32 13.4613 2972.36 30.2879 2972.36H1164.4C1368.01 2972.36 1532.9 2812.57 1532.9 2615.28V1516.34C1532.9 1500.03 1519.44 1486.99 1502.62 1486.99Z" fill="currentColor"/>
-        <path d="M14036.8 2088.65L14698 1692.44C14807.5 1627.22 14873 1513.09 14873 1389.17V357.076C14871.4 159.788 14706.5 0 14502.9 0H12576.2C12439.9 0 12305.3 37.5012 12189.2 105.981L11258.7 663.606L11048.4 789.153C11034.9 797.305 11041.6 816.87 11056.8 816.87H13420.9V1297.86L13108 1485.37H10735.4V357.076C10735.4 159.788 10570.5 0 10366.9 0H8463.82C8327.53 0 8192.91 37.5012 8076.81 105.981L4657.61 2153.87H3429.27V816.87H5509.04C5645.34 816.87 5779.95 779.37 5896.05 710.893L6237.64 505.45L7035.24 27.7182C7048.69 19.5658 7041.94 1.16621e-05 7026.8 1.16621e-05H2263.18C2059.58 1.16621e-05 1894.68 159.788 1894.68 357.076V2615.3C1894.68 2812.58 2059.58 2972.37 2263.18 2972.37H4977.32C5113.61 2972.37 5248.23 2934.87 5364.33 2866.39L6303.26 2303.87H8436.88C8573.18 2303.87 8707.79 2266.37 8823.9 2197.89L9200.79 1971.26V2913.67C9200.79 2946.28 9227.73 2974 9263.06 2974H9409.43C9545.73 2974 9680.34 2936.5 9796.45 2868.02L10735.4 2305.5H12241.4L13180.3 2868.02C13296.4 2938.13 13431 2974 13567.3 2974H15322.3C15337.5 2974 15344.2 2954.44 15330.8 2946.28L14036.8 2088.65ZM9202.48 1485.37H7669.6L9202.48 567.406V1485.37Z" fill="currentColor"/>
-      </svg>
+      <img src="/assets/images/icaur-logo.svg" alt="iCAUR" aria-hidden="true">
     </a>
   </div>
 
@@ -253,7 +245,7 @@ const SITE_FOOTER = `
         <a href="/reserve" class="btn btn--reserve btn--sm btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
       </div>
 
-      <!-- Right: Newsletter + Social -->
+      <!-- Right: Newsletter + Contact + Partner -->
       <div class="footer__body-right reveal reveal--up" data-delay="3">
         <h6 class="footer__nl-heading">Join Our Newsletter</h6>
         <form class="nl-form--footer" action="#" method="post" novalidate>
@@ -261,6 +253,22 @@ const SITE_FOOTER = `
           <button type="submit">Subscribe</button>
         </form>
         <p class="footer__nl-legal">By subscribing you agree to our <a href="/privacy">Privacy Policy</a> and consent to receive updates from iCAUR.</p>
+
+        <div class="footer__contact">
+          <a href="tel:+20221234567" class="footer__contact-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.72A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            <span>+20 (2) 2123-4567</span>
+          </a>
+          <a href="mailto:hello@icaur.com" class="footer__contact-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span>hello@icaur.com</span>
+          </a>
+        </div>
+
+        <div class="footer__partner">
+          <img src="/assets/images/Ghabour-logo.svg" alt="Ghabour Auto" class="footer__ghabour-logo">
+        </div>
+
         <div class="footer__social" aria-label="Social media">
           <a href="#" aria-label="Facebook" class="social-link">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>

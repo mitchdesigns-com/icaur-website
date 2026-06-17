@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>if(sessionStorage.getItem('pt-nav'))document.documentElement.classList.add('pt-entering');</script>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/Favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="About iCAUR — Egypt's next-generation EV company. Our story, mission, and values.">
   <title>About — iCAUR</title>
@@ -34,9 +36,7 @@
   <div class="cursor__label" id="cursorLabel"></div>
 </div>
 
-<div class="page-intro" id="pageIntro" aria-hidden="true">
-  <span class="page-intro__logo">iCAUR</span>
-</div>
+
 
 <div id="site-header"></div>
 
@@ -204,6 +204,7 @@
 
   <script src="/js/components.js" defer></script>
   <script src="/js/main.js" defer></script>
+  <script src="/js/transitions.js" defer></script>
   <script src="/js/game.js" defer></script>
   <script src="/js/about-car.js" defer></script>
   <script src="/js/dot-field.js" defer></script>

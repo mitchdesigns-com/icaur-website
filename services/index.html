@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>if(sessionStorage.getItem('pt-nav'))document.documentElement.classList.add('pt-entering');</script>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/Favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="iCAUR Services — Maintenance, warranty, service centers, and 24/7 support.">
   <title>Services — iCAUR</title>
@@ -34,7 +36,7 @@
   <div class="cursor__ring" id="cursorRing"></div>
   <div class="cursor__label" id="cursorLabel"></div>
 </div>
-<div class="page-intro" id="pageIntro" aria-hidden="true"><span class="page-intro__logo">iCAUR</span></div>
+
 
 <div id="site-header"></div>
 
@@ -54,7 +56,7 @@
 
     <!-- Folder download widget — centered below headline -->
     <div class="svc-hero__folder reveal reveal--up" data-delay="2">
-      <div class="folder-host" data-color="#F37021">
+      <div class="folder-host" data-color="#015699">
         <div class="folder-scale" style="transform:scale(2.2);transform-origin:top center">
           <div class="folder">
             <div class="folder__back">
@@ -89,18 +91,20 @@
      BOOK MAINTENANCE
 ══════════════════════════════════════════════════ -->
 <section class="svc-book" id="book">
+  <!-- Layer 1: background -->
   <div class="svc-book__bg" aria-hidden="true"></div>
 
+  <!-- Layer 2: card draws in, man pops from top -->
   <div class="svc-book__inner">
-    <!-- parallax wrapper — JS sets translateY here -->
     <div id="svcBookCard">
-      <!-- clip zone: all layers + card slide in from left inside this box -->
+      <!-- man sits behind the card; card covers feet, head pops above -->
+      <img class="svc-book__pop" src="/assets/images/Cropped man.png" alt="" aria-hidden="true">
       <div class="svc-book__panel-wrap">
         <div class="svc-book__rl svc-book__rl--1" aria-hidden="true"></div>
         <div class="svc-book__rl svc-book__rl--2" aria-hidden="true"></div>
         <div class="svc-book__card">
           <p class="eyebrow svc-book__eyebrow">Book Maintenance</p>
-          <h2 class="svc-book__h">Schedule In<br>Seconds</h2>
+          <h2 class="svc-book__h">Schedule In Seconds<br>By <span style="color:var(--amber)">iCAUR App</span></h2>
           <p class="svc-book__body">
             Download the iCAUR app to schedule your maintenance service instantly or <a href="/contact">Contact&nbsp;Us</a>.
           </p>
@@ -113,7 +117,7 @@
               </div>
             </a>
             <a href="#" class="svc-book__badge btn--magnetic" aria-label="Get it on Google Play">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M3.18 23.95c.37.2.79.26 1.19.18l11.11-11.11L12 9.59 3.18 23.95zm15.62-13.2L16.11 9.1l-3.08 3.08 3.08 3.07 2.71-1.65c.77-.47.77-1.38-.02-1.85zm-14.44-8.7C4.27 2.2 4 2.66 4 3.2v17.62l9.09-9.09-8.73-9.68zm8.97 8.91L7.69 5.28l9.08 5.24-3.44 3.44z"/></svg>
+              <svg width="20" height="22" viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.08 0.42C0.72 0.64 0.5 1.04 0.5 1.52V20.48C0.5 20.96 0.72 21.36 1.08 21.58L1.16 21.66L11.62 11.2V11.04L1.16 0.34L1.08 0.42Z" fill="white"/><path d="M15.08 14.68L11.62 11.2V11.04L15.08 7.56L15.18 7.62L19.26 9.94C20.42 10.6 20.42 11.68 19.26 12.34L15.18 14.62L15.08 14.68Z" fill="white" opacity="0.9"/><path d="M15.18 14.62L11.62 11.12L1.08 21.58C1.46 21.98 2.08 22.02 2.78 21.62L15.18 14.62Z" fill="white" opacity="0.7"/><path d="M15.18 7.62L2.78 0.62C2.08 0.22 1.46 0.26 1.08 0.66L11.62 11.12L15.18 7.62Z" fill="white" opacity="0.7"/></svg>
               <div class="svc-book__badge-text">
                 <span class="svc-book__badge-sub">Get it on</span>
                 <span class="svc-book__badge-name">Google Play</span>
@@ -256,6 +260,7 @@
 
   <script src="/js/components.js" defer></script>
   <script src="/js/main.js" defer></script>
+  <script src="/js/transitions.js" defer></script>
   <script src="/js/game.js" defer></script>
   <script src="/js/doodles.js" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>

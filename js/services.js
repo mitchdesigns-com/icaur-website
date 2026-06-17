@@ -201,8 +201,7 @@ function initBookParallax() {
     var rect    = section.getBoundingClientRect();
     var visible = -rect.top;
     if (visible < -window.innerHeight || visible > rect.height + window.innerHeight) return;
-    bg.style.transform       = 'translateY(' + (visible * 0.22).toFixed(2) + 'px)';
-    cardWrap.style.transform = 'translateY(' + (visible * -0.05).toFixed(2) + 'px)';
+    bg.style.transform = 'translateY(' + (visible * 0.22).toFixed(2) + 'px)';
   }
   window.addEventListener('scroll', function () {
     if (!ticking) { ticking = true; requestAnimationFrame(tick); }

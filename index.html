@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>if(sessionStorage.getItem('pt-nav'))document.documentElement.classList.add('pt-entering');</script>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/Favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="iCAUR — Egypt's next-generation electric vehicle. Built for every road.">
   <title>iCAUR — Built for Every Road</title>
@@ -41,9 +43,7 @@
 </div>
 
 <!-- ─── Page Intro Overlay ───────────────────────────────── -->
-<div class="page-intro" id="pageIntro" aria-hidden="true">
-  <span class="page-intro__logo">iCAUR</span>
-</div>
+
 
 <!-- ─── Navigation ───────────────────────────────────────── -->
 <div id="site-header"></div>
@@ -354,7 +354,7 @@
         <div class="innov-card__overlay"></div>
         <div class="innov-card__tag"><span>Sustainability</span></div>
         <div class="innov-card__body">
-          <h4>Zero Compromise<br>on the Environment</h4>
+          <h4>Zero Compromise on the Environment</h4>
           <p>Built with sustainability in mind — from materials to manufacturing.</p>
         </div>
       </div>
@@ -363,7 +363,7 @@
         <div class="innov-card__overlay"></div>
         <div class="innov-card__tag"><span>Technology</span></div>
         <div class="innov-card__body">
-          <h4>Powered by<br>the Future</h4>
+          <h4>Powered by the Future</h4>
           <p>Cutting-edge battery, OTA updates, and AI-driven systems that evolve with you.</p>
         </div>
       </div>
@@ -372,14 +372,14 @@
         <div class="innov-card__overlay"></div>
         <div class="innov-card__tag"><span>Design</span></div>
         <div class="innov-card__body">
-          <h4>Form Meets<br>Function</h4>
+          <h4>Form Meets Function</h4>
           <p>Every curve is intentional. Design as capable as it is beautiful.</p>
         </div>
       </div>
     </div>
 
     <footer class="innov__footer reveal reveal--up" data-delay="4">
-      <a href="/innovation" class="btn btn--dark btn--arrow btn--magnetic">View More <span class="arrow">→</span></a>
+      <a href="/innovation" class="btn btn--outline btn--sm btn--arrow btn--magnetic">Explore Innovation <span class="arrow">→</span></a>
     </footer>
   </div>
 </section>
@@ -390,12 +390,11 @@
 ═══════════════════════════════════════════════════════ -->
 <section class="section news" id="news">
   <div class="container">
-    <header class="news__head">
+    <header class="news__head news__head--center">
       <div class="reveal reveal--up" data-stagger="parent">
-        <p class="eyebrow">Media Center</p>
-        <h2 class="section-title">What's Happening Now</h2>
+        <p class="eyebrow" style="justify-content:center">Media Center</p>
+        <h2 class="section-title" style="text-align:center">What's Happening Now</h2>
       </div>
-      <a href="/news" class="btn btn--outline btn--sm news__all reveal reveal--up" data-delay="2">View Media Center</a>
     </header>
 
     <div class="news__grid">
@@ -441,6 +440,10 @@
         </div>
       </article>
 
+    </div>
+
+    <div style="text-align:center; margin-top: clamp(24px,3vh,40px);">
+      <a href="/news" class="btn btn--outline btn--sm btn--arrow btn--magnetic reveal reveal--up" data-delay="3">View Media Center <span class="arrow">→</span></a>
     </div>
 
   </div>
@@ -537,6 +540,7 @@
 
   <script src="/js/components.js" defer></script>
   <script src="/js/main.js" defer></script>
+  <script src="/js/transitions.js" defer></script>
   <script src="/js/game.js" defer></script>
 </body>
 </html>

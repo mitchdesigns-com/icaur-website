@@ -15,23 +15,13 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 // ============================================================
 // PAGE INTRO — branded logo flash on load
 // ============================================================
-(function initPageIntro() {
-  const intro = $('#pageIntro');
-  if (!intro) return;
-
-  // After fonts/styles settle (~750 ms), fade out intro
-  const dismiss = () => {
-    intro.classList.add('is-done');
+(function initPage() {
+  const ready = () => {
     document.body.classList.remove('is-loading');
-    // Trigger hero word reveals right after intro exits
-    setTimeout(triggerHeroWords, 300);
+    setTimeout(triggerHeroWords, 100);
   };
-
-  if (document.readyState === 'complete') {
-    setTimeout(dismiss, 750);
-  } else {
-    window.addEventListener('load', () => setTimeout(dismiss, 750), { once: true });
-  }
+  if (document.readyState === 'complete') setTimeout(ready, 50);
+  else window.addEventListener('load', () => setTimeout(ready, 50), { once: true });
 })();
 
 
