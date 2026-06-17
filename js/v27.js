@@ -441,21 +441,14 @@ function initBrand() {
     }
   });
 
-  /* "Explore" custom cursor on hover */
-  container.addEventListener('mouseenter', () => {
-    container.style.cursor = 'none';
-    const cursor = $('#cursor'), label = $('#cursorLabel');
-    if (cursor) { cursor.classList.add('is-label'); if (label) label.textContent = 'Explore'; }
-  });
-  container.addEventListener('mouseleave', () => {
-    container.style.cursor = 'default';
-    const cursor = $('#cursor'), label = $('#cursorLabel');
-    if (cursor) { cursor.classList.remove('is-label'); if (label) label.textContent = ''; }
-  });
+  container.style.cursor = 'none';
+
+  /* Flatter arc on narrow screens so near-full-width cards sit level */
+  const isMobile = window.innerWidth <= 640;
 
   new CircularGallery(container, {
     items,
-    bend: 3,
+    bend: isMobile ? 1 : 3,
     textColor: '#555859',
     borderRadius: 0.04,
     font: '500 20px GothamMedium, Montserrat, sans-serif',
@@ -573,11 +566,16 @@ const SLIDES = [
       { x: '18%', y: '54%', title: 'Nappa Leather',    desc: 'Perforated semi-aniline hide with massage.', img: '/assets/images/v27/interior-leather.jpg' },
     ]
   },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam026.jpg', label: 'Front Cabin' },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam027.jpg', label: 'Dash' },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam028.jpg', label: 'Console' },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam033.jpg', label: 'Rear' },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam0301.jpg', label: 'Detail' },
+  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam026 copy.jpg', label: 'Front Cabin' },
+  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam027 copy.jpg', label: 'Rear Seats' },
+  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam028 copy.jpg', label: 'Console' },
+  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam033 copy.jpg', label: 'Rear Cabin' },
+  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam0301 copy.jpg', label: 'Detailing' },
+  { src: '/assets/images/v27/interior-display.jpg', label: 'Central Display' },
+  { src: '/assets/images/v27/interior-leather.jpg', label: 'Nappa Leather' },
+  { src: '/assets/images/v27/interior-sunroof.jpg', label: 'Panoramic Roof' },
+  { src: '/assets/images/v27/interior-console.jpg', label: 'Wireless Charging' },
+  { src: '/assets/images/v27/interior-01.jpg', label: 'Cabin Ambience' },
 ];
 
 const PEEK = 72;
@@ -932,27 +930,34 @@ function initCharging() {
   let pct = 20;
   let dragging = false;
 
-  /* Background color transition on scroll */
+  /* Background: white immediately on entry, complete by 80% scroll progress */
+  const setChargingColors = (t) => {
+    const bg = interpolateColor('#1A1A1A', '#FFFFFF', Math.min(t / 0.8, 1));
+    section.style.background = bg;
+    const dark = t >= 0.8;
+    section.style.setProperty('--charge-fg', dark ? '#0A0A0A' : '#FFFFFF');
+    $$('.v27-charging-eyebrow, .v27-charging-intro, .v27-charge-stat-label', section).forEach(el => {
+      el.style.color = dark ? 'rgba(10,10,10,.55)' : 'rgba(255,255,255,.55)';
+    });
+    $$('.v27-charge-stat-val', section).forEach(el => {
+      el.style.color = dark ? '#0A0A0A' : '#FFFFFF';
+    });
+    $$('.v27-charging-h2', section).forEach(el => {
+      el.style.color = dark ? '#0A0A0A' : '#FFFFFF';
+    });
+  };
+
+  /* Initialise to white immediately */
+  setChargingColors(1);
+
   ScrollTrigger.create({
     trigger: section,
-    start: 'top 60%',
-    end: 'bottom 40%',
-    scrub: .8,
-    onUpdate(self) {
-      const t = self.progress;
-      const bg = interpolateColor('#0A0A0A', '#FFFFFF', t);
-      section.style.background = bg;
-      /* Flip text colors */
-      const textColor = t > .5 ? '#0A0A0A' : '#FFFFFF';
-      section.style.setProperty('--charge-fg', textColor);
-      $$('.v27-charging-eyebrow, .v27-charging-h2, .v27-charging-intro, .v27-charge-stat-label', section).forEach(el => {
-        el.style.color = t > .5 ? 'rgba(10,10,10,.55)' : 'rgba(255,255,255,.55)';
-      });
-      $$('.v27-charge-stat-val', section).forEach(el => {
-        el.style.color = t > .5 ? '#0A0A0A' : '#FFFFFF';
-      });
-      $$('.v27-charging-h2', section).forEach(el => { el.style.color = t > .5 ? '#0A0A0A' : '#FFFFFF'; });
-    }
+    start: 'top 80%',
+    end: 'top 20%',
+    scrub: .5,
+    onUpdate(self) { setChargingColors(self.progress); },
+    onEnter()      { setChargingColors(1); },
+    onEnterBack()  { setChargingColors(1); },
   });
 
   function updateSlider(newPct) {
@@ -982,6 +987,23 @@ function initCharging() {
   window.addEventListener('touchend',  () => { dragging = false; });
 
   updateSlider(20);
+
+  /* Animate to 80% when section enters viewport */
+  ScrollTrigger.create({
+    trigger: section,
+    start: 'top 75%',
+    once: true,
+    onEnter() {
+      const proxy = { val: 20 };
+      gsap.to(proxy, {
+        val: 80,
+        duration: 1.8,
+        ease: 'power2.out',
+        delay: 0.2,
+        onUpdate() { updateSlider(proxy.val); },
+      });
+    },
+  });
 }
 
 function interpolateColor(hex1, hex2, t) {
@@ -1001,18 +1023,8 @@ function initTrims() {
     trigger: '#v27-trims', start: 'top 70%', once: true,
     onEnter() {
       gsap.to('.v27-trim-col-head', { opacity: 1, y: 0, stagger: .1, duration: .6 });
-      gsap.to('.v27-trim-group-head', { opacity: 1, stagger: .1, duration: .5, delay: .2 });
+      gsap.from('.v27-trim-section-label, .v27-trim-row', { opacity: 0, y: 12, stagger: .04, duration: .45, delay: .2 });
     }
-  });
-
-  $$('.v27-trim-group-head').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const group  = btn.dataset.group;
-      const body   = $(`#v27-tg-${group}`);
-      const isOpen = btn.classList.contains('open');
-      btn.classList.toggle('open', !isOpen);
-      if (body) body.classList.toggle('open', !isOpen);
-    });
   });
 }
 

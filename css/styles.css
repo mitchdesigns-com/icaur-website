@@ -407,7 +407,7 @@ p  { line-height: 1.68; color: var(--text-mid); }
   margin: 0 auto; padding: 0 var(--pad-x);
   display: flex; align-items: center; justify-content: space-between; gap: var(--sp-20);
   background: rgba(255,255,255,.7);
-  border-radius: 6px;
+  border-radius: 999px;
   border: 1px solid rgba(255,255,255,.5);
   box-shadow: 0 8px 30px rgba(0,0,0,.08);
   backdrop-filter: blur(20px) saturate(180%);
@@ -3837,8 +3837,8 @@ p  { line-height: 1.68; color: var(--text-mid); }
   color: var(--text-mid); transition: border-color .2s, color .2s;
 }
 .post-share a:hover { border-color: var(--black); color: var(--black); }
+.post-hero, .post-cover, .post-body { background: #fff; }
 .post-cover {
-  background: var(--cream-deep);
   aspect-ratio: 16/7; overflow: hidden; border-radius: 20px;
   margin: 0 60px clamp(48px,6vh,80px);
 }

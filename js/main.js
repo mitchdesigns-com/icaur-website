@@ -1207,40 +1207,40 @@ document.addEventListener('click', e => {
 // centered, drift apart as you scroll away (up or down)
 // ============================================================
 (function initCtaLego() {
-  const section = $('#cta');
-  if (!section) return;
-  const left  = $('[data-lego="left"]',  section);
-  const right = $('[data-lego="right"]', section);
-  if (!left || !right) return;
-
+  const sections = $$('.cta-split');
+  if (!sections.length) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const panels = sections.map(section => ({
+    section,
+    left:  $('[data-lego="left"]',  section),
+    right: $('[data-lego="right"]', section),
+  })).filter(p => p.left && p.right);
+
+  if (!panels.length) return;
 
   let ticking = false;
 
   function update() {
     ticking = false;
-    if (window.innerWidth <= 900) {           // stacked on mobile — no spread
-      left.style.transform = right.style.transform = '';
-      return;
+    const mobile = window.innerWidth <= 900;
+    const vh = window.innerHeight;
+    for (const { section, left, right } of panels) {
+      if (mobile) { left.style.transform = right.style.transform = ''; continue; }
+      const rect = section.getBoundingClientRect();
+      const sectionCenter  = rect.top + rect.height / 2;
+      const viewportCenter = vh / 2;
+      const dist   = Math.abs(sectionCenter - viewportCenter) / (vh * 0.6);
+      const spread = Math.max(0, Math.min(1, dist));
+      const sign   = sectionCenter < viewportCenter ? -1 : 1;
+      const x  = spread * 86;
+      const y  = sign * spread * 24;
+      const ry = spread * 24;
+      const rx = spread * 7;
+      const sc = 1 - spread * 0.05;
+      left.style.transform  = `translate3d(${-x}px, ${y}px, 0) rotateX(${rx}deg) rotateY(${ ry}deg) scale(${sc})`;
+      right.style.transform = `translate3d(${ x}px, ${y}px, 0) rotateX(${rx}deg) rotateY(${-ry}deg) scale(${sc})`;
     }
-    const rect = section.getBoundingClientRect();
-    const vh   = window.innerHeight;
-    const sectionCenter  = rect.top + rect.height / 2;
-    const viewportCenter = vh / 2;
-    // distance of the section's centre from the viewport centre, normalised so
-    // spread hits 1 once the section is ~0.6 of a viewport away from centred
-    const dist = Math.abs(sectionCenter - viewportCenter) / (vh * 0.6);
-    const spread = Math.max(0, Math.min(1, dist));           // 0 assembled → 1 apart
-    const sign = sectionCenter < viewportCenter ? -1 : 1;    // leaving up vs down
-
-    const x   = spread * 86;
-    const y   = sign * spread * 24;
-    const ry  = spread * 24;   // hinge open in 3D
-    const rx  = spread * 7;    // slight tumble
-    const sc  = 1 - spread * 0.05;
-
-    left.style.transform  = `translate3d(${-x}px, ${y}px, 0) rotateX(${rx}deg) rotateY(${ ry}deg) scale(${sc})`;
-    right.style.transform = `translate3d(${ x}px, ${y}px, 0) rotateX(${rx}deg) rotateY(${-ry}deg) scale(${sc})`;
   }
 
   const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };

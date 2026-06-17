@@ -451,13 +451,18 @@
 }
 .v27-gallery-item:hover img { transform: scale(1.04); }
 /* ─── Circular Gallery ───────────────────────────────── */
+/* Card pixel-size scales with canvas height (~0.73× wide, ~0.41× tall),
+   so we clamp the height to keep cards a consistent size across screens. */
 .v27-cg-wrap {
   width: 100vw; margin-left: calc(50% - 50vw);
-  height: 80vh;
+  height: clamp(440px, 64vh, 680px);
   overflow: hidden; cursor: zoom-in; position: relative; z-index: 1;
 }
 .v27-cg-wrap:active { cursor: grabbing; }
 .v27-cg-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
+@media (max-width: 640px) {
+  .v27-cg-wrap { height: clamp(300px, 54vh, 440px); }
+}
 
 /* ─── Lightbox ───────────────────────────────────────── */
 .v27-lightbox {
@@ -1038,6 +1043,49 @@
 .v27-trim-check svg { width: 16px; height: 16px; }
 .v27-trim-dash { color: rgba(35,24,21,.18); font-size: 1.1rem; }
 .v27-trim-val { font-size: .82rem; font-weight: 600; color: #1F0F08; letter-spacing: .01em; }
+.v27-trim-section-label {
+  font-size: clamp(1.1rem,1.8vw,1.4rem); font-weight: 600; letter-spacing: -.015em;
+  color: #1F0F08; padding: clamp(24px,3.5vh,36px) 0 clamp(10px,1.5vh,16px);
+  border-top: 1px solid rgba(35,24,21,.10);
+}
+
+/* ── PDF Download grid ────────────────────────────── */
+.v27-dl-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: clamp(32px, 5vh, 52px);
+}
+.v27-dl-pill {
+  display: flex; align-items: center; gap: 10px;
+  background: #1a1a1a; border-radius: 10px;
+  padding: 9px 12px 9px 9px; text-decoration: none;
+  transition: background .2s;
+  cursor: pointer;
+}
+.v27-dl-pill:hover { background: #252525; }
+.v27-dl-pill:hover .v27-dl-arrow { color: var(--orange); }
+.v27-dl-badge {
+  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; width: 32px; height: 38px; border-radius: 6px;
+  background: var(--orange);
+  font-size: .38rem; font-weight: 800; letter-spacing: .08em;
+  text-transform: uppercase; color: #fff;
+}
+.v27-dl-badge svg { display: block; width: 11px; height: 14px; }
+.v27-dl-info {
+  display: flex; flex-direction: column; gap: 2px; min-width: 0;
+}
+.v27-dl-name {
+  font-size: .72rem; font-weight: 600; color: #fff;
+  letter-spacing: -.01em; white-space: nowrap;
+}
+.v27-dl-size { font-size: .6rem; color: rgba(255,255,255,.38); }
+.v27-dl-arrow {
+  flex-shrink: 0; color: rgba(255,255,255,.35); transition: color .2s;
+  display: flex; align-items: center; margin-left: 6px;
+}
 
 /* ══════════════════════════════════════════════════════
    RESERVE CTA
