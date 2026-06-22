@@ -433,6 +433,8 @@ html.pt-entering > body { opacity: 0; }
 }
 .nav__link:hover { color: var(--black); }
 .nav__link:hover::after { width: 100%; }
+.nav__link[aria-current="page"] { color: var(--black); }
+.nav__link[aria-current="page"]::after { width: 18px; left: 50%; transform: translateX(-50%); }
 
 /* ── Models mega dropdown (click-only, full-nav width) ── */
 .nav__item--has-drop { position: static; }
