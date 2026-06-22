@@ -175,11 +175,9 @@ function initSectionEntries() {
 }
 
 /* ── Book section: wipe reveal + parallax ─────────── */
-function initBookParallax() {
-  var section  = document.getElementById('book');
-  var bg       = section && section.querySelector('.svc-book__bg');
-  var cardWrap = document.getElementById('svcBookCard');
-  if (!section || !bg || !cardWrap) return;
+function initBookSection(section) {
+  var bg = section.querySelector('.svc-book__bg');
+  if (!bg) return;
 
   /* Trigger staggered wipe once on first intersection */
   var revealed = false;
@@ -207,6 +205,10 @@ function initBookParallax() {
     if (!ticking) { ticking = true; requestAnimationFrame(tick); }
   }, { passive: true });
   tick();
+}
+
+function initBookParallax() {
+  document.querySelectorAll('.svc-book').forEach(initBookSection);
 }
 
 /* ── Find Us — Interactive Leaflet map ────────────── */

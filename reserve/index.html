@@ -5,16 +5,12 @@
   <script>if(sessionStorage.getItem('pt-nav'))document.documentElement.classList.add('pt-entering');</script>
   <link rel="icon" type="image/svg+xml" href="/assets/images/Favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Reserve your iCAUR — Secure your V27 or V23 with a fully refundable deposit today.">
+  <meta name="description" content="Reserve your iCAUR — Secure your V27 or OT3 with a fully refundable deposit today.">
   <title>Reserve — iCAUR</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
-  <script src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
-    data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
-    data-endpoint="https://bugger-worker.mitchdesigns.workers.dev/functions/v1/ingest-feedback"
-    data-position="bottom-right" data-button-text="Feedback" data-accent="#4f46e5" async></script>
 </head>
 <body class="is-loading dark-hero-page">
 
@@ -32,151 +28,168 @@
   <div class="cursor__label" id="cursorLabel"></div>
 </div>
 
-
 <div id="site-header"></div>
 
 <main id="main">
 
-<!-- ═══════ HERO + FLOATING FORM ═══════ -->
-<section class="res-hero" id="reserve">
-  <div class="res-hero__bg" aria-hidden="true"></div>
+<!-- ═══════ RESERVE — SPLIT LAYOUT ═══════ -->
+<section class="rv-section" id="reserve">
 
-  <div class="res-hero__inner">
-    <!-- Headline -->
-    <p class="res-hero__eyebrow reveal reveal--up" data-delay="0">Your Next Drive Starts Here</p>
-    <h1 class="res-hero__h reveal reveal--up" data-delay="1">Reserve Your iCAUR</h1>
-    <p class="res-hero__sub reveal reveal--up" data-delay="2">Fill the form below and our team will help you take the next step toward owning the iCAUR.</p>
+  <!-- Parallax background image -->
+  <div class="rv-bg" aria-hidden="true" id="rvBg"></div>
+  <div class="rv-overlay" aria-hidden="true"></div>
 
-    <!-- Floating card -->
-    <div class="res-card reveal reveal--up" data-delay="3">
+  <div class="rv-layout">
 
-      <!-- Model chooser -->
-      <div class="res-card__section">
-        <p class="res-section-title">Choose Model</p>
-        <div class="res-model-row" role="radiogroup" aria-label="Select a model">
+    <!-- LEFT: Hero copy -->
+    <div class="rv-left reveal reveal--up">
+      <h1 class="rv-h1">Reserve<br>Your <em>iCAUR</em></h1>
+      <p class="rv-sub">Secure your spot and our team will guide you through every step toward owning your iCAUR.</p>
+    </div>
 
-          <!-- V27 -->
-          <div class="res-model-card is-active" data-model="v27" role="radio" aria-checked="true" tabindex="0">
-            <div class="res-model-card__img">
-              <img src="/assets/images/v27-model-in-homepge-01.png" alt="iCAUR V27 Electric SUV" loading="lazy">
-            </div>
-            <div class="res-model-card__body">
-              <p class="res-model-card__name">V27</p>
-              <div class="res-trims">
-                <label class="res-trim"><input type="checkbox" name="v27-trim" value="classic"> Classic</label>
-                <label class="res-trim"><input type="checkbox" name="v27-trim" value="premium" checked> Premium</label>
-                <label class="res-trim"><input type="checkbox" name="v27-trim" value="flagship"> Flagship</label>
+    <!-- RIGHT: Form card -->
+    <div class="rv-right reveal reveal--up" data-delay="1">
+
+      <div class="rv-card">
+
+        <!-- Eyebrow above form -->
+        <p class="eyebrow rv-eyebrow rv-card-eyebrow">Your Next Drive Starts Here</p>
+
+        <!-- Model chooser -->
+        <div class="rv-block">
+          <p class="rv-block-label">Choose Model</p>
+          <div class="rv-models" role="radiogroup" aria-label="Select a model">
+
+            <label class="rv-model">
+              <input type="radio" name="rv-model" value="v27" checked aria-label="V27">
+              <div class="rv-model-img-wrap">
+                <img src="/assets/images/v27-model-in-homepge-01.png" alt="iCAUR V27" loading="eager">
+                <div class="rv-model-overlay" aria-hidden="true"></div>
+                <span class="rv-model-name">V27</span>
+                <span class="rv-model-dot" aria-hidden="true">
+                  <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor"/></svg>
+                </span>
               </div>
-            </div>
-          </div>
+            </label>
 
-          <!-- V23 -->
-          <div class="res-model-card" data-model="v23" role="radio" aria-checked="false" tabindex="0">
-            <div class="res-model-card__img">
-              <img src="/assets/images/ot3-model-in-homepage-01.png" alt="iCAUR V23 Electric Sedan" loading="lazy">
-            </div>
-            <div class="res-model-card__body">
-              <p class="res-model-card__name">OT3</p>
-              <div class="res-trims">
-                <label class="res-trim"><input type="checkbox" name="v23-trim" value="classic"> Classic</label>
-                <label class="res-trim"><input type="checkbox" name="v23-trim" value="premium" checked> Premium</label>
-                <label class="res-trim"><input type="checkbox" name="v23-trim" value="flagship"> Flagship</label>
+            <label class="rv-model">
+              <input type="radio" name="rv-model" value="ot3" aria-label="OT3">
+              <div class="rv-model-img-wrap">
+                <img src="/assets/images/ot3-model-in-homepage-01.png" alt="iCAUR OT3" loading="eager">
+                <div class="rv-model-overlay" aria-hidden="true"></div>
+                <span class="rv-model-name">OT3</span>
+                <span class="rv-model-dot" aria-hidden="true">
+                  <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor"/></svg>
+                </span>
               </div>
-            </div>
-          </div>
+            </label>
 
+          </div>
         </div>
-      </div>
 
-      <!-- Contact form -->
-      <div class="res-card__section">
-        <form id="resForm" aria-label="Reservation form" novalidate>
+        <!-- Divider -->
+        <div class="rv-divider"></div>
 
-          <div class="rs-field-row">
-            <div class="rs-field">
-              <label class="rs-label" for="res-first">First Name</label>
-              <input class="rs-input" id="res-first" type="text" placeholder="" required autocomplete="given-name">
+        <!-- Form -->
+        <form id="rvForm" class="rv-form" novalidate>
+
+          <div class="rv-row">
+            <div class="rv-field" id="rvf-first">
+              <label class="rv-label" for="rv-first">First Name</label>
+              <input class="rv-input" id="rv-first" type="text" required autocomplete="given-name">
             </div>
-            <div class="rs-field">
-              <label class="rs-label" for="res-last">Last Name</label>
-              <input class="rs-input" id="res-last" type="text" placeholder="" required autocomplete="family-name">
+            <div class="rv-field" id="rvf-last">
+              <label class="rv-label" for="rv-last">Last Name</label>
+              <input class="rv-input" id="rv-last" type="text" required autocomplete="family-name">
             </div>
           </div>
 
-          <div class="rs-field">
-            <label class="rs-label" for="res-email">Email</label>
-            <input class="rs-input" id="res-email" type="email" placeholder="" required autocomplete="email">
+          <div class="rv-field" id="rvf-email">
+            <label class="rv-label" for="rv-email">Email Address</label>
+            <input class="rv-input" id="rv-email" type="email" required autocomplete="email">
           </div>
 
-          <div class="rs-field">
-            <label class="rs-label" for="res-phone">Phone Number</label>
-            <input class="rs-input" id="res-phone" type="tel" placeholder="" autocomplete="tel">
+          <div class="rv-field" id="rvf-phone">
+            <label class="rv-label" for="rv-phone">Phone Number</label>
+            <input class="rv-input" id="rv-phone" type="tel" autocomplete="tel">
           </div>
 
-          <div style="margin-top:28px">
-            <button type="submit" class="res-submit">Submit Your Interest</button>
-            <p class="res-terms-note">By submitting your interest you agree on iCAUR <a href="/terms">Terms &amp; Conditions</a></p>
+          <!-- Showroom dropdown -->
+          <div class="rv-select-wrap" id="rvf-showroom">
+            <span class="rv-select-label">Choose Showroom</span>
+            <select class="rv-select" id="rv-showroom">
+              <option value="" disabled selected></option>
+              <option value="new-cairo">New Cairo — Qattamya</option>
+              <option value="sheikh-zayed">Sheikh Zayed</option>
+              <option value="maadi">Maadi, Cairo</option>
+              <option value="6th-october">6th of October</option>
+            </select>
+            <span class="rv-select-arrow" aria-hidden="true">
+              <svg width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
           </div>
+
+          <button type="submit" class="rv-submit">Submit Your Interest</button>
+          <p class="rv-terms">By submitting you agree to our <a href="/terms">Terms &amp; Conditions</a></p>
 
         </form>
-      </div>
 
-    </div><!-- /res-card -->
-  </div><!-- /res-hero__inner -->
+      </div><!-- /rv-card -->
+    </div><!-- /rv-right -->
+
+  </div><!-- /rv-layout -->
 </section>
-
 
 </main>
 
 <div id="site-footer"></div>
 
 <script>
-// Model card selection
-document.querySelectorAll('.res-model-card').forEach(card => {
-  card.addEventListener('click', () => {
-    document.querySelectorAll('.res-model-card').forEach(c => {
-      c.classList.remove('is-active');
-      c.setAttribute('aria-checked', 'false');
+(function () {
+  /* ── Parallax background ── */
+  var bg = document.getElementById('rvBg');
+  if (bg) {
+    window.addEventListener('scroll', function () {
+      bg.style.transform = 'translateY(' + (window.scrollY * 0.35).toFixed(1) + 'px)';
+    }, { passive: true });
+  }
+
+  /* ── Floating labels ── */
+  document.querySelectorAll('.rv-field').forEach(function (wrap) {
+    var inp = wrap.querySelector('.rv-input');
+    if (!inp) return;
+    function refresh() {
+      wrap.classList.toggle('is-active', inp.value.length > 0 || document.activeElement === inp);
+    }
+    inp.addEventListener('input', refresh);
+    inp.addEventListener('focus', refresh);
+    inp.addEventListener('blur', refresh);
+    refresh();
+  });
+
+  /* ── Showroom dropdown floating label ── */
+  var showroomWrap = document.getElementById('rvf-showroom');
+  var showroomSel  = document.getElementById('rv-showroom');
+  if (showroomWrap && showroomSel) {
+    showroomSel.addEventListener('change', function () {
+      showroomWrap.classList.toggle('is-active', showroomSel.value !== '');
     });
-    card.classList.add('is-active');
-    card.setAttribute('aria-checked', 'true');
-  });
-  card.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
-  });
-});
+  }
 
-// Floating labels — inputs
-document.querySelectorAll('.rs-field').forEach(function(field) {
-  var inp = field.querySelector('.rs-input');
-  if (!inp) return;
-  function refresh() { field.classList.toggle('is-active', inp.value.length > 0 || document.activeElement === inp); }
-  inp.addEventListener('input', refresh);
-  inp.addEventListener('focus', refresh);
-  inp.addEventListener('blur', refresh);
-  refresh();
-});
-
-// Floating label — textarea
-document.querySelectorAll('.rs-textarea-wrap').forEach(function(wrap) {
-  var ta = wrap.querySelector('.rs-textarea');
-  if (!ta) return;
-  function refresh() { wrap.classList.toggle('is-active', ta.value.length > 0); }
-  ta.addEventListener('input', refresh);
-  ta.addEventListener('focus', refresh);
-  ta.addEventListener('blur', refresh);
-});
-
-// Form submit
-document.getElementById('resForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  this.innerHTML = '<div style="text-align:center;padding:40px 20px"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:16px"><polyline points="20 6 9 17 4 12"/></svg><h3 style="font-family:var(--f-display);font-size:1.6rem;font-weight:700;letter-spacing:-.025em;color:var(--black);margin:0 0 10px">Request Received</h3><p style="color:var(--text-mid);font-size:15px">Our team will be in touch with you shortly.</p></div>';
-});
+  /* ── Form submit ── */
+  var form = document.getElementById('rvForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      form.innerHTML = '<div class="rv-success"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><h3>Request Received</h3><p>Our team will be in touch with you shortly.</p></div>';
+    });
+  }
+})();
 </script>
 
 <script src="/js/components.js" defer></script>
 <script src="/js/main.js" defer></script>
-  <script src="/js/transitions.js" defer></script>
+<script src="/js/transitions.js" defer></script>
 <script src="/js/game.js" defer></script>
 </body>
 </html>

@@ -779,34 +779,7 @@ function splitHeadlineLetters(headline) {
 })();
 
 
-// ============================================================
-// FAQ ACCORDION — grid-row expand animation
-// ============================================================
-(function initFaq() {
-  $$('.faq-item__q').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const item     = btn.closest('.faq-item');
-      const answer   = item?.querySelector('.faq-item__a');
-      const expanded = btn.getAttribute('aria-expanded') === 'true';
-
-      // Collapse all
-      $$('.faq-item__q').forEach(b => {
-        b.setAttribute('aria-expanded', 'false');
-        b.closest('.faq-item')
-          ?.querySelector('.faq-item__a')
-          ?.classList.remove('is-open');
-      });
-
-      // Toggle clicked one open
-      if (!expanded) {
-        btn.setAttribute('aria-expanded', 'true');
-        answer?.classList.add('is-open');
-        // Scroll into view softly if needed
-        setTimeout(() => item?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 300);
-      }
-    });
-  });
-})();
+// FAQ accordion is handled inline in faq/index.html to avoid double-binding
 
 
 // ============================================================

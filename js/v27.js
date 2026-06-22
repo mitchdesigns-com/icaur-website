@@ -25,6 +25,11 @@ const HERO_POSE     = { rotY: -0.78, posX:  0.38, posY:  1.10, scale: 1.42 };
 const OVERVIEW_POSE = { rotY:  0.06, posX:  1.55, posY:  0.85, scale: 1.55 };
 const SIDE_POSE     = { rotY:  1.57, posX:  0.2,  posY:  1.90, scale: 1.08 };
 
+/* Smooth scroll-driven rotation target (drag is additive on top) */
+let scrollBaseRotY  = HERO_POSE.rotY;
+let dragExtraRot    = 0;
+let smoothRotY      = HERO_POSE.rotY; /* what the render loop lerps toward */
+
 let car = null;
 let isDragging  = false;
 let dragEnabled = false;
@@ -46,7 +51,7 @@ function initScene() {
   const scene = new THREE.Scene();
 
   const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0.2, 2.8, 7.5);
+  camera.position.set(0.2, 3.8, 9.2);
 
   /* Lights */
   scene.add(new THREE.AmbientLight(0xffffff, 0.55));
@@ -85,9 +90,14 @@ function initScene() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  /* Render loop */
+  /* Render loop — smooth lerp rotation so drag and scroll never snap */
   function animate() {
     requestAnimationFrame(animate);
+    if (car) {
+      const target = scrollBaseRotY + dragExtraRot;
+      smoothRotY = lerp(smoothRotY, target, 0.10);
+      car.rotation.y = smoothRotY;
+    }
     renderer.render(scene, camera);
   }
   animate();
@@ -96,49 +106,47 @@ function initScene() {
 function setupCarScrollAnim() {
   if (!car) return;
 
-  /* Overview: car rotates to front view as section enters; stays at OVERVIEW_POSE while pinned */
+  /* Overview: car rotates to front view as section enters */
   ScrollTrigger.create({
     trigger: '#v27-overview',
-    start: 'top 90%',
-    end: 'top top',
-    scrub: 1.2,
+    start: 'top 90%', end: 'top top', scrub: 1.5,
     onUpdate(self) {
-      if (!car || isDragging) return;
+      if (!car) return;
       const p = self.progress;
-      car.rotation.y = lerp(HERO_POSE.rotY, OVERVIEW_POSE.rotY, p);
-      car.position.x = lerp(HERO_POSE.posX, OVERVIEW_POSE.posX, p);
-      car.position.y = lerp(HERO_POSE.posY, OVERVIEW_POSE.posY, p);
+      scrollBaseRotY = lerp(HERO_POSE.rotY, OVERVIEW_POSE.rotY, p);
+      car.position.x  = lerp(HERO_POSE.posX,  OVERVIEW_POSE.posX,  p);
+      car.position.y  = lerp(HERO_POSE.posY,  OVERVIEW_POSE.posY,  p);
       car.scale.setScalar(lerp(HERO_POSE.scale, OVERVIEW_POSE.scale, p));
     },
   });
 
-  /* Exterior: car sweeps from front view to side profile as section enters */
+  /* Exterior: car sweeps from front view to side profile */
   ScrollTrigger.create({
     trigger: '#v27-exterior',
-    start: 'top 80%', end: 'top top', scrub: 1.8,
+    start: 'top 80%', end: 'top top', scrub: 1.5,
     onUpdate(self) {
-      if (!car || isDragging) return;
+      if (!car) return;
       const p = self.progress;
-      car.rotation.y = lerp(OVERVIEW_POSE.rotY, SIDE_POSE.rotY, p);
+      scrollBaseRotY = lerp(OVERVIEW_POSE.rotY, SIDE_POSE.rotY,  p);
       car.position.x  = lerp(OVERVIEW_POSE.posX,  SIDE_POSE.posX,  p);
       car.position.y  = lerp(OVERVIEW_POSE.posY,  SIDE_POSE.posY,  p);
       car.scale.setScalar(lerp(OVERVIEW_POSE.scale, SIDE_POSE.scale, p));
     },
   });
 
-  /* Exterior: enable drag while section is pinned; snap back on leave */
+  /* Exterior: enable drag while pinned; smoothly reset drag offset on leave */
   ScrollTrigger.create({
     trigger: '#v27-exterior',
     start: 'top top', end: 'bottom top',
     onEnter()     { dragEnabled = true;  showDragHint(true); },
-    onLeave()     { dragEnabled = false; showDragHint(false); resetCarToSidePose(); },
+    onLeave()     { dragEnabled = false; showDragHint(false); resetDragOffset(); },
     onEnterBack() { dragEnabled = true;  showDragHint(true); },
-    onLeaveBack() { dragEnabled = false; showDragHint(false); resetCarToSidePose(); },
+    onLeaveBack() { dragEnabled = false; showDragHint(false); resetDragOffset(); },
   });
 
   /* Hide canvas when past all 3D sections */
   ScrollTrigger.create({
-    trigger: '#v27-brand',
+    trigger: '#exterior-gallery',
     start: 'top top',
     end: 'bottom top',
     onUpdate(self) {
@@ -179,10 +187,14 @@ function setDragCursor(state) {
   }
 }
 
-function resetCarToSidePose() {
-  if (!car) return;
+function resetDragOffset() {
   if (inertiaTween) { inertiaTween.kill(); inertiaTween = null; }
-  gsap.to(car.rotation, { y: SIDE_POSE.rotY, duration: 0.8, ease: 'power2.inOut' });
+  /* Tween only the drag offset to 0 — scroll base handles the rest */
+  const state = { v: dragExtraRot };
+  gsap.to(state, {
+    v: 0, duration: 0.9, ease: 'power2.inOut',
+    onUpdate() { dragExtraRot = state.v; },
+  });
 }
 
 function setupDrag() {
@@ -201,16 +213,18 @@ function setupDrag() {
     if (!isDragging || !car) return;
     const x = e.clientX ?? e.touches?.[0]?.clientX ?? lastDragX;
     dragVelX = x - lastDragX; lastDragX = x;
-    car.rotation.y += dragVelX * 0.006;
+    dragExtraRot += dragVelX * 0.006;
   }
   function onUp() {
     if (!isDragging) return;
     isDragging = false;
     setDragCursor(dragEnabled ? 'hover' : 'none');
-    if (Math.abs(dragVelX) > 0.5 && car) {
-      inertiaTween = gsap.to(car.rotation, {
-        y: car.rotation.y + dragVelX * 0.3,
-        duration: 1.2, ease: 'power3.out',
+    if (Math.abs(dragVelX) > 0.5) {
+      const state = { v: dragExtraRot };
+      const target = dragExtraRot + dragVelX * 0.3;
+      inertiaTween = gsap.to(state, {
+        v: target, duration: 1.2, ease: 'power3.out',
+        onUpdate()   { dragExtraRot = state.v; },
         onComplete() { inertiaTween = null; },
       });
     }
@@ -271,12 +285,13 @@ function initExterior() {
    4.  EXTERIOR DESIGN — photo carousel
 ══════════════════════════════════════════════════════════ */
 const EXT_SLIDES = [
-  { src: '/assets/images/ICUAR V27 brochure 03 20.png',  label: 'Desert Run' },
-  { src: '/assets/images/v27/v27-01.png',                label: 'Front View' },
-  { src: '/assets/images/v27-19.png',                    label: 'Dynamic' },
-  { src: '/assets/images/v27/v27-17.png',                label: 'Side' },
-  { src: '/assets/images/v27/v27-02.png',                label: 'Profile' },
-  { src: '/assets/images/v27/car-side.jpg',              label: 'Side Profile' },
+  { src: '/assets/images/v27/v27-01.png',  label: 'Front View' },
+  { src: '/assets/images/v27/v27-02.png',  label: 'Profile' },
+  { src: '/assets/images/v27/v27-03.png',  label: 'Exterior' },
+  { src: '/assets/images/v27/v27-12.png',  label: 'Detail' },
+  { src: '/assets/images/v27/v27-17.png',  label: 'Side' },
+  { src: '/assets/images/v27/v27-20.png',  label: 'Dynamic' },
+  { src: '/assets/images/v27/v27-26.png',  label: 'Desert Run' },
 ];
 
 /* ─── Lightbox state ─────────────────────────────────── */
@@ -427,23 +442,79 @@ function initLightbox() {
   }, { passive: true });
 }
 
+function initDotGrid(wrap) {
+  const canvas = document.createElement('canvas');
+  wrap.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  const DOT_R = 1.5;
+  const GAP = 22;
+  const STEP = DOT_R * 2 + GAP;
+  const BASE = [200, 188, 174]; // #C8BCAE
+  const ACT  = [168, 144, 110]; // #A8906E
+  const PROX = 90;
+
+  let W = 0, H = 0, dots = [];
+  const mouse = { x: -9999, y: -9999 };
+
+  function build() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    W = wrap.offsetWidth; H = wrap.offsetHeight;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    canvas.style.cssText = `width:${W}px;height:${H}px;display:block`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    dots = [];
+    for (let y = STEP / 2; y < H; y += STEP)
+      for (let x = STEP / 2; x < W; x += STEP)
+        dots.push({ x, y });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const rect = wrap.getBoundingClientRect();
+    const mx = mouse.x - rect.left;
+    const my = mouse.y - rect.top;
+    for (const d of dots) {
+      const t = Math.max(0, 1 - Math.hypot(d.x - mx, d.y - my) / PROX);
+      const r = Math.round(BASE[0] + (ACT[0] - BASE[0]) * t);
+      const g = Math.round(BASE[1] + (ACT[1] - BASE[1]) * t);
+      const b = Math.round(BASE[2] + (ACT[2] - BASE[2]) * t);
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, DOT_R, 0, 6.283);
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fill();
+    }
+  }
+
+  let ticking = false;
+  window.addEventListener('mousemove', e => {
+    mouse.x = e.clientX; mouse.y = e.clientY;
+    if (!ticking) { ticking = true; requestAnimationFrame(() => { draw(); ticking = false; }); }
+  });
+  window.addEventListener('resize', () => { build(); draw(); });
+  build(); draw();
+}
+
 function initBrand() {
   const container = $('#v27-cg-container');
   if (!container) return;
+
+  const dotWrap = document.querySelector('.eg-dotgrid-wrap');
+  if (dotWrap) initDotGrid(dotWrap);
 
   const items = EXT_SLIDES.map(s => ({ image: s.src, text: s.label }));
   lbItems = items;
 
   ScrollTrigger.create({
-    trigger: '#v27-brand', start: 'top 75%', once: true,
+    trigger: '#exterior-gallery', start: 'top 85%', once: true,
     onEnter() {
-      gsap.from('#v27-brand-h2', { opacity: 0, y: 24, duration: .8, ease: 'power3.out' });
+      gsap.from('#eg-h2', { opacity: 0, y: 24, duration: .8, ease: 'power3.out' });
+      gsap.from('.eg-eyebrow', { opacity: 0, y: 12, duration: .6, ease: 'power2.out' });
     }
   });
 
   container.style.cursor = 'none';
 
-  /* Flatter arc on narrow screens so near-full-width cards sit level */
   const isMobile = window.innerWidth <= 640;
 
   new CircularGallery(container, {
@@ -451,7 +522,7 @@ function initBrand() {
     bend: isMobile ? 1 : 3,
     textColor: '#555859',
     borderRadius: 0.04,
-    font: '500 20px GothamMedium, Montserrat, sans-serif',
+    font: '500 16px GothamMedium, Montserrat, sans-serif',
     scrollSpeed: 4,
     scrollEase: 0.025,
     onItemClick: (idx, cx, cy) => openLightbox(idx, cx, cy),
@@ -511,6 +582,7 @@ function initAbout() {
    6.  GALLERY LIGHTBOX
 ══════════════════════════════════════════════════════════ */
 function initGallery() {
+  if (!document.querySelector('.v27-gallery-item')) return;
   /* Gallery images feed into the shared lightbox */
   const galleryImgs = $$('.v27-gallery-item img').map(img => ({ image: img.src, text: img.alt }));
 
@@ -1032,11 +1104,12 @@ function initTrims() {
    13. RESERVE SECTION
 ══════════════════════════════════════════════════════════ */
 function initReserve() {
+  if (!document.getElementById('v27-reserve')) return;
   ScrollTrigger.create({
     trigger: '#v27-reserve', start: 'top 70%', once: true,
     onEnter() {
-      gsap.from('#v27-reserve-h2', { opacity: 0, y: 30, duration: .8, ease: 'power3.out' });
-      gsap.from('#v27-reserve .v27-reserve-ctas', { opacity: 0, y: 20, duration: .6, delay: .35 });
+      gsap.from('#v27-reserve .cta-split__h', { opacity: 0, y: 30, duration: .8, stagger: .1, ease: 'power3.out' });
+      gsap.from('#v27-reserve .btn', { opacity: 0, y: 20, duration: .6, stagger: .1, delay: .35 });
     }
   });
 }

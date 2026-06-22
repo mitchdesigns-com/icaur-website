@@ -20,6 +20,7 @@
   z-index: 1;
   pointer-events: none;
   transition: opacity 0.5s ease;
+  transform: translateY(-9vh);
 }
 #v27-canvas-wrap canvas {
   width: 100% !important;
@@ -31,7 +32,7 @@
 .line-inner { display: block; }
 
 /* ─── Unified section headlines ──────────────────────────── */
-.v27-ext-h2, .v27-brand-h2, .v27-about-h2, .v27-gallery-h2,
+.v27-ext-h2, .v27-brand-h2, .eg-h2, .v27-about-h2, .v27-gallery-h2,
 .v27-interior-h2, .v27-tech-h2, .v27-safety-h2, .v27-charging-h2,
 .v27-trims-h2, .v27-reserve-h2 {
   font-size: clamp(2.2rem, 3.8vw, 3.6rem) !important;
@@ -85,10 +86,21 @@
 }
 /* Bottom CTA */
 .v27-hero-bottom {
-  position: absolute; bottom: clamp(44px, 6vh, 70px);
+  position: absolute; bottom: clamp(88px, 12vh, 130px);
   left: 0; right: 0; z-index: 6;
   display: flex; justify-content: center;
   pointer-events: all; opacity: 0;
+}
+
+/* V27 logo inline in headline */
+.v27-model-logo-inline {
+  height: .72em;
+  width: auto;
+  display: inline-block;
+  vertical-align: baseline;
+  margin-left: .12em;
+  position: relative;
+  top: .05em;
 }
 .v27-hero-reserve-btn { pointer-events: all; }
 
@@ -168,6 +180,13 @@
 }
 .v27-cta-btn--light:hover {
   border-color: rgba(255,255,255,.6); color: #fff;
+}
+.v27-cta-btn--outline {
+  background: transparent; color: #1F0F08; border: 2px solid #1F0F08;
+}
+.v27-cta-btn--outline:hover {
+  background: #1F0F08; color: #fff;
+  box-shadow: 0 10px 28px rgba(31,15,8,.18);
 }
 /* Scroll cue */
 .v27-scroll-cue {
@@ -312,68 +331,39 @@
 /* ══════════════════════════════════════════════════════
    EXTERIOR DESIGN — photo carousel (replaces brand)
 ══════════════════════════════════════════════════════ */
-#v27-brand {
-  position: relative; z-index: 6; background: #F5EFE5;
+/* ══════════════════════════════════════════════════════
+   EXTERIOR GALLERY
+══════════════════════════════════════════════════════ */
+#exterior-gallery {
+  position: relative; z-index: 5; background: #F5EFE5;
   padding: clamp(60px,8vh,100px) 0 0; overflow: hidden;
 }
 
-/* ─── Bubble doodles ────────────────────────────────────── */
-.v27-bd-layer {
-  position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+/* DotGrid canvas background */
+.eg-dotgrid-wrap {
+  position: absolute; inset: 0; z-index: 0;
+  pointer-events: none; opacity: 0.5;
 }
-.v27-bd {
-  position: absolute; overflow: visible;
-}
-.v27-bd--tr { width: clamp(160px,18vw,260px); top: -40px; right: -20px; }
-.v27-bd--lc { width: clamp(120px,14vw,200px); left: -30px; top: 38%; transform: translateY(-50%); }
-.v27-bd--br { width: clamp(140px,16vw,220px); bottom: 60px; right: 3%; }
+.eg-dotgrid-wrap canvas { display: block; width: 100%; height: 100%; }
 
-/* scattered dot bubbles */
-.bd-dot {
-  position: absolute; border-radius: 50%; background: #E8612A;
-}
-.bd-dot--1 { width: 14px; height: 14px; left: 22%; top: 18%; opacity: .22; }
-.bd-dot--2 { width: 9px;  height: 9px;  left: 55%; top: 8%;  opacity: .18; }
-.bd-dot--3 { width: 11px; height: 11px; left: 38%; top: 85%; opacity: .2;  }
-.bd-dot--4 { width: 7px;  height: 7px;  left: 78%; top: 72%; opacity: .25; }
-
-/* bubble keyframe animations */
-@keyframes bFloat  { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-14px)} }
-@keyframes bFloatX { 0%,100%{transform:translateX(0)}  50%{transform:translateX(10px)}  }
-@keyframes bPop    { 0%,100%{transform:scale(1)}       50%{transform:scale(1.12)}       }
-@keyframes bGlow   { 0%,100%{opacity:.45}              50%{opacity:.7}                  }
-
-.bd-float  { animation: bFloat  5s ease-in-out infinite; }
-.bd-floatx { animation: bFloatX 6.5s ease-in-out infinite; }
-.bd-pop    { animation: bPop    4s ease-in-out infinite; }
-.bd-glow   { animation: bGlow   3.5s ease-in-out infinite; }
-
-/* stagger animations so they don't all move together */
-.v27-bd--lc .bd-float  { animation-delay: -1.8s; }
-.v27-bd--br .bd-floatx { animation-delay: -3.2s; }
-.v27-bd--br .bd-pop    { animation-delay: -1.1s; }
-.bd-dot--2 { animation-delay: -2s; }
-.bd-dot--3 { animation-delay: -0.7s; }
-
-.v27-brand-head {
+/* Header */
+.eg-header {
   position: relative; z-index: 1;
-  padding: 0 var(--px); margin-bottom: clamp(40px,6vh,60px);
+  padding: 0 var(--px); margin-bottom: 16px;
 }
-.v27-brand-eyebrow {
-  color: #015699; letter-spacing: .32em; font-size: .68rem;
-  font-weight: 700; text-transform: uppercase; margin-bottom: 16px;
+.eg-eyebrow {
+  color: #015699 !important; letter-spacing: .32em !important;
+  margin-bottom: 16px; display: inline-flex; align-items: center;
 }
-.v27-eyebrow-dot { color: #015699; opacity: .6; }
-.v27-brand-h2 {
-  font-size: clamp(2rem,4vw,3.5rem); font-weight: 500;
-  line-height: 1.05; letter-spacing: -.02em; color: #1F0F08; margin: 0;
+.eg-eyebrow-dot {
+  display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+  background: currentColor; margin: 0 .65em; opacity: .55;
+  transform: translateY(-1px);
 }
-.v27-brand-h2 em { font-style: normal; color: #1F0F08; }
-.v27-brand-carousel-outer {
-  position: relative; padding: 14px 0 22px; overflow: hidden;
-}
-.v27-brand-carousel-track {
-  display: flex; gap: 10px; will-change: transform;
+.eg-h2 {
+  font-size: clamp(2rem,4vw,3.5rem) !important; font-weight: 500 !important;
+  line-height: 1.08 !important; letter-spacing: -.02em !important;
+  color: #1F0F08 !important; margin: 0;
 }
 
 /* ══════════════════════════════════════════════════════
@@ -455,7 +445,7 @@
    so we clamp the height to keep cards a consistent size across screens. */
 .v27-cg-wrap {
   width: 100vw; margin-left: calc(50% - 50vw);
-  height: clamp(440px, 64vh, 680px);
+  height: clamp(440px, 80vh, 760px);
   overflow: hidden; cursor: zoom-in; position: relative; z-index: 1;
 }
 .v27-cg-wrap:active { cursor: grabbing; }
@@ -1050,25 +1040,43 @@
 }
 
 /* ── PDF Download grid ────────────────────────────── */
+/* ══════════════════════════════════════════════════════
+   RESOURCES SECTION
+══════════════════════════════════════════════════════ */
+#v27-resources {
+  background: #F5EFE5;
+  padding: clamp(52px, 7vh, 88px) var(--px) clamp(64px, 9vh, 100px);
+  text-align: center;
+}
+.v27-res-eyebrow {
+  margin-bottom: 16px;
+}
+.v27-res-h2 {
+  font-size: clamp(1.9rem, 3.5vw, 3rem); font-weight: 500;
+  line-height: 1.08; letter-spacing: -.02em;
+  color: #1F0F08; margin: 0 0 clamp(36px, 5vh, 56px);
+}
 .v27-dl-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: clamp(32px, 5vh, 52px);
+  display: flex; flex-wrap: wrap; gap: 12px;
+  justify-content: center;
 }
 .v27-dl-pill {
-  display: flex; align-items: center; gap: 10px;
-  background: #1a1a1a; border-radius: 16px;
-  padding: 9px 12px 9px 9px; text-decoration: none;
-  transition: background .2s;
+  display: flex; align-items: center; gap: 12px;
+  background: #fff; border-radius: 18px;
+  padding: 11px 16px 11px 11px; text-decoration: none;
+  box-shadow: 0 2px 12px rgba(31,15,8,.07), 0 1px 3px rgba(31,15,8,.05);
+  transition: box-shadow .25s, transform .2s;
   cursor: pointer;
 }
-.v27-dl-pill:hover { background: #252525; }
+.v27-dl-pill:hover {
+  box-shadow: 0 8px 28px rgba(31,15,8,.12), 0 2px 8px rgba(31,15,8,.07);
+  transform: translateY(-2px);
+}
 .v27-dl-pill:hover .v27-dl-arrow { color: var(--orange); }
 .v27-dl-badge {
   flex-shrink: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px; width: 32px; height: 38px; border-radius: 6px;
+  gap: 3px; width: 34px; height: 40px; border-radius: 7px;
   background: var(--orange);
   font-size: .38rem; font-weight: 800; letter-spacing: .08em;
   text-transform: uppercase; color: #fff;
@@ -1078,13 +1086,13 @@
   display: flex; flex-direction: column; gap: 2px; min-width: 0;
 }
 .v27-dl-name {
-  font-size: .72rem; font-weight: 600; color: #fff;
+  font-size: .75rem; font-weight: 600; color: #1F0F08;
   letter-spacing: -.01em; white-space: nowrap;
 }
-.v27-dl-size { font-size: .6rem; color: rgba(255,255,255,.38); }
+.v27-dl-size { font-size: .62rem; color: rgba(31,15,8,.4); }
 .v27-dl-arrow {
-  flex-shrink: 0; color: rgba(255,255,255,.35); transition: color .2s;
-  display: flex; align-items: center; margin-left: 6px;
+  flex-shrink: 0; color: rgba(31,15,8,.25); transition: color .2s;
+  display: flex; align-items: center; margin-left: 4px;
 }
 
 /* ══════════════════════════════════════════════════════

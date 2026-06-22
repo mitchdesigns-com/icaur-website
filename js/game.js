@@ -106,7 +106,7 @@
       const sc = Math.min(bw / LOGO_IMG.naturalWidth, bh / LOGO_IMG.naturalHeight)
       const w = LOGO_IMG.naturalWidth * sc, h = LOGO_IMG.naturalHeight * sc
       const dx = bx + (bw - w) / 2, dy = by + (bh - h) / 2
-      if (flipBadge) {            // keep badge readable when the car is mirrored
+      if (flipBadge) {
         ctx.save(); ctx.translate(dx + w / 2, dy + h / 2); ctx.scale(-1, 1)
         ctx.drawImage(LOGO_IMG, -w / 2, -h / 2, w, h); ctx.restore()
       } else {

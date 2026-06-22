@@ -3,9 +3,8 @@
 /* ============================================================
    About page — pinned scene driver.
    One viewport: the Overview panel cross-fades into the iCAUR
-   Story panel while the cartoon car follows a smooth curved
-   path. Everything is SCRUBBED directly to scroll progress
-   (no spring / no bounce). Reuses the game car (window.iCAURCar).
+   Story panel while the V27 PNG car follows a smooth curved path.
+   Everything is SCRUBBED directly to scroll progress (no spring).
 ============================================================ */
 (function () {
   if (!window.matchMedia('(pointer: fine)').matches) return;   // skip touch
@@ -13,6 +12,10 @@
   const hero   = document.getElementById('hero');
   const scene  = document.getElementById('aboutScene');
   if (!hero || !scene) return;
+
+  /* V27 side-profile image */
+  const CAR_IMG = new Image();
+  CAR_IMG.src = '/assets/images/about-3d.png';
   const ovPanel = scene.querySelector('.scene-panel--overview');
   const stPanel = scene.querySelector('.scene-panel--story');
   const steps   = [...scene.querySelectorAll('.saga-step')];
@@ -101,7 +104,6 @@
   }
 
   function frame() {
-    if (!window.iCAURCar) { requestAnimationFrame(frame); return; }
     const s = state();
 
     // panels: fade + subtle slide (no x/y-only pop)
@@ -110,15 +112,26 @@
     steps.forEach((el, i) => el.classList.toggle('is-active', i === s.active));
 
     ctx.clearRect(0, 0, vw, vh);
-    if (s.op > 0.01 && s.x != null) {
+    if (s.op > 0.01 && s.x != null && CAR_IMG.complete && CAR_IMG.naturalWidth) {
       if (prevX != null) spin += (Math.hypot(s.x - prevX, s.y - prevY)) * 0.05 * (s.x >= prevX ? 1 : -1);
       prevX = s.x; prevY = s.y;
+
+      const sc = s.sc || HERO_SC;
+      const dh = 72 * sc;
+      const dw = dh * (CAR_IMG.naturalWidth / CAR_IMG.naturalHeight);
+
       ctx.save();
       ctx.globalAlpha = clamp(s.op, 0, 1);
       ctx.translate(s.x, s.y);
       ctx.rotate(s.rot);
-      ctx.scale(-1, 1);
-      window.iCAURCar.drawCar(ctx, 0, 0, s.sc || HERO_SC, spin, 0, 0, true);
+
+      /* subtle ground shadow */
+      ctx.fillStyle = 'rgba(0,0,0,0.13)';
+      ctx.beginPath();
+      ctx.ellipse(0, 4, dw * 0.38, dh * 0.07, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.drawImage(CAR_IMG, -dw / 2, -dh, dw, dh);
       ctx.restore();
     }
     requestAnimationFrame(frame);
