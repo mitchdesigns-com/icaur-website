@@ -41,6 +41,9 @@
   <!-- Site nav (injected by components.js) -->
   <div id="site-header"></div>
 
+  <!-- ─── DotGrid (fixed, BEHIND the 3D car — z0 < z1) ─────────── -->
+  <div class="eg-dotgrid-wrap" aria-hidden="true"></div>
+
   <!-- ─── 3D Canvas (fixed, behind all sections) ──────────────── -->
   <div id="v27-canvas-wrap">
     <canvas id="v27-canvas"></canvas>
@@ -52,17 +55,8 @@
   <section id="v27-hero">
     <div class="v27-hero-sticky">
 
-      <!-- Animated background bubbles -->
-      <div class="v27-bubbles" aria-hidden="true">
-        <div class="v27-bubble v27-bubble--1"></div>
-        <div class="v27-bubble v27-bubble--2"></div>
-        <div class="v27-bubble v27-bubble--3"></div>
-        <div class="v27-bubble v27-bubble--4"></div>
-        <div class="v27-bubble v27-bubble--5"></div>
-        <div class="v27-bubble v27-bubble--6"></div>
-        <div class="v27-bubble v27-bubble--7"></div>
-        <div class="v27-bubble v27-bubble--8"></div>
-      </div>
+      <!-- Floating particles background -->
+      <div class="v27-particles" id="v27-particles" aria-hidden="true"></div>
 
       <!-- Top text block -->
       <div class="v27-hero-top" id="v27-hero-top">
@@ -94,7 +88,7 @@
     <div class="v27-overview-sticky">
       <div class="v27-overview-inner">
         <div class="v27-overview-left" id="v27-ov-left">
-          <h2 class="v27-ov-h2">V27<br>Overview</h2>
+          <h2 class="v27-ov-h2"><img src="/assets/images/V27-logo.svg" alt="V27" class="v27-ov-logo"><br>Overview</h2>
           <p class="v27-ov-para">
             Built with extraordinary electric technology and bold V27 DNA,
             the iCAUR V27 gives you the best of both worlds — emission-free
@@ -124,7 +118,7 @@
       <div class="v27-ext-header">
         <div>
           <div class="eyebrow" id="v27-ext-eyebrow">360 Experience</div>
-          <h2 class="v27-ext-h2" id="v27-ext-h2">Designed to <em>Stand Out.</em></h2>
+          <h2 class="v27-ext-h2" id="v27-ext-h2">Designed To <em>Stand Out.</em></h2>
         </div>
       </div>
       <div class="v27-ext-window"></div>
@@ -134,21 +128,29 @@
             <img src="/assets/images/v27/car-color-camel.png" alt="Camel" draggable="false">
             <span class="v27-swatch-name">Camel</span>
           </button>
-          <button class="v27-swatch" data-color="black" aria-label="Black">
-            <img src="/assets/images/v27/car-color-Black.png" alt="Black" draggable="false">
-            <span class="v27-swatch-name">Black</span>
+          <button class="v27-swatch" data-color="carbon-black" aria-label="Carbon Black">
+            <img src="/assets/images/v27/car-color-carbon-black.png" alt="Carbon Black" draggable="false">
+            <span class="v27-swatch-name">Carbon Black</span>
           </button>
-          <button class="v27-swatch" data-color="olive" aria-label="Olive">
-            <img src="/assets/images/v27/car-color-Olive.png" alt="Olive" draggable="false">
-            <span class="v27-swatch-name">Olive</span>
+          <button class="v27-swatch" data-color="gold-sand" aria-label="Gold Sand">
+            <img src="/assets/images/v27/car-color-gold-sand.png" alt="Gold Sand" draggable="false">
+            <span class="v27-swatch-name">Gold Sand</span>
           </button>
-          <button class="v27-swatch" data-color="grey" aria-label="Grey">
-            <img src="/assets/images/v27/car-color-Grey.png" alt="Grey" draggable="false">
-            <span class="v27-swatch-name">Grey</span>
+          <button class="v27-swatch" data-color="khaki-white" aria-label="Khaki White">
+            <img src="/assets/images/v27/car-color-khaki-white.png" alt="Khaki White" draggable="false">
+            <span class="v27-swatch-name">Khaki White</span>
           </button>
-          <button class="v27-swatch" data-color="silver" aria-label="Silver">
-            <img src="/assets/images/v27/car-color-Silver.png" alt="Silver" draggable="false">
-            <span class="v27-swatch-name">Silver</span>
+          <button class="v27-swatch" data-color="porcelain-gray" aria-label="Porcelain Gray">
+            <img src="/assets/images/v27/car-color-porcelain-gray.png" alt="Porcelain Gray" draggable="false">
+            <span class="v27-swatch-name">Porcelain Gray</span>
+          </button>
+          <button class="v27-swatch" data-color="star-silver" aria-label="Star Silver">
+            <img src="/assets/images/v27/car-color-star-silver.png" alt="Star Silver" draggable="false">
+            <span class="v27-swatch-name">Star Silver</span>
+          </button>
+          <button class="v27-swatch" data-color="tactical-green" aria-label="Tactical Green">
+            <img src="/assets/images/v27/car-color-tactical-green.png" alt="Tactical Green" draggable="false">
+            <span class="v27-swatch-name">Tactical Green</span>
           </button>
         </div>
       </div>
@@ -156,12 +158,9 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════════
-       EXTERIOR DESIGN — circular gallery
+       EXTERIOR DESIGN — edge gallery (2-col, alternating sweep)
   ══════════════════════════════════════════════════════ -->
   <section id="exterior-gallery">
-    <!-- DotGrid interactive canvas background -->
-    <div class="eg-dotgrid-wrap" aria-hidden="true"></div>
-
     <!-- Header -->
     <div class="eg-header">
       <p class="eyebrow eg-eyebrow">
@@ -170,8 +169,8 @@
       <h2 class="eg-h2" id="eg-h2">DESIGNED TO BE SEEN.</h2>
     </div>
 
-    <!-- CircularGallery -->
-    <div id="v27-cg-container" class="v27-cg-wrap"></div>
+    <!-- EdgeGallery grid (cards injected by v27.js) -->
+    <div id="v27-eg-grid" class="v27-eg-grid"></div>
   </section>
 
   <!-- ══════════════════════════════════════════════════════
@@ -273,7 +272,7 @@
 
     <a class="v27-dl-pill" href="/assets/docs/iCAUR-V27-Insurance.pdf" download aria-label="Download V27 Insurance Program">
       <span class="v27-dl-badge">
-        <svg width="16" height="20" viewBox="0 0 16 20" fill="none"><rect width="16" height="20" rx="3" fill="#fff" fill-opacity=".15"/><path d="M3 13.5h10M3 10.5h10M3 7.5h6" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M10 1v4h4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg width="18" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
         PDF
       </span>
       <span class="v27-dl-info">
@@ -396,8 +395,8 @@
             Safety <span class="eyebrow-dot"></span> V27
           </p>
           <h2 class="v27-safety-h2" id="v27-sf-h2">
-            <span class="line-clip"><span class="line-inner">Protection that</span></span>
-            <span class="line-clip"><span class="line-inner" style="color:#F37021">moves with you.</span></span>
+            <span class="line-clip"><span class="line-inner">Protection That</span></span>
+            <span class="line-clip"><span class="line-inner" style="color:#F37021">Moves With You.</span></span>
           </h2>
         </div>
         <p class="v27-sf-intro">
@@ -512,92 +511,38 @@
     </div>
   </section>
 
-  <!-- ══════════════════════════════════════════════════════
-       TRIMS
-  ══════════════════════════════════════════════════════ -->
-  <section id="v27-trims">
-    <div class="v27-trims-head">
-      <div class="v27-trims-eyebrow"><span class="eyebrow-dot"></span>Choose Your Trim</div>
-      <h2 class="v27-trims-h2">Standard or Flagship</h2>
-    </div>
-
-    <div class="v27-trims-table">
-      <div class="v27-trims-col-heads">
-        <div></div>
-        <div class="v27-trim-col-head" id="v27-trim-head-std">
-          <span class="v27-trim-name">Standard</span>
-        </div>
-        <div class="v27-trim-col-head" id="v27-trim-head-fls">
-          <span class="v27-trim-badge">TOP</span>
-          <span class="v27-trim-name flagship">Flagship</span>
-        </div>
-      </div>
-
-      <!-- Performance & Range -->
-      <div class="v27-trim-section-label">Performance &amp; Range</div>
-      <div class="v27-trim-row">
-        <span class="v27-trim-feature">Range (WLTP)</span>
-        <div class="v27-trim-cell"><span class="v27-trim-val">449 km</span></div>
-        <div class="v27-trim-cell"><span class="v27-trim-val">500 km</span></div>
-      </div>
-      <div class="v27-trim-row">
-        <span class="v27-trim-feature">0–100 km/h</span>
-        <div class="v27-trim-cell"><span class="v27-trim-val">6.4 s</span></div>
-        <div class="v27-trim-cell"><span class="v27-trim-val">5.9 s</span></div>
-      </div>
-      <div class="v27-trim-row">
-        <span class="v27-trim-feature">Top Speed</span>
-        <div class="v27-trim-cell"><span class="v27-trim-val">200 km/h</span></div>
-        <div class="v27-trim-cell"><span class="v27-trim-val">230 km/h</span></div>
-      </div>
-      <div class="v27-trim-row">
-        <span class="v27-trim-feature">Drive Mode Sport+</span>
-        <div class="v27-trim-cell v27-trim-dash">—</div>
-        <div class="v27-trim-cell v27-trim-check"><svg fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#F37021" opacity=".12"/><path stroke="#F37021" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M7 12.5l3 3 7-7"/></svg></div>
-      </div>
-    </div>
-
-    <!-- PDF Downloads -->
-  </section>
+  <!-- Trims section removed (hidden on the landing page too) -->
 
   <!-- ══════════════════════════════════════════════════════
        RESERVE CTA
   ══════════════════════════════════════════════════════ -->
-  <section class="cta-split" id="v27-reserve" style="background:var(--black)">
-    <div class="cta-split__grid">
-      <div class="cta-split__panel cta-split__brick cta-split__brick--orange cta-split__panel--big" data-lego="left">
-        <div class="cta-split__knobs" aria-hidden="true"></div>
-        <div class="cta-split__content">
-          <h2 class="cta-split__h">Reserve Your<br>iCAUR V27</h2>
-          <p class="cta-split__body">Secure your place with a fully refundable deposit. Our team will guide you through every step.</p>
-          <a href="/reserve/" class="btn btn--dark btn--lg btn--arrow btn--magnetic">Reserve Now <span class="arrow">→</span></a>
-        </div>
-        <div class="cta-split__studs cta-split__studs--right" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-      </div>
-      <div class="cta-split__panel cta-split__brick cta-split__brick--white cta-split__panel--small" data-lego="right">
-        <div class="cta-split__knobs" aria-hidden="true"></div>
-        <div class="cta-split__studs cta-split__studs--left" aria-hidden="true"><span></span><span></span><span></span></div>
-        <div class="cta-split__content">
-          <h2 class="cta-split__h">Request a Test Drive</h2>
-          <p class="cta-split__body">Experience the V27 on Egyptian roads. Book a session with our team today.</p>
-          <a href="/contact/" class="btn btn--filled btn--arrow btn--magnetic">Book Now <span class="arrow">→</span></a>
-        </div>
-      </div>
+  <section class="cta-video" id="v27-reserve">
+  <video class="cta-video__bg" src="/assets/images/CTA-bg.mp4" poster="/assets/images/CTA.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+  <div class="cta-video__overlay" aria-hidden="true"></div>
+  <div class="cta-video__glass reveal reveal--up">
+    <span class="cta-video__dash" aria-hidden="true"></span>
+    <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
+    <p class="cta-video__body">Secure your place with a fully refundable deposit. Our team will guide you through every step — or call us directly at <a href="tel:19000" class="cta-video__tel">19000</a>.</p>
+    <div class="cta-video__actions">
+      <a href="/reserve/" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Now <span class="arrow">→</span></a>
+      <a href="/contact/" class="btn btn--outline btn--arrow btn--magnetic">Book Now <span class="arrow">→</span></a>
     </div>
-  </section>
+  </div>
+</section>
 
   <!-- Site footer (injected by components.js) -->
   <div id="site-footer"></div>
 
   <!-- ─── Scripts ─────────────────────────────────────────── -->
-  <!-- GSAP must be global before the module loads -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <!-- GSAP must be global before the module loads (3.13+: InertiaPlugin is free) -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/InertiaPlugin.min.js"></script>
   <script src="/js/components.js"></script>
   <script src="/js/main.js"></script>
   <script src="/js/transitions.js"></script>
   <script src="/js/game.js"></script>
-  <script type="module" src="/js/v27.js?v=11"></script>
+  <script type="module" src="/js/v27.js?v=16"></script>
 
 </body>
 </html>

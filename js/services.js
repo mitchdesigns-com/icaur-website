@@ -252,11 +252,11 @@ var BADGE_LABELS = { showroom: 'Showroom', service: 'Service Center' };
 function fuMakeIcon(active) {
   var S = 60, H = 30, DOT = active ? 20 : 13, off = H - DOT / 2;
   var dotCSS = active
-    ? 'background:#231815;box-shadow:0 0 0 4px rgba(35,24,21,0.20),0 0 16px rgba(35,24,21,0.55);animation:fuGlow 2s ease-in-out infinite;'
-    : 'background:#B08070;box-shadow:0 0 0 3px rgba(168,120,100,0.18);';
+    ? 'background:#F37021;box-shadow:0 0 0 4px rgba(243,112,33,0.22),0 0 16px rgba(243,112,33,0.55);animation:fuGlow 2s ease-in-out infinite;'
+    : 'background:#F37021;box-shadow:0 0 0 3px rgba(243,112,33,0.18);';
   var rings = active
     ? [0, 0.8, 1.6].map(function(delay) {
-        return '<div style="position:absolute;top:' + off + 'px;left:' + off + 'px;width:' + DOT + 'px;height:' + DOT + 'px;border-radius:50%;background:rgba(35,24,21,0.22);animation:fuBloom 2.4s ease-out infinite ' + delay + 's;pointer-events:none;"></div>';
+        return '<div style="position:absolute;top:' + off + 'px;left:' + off + 'px;width:' + DOT + 'px;height:' + DOT + 'px;border-radius:50%;background:rgba(243,112,33,0.22);animation:fuBloom 2.4s ease-out infinite ' + delay + 's;pointer-events:none;"></div>';
       }).join('')
     : '';
   return L.divIcon({

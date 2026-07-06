@@ -161,6 +161,9 @@ function splitHeadlineLetters(headline) {
     $$('a, button, [role="button"], .btn, label, input, textarea, select').forEach(el => {
       el.addEventListener('mouseenter', () => {
         cursor.classList.add('is-hover');
+        // FAQ questions: the ring keeps following the mouse across the
+        // row — only the plus icon itself (handled below) snaps the ring
+        if (el.matches('.faq-item__q')) return;
         if (el.matches('.btn, button, [role="button"], .v27-cta-btn')) {
           cursor.classList.add('is-fit');
           hoverEl = el;
@@ -169,6 +172,20 @@ function splitHeadlineLetters(headline) {
       el.addEventListener('mouseleave', () => {
         cursor.classList.remove('is-hover');
         if (hoverEl === el) {
+          cursor.classList.remove('is-fit');
+          hoverEl = null;
+        }
+      });
+    });
+
+    // FAQ plus icons: the ring wraps just the icon while the mouse is on it
+    $$('.faq-item__plus').forEach(plus => {
+      plus.addEventListener('mouseenter', () => {
+        cursor.classList.add('is-fit');
+        hoverEl = plus;
+      });
+      plus.addEventListener('mouseleave', () => {
+        if (hoverEl === plus) {
           cursor.classList.remove('is-fit');
           hoverEl = null;
         }
@@ -723,6 +740,144 @@ function splitHeadlineLetters(headline) {
 
 
 // ============================================================
+// USP ACCORDION — Why iCAUR items expand on click (client H6)
+// ============================================================
+(function initUspAccordion() {
+  const items = $$('.svc-list .svc-item');
+  if (!items.length) return;
+  items[0].classList.add('is-open');
+  items.forEach(item => {
+    item.addEventListener('click', () => {
+      const wasOpen = item.classList.contains('is-open');
+      items.forEach(o => o.classList.remove('is-open'));
+      if (!wasOpen) item.classList.add('is-open');
+    });
+  });
+})();
+
+
+// ============================================================
+// SERVICES HOVER LIST — homepage image preview (reference style)
+// ============================================================
+(function initUspList() {
+  const stack   = $('#uspStack');
+  const preview = $('#uspPreview');
+  if (!stack || !preview) return;
+  const img  = preview.querySelector('img');
+  const rows = $$('.usp-row', stack);
+
+  rows.forEach(row => {
+    row.addEventListener('mouseenter', () => {
+      if (img.getAttribute('src') !== row.dataset.img) img.src = row.dataset.img;
+      preview.classList.add('is-active');
+    });
+    row.addEventListener('focus', () => {
+      img.src = row.dataset.img;
+      preview.classList.add('is-active');
+    });
+  });
+  stack.addEventListener('mouseleave', () => preview.classList.remove('is-active'));
+})();
+
+
+// ============================================================
+// SPOTLIGHT HERO — flashlight reveal on service sub-pages
+// ============================================================
+(function initSpotHero() {
+  const hero = $('.spot-hero');
+  if (!hero) return;
+  const reveal = hero.querySelector('.spot-hero__reveal');
+  if (!reveal) return;
+
+  // Touch devices: no cursor — show the reveal layer as a gentle
+  // roaming spotlight instead of hiding the effect entirely.
+  const fine = window.matchMedia('(pointer: fine)').matches;
+
+  let mx = -999, my = -999;   // raw target
+  let sx = -999, sy = -999;   // smoothed
+
+  if (fine) {
+    // Fade the light in/out at the edges instead of dragging it away —
+    // a position of -999 would streak the circle across the image.
+    reveal.style.opacity = '0';
+    reveal.style.transition = 'opacity .45s ease';
+    hero.addEventListener('mouseenter', e => {
+      const r = hero.getBoundingClientRect();
+      // snap to the entry point so the light doesn't travel from its old spot
+      mx = sx = e.clientX - r.left;
+      my = sy = e.clientY - r.top;
+      reveal.style.opacity = '1';
+    });
+    hero.addEventListener('mousemove', e => {
+      const r = hero.getBoundingClientRect();
+      mx = e.clientX - r.left;
+      my = e.clientY - r.top;
+      reveal.style.opacity = '1';
+    }, { passive: true });
+    hero.addEventListener('mouseleave', () => {
+      reveal.style.opacity = '0';   // dim in place, no run-away
+    });
+  } else {
+    // slow autonomous drift for touch screens
+    let t = 0;
+    setInterval(() => {
+      t += 0.02;
+      mx = hero.offsetWidth  * (0.5 + 0.35 * Math.sin(t));
+      my = hero.offsetHeight * (0.55 + 0.2 * Math.cos(t * 0.8));
+    }, 40);
+  }
+
+  (function loop() {
+    sx += (mx - sx) * 0.1;
+    sy += (my - sy) * 0.1;
+    reveal.style.setProperty('--sx', sx.toFixed(1) + 'px');
+    reveal.style.setProperty('--sy', sy.toFixed(1) + 'px');
+    requestAnimationFrame(loop);
+  })();
+})();
+
+
+// ============================================================
+// DARK SECTION SPOTLIGHT — glow follows the cursor (client I2)
+// ============================================================
+(function initDarkSpotlight() {
+  const sections = $$('.innov-pillar--dark');
+  if (!sections.length || !window.matchMedia('(pointer: fine)').matches) return;
+  sections.forEach(sec => {
+    sec.addEventListener('mousemove', e => {
+      const r = sec.getBoundingClientRect();
+      sec.style.setProperty('--spot-x', `${e.clientX - r.left}px`);
+      sec.style.setProperty('--spot-y', `${e.clientY - r.top}px`);
+    }, { passive: true });
+  });
+})();
+
+
+// ============================================================
+// BRAND VALUES — hover/click reveal cards on About (client A1)
+// ============================================================
+(function initValueCards() {
+  const cards = $$('#valuesRow .value-card');
+  if (!cards.length) return;
+  const activate = card => {
+    cards.forEach(c => {
+      const on = c === card;
+      c.classList.toggle('is-active', on);
+      c.setAttribute('aria-expanded', String(on));
+    });
+  };
+  const fine = window.matchMedia('(pointer: fine)').matches;
+  cards.forEach(card => {
+    if (fine) card.addEventListener('mouseenter', () => activate(card));
+    card.addEventListener('click', () => activate(card));
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(card); }
+    });
+  });
+})();
+
+
+// ============================================================
 // SPEC COUNT-UP ANIMATION
 // ============================================================
 (function initSpecCounters() {
@@ -779,7 +934,29 @@ function splitHeadlineLetters(headline) {
 })();
 
 
-// FAQ accordion is handled inline in faq/index.html to avoid double-binding
+// ============================================================
+// FAQ ACCORDION — shared (homepage + FAQ page), one open at a time
+// ============================================================
+(function initFaqAccordion() {
+  const buttons = $$('.faq-item__q');
+  if (!buttons.length) return;
+
+  const setState = (btn, open) => {
+    btn.setAttribute('aria-expanded', String(open));
+    const answer = btn.closest('.faq-item').querySelector('.faq-item__a');
+    if (!answer) return;
+    answer.classList.toggle('is-open', open);
+    answer.setAttribute('aria-hidden', String(!open));
+  };
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const wasOpen = btn.getAttribute('aria-expanded') === 'true';
+      buttons.forEach(b => setState(b, false));   // only one open at a time
+      if (!wasOpen) setState(btn, true);
+    });
+  });
+})();
 
 
 // ============================================================
@@ -962,8 +1139,8 @@ document.addEventListener('click', e => {
   const MODEL_DATA = {
     v27: {
       name: 'V27',
-      img:  'assets/images/v27-model-in-homepge-01.png',
-      logo: 'assets/images/V27-logo.svg',
+      img:  '/assets/images/v27-model-in-homepge-01.png',
+      logo: '/assets/images/V27-logo.svg',
       trimSpecs: {
         'Standard Range': { range: '450 km', hp: '380 hp', accel: '4.8s' },
         'Long Range':     { range: '560 km', hp: '380 hp', accel: '4.8s' },
@@ -973,8 +1150,8 @@ document.addEventListener('click', e => {
     },
     o3t: {
       name: 'O3T',
-      img:  'assets/images/ot3-model-in-homepage-01.png',
-      logo: 'assets/images/T03-logo.svg',
+      img:  '/assets/images/ot3-model-in-homepage-01.png',
+      logo: '/assets/images/T03-logo.svg',
       trimSpecs: {
         'Core':  { range: '520 km', hp: '420 hp', accel: '4.2s' },
         'Plus':  { range: '580 km', hp: '480 hp', accel: '3.8s' },
@@ -1038,7 +1215,7 @@ document.addEventListener('click', e => {
       empty.className = 'cmp-empty';
       empty.innerHTML = `<button class="cmp-add-btn">
         <span class="cmp-add-btn__icon">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v14M4 11h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v14M4 11h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
         </span><span>Add Model</span></button>`;
       empty.querySelector('.cmp-add-btn').addEventListener('click', openModal);
       drawerBody.appendChild(empty);

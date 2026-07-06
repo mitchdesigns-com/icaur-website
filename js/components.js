@@ -54,9 +54,31 @@ const SITE_HEADER = `
           </article>
         </div>
       </li>
-      <li><a href="/services"   class="nav__link">Services</a></li>
+      <li class="nav__item--has-drop">
+        <a href="/services" class="nav__link nav__drop-trigger" aria-haspopup="true" aria-expanded="false">
+          Services
+          <svg class="nav__drop-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <div class="nav__dropdown nav__dropdown--list" id="navServicesDropdown" role="region" aria-label="Services">
+          <a href="/services/maintenance" class="nav__drop-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            <span>Maintenance Schedules</span>
+          </a>
+          <a href="/services/programs" class="nav__drop-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Programs</span>
+          </a>
+          <a href="/services/warranty" class="nav__drop-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+            <span>Warranty</span>
+          </a>
+        </div>
+      </li>
       <li><a href="/innovation" class="nav__link">Innovation</a></li>
       <li><a href="/news"       class="nav__link">Media Center</a></li>
+      <li><a href="/faq"        class="nav__link">FAQs</a></li>
       <li><a href="/contact"    class="nav__link">Contact Us</a></li>
     </ul>
 
@@ -206,12 +228,14 @@ const SITE_HEADER = `
   </nav>
   <div class="mobile-menu__actions">
     <a href="/reserve" class="btn btn--filled btn--lg">Reserve Your iCAUR</a>
-    <a href="/signin"  class="btn btn--outline-dark btn--lg">Sign In</a>
   </div>
 </div>
 `;
 
 const SITE_FOOTER = `
+<!-- GAME — before the footer so contact info is the last block (client G7) -->
+<section id="gameBg" class="game-bg" aria-label="iCAUR offroad game"></section>
+
 <footer class="footer" id="footer">
 
   <!-- Full-width Wordmark -->
@@ -292,9 +316,6 @@ const SITE_FOOTER = `
   </div>
 </footer>
 
-<!-- GAME (merged with footer — dark band, copyright closes it) -->
-<section id="gameBg" class="game-bg" aria-label="iCAUR offroad game"></section>
-
 <div class="footer__outro">
   <div class="footer__inner">
     <div class="footer__bottom">
@@ -353,28 +374,35 @@ const QUICK_NAV_HTML = `
     if (href !== '/' && path.startsWith(href)) a.setAttribute('aria-current', 'page');
   });
 
-  // Models dropdown — click-only toggle
-  const dropItem = document.querySelector('.nav__item--has-drop');
-  const dropTrigger = dropItem && dropItem.querySelector('.nav__drop-trigger');
-  if (dropItem && dropTrigger) {
+  // Nav dropdowns (Models, Services) — click-only toggle
+  const dropItems = [...document.querySelectorAll('.nav__item--has-drop')];
+  dropItems.forEach(dropItem => {
+    const dropTrigger = dropItem.querySelector('.nav__drop-trigger');
+    if (!dropTrigger) return;
     dropTrigger.addEventListener('click', (e) => {
       e.preventDefault();
       const open = dropItem.classList.toggle('is-open');
       dropTrigger.setAttribute('aria-expanded', open);
+      // close siblings
+      dropItems.forEach(o => {
+        if (o !== dropItem) {
+          o.classList.remove('is-open');
+          const t = o.querySelector('.nav__drop-trigger');
+          if (t) t.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+  });
+  if (dropItems.length) {
+    const closeAll = () => dropItems.forEach(o => {
+      o.classList.remove('is-open');
+      const t = o.querySelector('.nav__drop-trigger');
+      if (t) t.setAttribute('aria-expanded', 'false');
     });
     document.addEventListener('click', (e) => {
-      if (!dropItem.contains(e.target)) {
-        dropItem.classList.remove('is-open');
-        dropTrigger.setAttribute('aria-expanded', 'false');
-      }
+      if (!dropItems.some(d => d.contains(e.target))) closeAll();
     });
-    // Close on Escape
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        dropItem.classList.remove('is-open');
-        dropTrigger.setAttribute('aria-expanded', 'false');
-      }
-    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAll(); });
   }
 
   /* ── Quick Nav FAB ── */

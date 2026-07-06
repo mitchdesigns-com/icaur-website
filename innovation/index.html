@@ -12,6 +12,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/v27.css">
+
+  <!-- Three.js importmap — required by the LiquidEther fluid background -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+    }
+  }
+  </script>
+
   <script src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
     data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
     data-endpoint="https://bugger-worker.mitchdesigns.workers.dev/functions/v1/ingest-feedback"
@@ -40,7 +51,12 @@
 
 <!-- ═══════ HERO ═══════ -->
 <section class="innov-page-hero" id="hero">
-  <div class="innov-page-hero__bg" style="background-image:url('/assets/images/ICUAR V27 brochure 03 20.png')" aria-hidden="true"></div>
+  <div class="innov-page-hero__bg" aria-hidden="true">
+    <video class="innov-page-hero__video"
+      src="https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev/abouticaurhomepage.mp4"
+      poster="/assets/images/ICUAR V27 brochure 03 20.png"
+      autoplay muted loop playsinline preload="auto"></video>
+  </div>
   <div class="innov-page-hero__overlay" aria-hidden="true"></div>
   <div class="innov-page-hero__inner">
     <p class="eyebrow eyebrow--warm reveal reveal--up" data-delay="0">Rethinking Everything</p>
@@ -85,7 +101,7 @@
 
   <div class="v27-ct-item" data-rotate="14">
     <div class="v27-ct-item-inner">
-      <div class="v27-ct-left"><h3 class="v27-ct-title">Over-the-Air<br>Updates</h3></div>
+      <div class="v27-ct-left"><h3 class="v27-ct-title">Over-The-Air<br>Updates</h3></div>
       <div class="v27-ct-center">
         <img class="v27-ct-img" src="/assets/images/v27/v27-05.png" alt="OTA updates" loading="lazy">
       </div>
@@ -135,8 +151,8 @@
   <div class="innov-pillar__text">
     <p class="innov-pillar__num">02</p>
     <p class="innov-pillar__tag">Sustainability</p>
-    <h2 class="innov-pillar__h">Engineered for<br>Tomorrow</h2>
-    <p class="innov-pillar__body">iCAUR's commitment to sustainability runs deeper than zero-emissions driving. From recycled material content in the interior to solar-assisted charging at every service center, we're building a complete ecosystem — not just a vehicle.</p>
+    <h2 class="innov-pillar__h">Engineered For<br>Tomorrow</h2>
+    <p class="innov-pillar__body">Zero emissions is just the start — recycled interiors, solar-assisted charging, and a complete ecosystem built around the car.</p>
     <div class="innov-pillar__bullets">
       <div class="innov-pillar__bullet">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -166,8 +182,8 @@
   <div class="innov-pillar__text">
     <p class="innov-pillar__num">03</p>
     <p class="innov-pillar__tag">Design</p>
-    <h2 class="innov-pillar__h">Bold by<br>Necessity</h2>
-    <p class="innov-pillar__body">The V27's proportions weren't chosen for trend. Every surface serves a purpose — aerodynamic efficiency, thermal management, structural rigidity. The bold stance and sculpted flanks are the result of function pushing form into something unexpected.</p>
+    <h2 class="innov-pillar__h">Bold By<br>Necessity</h2>
+    <p class="innov-pillar__body">Every surface serves a purpose — aero, cooling, rigidity. Function pushed form into something unexpected.</p>
     <div class="innov-pillar__bullets">
       <div class="innov-pillar__bullet">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -191,25 +207,16 @@
 
 <!-- ═══════ SECONDARY STATS ═══════ -->
 <!-- ═══════ CTA SPLIT ═══════ -->
-<section class="cta-split" id="cta" style="background:var(--black)">
-  <div class="cta-split__grid">
-    <div class="cta-split__panel cta-split__brick cta-split__brick--orange cta-split__panel--big" data-lego="left">
-      <div class="cta-split__knobs" aria-hidden="true"></div>
-      <div class="cta-split__content">
-        <h2 class="cta-split__h">Experience the<br>Technology Live</h2>
-        <p class="cta-split__body">Book a test drive and feel what intelligent EV engineering actually means on Egyptian roads.</p>
-        <a href="/contact" class="btn btn--dark btn--lg btn--arrow btn--magnetic">Book a Test Drive <span class="arrow">→</span></a>
-      </div>
-      <div class="cta-split__studs cta-split__studs--right" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-    </div>
-    <div class="cta-split__panel cta-split__brick cta-split__brick--white cta-split__panel--small" data-lego="right">
-      <div class="cta-split__knobs" aria-hidden="true"></div>
-      <div class="cta-split__studs cta-split__studs--left" aria-hidden="true"><span></span><span></span><span></span></div>
-      <div class="cta-split__content">
-        <h2 class="cta-split__h">Explore Models</h2>
-        <p class="cta-split__body">See the full V27 and V23 specification sheets and compare trims.</p>
-        <a href="/models" class="btn btn--filled btn--arrow btn--magnetic">View Models <span class="arrow">→</span></a>
-      </div>
+<section class="cta-video" id="cta">
+  <video class="cta-video__bg" src="/assets/images/CTA-bg.mp4" poster="/assets/images/CTA.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+  <div class="cta-video__overlay" aria-hidden="true"></div>
+  <div class="cta-video__glass reveal reveal--up">
+    <span class="cta-video__dash" aria-hidden="true"></span>
+    <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
+    <p class="cta-video__body">Book a test drive and feel what intelligent EV engineering actually means on Egyptian roads.</p>
+    <div class="cta-video__actions">
+      <a href="/contact" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Book a Test Drive <span class="arrow">→</span></a>
+      <a href="/models" class="btn btn--outline btn--arrow btn--magnetic">View Models <span class="arrow">→</span></a>
     </div>
   </div>
 </section>

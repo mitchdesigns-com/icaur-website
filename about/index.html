@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
+
   <script
   src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
   data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
@@ -43,19 +44,27 @@
 <main id="main">
 
 <!-- ═══════ HERO ═══════ -->
-<section class="page-hero page-hero--image page-hero--center" id="hero">
+<section class="page-hero page-hero--image page-hero--center about-hero" id="hero">
   <div class="page-hero__bg-img" style="background-image:url('/assets/images/about-hero.jpg')" aria-hidden="true"></div>
+  <!-- Front copy of the scene, masked to the lower half — the headline
+       rises from behind it, landing between the cars and the sky -->
+  <div class="about-hero__front" aria-hidden="true"></div>
   <div class="page-hero__grain" aria-hidden="true"></div>
   <div class="page-hero__inner">
-<p class="eyebrow reveal reveal--up" data-delay="1">Our Story</p>
-    <h1 class="page-hero__h reveal reveal--up" data-delay="2">A New Generation<br><em>Automotive</em></h1>
-    <p class="page-hero__sub reveal reveal--up" data-delay="3">Smarter mobility. Bolder design. Real-world freedom.</p>
+    <p class="eyebrow">Our Story</p>
+    <h1 class="page-hero__h">A New Generation<br><em>Automotive</em></h1>
+    <p class="page-hero__sub">Smarter mobility. Bolder design. Real-world freedom.</p>
   </div>
 </section>
 
 <!-- ═══════ PINNED SCENE — Overview ⇄ iCAUR Story ═══════ -->
 <div class="about-scene" id="aboutScene">
   <div class="about-scene__pin">
+
+    <!-- Story car — drives in from the left during Overview, then
+         swings onto the rail and rotates to ride it down -->
+    <img src="/assets/images/about-3d.png" alt="" class="story-scene-car" id="storySceneCar" aria-hidden="true">
+
     <div class="container about-scene__stage">
 
       <!-- Overview panel -->
@@ -68,19 +77,35 @@
         </div>
       </div>
 
-      <!-- Story panel -->
+      <!-- Story panel — car rides the rail, images stack on the right -->
       <div class="scene-panel scene-panel--story" data-panel="story">
+
+        <!-- Left rail: gray line, passed area turns orange -->
+        <div class="story-rail" aria-hidden="true">
+          <div class="story-rail__line">
+            <div class="story-rail__fill" id="storyRailFill"></div>
+          </div>
+        </div>
+
         <div class="about-saga__inner">
         <p class="eyebrow">iCAUR Story</p>
         <div class="about-saga__steps">
           <div class="saga-step is-active" data-step="0">
-            <p>iCAUR is a new generation automotive brand redefining intelligent mobility through bold design, advanced technology, and expressive driving experiences. Built for the young and young-at-heart, iCAUR combines rugged character, smart innovation, and lifestyle-driven thinking to create vehicles that feel as exciting as they look.</p>
+            <p>Born to break the mold — rugged character, smart tech, and lifestyle-first thinking in EVs that feel as exciting as they look.</p>
           </div>
           <div class="saga-step" data-step="1">
-            <p>Today we design and deliver vehicles that turn heads in Cairo traffic and conquer the dunes outside Alexandria. Every iCAUR is engineered for the heat, dust, and texture of Egypt — and built to last.</p>
+            <p>Engineered for Egypt: the heat, the dust, the drama. From Cairo traffic to the dunes, built to last and born to turn heads.</p>
           </div>
         </div>
         </div>
+
+        <!-- Right: images pile over each other as the car drives down -->
+        <div class="story-stack" aria-hidden="true">
+          <img src="/assets/images/about-hero.jpg" class="story-stack__img" style="--r:-5deg; --x:-14px; --y:-10px" loading="lazy" alt="">
+          <img src="/assets/images/iCAUR INTL_V27 REV_cam027 copy.jpg" class="story-stack__img" style="--r:4deg; --x:12px; --y:6px" loading="lazy" alt="">
+          <img src="/assets/images/ICUAR V27 brochure 03 18.png" class="story-stack__img" style="--r:-2deg; --x:-4px; --y:12px" loading="lazy" alt="">
+        </div>
+
       </div>
 
     </div>
@@ -110,6 +135,38 @@
         <span class="figure__num" data-count-to="100" data-suffix="%">0</span>
         <span class="figure__label">Made in Egypt</span>
         <span class="figure__sub">Designed, engineered, and assembled locally.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ BRAND VALUES — interactive (client A1) ═══════ -->
+<section class="section about-values" id="values">
+  <div class="container">
+    <header class="section-head reveal reveal--up" data-stagger="parent">
+      <p class="eyebrow">What We Stand For</p>
+      <h2 class="section-title">Built <em>Different.</em> On Purpose.</h2>
+    </header>
+    <div class="values-row" id="valuesRow">
+      <div class="value-card is-active" tabindex="0" role="button" aria-expanded="true">
+        <span class="value-card__n">01</span>
+        <h3 class="value-card__name">Bold</h3>
+        <p class="value-card__desc">We don't do quiet. Every line, every stance, every decision is designed to stand out — and stay unforgettable.</p>
+      </div>
+      <div class="value-card" tabindex="0" role="button" aria-expanded="false">
+        <span class="value-card__n">02</span>
+        <h3 class="value-card__name">Fun</h3>
+        <p class="value-card__desc">Driving should feel like play. From the game-inspired details to the way it moves, an iCAUR never takes itself too seriously.</p>
+      </div>
+      <div class="value-card" tabindex="0" role="button" aria-expanded="false">
+        <span class="value-card__n">03</span>
+        <h3 class="value-card__name">Daring</h3>
+        <p class="value-card__desc">We take the roads others avoid. Dunes, downtown, or somewhere in between — daring is our default setting.</p>
+      </div>
+      <div class="value-card" tabindex="0" role="button" aria-expanded="false">
+        <span class="value-card__n">04</span>
+        <h3 class="value-card__name">Liberating</h3>
+        <p class="value-card__desc">No fuel stops. No compromises. No asking permission. Electric freedom, built for people who refuse to stand still.</p>
       </div>
     </div>
   </div>
@@ -172,25 +229,16 @@
 </div>
 
 <!-- ═══════ CTA ═══════ -->
-<section class="cta-split" id="cta" style="background:var(--black)">
-  <div class="cta-split__grid">
-    <div class="cta-split__panel cta-split__brick cta-split__brick--orange cta-split__panel--big" data-lego="left">
-      <div class="cta-split__knobs" aria-hidden="true"></div>
-      <div class="cta-split__content">
-        <h2 class="cta-split__h">Ready To Drive<br>Something Different?</h2>
-        <p class="cta-split__body">The V27 is waiting — let's get you behind the wheel and show you what electric really means.</p>
-        <a href="/reserve" class="btn btn--dark btn--lg btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
-      </div>
-      <div class="cta-split__studs cta-split__studs--right" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-    </div>
-    <div class="cta-split__panel cta-split__brick cta-split__brick--white cta-split__panel--small" data-lego="right">
-      <div class="cta-split__knobs" aria-hidden="true"></div>
-      <div class="cta-split__studs cta-split__studs--left" aria-hidden="true"><span></span><span></span><span></span></div>
-      <div class="cta-split__content">
-        <h2 class="cta-split__h">Need Help?</h2>
-        <p class="cta-split__body">Feel free to get in touch with our support team — we'll guide you start to finish.</p>
-        <a href="/contact" class="btn btn--filled btn--arrow btn--magnetic">Contact Us <span class="arrow">→</span></a>
-      </div>
+<section class="cta-video" id="cta">
+  <video class="cta-video__bg" src="/assets/images/CTA-bg.mp4" poster="/assets/images/CTA.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+  <div class="cta-video__overlay" aria-hidden="true"></div>
+  <div class="cta-video__glass reveal reveal--up">
+    <span class="cta-video__dash" aria-hidden="true"></span>
+    <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
+    <p class="cta-video__body">The V27 is waiting — let's get you behind the wheel and show you what electric really means.</p>
+    <div class="cta-video__actions">
+      <a href="/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
+      <a href="/contact" class="btn btn--outline btn--arrow btn--magnetic">Contact Us <span class="arrow">→</span></a>
     </div>
   </div>
 </section>
@@ -204,6 +252,7 @@
   <script src="/js/transitions.js" defer></script>
   <script src="/js/game.js" defer></script>
   <script src="/js/about-car.js" defer></script>
+  <script src="/js/about-story.js" defer></script>
   <script src="/js/dot-field.js" defer></script>
   <script src="/js/doodles.js" defer></script>
 </body>

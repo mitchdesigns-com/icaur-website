@@ -142,25 +142,16 @@
 </div>
 
 <!-- ═══════ CTA SPLIT ═══════ -->
-<section class="cta-split" id="cta" style="background:var(--black)">
-  <div class="cta-split__grid">
-    <div class="cta-split__panel cta-split__brick cta-split__brick--orange cta-split__panel--big" data-lego="left">
-      <div class="cta-split__knobs" aria-hidden="true"></div>
-      <div class="cta-split__content">
-        <h2 class="cta-split__h">Ready To Drive<br>Something Different?</h2>
-        <p class="cta-split__body">The V27 is waiting — let's get you behind the wheel.</p>
-        <a href="/reserve" class="btn btn--dark btn--lg btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
-      </div>
-      <div class="cta-split__studs cta-split__studs--right" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-    </div>
-    <div class="cta-split__panel cta-split__brick cta-split__brick--white cta-split__panel--small" data-lego="right">
-      <div class="cta-split__knobs" aria-hidden="true"></div>
-      <div class="cta-split__studs cta-split__studs--left" aria-hidden="true"><span></span><span></span><span></span></div>
-      <div class="cta-split__content">
-        <h2 class="cta-split__h">Need Help?</h2>
-        <p class="cta-split__body">Feel free to get in touch with our support team.</p>
-        <a href="/contact" class="btn btn--filled btn--arrow btn--magnetic">Send Us Message <span class="arrow">→</span></a>
-      </div>
+<section class="cta-video" id="cta">
+  <video class="cta-video__bg" src="/assets/images/CTA-bg.mp4" poster="/assets/images/CTA.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+  <div class="cta-video__overlay" aria-hidden="true"></div>
+  <div class="cta-video__glass reveal reveal--up">
+    <span class="cta-video__dash" aria-hidden="true"></span>
+    <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
+    <p class="cta-video__body">The V27 is waiting — let's get you behind the wheel.</p>
+    <div class="cta-video__actions">
+      <a href="/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
+      <a href="/contact" class="btn btn--outline btn--arrow btn--magnetic">Send Us Message <span class="arrow">→</span></a>
     </div>
   </div>
 </section>
@@ -182,17 +173,7 @@ document.querySelectorAll('.faq-cat-btn').forEach(btn => {
   });
 });
 
-// FAQ accordion
-document.querySelectorAll('.faq-item__q').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const item   = btn.closest('.faq-item');
-    const answer = item.querySelector('.faq-item__a');
-    const isOpen = btn.getAttribute('aria-expanded') === 'true';
-    btn.setAttribute('aria-expanded', !isOpen);
-    answer.classList.toggle('is-open', !isOpen);
-    answer.setAttribute('aria-hidden', isOpen);
-  });
-});
+// FAQ accordion (one open at a time) is handled globally in /js/main.js
 </script>
 
 <script src="/js/components.js" defer></script>

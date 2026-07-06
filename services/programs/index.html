@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script>if(sessionStorage.getItem('pt-nav'))document.documentElement.classList.add('pt-entering');</script>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/Favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="iCAUR Programs — extended coverage and protection plans that go beyond the standard warranty, built around your driving life.">
+  <title>Programs — iCAUR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script
+  src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
+  data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
+  data-endpoint="https://bugger-worker.mitchdesigns.workers.dev/functions/v1/ingest-feedback"
+  data-position="bottom-right"
+  data-button-text="Feedback"
+  data-accent="#4f46e5"
+  async></script>
+</head>
+<body class="is-loading dark-hero-page">
+
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+    <feBlend in="SourceGraphic" in2="grey" mode="multiply"/>
+  </filter>
+</svg>
+
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__dot" id="cursorDot"></div>
+  <div class="cursor__ring" id="cursorRing"></div>
+  <div class="cursor__label" id="cursorLabel"></div>
+</div>
+
+<div id="site-header"></div>
+
+<main id="main">
+
+<!-- ══════ HERO — cursor spotlight reveal ══════ -->
+<section class="spot-hero" id="hero">
+  <div class="spot-hero__base" style="background-image:url('/assets/images/v27/iCAUR INTL_V27 REV_cam027 copy.jpg')" aria-hidden="true"></div>
+  <div class="spot-hero__reveal" style="background-image:url('/assets/images/v27/iCAUR INTL_V27 REV_cam027 copy.jpg')" aria-hidden="true"></div>
+  <div class="spot-hero__shade" aria-hidden="true"></div>
+
+  <div class="spot-hero__head">
+    <p class="eyebrow eyebrow--warm spot-anim spot-anim--fade" style="animation-delay:.1s">Services</p>
+    <h1 class="spot-hero__h">
+      <span class="spot-l1 spot-anim spot-anim--reveal" style="animation-delay:.25s">Protection,</span>
+      <span class="spot-l2 spot-anim spot-anim--reveal" style="animation-delay:.42s">Your <em>Way.</em></span>
+    </h1>
+    <p class="spot-hero__sub spot-anim spot-anim--fade" style="animation-delay:.6s">Flexible plans that stretch coverage well beyond the standard period — pick the one that fits your driving life.</p>
+    <a href="#programs" class="btn btn--filled btn--arrow btn--magnetic spot-anim spot-anim--fade" style="animation-delay:.78s">Explore Programs <span class="arrow">→</span></a>
+  </div>
+</section>
+
+<!-- ══════ EXTENDED COVERAGE ══════ -->
+<section class="section svc-sub-band" id="programs">
+  <div class="container">
+    <span class="warranty-card__tag reveal reveal--up">Extended Coverage</span>
+    <h2 class="warranty-card__h reveal reveal--up" data-delay="1">Coverage Beyond<br>The Standard</h2>
+    <p class="warranty-card__body reveal reveal--up" data-delay="2" style="max-width:680px">For even greater peace of mind, iCAUR offers flexible extended warranty and protection programs designed to keep you covered beyond the standard period. Choose the plan that fits your driving life.</p>
+
+    <div class="warranty-card__perks reveal reveal--up" data-delay="3">
+      <div class="warranty-perk">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Extended drivetrain &amp; battery protection</span>
+      </div>
+      <div class="warranty-perk">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Priority service scheduling at all centers</span>
+      </div>
+      <div class="warranty-perk">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Complimentary loan vehicle during repairs</span>
+      </div>
+      <div class="warranty-perk">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>24/7 dedicated support hotline</span>
+      </div>
+    </div>
+
+    <a href="/contact/" class="btn btn--filled btn--arrow btn--magnetic reveal reveal--up" data-delay="4" style="margin-top:clamp(28px,4vh,44px);display:inline-flex">Contact Us <span class="arrow">→</span></a>
+  </div>
+</section>
+
+<!-- ══════ CTA ══════ -->
+<section class="cta-video" id="cta">
+  <video class="cta-video__bg" src="/assets/images/CTA-bg.mp4" poster="/assets/images/CTA.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+  <div class="cta-video__overlay" aria-hidden="true"></div>
+  <div class="cta-video__glass reveal reveal--up">
+    <span class="cta-video__dash" aria-hidden="true"></span>
+    <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
+    <p class="cta-video__body">The V27 is waiting — let's get you behind the wheel and show you what electric really means.</p>
+    <div class="cta-video__actions">
+      <a href="/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
+      <a href="/services/warranty" class="btn btn--outline btn--arrow btn--magnetic">See Warranty <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="site-footer"></div>
+
+  <script src="/js/components.js" defer></script>
+  <script src="/js/main.js" defer></script>
+  <script src="/js/transitions.js" defer></script>
+  <script src="/js/game.js" defer></script>
+  <script src="/js/doodles.js" defer></script>
+</body>
+</html>

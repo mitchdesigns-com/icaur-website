@@ -6,12 +6,14 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'meshopt_decoder';
-import { CircularGallery } from '/js/circular-gallery.js';
+import { Renderer as OglRenderer, Camera as OglCamera, Geometry as OglGeometry, Program as OglProgram, Mesh as OglMesh } from 'ogl';
 
 const gsap   = window.gsap;
 const ScrollTrigger = window.ScrollTrigger;
 gsap.registerPlugin(ScrollTrigger);
+if (window.InertiaPlugin) gsap.registerPlugin(window.InertiaPlugin);
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 const $ = (s, ctx = document) => ctx.querySelector(s);
@@ -30,7 +32,23 @@ let scrollBaseRotY  = HERO_POSE.rotY;
 let dragExtraRot    = 0;
 let smoothRotY      = HERO_POSE.rotY; /* what the render loop lerps toward */
 
-let car = null;
+/* ─── Car colors — one GLB per paint (same sources as the landing page) ── */
+const R2 = 'https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev';
+const CAR_COLORS = {
+  'camel':          '/assets/images/car-v27.glb',
+  'carbon-black':   `${R2}/car-v27-carbon-black.glb`,
+  'gold-sand':      `${R2}/car-v27-gold-sand.glb`,
+  'khaki-white':    `${R2}/car-v27-khaki-white.glb`,
+  'porcelain-gray': `${R2}/car-v27-porcelain-gray.glb`,
+  'star-silver':    `${R2}/car-v27-star-silver.glb`,
+  'tactical-green': `${R2}/car-v27-tactical-green.glb`,
+};
+
+let car = null;          /* pose group — poses/rotation applied here */
+let carBody = null;      /* current color GLB scene inside the group */
+let refBox = null;       /* camel bbox — variants are normalized to it */
+let activeColor = 'camel';
+const glbCache = new Map();   /* url → Promise<THREE.Group> */
 let isDragging  = false;
 let dragEnabled = false;
 let dragStartX  = 0;
@@ -38,32 +56,75 @@ let dragVelX    = 0;
 let lastDragX   = 0;
 let inertiaTween = null;
 
+/* Close any opened panels so every color variant looks identical,
+   and let every mesh cast the ground shadow */
+const CLOSE_PANELS = new Set(['Door_FL', 'Door_FR', 'Door_BL', 'Door_BR', 'Trunk', 'Bonnet']);
+function prepModel(scene) {
+  scene.traverse((o) => {
+    if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; }
+    if (CLOSE_PANELS.has(o.name)) {
+      o.position.set(0, 0, 0);
+      o.quaternion.set(0, 0, 0, 1);
+      o.scale.set(1, 1, 1);
+    }
+  });
+  /* Normalize every variant to the camel reference so poses,
+     shadow and scale stay identical across color swaps */
+  const box = new THREE.Box3().setFromObject(scene);
+  if (!refBox) {
+    refBox = { size: box.getSize(new THREE.Vector3()), center: box.getCenter(new THREE.Vector3()) };
+    return scene;
+  }
+  const size = box.getSize(new THREE.Vector3());
+  const fit  = Math.max(refBox.size.x, refBox.size.y, refBox.size.z) /
+               Math.max(size.x, size.y, size.z);
+  scene.scale.setScalar(fit);
+  const c = box.getCenter(new THREE.Vector3()).multiplyScalar(fit);
+  scene.position.set(refBox.center.x - c.x, refBox.center.y - c.y, refBox.center.z - c.z);
+  return scene;
+}
+
 function initScene() {
   const canvas = $('#v27-canvas');
   if (!canvas) return;
 
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   const scene = new THREE.Scene();
+
+  /* Environment reflections — vanilla stand-in for the landing
+     page's <Environment preset="city"> (lifts and enriches paint) */
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
   const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
   camera.position.set(0.2, 3.8, 9.2);
 
-  /* Lights */
-  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-  const d1 = new THREE.DirectionalLight(0xffffff, 3.8);
-  d1.position.set(5, 9, 6); scene.add(d1);
-  const d2 = new THREE.DirectionalLight(0xffffff, 2.2);
+  /* Lights — ported from the landing page rig */
+  scene.add(new THREE.AmbientLight(0xd8ccc5, 0.55));
+  const d1 = new THREE.DirectionalLight(0xfff5ee, 3.8);
+  d1.position.set(5, 9, 6);
+  d1.castShadow = true;
+  d1.shadow.mapSize.set(2048, 2048);
+  d1.shadow.camera.near = 0.5;  d1.shadow.camera.far = 40;
+  d1.shadow.camera.left = -9;   d1.shadow.camera.right = 9;
+  d1.shadow.camera.top  = 9;    d1.shadow.camera.bottom = -9;
+  d1.shadow.bias = -0.0005;     d1.shadow.normalBias = 0.02;
+  scene.add(d1);
+  const d2 = new THREE.DirectionalLight(0x555859, 2.2);
   d2.position.set(-6, 5, -8); scene.add(d2);
-  /* blue under-light removed per design */
-  const p1 = new THREE.PointLight(0xffffff, 1.2, 18);
-  p1.position.set(3, 4, 5); scene.add(p1);
-  const p2 = new THREE.PointLight(0xffeedd, 0.8, 14);
-  p2.position.set(-4, 3, -3); scene.add(p2);
+  const d3 = new THREE.DirectionalLight(0x015699, 1.0);
+  d3.position.set(0, -4, 4); scene.add(d3);
+  const p1 = new THREE.PointLight(0xffffff, 1.8);
+  p1.position.set(4, 8, 2); scene.add(p1);
+  const p2 = new THREE.PointLight(0x555859, 1.2);
+  p2.position.set(-3, 3, 6); scene.add(p2);
 
   /* GLTF loader */
   const draco = new DRACOLoader();
@@ -72,16 +133,54 @@ function initScene() {
   loader.setDRACOLoader(draco);
   loader.setMeshoptDecoder(MeshoptDecoder);
 
-  loader.load('/assets/images/car-v27.glb', (gltf) => {
-    car = gltf.scene;
+  /* Cached GLB loading — each color variant loads once */
+  function loadGlb(url) {
+    if (!glbCache.has(url)) {
+      glbCache.set(url, new Promise((resolve, reject) => {
+        loader.load(url, (gltf) => resolve(prepModel(gltf.scene)), undefined, reject);
+      }));
+    }
+    return glbCache.get(url);
+  }
+
+  /* Swap the car body to another paint (called by the swatches) */
+  window.__setCarColor = function (key) {
+    if (!CAR_COLORS[key] || key === activeColor) return;
+    activeColor = key;
+    loadGlb(CAR_COLORS[key]).then((body) => {
+      if (activeColor !== key || !car) return;   /* a newer pick won */
+      if (carBody) car.remove(carBody);
+      carBody = body;
+      car.add(carBody);
+    }).catch((err) => console.warn('GLB color load error:', err));
+  };
+
+  loadGlb(CAR_COLORS.camel).then((body) => {
+    car = new THREE.Group();
+    carBody = body;
+    car.add(carBody);
     car.rotation.y = HERO_POSE.rotY;
     car.position.set(HERO_POSE.posX, HERO_POSE.posY, 0);
     car.scale.setScalar(HERO_POSE.scale);
+
+    /* Real ground shadow cast by the main light (landing page style) */
+    const shadowPlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(12, 12),
+      new THREE.ShadowMaterial({ transparent: true, opacity: 0.42, color: 0x1a0f08 })
+    );
+    shadowPlane.rotation.x = -Math.PI / 2;
+    shadowPlane.position.y = 0.02;
+    shadowPlane.receiveShadow = true;
+    car.add(shadowPlane);
+
     scene.add(car);
     setupCarScrollAnim();
-  }, undefined, (err) => {
-    console.warn('GLB load error:', err);
-  });
+
+    /* Preload the other paints in the background so swaps are instant */
+    setTimeout(() => {
+      Object.values(CAR_COLORS).forEach((url) => loadGlb(url));
+    }, 2500);
+  }).catch((err) => console.warn('GLB load error:', err));
 
   /* Resize */
   window.addEventListener('resize', () => {
@@ -249,21 +348,204 @@ function setupDrag() {
 function initHeroEntrance() {
   const tl = gsap.timeline({ delay: .25 });
 
-  tl.to('#v27-model-badge', { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, 0)
-    .from('#v27-hero-h1',   { opacity: 0, y: 24, duration: .8, ease: 'power3.out' }, .2)
+  tl.from('#v27-hero-h1',   { opacity: 0, y: 24, duration: .8, ease: 'power3.out' }, .2)
     .to('#v27-hero-sub',    { opacity: 1, y: 0,  duration: .7, ease: 'power3.out' }, .55)
     .to('#v27-hero-bottom', { opacity: 1, y: 0,  duration: .7, ease: 'power3.out' }, .72);
+}
+
+/* ══════════════════════════════════════════════════════════
+   HERO PARTICLES — vanilla port of React Bits <Particles />
+   (ogl point cloud drifting behind the hero content)
+══════════════════════════════════════════════════════════ */
+function initHeroParticles() {
+  const container = $('#v27-particles');
+  if (!container) return;
+
+  const CFG = {
+    particleCount: 260,
+    particleSpread: 10,
+    speed: 0.1,
+    particleColors: ['#F37021', '#B9AB9C', '#555859'],
+    moveParticlesOnHover: true,
+    particleHoverFactor: 1,
+    alphaParticles: true,
+    particleBaseSize: 90,
+    sizeRandomness: 1,
+    cameraDistance: 20,
+    disableRotation: false,
+    pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+  };
+
+  const hexToRgb = (hex) => {
+    hex = hex.replace(/^#/, '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    const int = parseInt(hex, 16);
+    return [((int >> 16) & 255) / 255, ((int >> 8) & 255) / 255, (int & 255) / 255];
+  };
+
+  const vertex = /* glsl */ `
+    attribute vec3 position;
+    attribute vec4 random;
+    attribute vec3 color;
+    uniform mat4 modelMatrix;
+    uniform mat4 viewMatrix;
+    uniform mat4 projectionMatrix;
+    uniform float uTime;
+    uniform float uSpread;
+    uniform float uBaseSize;
+    uniform float uSizeRandomness;
+    varying vec4 vRandom;
+    varying vec3 vColor;
+    void main() {
+      vRandom = random;
+      vColor = color;
+      vec3 pos = position * uSpread;
+      pos.z *= 10.0;
+      vec4 mPos = modelMatrix * vec4(pos, 1.0);
+      float t = uTime;
+      mPos.x += sin(t * random.z + 6.28 * random.w) * mix(0.1, 1.5, random.x);
+      mPos.y += sin(t * random.y + 6.28 * random.x) * mix(0.1, 1.5, random.w);
+      mPos.z += sin(t * random.w + 6.28 * random.y) * mix(0.1, 1.5, random.z);
+      vec4 mvPos = viewMatrix * mPos;
+      if (uSizeRandomness == 0.0) {
+        gl_PointSize = uBaseSize;
+      } else {
+        gl_PointSize = (uBaseSize * (1.0 + uSizeRandomness * (random.x - 0.5))) / length(mvPos.xyz);
+      }
+      gl_Position = projectionMatrix * mvPos;
+    }
+  `;
+
+  const fragment = /* glsl */ `
+    precision highp float;
+    uniform float uTime;
+    uniform float uAlphaParticles;
+    varying vec4 vRandom;
+    varying vec3 vColor;
+    void main() {
+      vec2 uv = gl_PointCoord.xy;
+      float d = length(uv - vec2(0.5));
+      if (uAlphaParticles < 0.5) {
+        if (d > 0.5) { discard; }
+        gl_FragColor = vec4(vColor + 0.2 * sin(uv.yxx + uTime + vRandom.y * 6.28), 1.0);
+      } else {
+        float circle = smoothstep(0.5, 0.4, d) * 0.8;
+        gl_FragColor = vec4(vColor + 0.2 * sin(uv.yxx + uTime + vRandom.y * 6.28), circle);
+      }
+    }
+  `;
+
+  const renderer = new OglRenderer({ dpr: CFG.pixelRatio, depth: false, alpha: true });
+  const gl = renderer.gl;
+  container.appendChild(gl.canvas);
+  gl.clearColor(0, 0, 0, 0);
+
+  const camera = new OglCamera(gl, { fov: 15 });
+  camera.position.set(0, 0, CFG.cameraDistance);
+
+  function resize() {
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    camera.perspective({ aspect: gl.canvas.width / gl.canvas.height });
+  }
+  window.addEventListener('resize', resize, false);
+  resize();
+
+  /* container is pointer-events:none — track the mouse on window */
+  const mouse = { x: 0, y: 0 };
+  if (CFG.moveParticlesOnHover) {
+    window.addEventListener('mousemove', (e) => {
+      const rect = container.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+    }, { passive: true });
+  }
+
+  const count = CFG.particleCount;
+  const positions = new Float32Array(count * 3);
+  const randoms = new Float32Array(count * 4);
+  const colors = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    let x, y, z, len;
+    do {
+      x = Math.random() * 2 - 1;
+      y = Math.random() * 2 - 1;
+      z = Math.random() * 2 - 1;
+      len = x * x + y * y + z * z;
+    } while (len > 1 || len === 0);
+    const r = Math.cbrt(Math.random());
+    positions.set([x * r, y * r, z * r], i * 3);
+    randoms.set([Math.random(), Math.random(), Math.random(), Math.random()], i * 4);
+    colors.set(hexToRgb(CFG.particleColors[Math.floor(Math.random() * CFG.particleColors.length)]), i * 3);
+  }
+
+  const geometry = new OglGeometry(gl, {
+    position: { size: 3, data: positions },
+    random:   { size: 4, data: randoms },
+    color:    { size: 3, data: colors },
+  });
+
+  const program = new OglProgram(gl, {
+    vertex,
+    fragment,
+    uniforms: {
+      uTime:           { value: 0 },
+      uSpread:         { value: CFG.particleSpread },
+      uBaseSize:       { value: CFG.particleBaseSize * CFG.pixelRatio },
+      uSizeRandomness: { value: CFG.sizeRandomness },
+      uAlphaParticles: { value: CFG.alphaParticles ? 1 : 0 },
+    },
+    transparent: true,
+    depthTest: false,
+  });
+
+  const particles = new OglMesh(gl, { mode: gl.POINTS, geometry, program });
+
+  let lastTime = performance.now();
+  let elapsed = 0;
+  (function update(t) {
+    requestAnimationFrame(update);
+    const delta = (t || performance.now()) - lastTime;
+    lastTime = t || performance.now();
+    elapsed += delta * CFG.speed;
+
+    program.uniforms.uTime.value = elapsed * 0.001;
+
+    if (CFG.moveParticlesOnHover) {
+      particles.position.x = -mouse.x * CFG.particleHoverFactor;
+      particles.position.y = -mouse.y * CFG.particleHoverFactor;
+    }
+
+    if (!CFG.disableRotation) {
+      particles.rotation.x = Math.sin(elapsed * 0.0002) * 0.1;
+      particles.rotation.y = Math.cos(elapsed * 0.0005) * 0.15;
+      particles.rotation.z += 0.01 * CFG.speed;
+    }
+
+    renderer.render({ scene: particles, camera });
+  })(performance.now());
 }
 
 /* ══════════════════════════════════════════════════════════
    3.  360 EXPERIENCE — swatches + drag setup
 ══════════════════════════════════════════════════════════ */
 function initExterior() {
-  /* Swatch click → toggle active */
+  /* DotGrid — fixed behind the 3D car; visible only during the 360 stage */
+  const dotWrap = document.querySelector('.eg-dotgrid-wrap');
+  if (dotWrap) {
+    initDotGrid(dotWrap);
+    ScrollTrigger.create({
+      trigger: '#v27-exterior',
+      start: 'top 55%', end: 'bottom 45%',
+      onToggle(self) { dotWrap.classList.toggle('is-on', self.isActive); },
+    });
+  }
+
+  /* Swatch click → swap the car GLB to that paint */
   $$('.v27-swatch').forEach(btn => {
     btn.addEventListener('click', () => {
       $$('.v27-swatch').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      if (window.__setCarColor) window.__setCarColor(btn.dataset.color);
     });
   });
 
@@ -291,7 +573,6 @@ const EXT_SLIDES = [
   { src: '/assets/images/v27/v27-12.png',  label: 'Detail' },
   { src: '/assets/images/v27/v27-17.png',  label: 'Side' },
   { src: '/assets/images/v27/v27-20.png',  label: 'Dynamic' },
-  { src: '/assets/images/v27/v27-26.png',  label: 'Desert Run' },
 ];
 
 /* ─── Lightbox state ─────────────────────────────────── */
@@ -442,65 +723,171 @@ function initLightbox() {
   }, { passive: true });
 }
 
+/* Vanilla port of React Bits <DotGrid /> — proximity color shift,
+   inertia push on fast mouse moves, click shockwave, elastic return */
 function initDotGrid(wrap) {
+  const CFG = {
+    dotSize: 4,
+    gap: 22,
+    baseColor: '#C8BCAE',
+    activeColor: '#A8906E',
+    proximity: 100,
+    speedTrigger: 80,
+    shockRadius: 220,
+    shockStrength: 4,
+    maxSpeed: 5000,
+    resistance: 850,
+    returnDuration: 1.4,
+  };
+  const hasInertia = !!(window.InertiaPlugin);
+
+  const hexToRgb = (hex) => {
+    const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+    return m ? { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) } : { r: 0, g: 0, b: 0 };
+  };
+  const baseRgb = hexToRgb(CFG.baseColor);
+  const activeRgb = hexToRgb(CFG.activeColor);
+
   const canvas = document.createElement('canvas');
   wrap.appendChild(canvas);
   const ctx = canvas.getContext('2d');
-  const DOT_R = 1.5;
-  const GAP = 22;
-  const STEP = DOT_R * 2 + GAP;
-  const BASE = [200, 188, 174]; // #C8BCAE
-  const ACT  = [168, 144, 110]; // #A8906E
-  const PROX = 90;
+  const circlePath = new Path2D();
+  circlePath.arc(0, 0, CFG.dotSize / 2, 0, Math.PI * 2);
 
-  let W = 0, H = 0, dots = [];
-  const mouse = { x: -9999, y: -9999 };
+  let dots = [];
+  const pointer = { x: -9999, y: -9999, vx: 0, vy: 0, speed: 0, lastTime: 0, lastX: 0, lastY: 0 };
 
-  function build() {
-    const dpr = Math.min(devicePixelRatio || 1, 2);
-    W = wrap.offsetWidth; H = wrap.offsetHeight;
-    canvas.width = Math.round(W * dpr);
-    canvas.height = Math.round(H * dpr);
-    canvas.style.cssText = `width:${W}px;height:${H}px;display:block`;
+  function buildGrid() {
+    const { width, height } = wrap.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const cell = CFG.dotSize + CFG.gap;
+    const cols = Math.floor((width + CFG.gap) / cell);
+    const rows = Math.floor((height + CFG.gap) / cell);
+    const startX = (width - (cell * cols - CFG.gap)) / 2 + CFG.dotSize / 2;
+    const startY = (height - (cell * rows - CFG.gap)) / 2 + CFG.dotSize / 2;
+
     dots = [];
-    for (let y = STEP / 2; y < H; y += STEP)
-      for (let x = STEP / 2; x < W; x += STEP)
-        dots.push({ x, y });
+    for (let y = 0; y < rows; y++)
+      for (let x = 0; x < cols; x++)
+        dots.push({ cx: startX + x * cell, cy: startY + y * cell, xOffset: 0, yOffset: 0, _inertiaApplied: false });
   }
 
+  const proxSq = CFG.proximity * CFG.proximity;
   function draw() {
-    ctx.clearRect(0, 0, W, H);
-    const rect = wrap.getBoundingClientRect();
-    const mx = mouse.x - rect.left;
-    const my = mouse.y - rect.top;
-    for (const d of dots) {
-      const t = Math.max(0, 1 - Math.hypot(d.x - mx, d.y - my) / PROX);
-      const r = Math.round(BASE[0] + (ACT[0] - BASE[0]) * t);
-      const g = Math.round(BASE[1] + (ACT[1] - BASE[1]) * t);
-      const b = Math.round(BASE[2] + (ACT[2] - BASE[2]) * t);
-      ctx.beginPath();
-      ctx.arc(d.x, d.y, DOT_R, 0, 6.283);
-      ctx.fillStyle = `rgb(${r},${g},${b})`;
-      ctx.fill();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const { x: px, y: py } = pointer;
+    for (const dot of dots) {
+      const ox = dot.cx + dot.xOffset;
+      const oy = dot.cy + dot.yOffset;
+      const dx = dot.cx - px;
+      const dy = dot.cy - py;
+      const dsq = dx * dx + dy * dy;
+
+      let fill = CFG.baseColor;
+      if (dsq <= proxSq) {
+        const t = 1 - Math.sqrt(dsq) / CFG.proximity;
+        const r = Math.round(baseRgb.r + (activeRgb.r - baseRgb.r) * t);
+        const g = Math.round(baseRgb.g + (activeRgb.g - baseRgb.g) * t);
+        const b = Math.round(baseRgb.b + (activeRgb.b - baseRgb.b) * t);
+        fill = `rgb(${r},${g},${b})`;
+      }
+
+      ctx.save();
+      ctx.translate(ox, oy);
+      ctx.fillStyle = fill;
+      ctx.fill(circlePath);
+      ctx.restore();
     }
+    requestAnimationFrame(draw);
   }
 
-  let ticking = false;
-  window.addEventListener('mousemove', e => {
-    mouse.x = e.clientX; mouse.y = e.clientY;
-    if (!ticking) { ticking = true; requestAnimationFrame(() => { draw(); ticking = false; }); }
-  });
-  window.addEventListener('resize', () => { build(); draw(); });
-  build(); draw();
+  /* spring the dot back home after a push */
+  const springBack = (dot) => {
+    gsap.to(dot, {
+      xOffset: 0, yOffset: 0,
+      duration: CFG.returnDuration, ease: 'elastic.out(1,0.75)',
+      onComplete: () => { dot._inertiaApplied = false; },
+    });
+  };
+  const push = (dot, pushX, pushY) => {
+    dot._inertiaApplied = true;
+    gsap.killTweensOf(dot);
+    if (hasInertia) {
+      gsap.to(dot, {
+        inertia: { xOffset: pushX, yOffset: pushY, resistance: CFG.resistance },
+        onComplete: () => springBack(dot),
+      });
+    } else {
+      gsap.to(dot, {
+        xOffset: pushX * 0.4, yOffset: pushY * 0.4,
+        duration: .25, ease: 'power2.out',
+        onComplete: () => springBack(dot),
+      });
+    }
+  };
+
+  const throttle = (fn, limit) => {
+    let last = 0;
+    return function (...args) {
+      const now = performance.now();
+      if (now - last >= limit) { last = now; fn.apply(this, args); }
+    };
+  };
+
+  const onMove = (e) => {
+    const now = performance.now();
+    const dt = pointer.lastTime ? now - pointer.lastTime : 16;
+    let vx = ((e.clientX - pointer.lastX) / dt) * 1000;
+    let vy = ((e.clientY - pointer.lastY) / dt) * 1000;
+    let speed = Math.hypot(vx, vy);
+    if (speed > CFG.maxSpeed) {
+      const s = CFG.maxSpeed / speed;
+      vx *= s; vy *= s; speed = CFG.maxSpeed;
+    }
+    pointer.lastTime = now; pointer.lastX = e.clientX; pointer.lastY = e.clientY;
+    pointer.vx = vx; pointer.vy = vy; pointer.speed = speed;
+
+    const rect = canvas.getBoundingClientRect();
+    pointer.x = e.clientX - rect.left;
+    pointer.y = e.clientY - rect.top;
+
+    for (const dot of dots) {
+      const dist = Math.hypot(dot.cx - pointer.x, dot.cy - pointer.y);
+      if (speed > CFG.speedTrigger && dist < CFG.proximity && !dot._inertiaApplied) {
+        push(dot, dot.cx - pointer.x + vx * 0.005, dot.cy - pointer.y + vy * 0.005);
+      }
+    }
+  };
+
+  const onClick = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+    for (const dot of dots) {
+      const dist = Math.hypot(dot.cx - cx, dot.cy - cy);
+      if (dist < CFG.shockRadius && !dot._inertiaApplied) {
+        const falloff = Math.max(0, 1 - dist / CFG.shockRadius);
+        push(dot, (dot.cx - cx) * CFG.shockStrength * falloff, (dot.cy - cy) * CFG.shockStrength * falloff);
+      }
+    }
+  };
+
+  window.addEventListener('mousemove', throttle(onMove, 50), { passive: true });
+  window.addEventListener('click', onClick);
+  window.addEventListener('resize', buildGrid);
+  buildGrid();
+  draw();   /* paints immediately, then self-schedules via rAF */
 }
 
 function initBrand() {
-  const container = $('#v27-cg-container');
-  if (!container) return;
-
-  const dotWrap = document.querySelector('.eg-dotgrid-wrap');
-  if (dotWrap) initDotGrid(dotWrap);
+  const grid = $('#v27-eg-grid');
+  if (!grid) return;
 
   const items = EXT_SLIDES.map(s => ({ image: s.src, text: s.label }));
   lbItems = items;
@@ -513,19 +900,43 @@ function initBrand() {
     }
   });
 
-  container.style.cursor = 'none';
+  /* Edge gallery — 2-col grid, cards sweep in from alternating sides
+     while the photo settles from a slight zoom (landing page style) */
+  items.forEach((it, i) => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'v27-eg-card';
+    card.setAttribute('aria-label', it.text);
+    card.dataset.cursorLabel = 'View';
 
-  const isMobile = window.innerWidth <= 640;
+    const img = document.createElement('img');
+    img.src = it.image;
+    img.alt = it.text;
+    img.draggable = false;
+    card.appendChild(img);
 
-  new CircularGallery(container, {
-    items,
-    bend: isMobile ? 1 : 3,
-    textColor: '#555859',
-    borderRadius: 0.04,
-    font: '500 16px GothamMedium, Montserrat, sans-serif',
-    scrollSpeed: 4,
-    scrollEase: 0.025,
-    onItemClick: (idx, cx, cy) => openLightbox(idx, cx, cy),
+    const tag = document.createElement('span');
+    tag.className = 'v27-eg-tag';
+    tag.textContent = it.text;
+    card.appendChild(tag);
+
+    card.addEventListener('click', (e) => openLightbox(i, e.clientX, e.clientY));
+    grid.appendChild(card);
+
+    const fromLeft = i % 2 === 0;
+    const tl = gsap.timeline({
+      scrollTrigger: { trigger: card, start: 'top 85%', once: true },
+    });
+    tl.fromTo(card,
+      { xPercent: fromLeft ? -46 : 46, rotation: fromLeft ? -7 : 7, opacity: 0, transformOrigin: '50% 50%' },
+      { xPercent: 0, rotation: 0, opacity: 1, duration: 1.3, ease: 'power3.out' },
+      0
+    );
+    tl.fromTo(img,
+      { scale: 1.16 },
+      { scale: 1, duration: 1.4, ease: 'power3.out', onComplete: () => gsap.set(img, { clearProps: 'transform' }) },
+      0
+    );
   });
 }
 
@@ -1008,7 +1419,8 @@ function initCharging() {
     section.style.background = bg;
     const dark = t >= 0.8;
     section.style.setProperty('--charge-fg', dark ? '#0A0A0A' : '#FFFFFF');
-    $$('.v27-charging-eyebrow, .v27-charging-intro, .v27-charge-stat-label', section).forEach(el => {
+    /* eyebrow stays brand orange in both themes */
+    $$('.v27-charging-intro, .v27-charge-stat-label', section).forEach(el => {
       el.style.color = dark ? 'rgba(10,10,10,.55)' : 'rgba(255,255,255,.55)';
     });
     $$('.v27-charge-stat-val', section).forEach(el => {
@@ -1087,18 +1499,7 @@ function interpolateColor(hex1, hex2, t) {
   return `rgb(${r},${g},${b})`;
 }
 
-/* ══════════════════════════════════════════════════════════
-   12. TRIMS ACCORDION
-══════════════════════════════════════════════════════════ */
-function initTrims() {
-  ScrollTrigger.create({
-    trigger: '#v27-trims', start: 'top 70%', once: true,
-    onEnter() {
-      gsap.to('.v27-trim-col-head', { opacity: 1, y: 0, stagger: .1, duration: .6 });
-      gsap.from('.v27-trim-section-label, .v27-trim-row', { opacity: 0, y: 12, stagger: .04, duration: .45, delay: .2 });
-    }
-  });
-}
+/* Trims section removed (hidden on the landing page too) */
 
 /* ══════════════════════════════════════════════════════════
    13. RESERVE SECTION
@@ -1120,6 +1521,7 @@ function initReserve() {
 function init() {
   initScene();
   initHeroEntrance();
+  initHeroParticles();
   initExterior();
   initLightbox();
   initBrand();
@@ -1130,7 +1532,6 @@ function init() {
   initTech();
   initSafety();
   initCharging();
-  initTrims();
   initReserve();
 }
 

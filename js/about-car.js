@@ -2,12 +2,12 @@
 
 /* ============================================================
    About page — pinned scene driver.
-   One viewport: the Overview panel cross-fades into the iCAUR
-   Story panel while the V27 PNG car follows a smooth curved path.
-   Everything is SCRUBBED directly to scroll progress (no spring).
+   REPLACED by js/about-3d.js (Three.js porcelain-gray V27 GLB
+   moving between the text blocks). The 2D canvas version below
+   is disabled but kept for reference.
 ============================================================ */
 (function () {
-  if (!window.matchMedia('(pointer: fine)').matches) return;   // skip touch
+  return;   // disabled — about-3d.js drives the scene now
 
   const hero   = document.getElementById('hero');
   const scene  = document.getElementById('aboutScene');
