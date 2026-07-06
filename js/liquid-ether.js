@@ -403,11 +403,15 @@ export function createLiquidEther(container, opts = {}) {
   }
 
   /* ── Bootstrap ───────────────────────────────────────────── */
-  container.style.position = container.style.position || 'relative';
-  container.style.overflow = container.style.overflow || 'hidden';
+  /* Mount on an inner div — the React component's own root — so the
+     host layer's CSS positioning (e.g. absolute inset:0) is untouched */
+  const mount = document.createElement('div');
+  mount.className = 'liquid-ether-container';
+  mount.style.cssText = 'position:relative;overflow:hidden;width:100%;height:100%;touch-action:none;';
+  container.appendChild(mount);
 
   webgl = new WebGLManager({
-    $wrapper: container, autoDemo, autoSpeed, autoIntensity,
+    $wrapper: mount, autoDemo, autoSpeed, autoIntensity,
     takeoverDuration, autoResumeDelay, autoRampDuration,
   });
 
@@ -428,20 +432,21 @@ export function createLiquidEther(container, opts = {}) {
     if (!webgl) return;
     if (iv && !document.hidden) { webgl.start(); } else { webgl.pause(); }
   }, { threshold: [0, 0.01, 0.1] });
-  io.observe(container);
+  io.observe(mount);
 
   ro = new ResizeObserver(() => {
     if (!webgl) return;
     if (resizeRaf) cancelAnimationFrame(resizeRaf);
     resizeRaf = requestAnimationFrame(() => { if (webgl) webgl.resize(); });
   });
-  ro.observe(container);
+  ro.observe(mount);
 
   return {
     dispose() {
       try { ro?.disconnect(); } catch(e) {}
       try { io?.disconnect(); } catch(e) {}
       if (webgl) { webgl.dispose(); webgl = null; }
+      if (mount.parentNode) mount.parentNode.removeChild(mount);
     }
   };
 }

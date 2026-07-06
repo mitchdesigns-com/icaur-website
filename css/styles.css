@@ -462,25 +462,36 @@ html.pt-entering > body { opacity: 0; }
   opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0);
 }
 
-/* Compact list variant — Services dropdown (client S2) */
-.nav__dropdown--list {
-  position: absolute; top: calc(100% + 10px); left: 50%;
-  width: 250px;
-  display: flex; flex-direction: column; gap: 2px;
-  padding: 8px;
+/* Services dropdown — 3 links on the left, image on the right.
+   Inherits the Models positioning (fixed, below the nav) so it never
+   overlaps the bar; just a narrower panel + its own 2-col layout. */
+.nav__dropdown--services {
+  width: min(680px, calc(100vw - 32px));
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 14px; padding: 14px; align-items: stretch;
 }
-.nav__item--has-drop { position: relative; }
-.nav__drop-link {
-  display: flex; align-items: center; gap: 10px;
-  padding: 11px 14px; border-radius: 12px;
-  font-family: var(--f-display); font-size: 12px; font-weight: 700;
-  letter-spacing: .06em; text-transform: uppercase;
-  color: var(--black); text-decoration: none;
-  transition: background .2s, color .2s;
+.nav__svc-links {
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 4px; padding: 6px 4px;
 }
-.nav__drop-link svg { color: var(--amber); flex-shrink: 0; }
-.nav__drop-link:hover { background: var(--amber); color: var(--white); }
-.nav__drop-link:hover svg { color: var(--white); }
+.nav__svc-link {
+  font-family: var(--f-display);
+  font-size: clamp(15px, 1.3vw, 18px); font-weight: 800;
+  letter-spacing: -.005em; line-height: 1.2;
+  color: var(--black); text-decoration: none; white-space: nowrap;
+  padding: 14px 18px; border-radius: 12px;
+  transition: background .2s, color .2s, padding-left .25s var(--ease-out);
+}
+.nav__svc-link:hover { background: var(--amber); color: var(--white); padding-left: 26px; }
+.nav__svc-media {
+  display: block; border-radius: 14px; overflow: hidden;
+  min-height: 190px; background: #EDE7DF; position: relative;
+}
+.nav__svc-media img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform .6s var(--ease-out);
+}
+.nav__svc-media:hover img { transform: scale(1.05); }
 
 /* mfc cards inside the dropdown */
 .nav__dropdown .mfc { aspect-ratio: 16/8; cursor: pointer; }
@@ -4451,6 +4462,44 @@ a.reach-tile:hover { transform: translateY(-5px); box-shadow: 0 18px 44px rgba(0
 .warranty-card__perks { display: flex; flex-direction: column; gap: 12px; margin-bottom: var(--sp-20); }
 .warranty-perk { display: flex; align-items: center; gap: 12px; font-size: 15px; color: rgba(255,255,255,.7); }
 .warranty-perk svg { flex-shrink: 0; }
+
+/* Perk boxes — 4-up feature grid on a dark band, centered content */
+.perk-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 14px; max-width: 940px;
+  margin: clamp(28px, 4vh, 44px) auto var(--sp-8);
+}
+.perk-box {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 16px; padding: clamp(22px, 2.2vw, 32px) clamp(18px, 1.8vw, 24px);
+  transition: transform .45s var(--ease-spring), background .3s, border-color .3s;
+}
+.perk-box:hover {
+  transform: translateY(-6px);
+  background: rgba(255, 255, 255, .08);
+  border-color: rgba(243, 112, 33, .4);
+}
+.perk-box__icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 52px; height: 52px; border-radius: 14px;
+  background: rgba(243, 112, 33, .12); color: var(--amber);
+  transition: background .3s, color .3s, transform .45s var(--ease-spring);
+}
+.perk-box:hover .perk-box__icon {
+  background: var(--amber); color: var(--white);
+  transform: rotate(-6deg) scale(1.06);
+}
+.perk-box__h {
+  font-family: var(--f-display); font-size: 16px; font-weight: 800;
+  letter-spacing: -.01em; color: var(--white); margin: 4px 0 0;
+}
+.perk-box__p {
+  font-size: 13px; line-height: 1.6; color: rgba(255, 255, 255, .55); margin: 0;
+}
+@media (max-width: 860px) { .perk-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .perk-grid { grid-template-columns: 1fr; } }
 .warranty-card__cta-area { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
 .btn--ghost-light {
   display: inline-flex; align-items: center;

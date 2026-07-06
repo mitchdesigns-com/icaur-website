@@ -675,9 +675,12 @@
   position: sticky; top: 0; height: 100vh; z-index: 1;
   overflow: hidden; background: #0D0B09;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
+  /* optical lift: headline sits a touch above geometric center, which
+     also shortens the black lead-in while the section scrolls into view */
+  padding-bottom: clamp(64px, 14vh, 160px);
 }
 
-/* LiquidEther canvas wrapper */
+/* LiquidEther canvas wrapper — exact landing-page setup */
 .v27-ct-liquid-bg {
   position: absolute; inset: 0; z-index: 0; opacity: 0.7;
   overflow: hidden;
@@ -692,15 +695,27 @@
     linear-gradient(to bottom, rgba(13,11,9,.5) 0%, transparent 25%, transparent 75%, rgba(13,11,9,.6) 100%);
 }
 
-/* Headline copy — left-aligned to match the homepage (client I1) */
+/* Headline copy — centered over the fluid background */
 .v27-ct-head {
-  position: relative; z-index: 2; text-align: left; padding: 0 var(--px);
+  position: relative; z-index: 2; text-align: center; padding: 0 var(--px);
   width: 100%; max-width: 1280px; margin: 0 auto;
 }
 .v27-ct-eyebrow {
   font-size: .7rem; font-weight: 700; letter-spacing: .32em; text-transform: uppercase;
   color: var(--orange); margin-bottom: 24px;
-  display: flex; align-items: center; justify-content: flex-start; gap: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+/* Brand dashes — same mark as the sitewide .eyebrow */
+.v27-ct-eyebrow::before {
+  content: '';
+  flex-shrink: 0;
+  width: 34px; height: 9px;
+  background: url('../assets/images/dashes.svg') no-repeat center / contain;
+}
+/* Dot separator used inside eyebrows (was an unstyled, invisible span) */
+.eyebrow-dot {
+  display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+  background: currentColor; opacity: .55; flex-shrink: 0;
 }
 .v27-ct-line-wrap {
   position: relative; overflow: hidden; display: block; margin-bottom: 2px;
@@ -717,7 +732,7 @@
   position: absolute; inset: 0;
 }
 .v27-ct-sub {
-  font-size: clamp(.82rem,1.05vw,1rem); color: rgba(255,255,255,.35);
+  font-size: clamp(.82rem,1.05vw,1rem); color: rgba(255,255,255,.55);
   max-width: 500px; margin: 0 auto; line-height: 1.75; font-weight: 400;
   opacity: 0; transform: translateY(8px);
 }
