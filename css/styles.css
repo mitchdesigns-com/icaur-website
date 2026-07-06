@@ -4209,6 +4209,38 @@ a.reach-tile:hover { transform: translateY(-5px); box-shadow: 0 18px 44px rgba(0
   .white-hover-cards { grid-template-columns: 1fr; }
 }
 
+/* Centered dark sub-band variant */
+.svc-sub-band--center { text-align: center; }
+.svc-sub-band--center .warranty-card__body {
+  max-width: 640px; margin-left: auto; margin-right: auto;
+}
+.svc-sub-band--center .warranty-card__dl-label { text-align: center; }
+.svc-sub-band--center .warranty-card__downloads {
+  max-width: 620px; margin-left: auto; margin-right: auto;
+}
+
+/* Subtle dot-grid texture behind a dark sub-band, faded toward the edges */
+.svc-sub-band--dots { position: relative; overflow: hidden; }
+.svc-sub-band--dots::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, .13) 1.3px, transparent 1.6px);
+  background-size: 24px 24px;
+  -webkit-mask-image: radial-gradient(ellipse 72% 66% at 50% 46%, #000 0%, transparent 82%);
+          mask-image: radial-gradient(ellipse 72% 66% at 50% 46%, #000 0%, transparent 82%);
+}
+.svc-sub-band--dots > .container { position: relative; z-index: 1; }
+
+/* Download cards — 2-up centered white-hover-cards with centered content */
+.dl-cards {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 620px; margin: var(--sp-16) auto 0;
+}
+.dl-cards .white-hover-card { align-items: center; text-align: center; }
+.dl-cards .white-hover-card__p { margin-bottom: var(--sp-16); }
+@media (max-width: 620px) {
+  .dl-cards { grid-template-columns: 1fr; }
+}
+
 .svc-hero__folder {
   display: flex; flex-direction: column; align-items: center; gap: 24px;
   margin-top: var(--sp-32);
