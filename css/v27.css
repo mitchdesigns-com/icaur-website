@@ -716,7 +716,9 @@
 }
 .v27-ct-eyebrow {
   font-size: .7rem; font-weight: 700; letter-spacing: .32em; text-transform: uppercase;
-  color: var(--orange); margin-bottom: 24px;
+  /* --amber is defined globally in styles.css :root (same #F37021 as --orange,
+     which is scoped to .v27-page and undefined on the innovation page) */
+  color: var(--amber); margin-bottom: 24px;
   display: flex; align-items: center; justify-content: center; gap: 10px;
 }
 /* Brand dashes — same mark as the sitewide .eyebrow */

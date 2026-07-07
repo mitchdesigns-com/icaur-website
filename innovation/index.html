@@ -72,7 +72,7 @@
     <div class="v27-ct-liquid-bg" id="v27-ct-liquid-bg" aria-hidden="true"></div>
     <div class="v27-ct-vignette" aria-hidden="true"></div>
     <div class="v27-ct-head" id="v27-ct-head">
-      <p class="v27-ct-eyebrow" id="v27-ct-eyebrow">Technology <span class="eyebrow-dot" style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--amber);vertical-align:middle"></span> iCAUR</p>
+      <p class="v27-ct-eyebrow" id="v27-ct-eyebrow">Technology</p>
       <div class="v27-ct-line-wrap">
         <div class="v27-ct-line1" id="v27-ct-line1">Intelligence</div>
         <div class="v27-ct-mask" id="v27-ct-mask1"></div>
@@ -302,6 +302,16 @@
         }).fromTo([left, right], { opacity: 0, y: 32 }, { opacity: 1, y: 0, stagger: 0.05 });
       }
     });
+
+    /* ScrollTrigger measures start/end at creation, but web fonts, lazy
+       images and the async fluid background all reflow the layout afterward —
+       which left every item's start/end at negative offsets, pinning progress
+       at 1 so the images never rotated. Re-measure once the layout settles. */
+    var refresh = function () { ST.refresh(); };
+    if (document.readyState === 'complete') refresh();
+    else window.addEventListener('load', refresh);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(refresh);
+    setTimeout(refresh, 800);
   }
 
   if (document.readyState === 'loading') {
