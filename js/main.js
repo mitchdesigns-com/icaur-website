@@ -757,6 +757,32 @@ function splitHeadlineLetters(headline) {
 
 
 // ============================================================
+// TILTED CARDS — 3D perspective tilt on hover (React Bits port)
+// Applied to every white-hover-card (and its .svc-hub-card alias)
+// site-wide; also any explicit [data-tilt] element.
+// ============================================================
+(function initTiltCards() {
+  const cards = $$('.white-hover-card, .svc-hub-card, [data-tilt]');
+  if (!cards.length || !window.matchMedia('(pointer: fine)').matches) return;
+
+  const AMP = 9;   // max tilt in degrees
+
+  cards.forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width  - 0.5;   // -0.5 … 0.5
+      const py = (e.clientY - r.top)  / r.height - 0.5;
+      const rotY = ( px * AMP * 2).toFixed(2);
+      const rotX = (-py * AMP * 2).toFixed(2);
+      card.style.transform =
+        `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-6px) scale(1.04)`;
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+  });
+})();
+
+
+// ============================================================
 // SERVICES HOVER LIST — homepage image preview (reference style)
 // ============================================================
 (function initUspList() {
@@ -766,13 +792,22 @@ function splitHeadlineLetters(headline) {
   const img  = preview.querySelector('img');
   const rows = $$('.usp-row', stack);
 
+  // Center the preview vertically on whichever row is hovered
+  const alignTo = row => {
+    const wrapRect = preview.parentElement.getBoundingClientRect();
+    const rowRect  = row.getBoundingClientRect();
+    preview.style.top = (rowRect.top - wrapRect.top + rowRect.height / 2) + 'px';
+  };
+
   rows.forEach(row => {
     row.addEventListener('mouseenter', () => {
       if (img.getAttribute('src') !== row.dataset.img) img.src = row.dataset.img;
+      alignTo(row);
       preview.classList.add('is-active');
     });
     row.addEventListener('focus', () => {
       img.src = row.dataset.img;
+      alignTo(row);
       preview.classList.add('is-active');
     });
   });
@@ -1139,7 +1174,7 @@ document.addEventListener('click', e => {
   const MODEL_DATA = {
     v27: {
       name: 'V27',
-      img:  '/assets/images/v27-model-in-homepge-01.png',
+      img:  '/assets/images/v27-model-in-homepge-01.webp',
       logo: '/assets/images/V27-logo.svg',
       trimSpecs: {
         'Standard Range': { range: '450 km', hp: '380 hp', accel: '4.8s' },
@@ -1150,7 +1185,7 @@ document.addEventListener('click', e => {
     },
     o3t: {
       name: 'O3T',
-      img:  '/assets/images/ot3-model-in-homepage-01.png',
+      img:  '/assets/images/ot3-model-in-homepage-01.webp',
       logo: '/assets/images/T03-logo.svg',
       trimSpecs: {
         'Core':  { range: '520 km', hp: '420 hp', accel: '4.2s' },
@@ -1522,6 +1557,10 @@ document.addEventListener('click', e => {
 // ============================================================
 // OUR MISSION — scroll-driven 3D carousel (mirrors the services
 // section) + floating parallax images around the statement
+// ============================================================
+// OUR MISSION — horizontal carousel (headline → statement) that
+// sweeps through on scroll, with floating parallax images that
+// scatter out from the statement and a curve reveal on entry
 // ============================================================
 (function initMissionScroll() {
   const driver  = $('#missionDriver');

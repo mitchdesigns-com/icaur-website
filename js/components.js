@@ -31,8 +31,8 @@ const SITE_HEADER = `
           <article class="mfc">
             <a href="/models/v27" class="mfc__inner" data-cursor-label="Explore">
               <span class="mfc__glow" aria-hidden="true"></span>
-              <img src="/assets/images/v27-model-in-homepge-01.png" alt="" class="mfc__img mfc__img--default" loading="lazy">
-              <img src="/assets/images/v27-model-in-homepge-02.png" alt="iCAUR V27" class="mfc__img mfc__img--hover" loading="lazy">
+              <img src="/assets/images/v27-model-in-homepge-01.webp" alt="" class="mfc__img mfc__img--default" loading="lazy">
+              <img src="/assets/images/v27-model-in-homepge-02.webp" alt="iCAUR V27" class="mfc__img mfc__img--hover" loading="lazy">
               <div class="mfc__bottom">
                 <img src="/assets/images/V27-logo.svg" alt="iCAUR V27" class="mfc__logo">
                 <h3 class="mfc__name">Bold. <span class="mfc__hl">Capable.</span></h3>
@@ -43,8 +43,8 @@ const SITE_HEADER = `
           <article class="mfc">
             <a href="/models/v27" class="mfc__inner" data-cursor-label="Explore">
               <span class="mfc__glow" aria-hidden="true"></span>
-              <img src="/assets/images/ot3-model-in-homepage-01.png" alt="" class="mfc__img mfc__img--default" loading="lazy">
-              <img src="/assets/images/ot3-model-in-homepage-02.png" alt="iCAUR OT3" class="mfc__img mfc__img--hover" loading="lazy">
+              <img src="/assets/images/ot3-model-in-homepage-01.webp" alt="" class="mfc__img mfc__img--default" loading="lazy">
+              <img src="/assets/images/ot3-model-in-homepage-02.webp" alt="iCAUR OT3" class="mfc__img mfc__img--hover" loading="lazy">
               <div class="mfc__bottom">
                 <img src="/assets/images/T03-logo.svg" alt="iCAUR OT3" class="mfc__logo">
                 <h3 class="mfc__name">Smart. <span class="mfc__hl">Sleek.</span></h3>
@@ -68,7 +68,7 @@ const SITE_HEADER = `
             <a href="/services/warranty" class="nav__svc-link">Warranty</a>
           </div>
           <a href="/services" class="nav__svc-media" data-cursor-label="Explore" aria-label="All services">
-            <img src="/assets/images/Maintainance.png" alt="iCAUR service &amp; maintenance" loading="lazy">
+            <img src="/assets/images/Maintainance.webp" alt="iCAUR service &amp; maintenance" loading="lazy">
           </a>
         </div>
       </li>
@@ -133,8 +133,8 @@ const SITE_HEADER = `
       <!-- V27 -->
       <div class="cmp-model-col">
         <div class="cmp-mfc">
-          <img src="/assets/images/v27-model-in-homepge-01.png" alt="iCAUR V27" class="cmp-mfc__img cmp-mfc__img--default">
-          <img src="/assets/images/v27-model-in-homepge-02.png" alt="iCAUR V27" class="cmp-mfc__img cmp-mfc__img--hover">
+          <img src="/assets/images/v27-model-in-homepge-01.webp" alt="iCAUR V27" class="cmp-mfc__img cmp-mfc__img--default">
+          <img src="/assets/images/v27-model-in-homepge-02.webp" alt="iCAUR V27" class="cmp-mfc__img cmp-mfc__img--hover">
           <img src="/assets/images/V27-logo.svg" alt="" class="cmp-mfc__logo" aria-hidden="true">
           <div class="cmp-mfc__bottom">
             <span class="cmp-mfc__name">Bold. <em>Capable.</em></span>
@@ -166,8 +166,8 @@ const SITE_HEADER = `
       <!-- O3T -->
       <div class="cmp-model-col">
         <div class="cmp-mfc">
-          <img src="/assets/images/ot3-model-in-homepage-01.png" alt="iCAUR O3T" class="cmp-mfc__img cmp-mfc__img--default">
-          <img src="/assets/images/ot3-model-in-homepage-02.png" alt="iCAUR O3T" class="cmp-mfc__img cmp-mfc__img--hover">
+          <img src="/assets/images/ot3-model-in-homepage-01.webp" alt="iCAUR O3T" class="cmp-mfc__img cmp-mfc__img--default">
+          <img src="/assets/images/ot3-model-in-homepage-02.webp" alt="iCAUR O3T" class="cmp-mfc__img cmp-mfc__img--hover">
           <img src="/assets/images/T03-logo.svg" alt="" class="cmp-mfc__logo" aria-hidden="true">
           <div class="cmp-mfc__bottom">
             <span class="cmp-mfc__name">Smart. <em>Sleek.</em></span>

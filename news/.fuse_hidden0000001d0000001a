@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script>if(sessionStorage.getItem('pt-nav'))document.documentElement.classList.add('pt-entering');</script>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/Favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="iCAUR News — Latest updates, engineering insights, and announcements from Egypt's next-gen EV company.">
+  <title>News — iCAUR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script
+  src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
+  data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
+  data-endpoint="https://bugger-worker.mitchdesigns.workers.dev/functions/v1/ingest-feedback"
+  data-position="bottom-right"
+  data-button-text="Feedback"
+  data-accent="#4f46e5"
+  async></script>
+</head>
+<body class="is-loading">
+
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+    <feBlend in="SourceGraphic" in2="grey" mode="multiply"/>
+  </filter>
+</svg>
+
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__dot" id="cursorDot"></div>
+  <div class="cursor__ring" id="cursorRing"></div>
+  <div class="cursor__label" id="cursorLabel"></div>
+</div>
+
+
+<div id="site-header"></div>
+
+<main id="main">
+
+<!-- ═══════ HERO + FEATURED ═══════ -->
+<section class="section news-hero" id="hero">
+  <div class="container">
+    <nav class="breadcrumb breadcrumb--dark reveal reveal--up" data-delay="0" aria-label="Breadcrumb">
+      <a href="/">Home</a><span>›</span><span aria-current="page">News</span>
+    </nav>
+    <div class="news-featured reveal reveal--up" data-delay="1">
+      <a class="news-featured__img" href="/news/electric-wiring" data-cursor-label="Read">
+        <img src="../assets/images/iCAUR INTL_V27 REV_cam025.jpg" alt="iCAUR V27 Studio Design Revealed" loading="eager" width="800" height="500">
+      </a>
+      <div class="news-featured__text">
+        <div class="news-featured__meta">
+          <span class="news-featured__tag">News</span>
+          <time datetime="2026-05-28">May 28, 2026</time>
+        </div>
+        <h2 style="margin-bottom:var(--sp-8)">iCAUR V27 Studio Design Revealed</h2>
+        <p style="font-size:16px;line-height:1.75;color:var(--text-mid);margin-bottom:var(--sp-12)">A first look at the design philosophy behind Egypt's most anticipated electric vehicle — how proportions, surfaces, and intent come together into one bold statement.</p>
+        <a href="/news/electric-wiring" class="btn btn--dark btn--arrow btn--magnetic">Read Article <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FILTERS + GRID ═══════ -->
+<section class="section news-filters" id="filters" style="padding:0">
+  <div class="container">
+    <nav class="news-filters__inner" aria-label="Article categories">
+      <button class="filter-btn is-active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="blog">Blog</button>
+      <button class="filter-btn" data-filter="news">News</button>
+      <button class="filter-btn" data-filter="event">Event</button>
+    </nav>
+  </div>
+</section>
+
+<section class="section news-grid-full" id="articles" style="padding-top:var(--sp-24)">
+  <div class="container">
+    <div class="news__grid">
+      <article class="news-card reveal reveal--up" data-delay="0" data-category="blog">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type news-card__type--blog">Blog</span>
+            <div class="news-card__date-loc"><time datetime="2026-05-20">May 20, 2026</time></div>
+          </div>
+          <h4>Electric Wiring Matrix Optimized for Egypt</h4>
+        </div>
+        <a href="/news/electric-wiring" class="news-card__img" data-cursor-label="Read">
+          <img src="../assets/images/v27/car-side.jpg" alt="Electric Wiring Matrix" loading="lazy" width="400" height="250">
+        </a>
+        <div class="news-card__body">
+          <p>How iCAUR's engineers rebuilt the EV powertrain for Egypt's unique climate and roads.</p>
+        </div>
+      </article>
+
+      <article class="news-card reveal reveal--up" data-delay="1" data-category="event">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type news-card__type--event">Event</span>
+            <div class="news-card__date-loc"><time datetime="2026-05-12">May 12, 2026</time></div>
+          </div>
+          <h4>Test Drive: The Wanderer Campaign</h4>
+        </div>
+        <a href="/news/electric-wiring" class="news-card__img" data-cursor-label="Read">
+          <img src="../assets/images/ICUAR V27 brochure 03 20.png" alt="Test Drive: The Wanderer Campaign" loading="lazy" width="400" height="250">
+        </a>
+        <div class="news-card__body">
+          <p>We drove the V27 across three terrains — desert, coastal highway, and city traffic. Here's everything we discovered.</p>
+        </div>
+      </article>
+
+      <article class="news-card reveal reveal--up" data-delay="2" data-category="blog">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type news-card__type--blog">Blog</span>
+            <div class="news-card__date-loc"><time datetime="2026-04-30">Apr 30, 2026</time></div>
+          </div>
+          <h4>Inside the AI-Powered iCAUR Cabin</h4>
+        </div>
+        <a href="/news/electric-wiring" class="news-card__img" data-cursor-label="Read">
+          <img src="../assets/images/v27/interior-display.jpg" alt="AI Cabin Technology" loading="lazy" width="400" height="250">
+        </a>
+        <div class="news-card__body">
+          <p>How iCAUR's intelligent cockpit learns your habits, predicts your needs, and makes every drive personal.</p>
+        </div>
+      </article>
+
+      <article class="news-card reveal reveal--up" data-delay="0" data-category="news">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type">News</span>
+            <div class="news-card__date-loc"><time datetime="2026-04-14">Apr 14, 2026</time></div>
+          </div>
+          <h4>Egypt's Electric Future Starts in 2026</h4>
+        </div>
+        <a href="/news/electric-wiring" class="news-card__img" data-cursor-label="Read">
+          <img src="../assets/images/iCAUR INTL_V27 REV_cam027 copy.jpg" alt="Egypt's EV Future" loading="lazy" width="400" height="250">
+        </a>
+        <div class="news-card__body">
+          <p>iCAUR CEO Ahmed Kamal on why now is the right time, the biggest challenges, and what comes next.</p>
+        </div>
+      </article>
+
+      <article class="news-card reveal reveal--up" data-delay="1" data-category="blog">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type news-card__type--blog">Blog</span>
+            <div class="news-card__date-loc"><time datetime="2026-03-28">Mar 28, 2026</time></div>
+          </div>
+          <h4>The V23: Designing for the City</h4>
+        </div>
+        <a href="/news/electric-wiring" class="news-card__img" data-cursor-label="Read">
+          <img src="../assets/images/v27-23.png" alt="V23 Design Language" loading="lazy" width="400" height="250">
+        </a>
+        <div class="news-card__body">
+          <p>A deeper look at the design choices behind iCAUR's more urban model — its sleek proportions and bold surfaces.</p>
+        </div>
+      </article>
+
+      <article class="news-card reveal reveal--up" data-delay="2" data-category="blog">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type news-card__type--blog">Blog</span>
+            <div class="news-card__date-loc"><time datetime="2026-03-10">Mar 10, 2026</time></div>
+          </div>
+          <h4>Built for Egypt's Heat: Our Battery Story</h4>
+        </div>
+        <a href="/news/electric-wiring" class="news-card__img" data-cursor-label="Read">
+          <img src="../assets/images/v27/interior-01.jpg" alt="iCAUR Battery Technology" loading="lazy" width="400" height="250">
+        </a>
+        <div class="news-card__body">
+          <p>How iCAUR's thermal management system was purpose-built to maintain peak performance in 45°C+ summer heat.</p>
+        </div>
+      </article>
+    </div>
+
+    <!-- Load more -->
+    <div style="text-align:center;margin-top:var(--sp-32)" class="reveal reveal--up">
+      <button class="btn btn--ghost btn--lg btn--magnetic">Load More Articles</button>
+    </div>
+  </div>
+</section>
+
+
+</main>
+
+<div id="site-footer"></div>
+
+<script>
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.news-card').forEach(card => {
+      const show = filter === 'all' || card.dataset.category === filter;
+      card.style.display = show ? '' : 'none';
+    });
+  });
+});
+</script>
+  <script src="/js/components.js" defer></script>
+  <script src="/js/main.js" defer></script>
+  <script src="/js/transitions.js" defer></script>
+  <script src="/js/game.js" defer></script>
+</body>
+</html>

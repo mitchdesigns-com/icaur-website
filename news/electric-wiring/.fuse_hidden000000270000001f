@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script>if(sessionStorage.getItem('pt-nav'))document.documentElement.classList.add('pt-entering');</script>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/Favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="How iCAUR's engineers rebuilt the EV powertrain for Egypt's unique climate and roads.">
+  <title>Electric Wiring Matrix Optimized for Egypt — iCAUR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
+    data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
+    data-endpoint="https://bugger-worker.mitchdesigns.workers.dev/functions/v1/ingest-feedback"
+    data-position="bottom-right" data-button-text="Feedback" data-accent="#4f46e5" async></script>
+</head>
+<body class="is-loading">
+
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+    <feBlend in="SourceGraphic" in2="grey" mode="multiply"/>
+  </filter>
+</svg>
+
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__dot" id="cursorDot"></div>
+  <div class="cursor__ring" id="cursorRing"></div>
+  <div class="cursor__label" id="cursorLabel"></div>
+</div>
+
+
+<div id="site-header"></div>
+
+<main id="main">
+
+<!-- ═══════ POST HERO ═══════ -->
+<section class="post-hero">
+  <div class="post-hero__inner">
+    <nav class="breadcrumb reveal reveal--up" data-delay="0" aria-label="Breadcrumb">
+      <a href="/">Home</a><span>›</span><a href="/news">Media Center</a><span>›</span><span aria-current="page">Article</span>
+    </nav>
+    <h1 class="post-hero__h reveal reveal--up" data-delay="1">Electric Wiring Matrix<br>Optimized For Egypt</h1>
+    <div class="post-meta reveal reveal--up" data-delay="2">
+      <span class="post-meta__tag">Blog</span>
+      <span class="post-meta__dot">·</span>
+      <span>5 min read</span>
+      <span class="post-meta__dot">·</span>
+      <time datetime="2026-05-20">20 May 2026</time>
+      <div class="post-share" aria-label="Share article">
+        <a href="#" aria-label="Copy link"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></a>
+        <a href="#" aria-label="Share on LinkedIn"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg></a>
+        <a href="#" aria-label="Share on X"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ COVER IMAGE ═══════ -->
+<div class="post-cover reveal reveal--up">
+  <img src="/assets/images/v27/car-side.jpg" alt="iCAUR V27 electric powertrain" loading="eager">
+</div>
+
+<!-- ═══════ ARTICLE BODY ═══════ -->
+<article class="post-body reveal reveal--up">
+
+  <h2>1. Engineering For Egyptian Roads</h2>
+  <p>Egypt's road conditions are unlike any other market. From the dense urban grid of Cairo to the open desert highways of Sinai, iCAUR's engineers faced a unique challenge — building an EV electrical architecture that could handle the full spectrum of Egyptian driving without compromise.</p>
+  <p>The result is the iCAUR Electric Wiring Matrix: a purpose-built, climate-hardened power distribution system designed from the ground up for the heat, dust, and demands of Egypt's roads.</p>
+
+  <div class="post-pullquote">
+    "We didn't adapt an existing architecture. We built Egypt's from scratch."
+  </div>
+
+  <h2>2. The Heat Problem</h2>
+  <p>Egypt's summer temperatures regularly exceed 45°C — and in urban stop-and-go traffic, interior temperatures can climb far higher. Traditional EV wiring harnesses lose efficiency under these conditions, creating thermal resistance that reduces range and performance over time.</p>
+  <p>iCAUR's matrix uses a new class of thermally-stable polymer sheathing developed in partnership with local material suppliers. The result is a wiring system that maintains full conductivity at temperatures up to 85°C — without adding weight or cost.</p>
+
+  <div class="post-img">
+    <img src="/assets/images/iCAUR INTL_V27 REV_cam026 copy.jpg" alt="iCAUR V27 chassis engineering" loading="lazy">
+  </div>
+
+  <h2>3. Redundancy As A Design Principle</h2>
+  <p>Unlike mass-market EV platforms that rely on a single high-voltage backbone, the iCAUR matrix uses a distributed ring architecture. Each major system — drive, thermal management, cabin, and ADAS — runs on an isolated power loop with automatic fallback pathways.</p>
+  <p>In the event of a partial failure, the system automatically reroutes power to maintain core functionality. The driver is notified via the cabin display, but the vehicle remains fully drivable until the next service appointment.</p>
+
+  <h2>4. Charging At Egypt's Grid Reality</h2>
+  <p>Egypt's public charging infrastructure is still developing. Rather than assuming fast-charge availability, the iCAUR wiring matrix is optimized for overnight home charging at 7kW — the most common scenario for current Egyptian EV owners. The system charges from 20% to 80% in under four hours at this rate.</p>
+  <p>When DC fast chargers are available, the matrix automatically adjusts its thermal management protocols to accept peak rates without compromising battery longevity — protecting the investment in every iCAUR sold.</p>
+
+  <h2>5. What This Means For You</h2>
+  <p>The Electric Wiring Matrix isn't a feature you'll see advertised on a spec sheet. But you'll feel it every time the V27 starts instantly in a July heatwave, delivers consistent range whether you're in Maadi or Marsa Matrouh, and charges reliably on a standard home socket. That's the point — engineering that disappears into the experience.</p>
+
+</article>
+
+<!-- ═══════ READ ALSO ═══════ -->
+<section class="post-read-also">
+  <div class="post-read-also__inner">
+    <h3>Read Also</h3>
+    <div class="post-read-also__grid">
+
+      <article class="news-card reveal reveal--up" data-delay="0">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type news-card__type--blog">Blog</span>
+            <div class="news-card__date-loc"><time datetime="2026-04-30">Apr 30, 2026</time></div>
+          </div>
+          <h4>Inside the AI-Powered iCAUR Cabin</h4>
+        </div>
+        <a href="/news/ai-cabin" class="news-card__img" data-cursor-label="Read">
+          <img src="/assets/images/v27/interior-display.jpg" alt="AI Cabin" loading="lazy" width="400" height="250">
+        </a>
+        <div class="news-card__body">
+          <p>How iCAUR's intelligent cockpit learns your habits, predicts your needs, and makes every drive personal.</p>
+          <footer><a href="/news/ai-cabin" class="btn btn--dark btn--sm btn--arrow">Read <span class="arrow">→</span></a></footer>
+        </div>
+      </article>
+
+      <article class="news-card reveal reveal--up" data-delay="1">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type news-card__type--blog">Blog</span>
+            <div class="news-card__date-loc"><time datetime="2026-03-10">Mar 10, 2026</time></div>
+          </div>
+          <h4>Built for Egypt's Heat: Our Battery Story</h4>
+        </div>
+        <a href="/news/battery-tech" class="news-card__img" data-cursor-label="Read">
+          <img src="/assets/images/v27/interior-01.jpg" alt="Battery Technology" loading="lazy" width="400" height="250">
+        </a>
+        <div class="news-card__body">
+          <p>How iCAUR's thermal management system was purpose-built to maintain peak performance in 45°C+ summer heat.</p>
+          <footer><a href="/news/battery-tech" class="btn btn--dark btn--sm btn--arrow">Read <span class="arrow">→</span></a></footer>
+        </div>
+      </article>
+
+    </div>
+
+    <div style="text-align:center;margin-top:48px">
+      <a href="/news" class="btn btn--ghost btn--lg btn--magnetic">View All <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="/js/components.js" defer></script>
+<script src="/js/main.js" defer></script>
+  <script src="/js/transitions.js" defer></script>
+<script src="/js/game.js" defer></script>
+</body>
+</html>

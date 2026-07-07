@@ -100,13 +100,13 @@ const DEFAULT_MODELS = [
   {
     value: "v27",
     label: "V27",
-    image: "/assets/images/v27-model-in-homepge-01.png",
+    image: "/assets/images/v27-model-in-homepge-01.webp",
     alt: "iCAUR V27",
   },
   {
     value: "ot3",
     label: "OT3",
-    image: "/assets/images/ot3-model-in-homepage-01.png",
+    image: "/assets/images/ot3-model-in-homepage-01.webp",
     alt: "iCAUR OT3",
   },
 ];

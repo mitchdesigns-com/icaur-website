@@ -49,6 +49,7 @@ let carBody = null;      /* current color GLB scene inside the group */
 let refBox = null;       /* camel bbox — variants are normalized to it */
 let activeColor = 'camel';
 const glbCache = new Map();   /* url → Promise<THREE.Group> */
+const glbReady = new Set();   /* urls whose model is decoded & ready (instant swap) */
 let isDragging  = false;
 let dragEnabled = false;
 let dragStartX  = 0;
@@ -137,22 +138,40 @@ function initScene() {
   function loadGlb(url) {
     if (!glbCache.has(url)) {
       glbCache.set(url, new Promise((resolve, reject) => {
-        loader.load(url, (gltf) => resolve(prepModel(gltf.scene)), undefined, reject);
+        loader.load(url, (gltf) => { glbReady.add(url); resolve(prepModel(gltf.scene)); }, undefined, reject);
       }));
     }
     return glbCache.get(url);
   }
 
-  /* Swap the car body to another paint (called by the swatches) */
-  window.__setCarColor = function (key) {
+  /* Warm a paint's GLB into cache (hover/focus preload) */
+  window.__warmCarColor = function (key) {
+    if (CAR_COLORS[key]) loadGlb(CAR_COLORS[key]);
+  };
+
+  /* Swap the car body to another paint (called by the swatches).
+     Instant when the GLB is already decoded; otherwise shows a
+     loading spinner on the swatch and swaps the moment it arrives. */
+  window.__setCarColor = function (key, btn) {
     if (!CAR_COLORS[key] || key === activeColor) return;
     activeColor = key;
-    loadGlb(CAR_COLORS[key]).then((body) => {
+    const url = CAR_COLORS[key];
+    const swap = (body) => {
       if (activeColor !== key || !car) return;   /* a newer pick won */
       if (carBody) car.remove(carBody);
       carBody = body;
       car.add(carBody);
-    }).catch((err) => console.warn('GLB color load error:', err));
+      if (btn) btn.classList.remove('is-loading');
+    };
+    if (glbReady.has(url)) {
+      glbCache.get(url).then(swap);              /* cached → instant */
+    } else {
+      if (btn) btn.classList.add('is-loading');  /* network wait → feedback */
+      loadGlb(url).then(swap).catch((err) => {
+        if (btn) btn.classList.remove('is-loading');
+        console.warn('GLB color load error:', err);
+      });
+    }
   };
 
   loadGlb(CAR_COLORS.camel).then((body) => {
@@ -176,10 +195,12 @@ function initScene() {
     scene.add(car);
     setupCarScrollAnim();
 
-    /* Preload the other paints in the background so swaps are instant */
+    /* Eagerly preload every other paint in parallel (like the landing
+       page) so swaps are instant. A short delay lets the camel model
+       paint first before the ~5MB variants compete for bandwidth. */
     setTimeout(() => {
-      Object.values(CAR_COLORS).forEach((url) => loadGlb(url));
-    }, 2500);
+      Object.keys(CAR_COLORS).forEach((k) => { if (k !== 'camel') loadGlb(CAR_COLORS[k]); });
+    }, 600);
   }).catch((err) => console.warn('GLB load error:', err));
 
   /* Resize */
@@ -540,12 +561,16 @@ function initExterior() {
     });
   }
 
-  /* Swatch click → swap the car GLB to that paint */
+  /* Swatch click → swap the car GLB to that paint.
+     Hover warms the GLB so a click right after is already cached. */
+  const warm = (key) => { if (window.__warmCarColor) window.__warmCarColor(key); };
   $$('.v27-swatch').forEach(btn => {
+    btn.addEventListener('mouseenter', () => warm(btn.dataset.color));
+    btn.addEventListener('focus',      () => warm(btn.dataset.color));
     btn.addEventListener('click', () => {
       $$('.v27-swatch').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      if (window.__setCarColor) window.__setCarColor(btn.dataset.color);
+      if (window.__setCarColor) window.__setCarColor(btn.dataset.color, btn);
     });
   });
 
@@ -567,12 +592,12 @@ function initExterior() {
    4.  EXTERIOR DESIGN — photo carousel
 ══════════════════════════════════════════════════════════ */
 const EXT_SLIDES = [
-  { src: '/assets/images/v27/v27-01.png',  label: 'Front View' },
-  { src: '/assets/images/v27/v27-02.png',  label: 'Profile' },
-  { src: '/assets/images/v27/v27-03.png',  label: 'Exterior' },
-  { src: '/assets/images/v27/v27-12.png',  label: 'Detail' },
-  { src: '/assets/images/v27/v27-17.png',  label: 'Side' },
-  { src: '/assets/images/v27/v27-20.png',  label: 'Dynamic' },
+  { src: '/assets/images/v27/v27-01.webp',  label: 'Front View' },
+  { src: '/assets/images/v27/v27-02.webp',  label: 'Profile' },
+  { src: '/assets/images/v27/v27-03.webp',  label: 'Exterior' },
+  { src: '/assets/images/v27/v27-12.webp',  label: 'Detail' },
+  { src: '/assets/images/v27/v27-17.webp',  label: 'Side' },
+  { src: '/assets/images/v27/v27-20.webp',  label: 'Dynamic' },
 ];
 
 /* ─── Lightbox state ─────────────────────────────────── */
@@ -1041,24 +1066,24 @@ function initMarquee() {
    8.  INTERIOR CAROUSEL
 ══════════════════════════════════════════════════════════ */
 const SLIDES = [
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam025.jpg', label: 'Overview',
+  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam025.webp', label: 'Overview',
     hotspots: [
-      { x: '38%', y: '22%', title: 'Panoramic Sunroof', desc: 'Tinted electrochromic glass dims on demand.', img: '/assets/images/v27/interior-sunroof.jpg' },
-      { x: '52%', y: '44%', title: 'Central Display',  desc: '34" curved AMOLED, 2880×1080 resolution.',  img: '/assets/images/v27/interior-display.jpg' },
-      { x: '30%', y: '62%', title: 'Centre Console',   desc: 'Floating console with wireless charging.',    img: '/assets/images/v27/interior-console.jpg' },
-      { x: '18%', y: '54%', title: 'Nappa Leather',    desc: 'Perforated semi-aniline hide with massage.', img: '/assets/images/v27/interior-leather.jpg' },
+      { x: '38%', y: '22%', title: 'Panoramic Sunroof', desc: 'Tinted electrochromic glass dims on demand.', img: '/assets/images/v27/interior-sunroof.webp' },
+      { x: '52%', y: '44%', title: 'Central Display',  desc: '34" curved AMOLED, 2880×1080 resolution.',  img: '/assets/images/v27/interior-display.webp' },
+      { x: '30%', y: '62%', title: 'Centre Console',   desc: 'Floating console with wireless charging.',    img: '/assets/images/v27/interior-console.webp' },
+      { x: '18%', y: '54%', title: 'Nappa Leather',    desc: 'Perforated semi-aniline hide with massage.', img: '/assets/images/v27/interior-leather.webp' },
     ]
   },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam026 copy.jpg', label: 'Front Cabin' },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam027 copy.jpg', label: 'Rear Seats' },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam028 copy.jpg', label: 'Console' },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam033 copy.jpg', label: 'Rear Cabin' },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam0301 copy.jpg', label: 'Detailing' },
-  { src: '/assets/images/v27/interior-display.jpg', label: 'Central Display' },
-  { src: '/assets/images/v27/interior-leather.jpg', label: 'Nappa Leather' },
-  { src: '/assets/images/v27/interior-sunroof.jpg', label: 'Panoramic Roof' },
-  { src: '/assets/images/v27/interior-console.jpg', label: 'Wireless Charging' },
-  { src: '/assets/images/v27/interior-01.jpg', label: 'Cabin Ambience' },
+  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam026 copy.webp', label: 'Front Cabin' },
+  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam027 copy.webp', label: 'Rear Seats' },
+  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam028 copy.webp', label: 'Console' },
+  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam033 copy.webp', label: 'Rear Cabin' },
+  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam0301 copy.webp', label: 'Detailing' },
+  { src: '/assets/images/v27/interior-display.webp', label: 'Central Display' },
+  { src: '/assets/images/v27/interior-leather.webp', label: 'Nappa Leather' },
+  { src: '/assets/images/v27/interior-sunroof.webp', label: 'Panoramic Roof' },
+  { src: '/assets/images/v27/interior-console.webp', label: 'Wireless Charging' },
+  { src: '/assets/images/v27/interior-01.webp', label: 'Cabin Ambience' },
 ];
 
 const PEEK = 72;

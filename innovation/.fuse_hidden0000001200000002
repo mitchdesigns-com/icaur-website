@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script>if(sessionStorage.getItem('pt-nav'))document.documentElement.classList.add('pt-entering');</script>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/Favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="iCAUR Innovation — The technology, sustainability, and design principles driving Egypt's next-generation EV.">
+  <title>Innovation — iCAUR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/v27.css">
+
+  <!-- Three.js importmap — required by the LiquidEther fluid background -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
+    data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
+    data-endpoint="https://bugger-worker.mitchdesigns.workers.dev/functions/v1/ingest-feedback"
+    data-position="bottom-right" data-button-text="Feedback" data-accent="#4f46e5" async></script>
+</head>
+<body class="is-loading dark-hero-page">
+
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+    <feBlend in="SourceGraphic" in2="grey" mode="multiply"/>
+  </filter>
+</svg>
+
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__dot" id="cursorDot"></div>
+  <div class="cursor__ring" id="cursorRing"></div>
+  <div class="cursor__label" id="cursorLabel"></div>
+</div>
+
+
+<div id="site-header"></div>
+
+<main id="main">
+
+<!-- ═══════ HERO ═══════ -->
+<section class="innov-page-hero" id="hero">
+  <div class="innov-page-hero__bg" aria-hidden="true">
+    <video class="innov-page-hero__video"
+      src="https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev/abouticaurhomepage.mp4"
+      poster="/assets/images/ICUAR V27 brochure 03 20.png"
+      autoplay muted loop playsinline preload="auto"></video>
+  </div>
+  <div class="innov-page-hero__overlay" aria-hidden="true"></div>
+  <div class="innov-page-hero__inner">
+    <p class="eyebrow eyebrow--warm reveal reveal--up" data-delay="0">Rethinking Everything</p>
+    <h1 class="innov-page-hero__h reveal reveal--up" data-delay="1">Built Different.<br><em>By Design.</em></h1>
+    <a href="/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic reveal reveal--up" data-delay="3">Reserve Your iCAUR <span class="arrow">→</span></a>
+  </div>
+</section>
+
+<!-- ═══════ PILLAR 1 — Technology (V27 scroll-style) ═══════ -->
+<section id="innov-tech" style="position:relative;z-index:5;background:#0D0B09">
+
+  <div class="v27-ct-sticky">
+    <div class="v27-ct-liquid-bg" id="v27-ct-liquid-bg" aria-hidden="true"></div>
+    <div class="v27-ct-vignette" aria-hidden="true"></div>
+    <div class="v27-ct-head" id="v27-ct-head">
+      <p class="v27-ct-eyebrow" id="v27-ct-eyebrow">Technology <span class="eyebrow-dot" style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--amber);vertical-align:middle"></span> iCAUR</p>
+      <div class="v27-ct-line-wrap">
+        <div class="v27-ct-line1" id="v27-ct-line1">Intelligence</div>
+        <div class="v27-ct-mask" id="v27-ct-mask1"></div>
+      </div>
+      <div class="v27-ct-line-wrap" style="margin-bottom:24px">
+        <div class="v27-ct-line2" id="v27-ct-line2">Built In.</div>
+        <div class="v27-ct-mask" id="v27-ct-mask2"></div>
+      </div>
+      <p class="v27-ct-sub" id="v27-ct-sub">Four breakthrough systems that make every iCAUR smarter the further you drive.</p>
+    </div>
+  </div>
+
+  <div class="v27-ct-item" data-rotate="-14">
+    <div class="v27-ct-item-inner">
+      <div class="v27-ct-left"><h3 class="v27-ct-title">Adaptive Range<br>Prediction</h3></div>
+      <div class="v27-ct-center">
+        <img class="v27-ct-img" src="/assets/images/v27/interior-display.jpg" alt="Adaptive range prediction" loading="lazy">
+      </div>
+      <div class="v27-ct-right">
+        <p class="v27-ct-label">01 · Intelligence</p>
+        <p class="v27-ct-desc">AI-driven energy management learns your driving patterns and optimizes battery deployment in real time — no input required.</p>
+        <div class="v27-ct-deco"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="v27-ct-item" data-rotate="14">
+    <div class="v27-ct-item-inner">
+      <div class="v27-ct-left"><h3 class="v27-ct-title">Over-The-Air<br>Updates</h3></div>
+      <div class="v27-ct-center">
+        <img class="v27-ct-img" src="/assets/images/v27/v27-05.png" alt="OTA updates" loading="lazy">
+      </div>
+      <div class="v27-ct-right">
+        <p class="v27-ct-label">02 · Connectivity</p>
+        <p class="v27-ct-desc">Your iCAUR gets smarter overnight. New features, performance improvements, and safety patches delivered wirelessly.</p>
+        <div class="v27-ct-deco"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="v27-ct-item" data-rotate="-12">
+    <div class="v27-ct-item-inner">
+      <div class="v27-ct-left"><h3 class="v27-ct-title">Level 2<br>Driver Assistance</h3></div>
+      <div class="v27-ct-center">
+        <img class="v27-ct-img" src="/assets/images/v27/iCAUR INTL_V27 REV_cam027 copy.jpg" alt="Driver assistance" loading="lazy">
+      </div>
+      <div class="v27-ct-right">
+        <p class="v27-ct-label">03 · Safety</p>
+        <p class="v27-ct-desc">Adaptive cruise, lane centering, and automatic emergency braking work in concert so you're always in control.</p>
+        <div class="v27-ct-deco"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="v27-ct-item" data-rotate="12">
+    <div class="v27-ct-item-inner">
+      <div class="v27-ct-left"><h3 class="v27-ct-title">14&quot; Intelligent<br>Touchscreen</h3></div>
+      <div class="v27-ct-center">
+        <img class="v27-ct-img" src="/assets/images/v27/interior-01.jpg" alt="Intelligent touchscreen" loading="lazy">
+      </div>
+      <div class="v27-ct-right">
+        <p class="v27-ct-label">04 · Interface</p>
+        <p class="v27-ct-desc">A responsive, high-resolution cockpit that adapts its layout to how you drive — day, night, or desert highway.</p>
+        <div class="v27-ct-deco"></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════ PILLAR 2 — Sustainability ═══════ -->
+<div class="innov-pillar innov-pillar--reverse innov-pillar--cream">
+  <div class="innov-pillar__img reveal reveal--up">
+    <img src="/assets/images/ICUAR V27 brochure 03 18.png" alt="iCAUR sustainability" loading="lazy">
+  </div>
+  <div class="innov-pillar__text">
+    <p class="innov-pillar__num">02</p>
+    <p class="innov-pillar__tag">Sustainability</p>
+    <h2 class="innov-pillar__h">Engineered For<br>Tomorrow</h2>
+    <p class="innov-pillar__body">Zero emissions is just the start — recycled interiors, solar-assisted charging, and a complete ecosystem built around the car.</p>
+    <div class="innov-pillar__bullets">
+      <div class="innov-pillar__bullet">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Zero tailpipe emissions</span>
+      </div>
+      <div class="innov-pillar__bullet">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Recycled &amp; bio-based interior materials</span>
+      </div>
+      <div class="innov-pillar__bullet">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Solar-powered service centers</span>
+      </div>
+      <div class="innov-pillar__bullet">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Battery second-life program</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PILLAR 3 — Design ═══════ -->
+<div class="innov-pillar innov-pillar--dark">
+  <div class="innov-pillar__img reveal reveal--up">
+    <img src="/assets/images/iCAUR INTL_V27 REV_cam025.jpg" alt="iCAUR V27 bold design" loading="lazy">
+  </div>
+  <div class="innov-pillar__text">
+    <p class="innov-pillar__num">03</p>
+    <p class="innov-pillar__tag">Design</p>
+    <h2 class="innov-pillar__h">Bold By<br>Necessity</h2>
+    <p class="innov-pillar__body">Every surface serves a purpose — aero, cooling, rigidity. Function pushed form into something unexpected.</p>
+    <div class="innov-pillar__bullets">
+      <div class="innov-pillar__bullet">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>0.28 Cd drag coefficient</span>
+      </div>
+      <div class="innov-pillar__bullet">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Flush door handles &amp; flush glass</span>
+      </div>
+      <div class="innov-pillar__bullet">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>5 exterior color options</span>
+      </div>
+      <div class="innov-pillar__bullet">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Panoramic glass roof standard</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SECONDARY STATS ═══════ -->
+<!-- ═══════ CTA SPLIT ═══════ -->
+<section class="cta-video" id="cta">
+  <video class="cta-video__bg" src="/assets/images/CTA-bg.mp4" poster="/assets/images/CTA.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+  <div class="cta-video__overlay" aria-hidden="true"></div>
+  <div class="cta-video__glass reveal reveal--up">
+    <span class="cta-video__dash" aria-hidden="true"></span>
+    <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
+    <p class="cta-video__body">Book a test drive and feel what intelligent EV engineering actually means on Egyptian roads.</p>
+    <div class="cta-video__actions">
+      <a href="/contact" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Book a Test Drive <span class="arrow">→</span></a>
+      <a href="/models" class="btn btn--outline btn--arrow btn--magnetic">View Models <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="/js/components.js" defer></script>
+<script src="/js/main.js" defer></script>
+  <script src="/js/transitions.js" defer></script>
+<script src="/js/game.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script>
+(function () {
+  function initInnovTech() {
+    var section = document.getElementById('innov-tech');
+    if (!section || !window.gsap || !window.ScrollTrigger) return;
+    var gsap = window.gsap;
+    var ST = window.ScrollTrigger;
+    gsap.registerPlugin(ST);
+    var $ = function(s) { return document.querySelector(s); };
+    var $$ = function(s) { return Array.from(document.querySelectorAll(s)); };
+
+    /* LiquidEther fluid background */
+    var liquidBg = $('#v27-ct-liquid-bg');
+    if (liquidBg) {
+      import('/js/liquid-ether.js').then(function(m) {
+        m.createLiquidEther(liquidBg, {
+          colors: ['#2A1810', '#231815', '#015699', '#555859', '#E8D5CC'],
+          mouseForce: 20, cursorSize: 150, resolution: 0.4,
+          iterationsPoisson: 16, iterationsViscous: 16, dt: 0.012,
+          autoDemo: true, autoSpeed: 0.2, autoIntensity: 1.6,
+          autoResumeDelay: 2500, autoRampDuration: 1.4, takeoverDuration: 0.5,
+        });
+      }).catch(function() {});
+    }
+
+    /* Headline mask-reveal */
+    var headEl = $('#v27-ct-head');
+    if (headEl) {
+      gsap.set(['#v27-ct-line1', '#v27-ct-line2', '#v27-ct-sub'], { opacity: 0 });
+      gsap.set('#v27-ct-mask1', { x: '-101%', background: '#0D0B09' });
+      gsap.set('#v27-ct-mask2', { x: '101%', background: '#555859' });
+      ST.create({
+        trigger: headEl, start: 'top 80%', once: true,
+        onEnter: function() {
+          var tl = gsap.timeline();
+          tl.from('#v27-ct-eyebrow', { opacity: 0, y: 10, duration: .3, ease: 'power2.out' })
+            .to('#v27-ct-mask1', { x: '0%', duration: .28, ease: 'power2.in' }, '-=0.05')
+            .set('#v27-ct-line1', { opacity: 1 })
+            .to('#v27-ct-mask1', { x: '101%', duration: .28, ease: 'power2.out' })
+            .to('#v27-ct-mask2', { x: '0%', duration: .28, ease: 'power2.in' }, '-=0.18')
+            .set('#v27-ct-line2', { opacity: 1 })
+            .to('#v27-ct-mask2', { x: '-101%', duration: .28, ease: 'power2.out' })
+            .to('#v27-ct-sub', { opacity: 1, y: 0, duration: .35, ease: 'power2.out' }, '-=0.1');
+        }
+      });
+    }
+
+    /* Per-item scroll animations */
+    $$('#innov-tech .v27-ct-item').forEach(function(item) {
+      var img   = item.querySelector('.v27-ct-img');
+      var left  = item.querySelector('.v27-ct-left');
+      var right = item.querySelector('.v27-ct-right');
+      var rotate = parseFloat(item.dataset.rotate) || 0;
+      if (!img) return;
+      ST.create({
+        trigger: item, start: 'top bottom', end: 'bottom top', scrub: 1.2,
+        onUpdate: function(self) {
+          var p = self.progress;
+          var ep = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
+          var rot = rotate * (1 - ep * 2);
+          var scl = Math.min(0.88 + ep * (1 - ep) * 0.48 + (p > 0.5 ? 0.12 : 0), 1.02);
+          var yShift = (0.5 - p) * 80;
+          gsap.set(img, { rotate: rot, scale: scl, y: yShift });
+        }
+      });
+      if (left && right) {
+        gsap.timeline({
+          scrollTrigger: { trigger: item, start: 'top 70%', end: 'center 40%', scrub: 0.9 }
+        }).fromTo([left, right], { opacity: 0, y: 32 }, { opacity: 1, y: 0, stagger: 0.05 });
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initInnovTech);
+  } else {
+    initInnovTech();
+  }
+})();
+</script>
+</body>
+</html>

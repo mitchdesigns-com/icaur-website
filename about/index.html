@@ -43,17 +43,19 @@
 
 <main id="main">
 
-<!-- ═══════ HERO ═══════ -->
-<section class="page-hero page-hero--image page-hero--center about-hero" id="hero">
-  <div class="page-hero__bg-img" style="background-image:url('/assets/images/about-hero.jpg')" aria-hidden="true"></div>
-  <!-- Front copy of the scene, masked to the lower half — the headline
-       rises from behind it, landing between the cars and the sky -->
-  <div class="about-hero__front" aria-hidden="true"></div>
-  <div class="page-hero__grain" aria-hidden="true"></div>
-  <div class="page-hero__inner">
-    <p class="eyebrow">Our Story</p>
-    <h1 class="page-hero__h">A New Generation<br><em>Automotive</em></h1>
-    <p class="page-hero__sub">Smarter mobility. Bolder design. Real-world freedom.</p>
+<!-- ═══════ HERO — spotlight reveal (same as the service heroes) ═══════ -->
+<section class="spot-hero" id="hero">
+  <div class="spot-hero__base" style="background-image:url('/assets/images/about-hero.webp')" aria-hidden="true"></div>
+  <div class="spot-hero__reveal" style="background-image:url('/assets/images/about-hero.webp')" aria-hidden="true"></div>
+  <div class="spot-hero__shade" aria-hidden="true"></div>
+
+  <div class="spot-hero__head">
+    <p class="eyebrow eyebrow--warm spot-anim spot-anim--fade" style="animation-delay:.1s">Our Story</p>
+    <h1 class="spot-hero__h">
+      <span class="spot-l1 spot-anim spot-anim--reveal" style="animation-delay:.25s">A New Generation</span>
+      <span class="spot-l2 spot-anim spot-anim--reveal" style="animation-delay:.42s"><em>Automotive</em></span>
+    </h1>
+    <p class="spot-hero__sub spot-anim spot-anim--fade" style="animation-delay:.6s">Smarter mobility. Bolder design. Real-world freedom.</p>
   </div>
 </section>
 
@@ -63,7 +65,7 @@
 
     <!-- Story car — drives in from the left during Overview, then
          swings onto the rail and rotates to ride it down -->
-    <img src="/assets/images/about-3d.png" alt="" class="story-scene-car" id="storySceneCar" aria-hidden="true">
+    <img src="/assets/images/about-3d.webp" alt="" class="story-scene-car" id="storySceneCar" aria-hidden="true">
 
     <div class="container about-scene__stage">
 
@@ -101,9 +103,9 @@
 
         <!-- Right: images pile over each other as the car drives down -->
         <div class="story-stack" aria-hidden="true">
-          <img src="/assets/images/about-hero.jpg" class="story-stack__img" style="--r:-5deg; --x:-14px; --y:-10px" loading="lazy" alt="">
-          <img src="/assets/images/iCAUR INTL_V27 REV_cam027 copy.jpg" class="story-stack__img" style="--r:4deg; --x:12px; --y:6px" loading="lazy" alt="">
-          <img src="/assets/images/ICUAR V27 brochure 03 18.png" class="story-stack__img" style="--r:-2deg; --x:-4px; --y:12px" loading="lazy" alt="">
+          <img src="/assets/images/about-hero.webp" class="story-stack__img" style="--r:-5deg; --x:-14px; --y:-10px" loading="lazy" alt="">
+          <img src="/assets/images/iCAUR INTL_V27 REV_cam027 copy.webp" class="story-stack__img" style="--r:4deg; --x:12px; --y:6px" loading="lazy" alt="">
+          <img src="/assets/images/ICUAR V27 brochure 03 18.webp" class="story-stack__img" style="--r:-2deg; --x:-4px; --y:12px" loading="lazy" alt="">
         </div>
 
       </div>
@@ -147,19 +149,19 @@
     <h2 class="section-title section-title--light reveal reveal--up" data-delay="1">Built <em>Different.</em> On Purpose.</h2>
 
     <div class="usp-list__stack" id="uspStack">
-      <div class="usp-row" tabindex="0" data-img="/assets/images/v27/v27-01.png">
+      <div class="usp-row" tabindex="0" data-img="/assets/images/v27/v27-01.webp">
         <span class="usp-row__title">Bold</span>
         <span class="usp-row__tag">Designed to stand out &mdash; and stay unforgettable.</span>
       </div>
-      <div class="usp-row" tabindex="0" data-img="/assets/images/v27/interior-display.jpg">
+      <div class="usp-row" tabindex="0" data-img="/assets/images/v27/interior-display.webp">
         <span class="usp-row__title">Fun</span>
         <span class="usp-row__tag">Driving should feel like play, every time.</span>
       </div>
-      <div class="usp-row" tabindex="0" data-img="/assets/images/v27/v27-26.png">
+      <div class="usp-row" tabindex="0" data-img="/assets/images/v27/v27-26.webp">
         <span class="usp-row__title">Daring</span>
         <span class="usp-row__tag">We take the roads others avoid.</span>
       </div>
-      <div class="usp-row" tabindex="0" data-img="/assets/images/about-hero.jpg">
+      <div class="usp-row" tabindex="0" data-img="/assets/images/about-hero.webp">
         <span class="usp-row__title">Liberating</span>
         <span class="usp-row__tag">Electric freedom &mdash; no permission needed.</span>
       </div>
@@ -172,9 +174,12 @@
   </div>
 </section>
 
-<!-- ═══════ OUR MISSION — carousel ═══════ -->
+<!-- ═══════ OUR MISSION — horizontal carousel (headline → statement), floating images, dot-grid bg ═══════ -->
 <div class="diff-scroll-driver" id="missionDriver">
 <section class="section diff mission-diff" id="missionSection">
+
+  <!-- Light dot grid behind the carousel -->
+  <div class="ms-dots" aria-hidden="true"></div>
 
   <div class="diff__curve" aria-hidden="true">
     <svg viewBox="0 0 1440 140" preserveAspectRatio="none"><path d="M0,100 C360,0 1080,0 1440,100 L1440,140 L0,140 Z"/></svg>
@@ -185,10 +190,10 @@
 
   <!-- floating parallax images drifting around the statement -->
   <div class="mission-floats" aria-hidden="true">
-    <div class="mission-float" data-depth="0.05" style="top:6%;left:4%;width:clamp(160px,18vw,280px)"><div class="mission-float__inner"><img src="/assets/images/ICUAR V27 brochure 03 18.png" alt=""></div></div>
-    <div class="mission-float" data-depth="0.12" style="top:52%;left:5%;width:clamp(140px,16vw,250px)"><div class="mission-float__inner"><img src="/assets/images/ICUAR V27 brochure 03 23.jpg.png" alt=""></div></div>
-    <div class="mission-float" data-depth="0.07" style="top:6%;right:4%;width:clamp(150px,17vw,270px)"><div class="mission-float__inner"><img src="/assets/images/iCAUR INTL_V27 REV_cam027 copy.jpg" alt=""></div></div>
-    <div class="mission-float" data-depth="0.14" style="top:52%;right:5%;width:clamp(140px,16vw,250px)"><div class="mission-float__inner"><img src="/assets/images/ICUAR V27 brochure 03 20.png" alt=""></div></div>
+    <div class="mission-float" data-depth="0.05" style="top:6%;left:4%;width:clamp(160px,18vw,280px)"><div class="mission-float__inner"><img src="/assets/images/ICUAR V27 brochure 03 18.webp" alt=""></div></div>
+    <div class="mission-float" data-depth="0.12" style="top:52%;left:5%;width:clamp(140px,16vw,250px)"><div class="mission-float__inner"><img src="/assets/images/ICUAR V27 brochure 03 23.webp" alt=""></div></div>
+    <div class="mission-float" data-depth="0.07" style="top:6%;right:4%;width:clamp(150px,17vw,270px)"><div class="mission-float__inner"><img src="/assets/images/iCAUR INTL_V27 REV_cam027 copy.webp" alt=""></div></div>
+    <div class="mission-float" data-depth="0.14" style="top:52%;right:5%;width:clamp(140px,16vw,250px)"><div class="mission-float__inner"><img src="/assets/images/ICUAR V27 brochure 03 20.webp" alt=""></div></div>
   </div>
 
   <div class="diff__viewport">
@@ -217,7 +222,7 @@
 
   <div class="vision__img-stage">
     <div class="vision__img-wrap" id="visionImgWrap">
-      <img src="/assets/images/about-hero.jpg" alt="iCAUR Vision" class="vision__img" loading="lazy">
+      <img src="/assets/images/about-hero.webp" alt="iCAUR Vision" class="vision__img" loading="lazy">
     </div>
   </div>
 
@@ -230,7 +235,7 @@
 
 <!-- ═══════ CTA ═══════ -->
 <section class="cta-video" id="cta">
-  <video class="cta-video__bg" src="/assets/images/CTA-bg.mp4" poster="/assets/images/CTA.jpg" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+  <video class="cta-video__bg" src="/assets/images/CTA-bg.webm" poster="/assets/images/CTA.webp" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
   <div class="cta-video__overlay" aria-hidden="true"></div>
   <div class="cta-video__glass reveal reveal--up">
     <span class="cta-video__dash" aria-hidden="true"></span>

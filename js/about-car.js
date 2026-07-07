@@ -15,7 +15,7 @@
 
   /* V27 side-profile image */
   const CAR_IMG = new Image();
-  CAR_IMG.src = '/assets/images/about-3d.png';
+  CAR_IMG.src = '/assets/images/about-3d.webp';
   const ovPanel = scene.querySelector('.scene-panel--overview');
   const stPanel = scene.querySelector('.scene-panel--story');
   const steps   = [...scene.querySelectorAll('.saga-step')];
