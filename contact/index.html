@@ -65,32 +65,25 @@
     <!-- RIGHT — chips + form -->
     <div class="rs-right">
 
-      <!-- Chips -->
-      <div class="contact-chips" role="tablist" aria-label="Request type" style="margin-bottom:24px">
-        <button class="contact-chip is-active" role="tab" data-tab="test-drive" aria-selected="true" type="button">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>
-          </svg>
-          Test Drive
-        </button>
-        <button class="contact-chip" role="tab" data-tab="maintenance" aria-selected="false" type="button">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-          </svg>
-          Maintenance
-        </button>
-        <button class="contact-chip" role="tab" data-tab="inquiry" aria-selected="false" type="button">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-          Inquiry
-        </button>
-      </div>
-
-      <!-- Form -->
+      <!-- Form — mirrors the Chery EG contact structure -->
       <form id="rsForm" aria-label="Contact form" novalidate>
 
-        <!-- Common: name row -->
+        <!-- Salutation -->
+        <div class="rs-group">
+          <p class="rs-group-label">Salutation</p>
+          <div class="rs-radios" role="radiogroup" aria-label="Salutation">
+            <label class="rs-radio">
+              <input type="radio" name="rs-salutation" value="mr">
+              <span class="rs-radio-dot" aria-hidden="true"></span>Mr.
+            </label>
+            <label class="rs-radio">
+              <input type="radio" name="rs-salutation" value="mrs">
+              <span class="rs-radio-dot" aria-hidden="true"></span>Mrs.
+            </label>
+          </div>
+        </div>
+
+        <!-- Full name -->
         <div class="rs-field-row">
           <div class="rs-field" id="rsf-first">
             <label class="rs-label" for="rs-first">First Name</label>
@@ -102,77 +95,92 @@
           </div>
         </div>
 
-        <!-- Common: email -->
+        <!-- Phone + City -->
+        <div class="rs-ctx-row">
+          <div class="rs-field" id="rsf-phone">
+            <label class="rs-label" for="rs-phone">Phone Number</label>
+            <input class="rs-input" id="rs-phone" type="tel" autocomplete="tel">
+          </div>
+          <div class="rs-select-wrap">
+            <span class="rs-select-label">City</span>
+            <select class="rs-select" id="rs-city" aria-label="City">
+              <option value="" disabled selected></option>
+              <option value="cairo">Cairo</option>
+              <option value="giza">Giza</option>
+              <option value="alexandria">Alexandria</option>
+              <option value="new-cairo">New Cairo</option>
+              <option value="6th-october">6th of October</option>
+              <option value="sheikh-zayed">Sheikh Zayed</option>
+              <option value="mansoura">Mansoura</option>
+              <option value="tanta">Tanta</option>
+              <option value="assiut">Assiut</option>
+              <option value="luxor">Luxor</option>
+              <option value="aswan">Aswan</option>
+              <option value="hurghada">Hurghada</option>
+              <option value="port-said">Port Said</option>
+              <option value="suez">Suez</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Email -->
         <div class="rs-field" id="rsf-email">
           <label class="rs-label" for="rs-email">Email Address</label>
           <input class="rs-input" id="rs-email" type="email" required autocomplete="email">
         </div>
 
-        <!-- Common: phone -->
-        <div class="rs-field" id="rsf-phone">
-          <label class="rs-label" for="rs-phone">Phone Number</label>
-          <input class="rs-input" id="rs-phone" type="tel" autocomplete="tel">
-        </div>
-
-        <!-- Panel: Test Drive -->
-        <div class="contact-panel is-active rs-ctx" id="rp-test-drive" role="tabpanel">
-          <div class="rs-ctx-row">
-            <div class="rs-select-wrap">
-              <span class="rs-select-label">Preferred Model</span>
-              <select class="rs-select" id="rs-td-model">
-                <option value="" disabled selected></option>
-                <option value="v27">V27</option>
-                <option value="o3t">O3T</option>
-              </select>
-            </div>
-            <div class="rs-select-wrap">
-              <span class="rs-select-label">Choose Showroom</span>
-              <select class="rs-select" id="rs-td-showroom">
-                <option value="" disabled selected></option>
-                <option value="new-cairo">New Cairo — Qattamya</option>
-                <option value="sheikh-zayed">Sheikh Zayed</option>
-                <option value="maadi">Maadi, Cairo</option>
-                <option value="6th-october">6th of October</option>
-              </select>
-            </div>
+        <!-- Request Category + dependent Sub-category -->
+        <div class="rs-ctx-row">
+          <div class="rs-select-wrap">
+            <span class="rs-select-label">Request Category</span>
+            <select class="rs-select" id="rs-category" aria-label="Request category">
+              <option value="" disabled selected></option>
+              <option value="inquiry">Inquiry</option>
+              <option value="complaint">Complaint</option>
+            </select>
+          </div>
+          <div class="rs-select-wrap is-disabled" id="rs-subwrap">
+            <span class="rs-select-label" id="rs-sublabel">Sub-category</span>
+            <select class="rs-select" id="rs-subcategory" disabled aria-label="Sub-category">
+              <option value="" disabled selected></option>
+            </select>
           </div>
         </div>
 
-        <!-- Panel: Maintenance -->
-        <div class="contact-panel rs-ctx" id="rp-maintenance" role="tabpanel">
-          <div class="rs-ctx-row">
-            <div class="rs-select-wrap">
-              <span class="rs-select-label">Your Vehicle</span>
-              <select class="rs-select" id="rs-mt-model">
-                <option value="" disabled selected></option>
-                <option value="v27">V27</option>
-                <option value="o3t">O3T</option>
-              </select>
-            </div>
-            <div class="rs-select-wrap">
-              <span class="rs-select-label">Service Center</span>
-              <select class="rs-select" id="rs-mt-city">
-                <option value="" disabled selected></option>
-                <option value="new-cairo">New Cairo — Qattamya</option>
-                <option value="sheikh-zayed">Sheikh Zayed</option>
-                <option value="maadi">Maadi, Cairo</option>
-                <option value="6th-october">6th of October</option>
-              </select>
-            </div>
-          </div>
+        <!-- Message -->
+        <div class="rs-textarea-wrap">
+          <span class="rs-textarea-label">Message</span>
+          <textarea class="rs-textarea" id="rs-message" placeholder=""></textarea>
         </div>
 
-        <!-- Panel: Inquiry -->
-        <div class="contact-panel rs-ctx" id="rp-inquiry" role="tabpanel">
-          <div class="rs-textarea-wrap">
-            <span class="rs-textarea-label">Message</span>
-            <textarea class="rs-textarea" id="rs-message" placeholder=""></textarea>
+        <!-- Preferred communication channels -->
+        <div class="rs-group">
+          <p class="rs-group-label">Please select preferred communication channel</p>
+          <div class="rs-checks">
+            <label class="rs-check">
+              <input type="checkbox" name="rs-channel" value="phone-call" checked>
+              <span class="rs-check-box" aria-hidden="true">
+                <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>Phone Call
+            </label>
+            <label class="rs-check">
+              <input type="checkbox" name="rs-channel" value="email" checked>
+              <span class="rs-check-box" aria-hidden="true">
+                <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>Email
+            </label>
+            <label class="rs-check">
+              <input type="checkbox" name="rs-channel" value="sms" checked>
+              <span class="rs-check-box" aria-hidden="true">
+                <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>SMS
+            </label>
           </div>
         </div>
 
         <!-- CTA -->
         <div class="rs-cta">
-          <button type="submit" class="rs-submit" id="rsSubmitBtn">REQUEST TEST DRIVE</button>
+          <button type="submit" class="rs-submit" id="rsSubmitBtn">SUBMIT</button>
         </div>
 
       </form>
@@ -183,33 +191,39 @@
 
 <script>
 (function () {
-  /* ── Auto-select tab from URL param (?tab=maintenance, ?tab=test-drive) ── */
+  /* ── Request Category → dependent Sub-category (Chery-style) ── */
+  var SUB = {
+    inquiry:   { label: 'Inquiry Type',   opts: ['Service Follow Up', 'After Sales General Info', 'Spare Parts Inquiry', 'Sales'] },
+    complaint: { label: 'Complaint Type', opts: ['After Sales Complaint', 'Spare Parts Complaint', 'Sales Complaint'] }
+  };
+  var catSel   = document.getElementById('rs-category');
+  var subSel   = document.getElementById('rs-subcategory');
+  var subWrap  = document.getElementById('rs-subwrap');
+  var subLabel = document.getElementById('rs-sublabel');
+
+  function slug(s) { return s.toLowerCase().replace(/\s+/g, '-'); }
+
+  function setCategory(cat, presetSub) {
+    var conf = SUB[cat];
+    if (!conf || !subSel) return;
+    subLabel.textContent = conf.label;
+    subSel.innerHTML = '<option value="" disabled selected></option>' +
+      conf.opts.map(function (o) { return '<option value="' + slug(o) + '">' + o + '</option>'; }).join('');
+    subSel.disabled = false;
+    subWrap.classList.remove('is-disabled');
+    subWrap.classList.toggle('is-active', !!presetSub);
+    if (presetSub) subSel.value = presetSub;
+  }
+
+  if (catSel) catSel.addEventListener('change', function () { setCategory(catSel.value); });
+
+  /* ── Legacy quick-nav links (?tab=maintenance / ?tab=test-drive)
+        map onto a preselected inquiry ── */
   var urlTab = new URLSearchParams(location.search).get('tab');
-
-  /* ── Chip switching ── */
-  var chips   = document.querySelectorAll('.contact-chip');
-  var panels  = document.querySelectorAll('.contact-panel');
-  var submitBtn = document.getElementById('rsSubmitBtn');
-  var labels  = { 'test-drive':'REQUEST TEST DRIVE', 'maintenance':'BOOK MAINTENANCE', 'inquiry':'SEND MESSAGE' };
-
-  chips.forEach(function (chip) {
-    chip.addEventListener('click', function () {
-      var tab = chip.dataset.tab;
-      chips.forEach(function (c) {
-        c.classList.toggle('is-active', c === chip);
-        c.setAttribute('aria-selected', c === chip ? 'true' : 'false');
-      });
-      panels.forEach(function (p) {
-        p.classList.toggle('is-active', p.id === 'rp-' + tab);
-      });
-      if (submitBtn) submitBtn.textContent = labels[tab] || 'SEND';
-    });
-  });
-
-  /* ── Auto-activate tab from URL param ── */
-  if (urlTab) {
-    var target = document.querySelector('.contact-chip[data-tab="' + urlTab + '"]');
-    if (target) target.click();
+  if (catSel && (urlTab === 'maintenance' || urlTab === 'test-drive')) {
+    catSel.value = 'inquiry';
+    catSel.closest('.rs-select-wrap').classList.add('is-active');
+    setCategory('inquiry', urlTab === 'maintenance' ? 'service-follow-up' : 'sales');
   }
 
   /* ── Floating labels (text inputs) ── */

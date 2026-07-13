@@ -37,6 +37,10 @@ const SITE_HEADER = `
                 <img src="/assets/images/V27-logo.svg" alt="iCAUR V27" class="mfc__logo">
                 <h3 class="mfc__name">Bold. <span class="mfc__hl">Capable.</span></h3>
                 <div class="mfc__specs"><span>450 km</span><span>380 hp</span><span>4.8s 0–100</span></div>
+                <div class="mfc__price">
+                  <span class="mfc__price-label">Starts from</span>
+                  <span class="mfc__price-value">1,490,000 EGP</span>
+                </div>
               </div>
             </a>
           </article>
@@ -44,11 +48,15 @@ const SITE_HEADER = `
             <a href="/models/v27" class="mfc__inner" data-cursor-label="Explore">
               <span class="mfc__glow" aria-hidden="true"></span>
               <img src="/assets/images/ot3-model-in-homepage-01.webp" alt="" class="mfc__img mfc__img--default" loading="lazy">
-              <img src="/assets/images/ot3-model-in-homepage-02.webp" alt="iCAUR OT3" class="mfc__img mfc__img--hover" loading="lazy">
+              <img src="/assets/images/ot3-model-in-homepage-02.webp" alt="iCAUR O3T" class="mfc__img mfc__img--hover" loading="lazy">
               <div class="mfc__bottom">
-                <img src="/assets/images/T03-logo.svg" alt="iCAUR OT3" class="mfc__logo">
+                <img src="/assets/images/T03-logo.svg" alt="iCAUR O3T" class="mfc__logo">
                 <h3 class="mfc__name">Smart. <span class="mfc__hl">Sleek.</span></h3>
                 <div class="mfc__specs"><span>520 km</span><span>420 hp</span><span>4.2s 0–100</span></div>
+                <div class="mfc__price">
+                  <span class="mfc__price-label">Starts from</span>
+                  <span class="mfc__price-value">480,000 EGP</span>
+                </div>
               </div>
             </a>
           </article>
@@ -99,6 +107,9 @@ const SITE_HEADER = `
 <!-- Compare Drawer -->
 <div class="cmp-drawer" id="cmpDrawer" aria-hidden="true">
   <div class="cmp-drawer__backdrop" id="cmpBackdrop"></div>
+  <!-- page-transition style sheets: amber → sky sweep in ahead of the panel -->
+  <div class="cmp-drawer__sheet cmp-drawer__sheet--1" aria-hidden="true"></div>
+  <div class="cmp-drawer__sheet cmp-drawer__sheet--2" aria-hidden="true"></div>
   <div class="cmp-drawer__panel">
     <header class="cmp-drawer__header">
       <h3>Compare iCAUR Models</h3>
@@ -213,7 +224,7 @@ const SITE_HEADER = `
         <a href="/models/v27">Models</a>
         <ul class="mobile-menu__sub" role="list">
           <li><a href="/models/v27">V27</a></li>
-          <li><a href="/models/v27">OT3</a></li>
+          <li><a href="/models/v27">O3T</a></li>
         </ul>
       </li>
       <li><a href="/services">Services</a></li>
@@ -286,7 +297,7 @@ const SITE_FOOTER = `
         </div>
 
         <div class="footer__partner">
-          <img src="/assets/images/Ghabour-logo.svg" alt="Ghabour Auto" class="footer__ghabour-logo">
+          <img src="/assets/images/GBauto.webp" alt="Ghabour Auto" class="footer__ghabour-logo">
         </div>
 
         <div class="footer__social" aria-label="Social media">
@@ -369,6 +380,34 @@ const QUICK_NAV_HTML = `
     const href = a.getAttribute('href');
     if (href !== '/' && path.startsWith(href)) a.setAttribute('aria-current', 'page');
   });
+
+  /* ── Overlap guard: the header must NEVER overlap. Measure the tab
+     row's natural width each resize (layout-only, so no flicker); the
+     moment it wouldn't fit — zoom, browser min-font-size, long labels —
+     force the mobile design regardless of the CSS breakpoint. ── */
+  const navEl = document.getElementById('nav');
+  if (navEl) {
+    const inner   = navEl.querySelector('.nav__inner');
+    const logo    = navEl.querySelector('.nav__logo');
+    const links   = navEl.querySelector('.nav__links');
+    const actions = navEl.querySelector('.nav__actions');
+    const BUFFER  = 24;
+    let navQueued = false;
+    const probe = () => {
+      navQueued = false;
+      navEl.classList.remove('nav--compact');            /* measure natural state */
+      if (getComputedStyle(links).display === 'none') return;  /* CSS media already mobile */
+      const cs = getComputedStyle(inner);
+      const chrome = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) +
+                     2 * (parseFloat(cs.columnGap) || 0);
+      const need = logo.offsetWidth + links.scrollWidth + actions.scrollWidth + chrome + BUFFER;
+      if (need > inner.clientWidth) navEl.classList.add('nav--compact');
+    };
+    const queueProbe = () => { if (!navQueued) { navQueued = true; requestAnimationFrame(probe); } };
+    window.addEventListener('resize', queueProbe, { passive: true });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(probe);
+    probe();
+  }
 
   // Nav dropdowns (Models, Services) — click-only toggle
   const dropItems = [...document.querySelectorAll('.nav__item--has-drop')];

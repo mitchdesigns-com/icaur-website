@@ -164,6 +164,9 @@ function splitHeadlineLetters(headline) {
         // FAQ questions: the ring keeps following the mouse across the
         // row — only the plus icon itself (handled below) snaps the ring
         if (el.matches('.faq-item__q')) return;
+        // Color swatches: keep the round cursor (a fitted ring reads as
+        // an awkward square around the tall thumbnail+label button)
+        if (el.matches('.v27-swatch')) return;
         if (el.matches('.btn, button, [role="button"], .v27-cta-btn')) {
           cursor.classList.add('is-fit');
           hoverEl = el;

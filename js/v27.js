@@ -8,7 +8,6 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'meshopt_decoder';
-import { Renderer as OglRenderer, Camera as OglCamera, Geometry as OglGeometry, Program as OglProgram, Mesh as OglMesh } from 'ogl';
 
 const gsap   = window.gsap;
 const ScrollTrigger = window.ScrollTrigger;
@@ -22,15 +21,24 @@ const $$ = (s, ctx = document) => [...ctx.querySelectorAll(s)];
 /* ══════════════════════════════════════════════════════════
    1.  THREE.JS SCENE
 ══════════════════════════════════════════════════════════ */
-/* Front-left quarter angle, car pushed up to close gap below text */
-const HERO_POSE     = { rotY: -0.78, posX:  0.38, posY:  1.10, scale: 1.42 };
+/* Mostly front view with just a hint of the left side (very slight
+   angle), centered in the hero over the road's speed lines;
+   pushed up to close the gap below the text */
+const HERO_POSE     = { rotY: -0.30, posX:  0.35, posY:  1.35, scale: 1.42 };
 const OVERVIEW_POSE = { rotY:  0.06, posX:  1.55, posY:  0.85, scale: 1.55 };
-const SIDE_POSE     = { rotY:  1.57, posX:  0.2,  posY:  1.90, scale: 1.08 };
+/* 360 stage: front-left quarter — same angle as the color swatch
+   thumbnails — sitting lower, closer to the swatch row */
+const SIDE_POSE     = { rotY: -0.78, posX:  0.2,  posY:  1.55, scale: 1.12 };
 
 /* Smooth scroll-driven rotation target (drag is additive on top) */
 let scrollBaseRotY  = HERO_POSE.rotY;
 let dragExtraRot    = 0;
 let smoothRotY      = HERO_POSE.rotY; /* what the render loop lerps toward */
+
+/* Hero road wave — written by initHeroRoad each frame, read by the
+   render loop so the car bobs in sync with the lines (on: 0..1);
+   speed feeds the wheel spin so it matches the road flow */
+const heroWave = { y: 0, roll: 0, on: 0, speed: 0 };
 
 /* ─── Car colors — one GLB per paint (same sources as the landing page) ── */
 const R2 = 'https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev';
@@ -61,6 +69,7 @@ let inertiaTween = null;
    and let every mesh cast the ground shadow */
 const CLOSE_PANELS = new Set(['Door_FL', 'Door_FR', 'Door_BL', 'Door_BR', 'Trunk', 'Bonnet']);
 function prepModel(scene) {
+  const wheels = [];
   scene.traverse((o) => {
     if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; }
     if (CLOSE_PANELS.has(o.name)) {
@@ -68,7 +77,32 @@ function prepModel(scene) {
       o.quaternion.set(0, 0, 0, 1);
       o.scale.set(1, 1, 1);
     }
+    if (/^Wheel_(FL|FR|BL|BR)$/.test(o.name)) wheels.push(o);
   });
+
+  /* Wheels: the Wheel_* groups pivot at the model ORIGIN, so rotating
+     them swings the tires around the car. Instead, wrap each rim/tire
+     part in a pivot at its own hub center and spin that (calipers and
+     other wheel hardware stay still). The thin bbox axis is the axle. */
+  scene.updateMatrixWorld(true);
+  const spinners = [];
+  wheels.forEach((grp) => {
+    [...grp.children].forEach((part) => {
+      if (!/tire|rim/i.test(part.name)) return;
+      const box = new THREE.Box3().setFromObject(part);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      const pivot = new THREE.Object3D();
+      pivot.userData.axis = size.x < size.z ? 'x' : 'z';
+      grp.add(pivot);
+      pivot.position.copy(grp.worldToLocal(center.clone()));
+      pivot.updateMatrixWorld(true);
+      pivot.attach(part);
+      spinners.push(pivot);
+    });
+  });
+
+  scene.userData.spinners = spinners;
   /* Normalize every variant to the camel reference so poses,
      shadow and scale stay identical across color swaps */
   const box = new THREE.Box3().setFromObject(scene);
@@ -211,12 +245,30 @@ function initScene() {
   });
 
   /* Render loop — smooth lerp rotation so drag and scroll never snap */
+  let lastFrameT = performance.now();
   function animate() {
     requestAnimationFrame(animate);
+    const now = performance.now();
+    const dt = Math.min((now - lastFrameT) / 1000, 0.05);
+    lastFrameT = now;
     if (car) {
       const target = scrollBaseRotY + dragExtraRot;
       smoothRotY = lerp(smoothRotY, target, 0.10);
       car.rotation.y = smoothRotY;
+    }
+    /* ride the hero road's wave — gentle bob + roll on the body only,
+       so the pose group (scroll scrubs / drag) is never fought */
+    if (carBody) {
+      const k = heroWave.on;
+      carBody.position.y = heroWave.y * 0.05 * k;
+      carBody.rotation.z = heroWave.roll * 0.016 * k;
+
+      /* wheels roll at the road's speed while the hero drives */
+      const spinners = carBody.userData.spinners;
+      if (spinners && k > 0.01) {
+        const step = heroWave.speed * 0.9 * k * dt;
+        spinners.forEach(p => { p.rotation[p.userData.axis] -= step; });
+      }
     }
     renderer.render(scene, camera);
   }
@@ -264,16 +316,27 @@ function setupCarScrollAnim() {
     onLeaveBack() { dragEnabled = false; showDragHint(false); resetDragOffset(); },
   });
 
-  /* Hide canvas when past all 3D sections */
-  ScrollTrigger.create({
-    trigger: '#exterior-gallery',
-    start: 'top top',
-    end: 'bottom top',
-    onUpdate(self) {
+  /* Past the 360 stage: the car scrolls OUT with the section instead of
+     staying fixed over the next content. Measured live on every scroll
+     frame against the sticky's real unpin point — the car holds still
+     while the section is pinned, then rides up in exact lockstep with
+     it (immune to stale cached trigger positions from layout shifts). */
+  const extSection = document.querySelector('#v27-exterior');
+  const extSticky  = extSection && extSection.querySelector('.v27-ext-sticky');
+  if (extSection && extSticky) {
+    let riding = false;
+    const ride = () => {
+      riding = false;
       const wrap = $('#v27-canvas-wrap');
-      if (wrap) wrap.style.opacity = self.progress > 0.8 ? '0' : '1';
-    },
-  });
+      if (!wrap) return;
+      const off = Math.min(0, extSection.getBoundingClientRect().bottom - extSticky.offsetHeight);
+      wrap.style.transform = `translateY(calc(-9vh + ${off.toFixed(1)}px))`;
+    };
+    const queueRide = () => { if (!riding) { riding = true; requestAnimationFrame(ride); } };
+    window.addEventListener('scroll', queueRide, { passive: true });
+    window.addEventListener('resize', queueRide, { passive: true });
+    ride();
+  }
 }
 
 
@@ -375,190 +438,159 @@ function initHeroEntrance() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   HERO PARTICLES — vanilla port of React Bits <Particles />
-   (ogl point cloud drifting behind the hero content)
+   HERO ROAD — light take on React Bits <Hyperspeed />.
+   A fixed 2D-canvas layer UNDER the 3D car (z0 < canvas z1):
+   perspective speed lines flowing from a vanishing point on
+   the upper right down past the car's wheels, so the model
+   reads as driving over them. Line speed surges with scroll
+   velocity, and the whole layer whooshes + cross-fades to
+   white as the hero hands off to the Overview section.
 ══════════════════════════════════════════════════════════ */
-function initHeroParticles() {
-  const container = $('#v27-particles');
-  if (!container) return;
+function initHeroRoad() {
+  const wrap = document.querySelector('.v27-hyper-wrap');
+  const hero = document.getElementById('v27-hero');
+  if (!wrap || !hero) return;
 
   const CFG = {
-    particleCount: 260,
-    particleSpread: 10,
-    speed: 0.1,
-    particleColors: ['#F37021', '#B9AB9C', '#555859'],
-    moveParticlesOnHover: true,
-    particleHoverFactor: 1,
-    alphaParticles: true,
-    particleBaseSize: 90,
-    sizeRandomness: 1,
-    cameraDistance: 20,
-    disableRotation: false,
-    pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+    /* world lane x positions — mostly negative so the fan sweeps
+       down-LEFT beneath the car (front-left quarter pose) */
+    lanes: [-5.2, -3.9, -2.7, -1.7, -0.85, -0.1, 0.75, 1.7],
+    dashPerLane: 11,
+    dashLen: [2.2, 4.6],
+    streakCount: 22,
+    streakLen: [7, 17],
+    near: 1.7, far: 48,
+    camH: 1.28,
+    baseSpeed: 11,
+    /* gentle traveling ground wave (world amp / spatial freq / rad-per-s) */
+    wave: { amp: 0.09, freq: 0.35, om: 1.2 },
+    carZ: 6.5,                 /* road depth the car visually sits at */
+    dashRgb: '206, 193, 173',                                   /* warm gray */
+    streakRgbs: ['243, 112, 33', '224, 169, 109', '164, 128, 94'],  /* orange / amber / brown */
   };
 
-  const hexToRgb = (hex) => {
-    hex = hex.replace(/^#/, '');
-    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
-    const int = parseInt(hex, 16);
-    return [((int >> 16) & 255) / 255, ((int >> 8) & 255) / 255, (int & 255) / 255];
-  };
+  const canvas = document.createElement('canvas');
+  wrap.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
 
-  const vertex = /* glsl */ `
-    attribute vec3 position;
-    attribute vec4 random;
-    attribute vec3 color;
-    uniform mat4 modelMatrix;
-    uniform mat4 viewMatrix;
-    uniform mat4 projectionMatrix;
-    uniform float uTime;
-    uniform float uSpread;
-    uniform float uBaseSize;
-    uniform float uSizeRandomness;
-    varying vec4 vRandom;
-    varying vec3 vColor;
-    void main() {
-      vRandom = random;
-      vColor = color;
-      vec3 pos = position * uSpread;
-      pos.z *= 10.0;
-      vec4 mPos = modelMatrix * vec4(pos, 1.0);
-      float t = uTime;
-      mPos.x += sin(t * random.z + 6.28 * random.w) * mix(0.1, 1.5, random.x);
-      mPos.y += sin(t * random.y + 6.28 * random.x) * mix(0.1, 1.5, random.w);
-      mPos.z += sin(t * random.w + 6.28 * random.y) * mix(0.1, 1.5, random.z);
-      vec4 mvPos = viewMatrix * mPos;
-      if (uSizeRandomness == 0.0) {
-        gl_PointSize = uBaseSize;
-      } else {
-        gl_PointSize = (uBaseSize * (1.0 + uSizeRandomness * (random.x - 0.5))) / length(mvPos.xyz);
-      }
-      gl_Position = projectionMatrix * mvPos;
-    }
-  `;
-
-  const fragment = /* glsl */ `
-    precision highp float;
-    uniform float uTime;
-    uniform float uAlphaParticles;
-    varying vec4 vRandom;
-    varying vec3 vColor;
-    void main() {
-      vec2 uv = gl_PointCoord.xy;
-      float d = length(uv - vec2(0.5));
-      if (uAlphaParticles < 0.5) {
-        if (d > 0.5) { discard; }
-        gl_FragColor = vec4(vColor + 0.2 * sin(uv.yxx + uTime + vRandom.y * 6.28), 1.0);
-      } else {
-        float circle = smoothstep(0.5, 0.4, d) * 0.8;
-        gl_FragColor = vec4(vColor + 0.2 * sin(uv.yxx + uTime + vRandom.y * 6.28), circle);
-      }
-    }
-  `;
-
-  const renderer = new OglRenderer({ dpr: CFG.pixelRatio, depth: false, alpha: true });
-  const gl = renderer.gl;
-  container.appendChild(gl.canvas);
-  gl.clearColor(0, 0, 0, 0);
-
-  const camera = new OglCamera(gl, { fov: 15 });
-  camera.position.set(0, 0, CFG.cameraDistance);
-
+  let W = 0, H = 0, focal = 0;
   function resize() {
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    camera.perspective({ aspect: gl.canvas.width / gl.canvas.height });
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = wrap.clientWidth; H = wrap.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    focal = H * 0.95;
   }
-  window.addEventListener('resize', resize, false);
+  window.addEventListener('resize', resize);
   resize();
 
-  /* container is pointer-events:none — track the mouse on window */
-  const mouse = { x: 0, y: 0 };
-  if (CFG.moveParticlesOnHover) {
-    window.addEventListener('mousemove', (e) => {
-      const rect = container.getBoundingClientRect();
-      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-    }, { passive: true });
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const dashes = [];
+  CFG.lanes.forEach(x => {
+    for (let i = 0; i < CFG.dashPerLane; i++)
+      dashes.push({ x, z: rand(CFG.near, CFG.far), len: rand(CFG.dashLen[0], CFG.dashLen[1]) });
+  });
+  const streaks = [];
+  for (let i = 0; i < CFG.streakCount; i++) {
+    streaks.push({
+      x: CFG.lanes[Math.floor(Math.random() * CFG.lanes.length)] + rand(-0.3, 0.3),
+      z: rand(CFG.near, CFG.far),
+      len: rand(CFG.streakLen[0], CFG.streakLen[1]),
+      rgb: CFG.streakRgbs[Math.floor(Math.random() * CFG.streakRgbs.length)],
+    });
   }
 
-  const count = CFG.particleCount;
-  const positions = new Float32Array(count * 3);
-  const randoms = new Float32Array(count * 4);
-  const colors = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    let x, y, z, len;
-    do {
-      x = Math.random() * 2 - 1;
-      y = Math.random() * 2 - 1;
-      z = Math.random() * 2 - 1;
-      len = x * x + y * y + z * z;
-    } while (len > 1 || len === 0);
-    const r = Math.cbrt(Math.random());
-    positions.set([x * r, y * r, z * r], i * 3);
-    randoms.set([Math.random(), Math.random(), Math.random(), Math.random()], i * 4);
-    colors.set(hexToRgb(CFG.particleColors[Math.floor(Math.random() * CFG.particleColors.length)]), i * 3);
-  }
+  /* scroll velocity → smoothed speed boost, so lines surge as you scroll */
+  let lastScrollY = window.scrollY, boost = 0;
+  const clamp01 = v => Math.min(Math.max(v, 0), 1);
 
-  const geometry = new OglGeometry(gl, {
-    position: { size: 3, data: positions },
-    random:   { size: 4, data: randoms },
-    color:    { size: 3, data: colors },
-  });
+  let lastT = performance.now();
+  (function frame(t) {
+    requestAnimationFrame(frame);
+    const dt = Math.min((t - lastT) / 1000, 0.05); lastT = t;
 
-  const program = new OglProgram(gl, {
-    vertex,
-    fragment,
-    uniforms: {
-      uTime:           { value: 0 },
-      uSpread:         { value: CFG.particleSpread },
-      uBaseSize:       { value: CFG.particleBaseSize * CFG.pixelRatio },
-      uSizeRandomness: { value: CFG.sizeRandomness },
-      uAlphaParticles: { value: CFG.alphaParticles ? 1 : 0 },
-    },
-    transparent: true,
-    depthTest: false,
-  });
+    /* hero exit progress from live geometry: 0 pinned … 1 fully gone */
+    const heroBottom = hero.getBoundingClientRect().bottom;
+    const exit = clamp01(1 - heroBottom / window.innerHeight);
+    wrap.style.opacity = (1 - exit).toFixed(3);
+    heroWave.on = 1 - exit;
+    if (heroBottom <= 0) { heroWave.on = 0; return; }   /* off-screen — skip all work */
 
-  const particles = new OglMesh(gl, { mode: gl.POINTS, geometry, program });
+    const dy = window.scrollY - lastScrollY; lastScrollY = window.scrollY;
+    boost += (Math.min(Math.abs(dy) * 0.07, 10) - boost) * 0.08;
 
-  let lastTime = performance.now();
-  let elapsed = 0;
-  (function update(t) {
-    requestAnimationFrame(update);
-    const delta = (t || performance.now()) - lastTime;
-    lastTime = t || performance.now();
-    elapsed += delta * CFG.speed;
+    /* cruise + scroll surge + exit whoosh */
+    const speed = CFG.baseSpeed * (1 + exit * 2.4) + boost;
+    heroWave.speed = speed;
 
-    program.uniforms.uTime.value = elapsed * 0.001;
+    /* vanishing point sways gently — playful, alive */
+    const vpX = W * 0.63 + Math.sin(t * 0.00033) * W * 0.012;
+    const vpY = H * 0.345 + Math.cos(t * 0.00026) * H * 0.008;
 
-    if (CFG.moveParticlesOnHover) {
-      particles.position.x = -mouse.x * CFG.particleHoverFactor;
-      particles.position.y = -mouse.y * CFG.particleHoverFactor;
-    }
+    ctx.clearRect(0, 0, W, H);
 
-    if (!CFG.disableRotation) {
-      particles.rotation.x = Math.sin(elapsed * 0.0002) * 0.1;
-      particles.rotation.y = Math.cos(elapsed * 0.0005) * 0.15;
-      particles.rotation.z += 0.01 * CFG.speed;
-    }
+    /* traveling ground wave — the same phase drives the car's bob,
+       so the model reads as riding these lines */
+    const tw = t * 0.001;
+    const waveAt = z => Math.sin(z * CFG.wave.freq - tw * CFG.wave.om) * CFG.wave.amp;
+    heroWave.y    = Math.sin(CFG.carZ * CFG.wave.freq - tw * CFG.wave.om);
+    heroWave.roll = Math.cos(CFG.carZ * CFG.wave.freq - tw * CFG.wave.om);
 
-    renderer.render({ scene: particles, camera });
+    const project = (x, z) => [vpX + focal * x / z, vpY + focal * (CFG.camH - waveAt(z)) / z];
+    const drawSeg = (s, rgb, aMul, wMul, glow) => {
+      /* lines RECEDE toward the horizon — ground flows nose-to-tail,
+         so the car reads as driving forward */
+      s.z += speed * dt;
+      if (s.z > CFG.far) s.z -= CFG.far - CFG.near;            /* recycle */
+      const z1 = Math.max(s.z, CFG.near), z2 = s.z + s.len;
+      if (z1 >= z2) return;
+      const [x1, y1] = project(s.x, z1);
+      const [x2, y2] = project(s.x, z2);
+      const a = (1 - z2 / CFG.far) * aMul;                     /* fade to horizon */
+      if (a <= 0.01) return;
+      /* bright head near the camera fading down the tail — the
+         streaks read as lit, with real depth */
+      const grad = ctx.createLinearGradient(x1, y1, x2, y2);
+      grad.addColorStop(0, `rgba(${rgb}, ${a.toFixed(3)})`);
+      grad.addColorStop(1, `rgba(${rgb}, ${(a * 0.15).toFixed(3)})`);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = Math.max(Math.min(focal * 0.014 / z1, 5.5) * wMul, 0.8);
+      ctx.shadowBlur = glow ? 12 : 0;
+      ctx.shadowColor = glow ? `rgba(${rgb}, .5)` : 'transparent';
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    };
+
+    ctx.lineCap = 'round';
+    dashes.forEach(d => drawSeg(d, CFG.dashRgb, 0.85, 1.1, false));
+    streaks.forEach(s => drawSeg(s, s.rgb, 0.9, 2.1, true));
+    ctx.shadowBlur = 0;
   })(performance.now());
 }
+
 
 /* ══════════════════════════════════════════════════════════
    3.  360 EXPERIENCE — swatches + drag setup
 ══════════════════════════════════════════════════════════ */
 function initExterior() {
-  /* DotGrid — fixed behind the 3D car; visible only during the 360 stage */
+  /* DotGrid — fixed behind the 3D car; visible only during the 360 stage.
+     Toggled from live geometry each scroll frame (not cached trigger px,
+     which drift when the injected nav / late assets shift the layout). */
   const dotWrap = document.querySelector('.eg-dotgrid-wrap');
-  if (dotWrap) {
+  const dotExt  = document.querySelector('#v27-exterior');
+  if (dotWrap && dotExt) {
     initDotGrid(dotWrap);
-    ScrollTrigger.create({
-      trigger: '#v27-exterior',
-      start: 'top 55%', end: 'bottom 45%',
-      onToggle(self) { dotWrap.classList.toggle('is-on', self.isActive); },
-    });
+    let dotQueued = false;
+    const dotUpdate = () => {
+      dotQueued = false;
+      const r = dotExt.getBoundingClientRect();
+      const on = r.top < window.innerHeight * 0.55 && r.bottom > window.innerHeight * 0.45;
+      dotWrap.classList.toggle('is-on', on);
+    };
+    const dotQueue = () => { if (!dotQueued) { dotQueued = true; requestAnimationFrame(dotUpdate); } };
+    window.addEventListener('scroll', dotQueue, { passive: true });
+    window.addEventListener('resize', dotQueue, { passive: true });
+    dotUpdate();
   }
 
   /* Swatch click → swap the car GLB to that paint.
@@ -1268,6 +1300,28 @@ function initTech() {
     }).catch(() => { /* WebGL not supported — silently skip */ });
   }
 
+  /* ── Headline depth scrub: LARGE while the intro is on screen, then
+     scales down and blurs over the section's first viewport of scroll,
+     so the tech cards sweep over a receding headline. Driven from live
+     geometry each scroll frame → perfectly reversible on scroll-up. ── */
+  const ctHead = $('#v27-ct-head');
+  if (ctHead) {
+    ctHead.style.willChange = 'transform, filter';
+    let headQueued = false;
+    const headScrub = () => {
+      headQueued = false;
+      const top = section.getBoundingClientRect().top;
+      const p = Math.min(Math.max(-top / window.innerHeight, 0), 1);
+      const e = 1 - (1 - p) * (1 - p);            /* ease-out: recedes early */
+      ctHead.style.transform = `scale(${(1.6 - 0.6 * e).toFixed(4)})`;
+      ctHead.style.filter = e > 0.02 ? `blur(${(e * 9).toFixed(2)}px)` : 'none';
+    };
+    const headQueue = () => { if (!headQueued) { headQueued = true; requestAnimationFrame(headScrub); } };
+    window.addEventListener('scroll', headQueue, { passive: true });
+    window.addEventListener('resize', headQueue, { passive: true });
+    headScrub();
+  }
+
   /* ── Headline mask-reveal animation ── */
   const headEl = $('#v27-ct-head');
   if (headEl) {
@@ -1546,7 +1600,7 @@ function initReserve() {
 function init() {
   initScene();
   initHeroEntrance();
-  initHeroParticles();
+  initHeroRoad();
   initExterior();
   initLightbox();
   initBrand();
