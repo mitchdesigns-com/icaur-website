@@ -278,6 +278,29 @@
       });
     }
 
+    /* Headline depth scrub: LARGE at the intro, then scales down and
+       blurs over the section's first viewport of scroll so the tech
+       cards sweep over a receding headline. Driven from live geometry
+       each scroll frame → perfectly reversible on scroll-up. (Same
+       effect as the V27 model page's initTech.) */
+    var ctHead = $('#v27-ct-head');
+    if (ctHead) {
+      ctHead.style.willChange = 'transform, filter';
+      var headQueued = false;
+      var headScrub = function () {
+        headQueued = false;
+        var top = section.getBoundingClientRect().top;
+        var p = Math.min(Math.max(-top / window.innerHeight, 0), 1);
+        var e = 1 - (1 - p) * (1 - p);            /* ease-out: recedes early */
+        ctHead.style.transform = 'scale(' + (1.6 - 0.6 * e).toFixed(4) + ')';
+        ctHead.style.filter = e > 0.02 ? 'blur(' + (e * 9).toFixed(2) + 'px)' : 'none';
+      };
+      var headQueue = function () { if (!headQueued) { headQueued = true; requestAnimationFrame(headScrub); } };
+      window.addEventListener('scroll', headQueue, { passive: true });
+      window.addEventListener('resize', headQueue, { passive: true });
+      headScrub();
+    }
+
     /* Per-item scroll animations */
     $$('#innov-tech .v27-ct-item').forEach(function(item) {
       var img   = item.querySelector('.v27-ct-img');
