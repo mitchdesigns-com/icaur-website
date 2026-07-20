@@ -206,7 +206,7 @@ function init() {
     pano.colorSpace = THREE.SRGBColorSpace;
     pano.mapping = THREE.EquirectangularReflectionMapping;
     scene.background = pano;
-    scene.backgroundIntensity = 1.05;   /* modest lift through the tone mapper */
+    scene.backgroundIntensity = 0.82;   /* moody — the scene sits dark */
     /* rotation tuned so the mirror junctions (every 90°) sit ~45° off
        the centre of BOTH the side and the rear hero shots — a junction
        centred in frame reads as a butterfly-symmetric mountain */
@@ -313,11 +313,13 @@ function init() {
 
   /* ── Lights — neutral/cool rig to match the monochrome basalt plate
         (a warm sunset rig would clash with the storm light) ── */
-  scene.add(new THREE.HemisphereLight(0xc8d2e2, 0x3a3d42, 0.85));
+  /* low ambient — deep shadows give the paint its contrast; the key and
+     rim carve the body out of the dark backdrop */
+  scene.add(new THREE.HemisphereLight(0xc8d2e2, 0x33363c, 0.65));
   /* near-vertical key → compact contact shadow straight under the car;
      a long directional shadow would contradict the plate's fixed sun
      as the camera orbits */
-  const key = new THREE.DirectionalLight(0xf4f6fa, 2.1);
+  const key = new THREE.DirectionalLight(0xf4f6fa, 2.6);
   key.position.set(1.5, 10, 1.2);
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
@@ -327,7 +329,7 @@ function init() {
   key.shadow.bias = -0.0005;   key.shadow.normalBias = 0.02;
   scene.add(key);
   /* cool rim from behind so the tail reads in the rear shot */
-  const rim = new THREE.DirectionalLight(0xdde8f6, 1.9);
+  const rim = new THREE.DirectionalLight(0xdde8f6, 2.6);
   rim.position.set(-8, 4, -5);
   scene.add(rim);
   /* soft cool fill from the opposite quarter so the shadow side of the
@@ -344,6 +346,11 @@ function init() {
   loader.setMeshoptDecoder(MeshoptDecoder);
 
   let car = null, trunkPivot = null, trunkSign = 1, KEYS = null;
+  /* tail lights — the Light_RED lens materials (cloned per-mesh) plus a
+     soft red spill light; both fade on with the vision beat */
+  const tailMats = [];
+  const tailGlow = new THREE.PointLight(0xff1616, 0, 6);
+  scene.add(tailGlow);
   /* the pivot's parent is rotated in the GLB, so the swing must be
      computed about the WORLD vertical axis, not the pivot's local Y */
   const trunkParentQ = new THREE.Quaternion();
@@ -377,7 +384,7 @@ function init() {
             m.depthWrite = false;
           }
           /* dark paint reads through reflections — lift the env response */
-          if ('envMapIntensity' in m) m.envMapIntensity = 1.1;
+          if ('envMapIntensity' in m) m.envMapIntensity = 1.35;
         });
       }
       if (/^Wheel_(FL|FR|BL|BR)$/.test(o.name)) wheels.push(o);
@@ -440,6 +447,29 @@ function init() {
       parent.getWorldQuaternion(trunkParentQ);
     }
 
+    /* ── Tail lights: clone the Light_RED lens materials on the two rear
+          lamps (cloned so nothing else sharing the material glows) and
+          prime them to emit red; the frame loop drives the intensity ── */
+    ['Light_BL', 'Light_BR'].forEach(name => {
+      const lamp = car.getObjectByName(name);
+      if (!lamp) return;
+      lamp.traverse(o => {
+        if (!o.isMesh) return;
+        const mats = Array.isArray(o.material) ? o.material : [o.material];
+        mats.forEach((m, i) => {
+          if (!/light_red/i.test(m.name || '')) return;
+          const glow = m.clone();
+          glow.emissive = new THREE.Color(0xff0f0f);
+          glow.emissiveIntensity = 0;
+          if (Array.isArray(o.material)) o.material[i] = glow;
+          else o.material = glow;
+          tailMats.push(glow);
+        });
+      });
+    });
+    /* red spill centred behind the tailgate */
+    tailGlow.position.set(box.min.x - 0.3, 0.95, 0);
+
     /* ── Drone keyframes: top → side (car RIGHT) → rear (car LEFT).
           `shift` is a screen-space horizontal offset (fraction of the
           viewport) applied via setViewOffset — negative pushes the car
@@ -462,9 +492,11 @@ function init() {
       /* swing around the tail… */
       { p: 0.68, pos: V(-4.9,  1.85, s * 4.9), look: V(-0.4, 0.90, 0), shift: 0 },
       /* …to a slightly distant rear shot, car framed left */
-      { p: 0.82, pos: V(rearX - 5.3, 2.15, s * 1.5), look: V(-0.9, 0.95, 0), shift: 0.18 },
+      /* …to a CLOSE rear shot aimed at the tailgate, so the gate is
+         clearly seen swinging open */
+      { p: 0.82, pos: V(rearX - 3.6, 1.85, s * 1.2), look: V(rearX + 0.9, 1.05, 0), shift: 0.18 },
       /* settle while the vision writes */
-      { p: 1.00, pos: V(rearX - 5.0, 2.00, s * 0.6), look: V(-0.8, 0.95, 0), shift: 0.20 },
+      { p: 1.00, pos: V(rearX - 3.3, 1.70, s * 0.5), look: V(rearX + 0.9, 1.00, 0), shift: 0.20 },
     ];
 
     window.__cinema = { car, trunkPivot, trunkSign, KEYS, box };
@@ -515,6 +547,12 @@ function init() {
         _invQ.copy(trunkParentQ).invert();
         trunkPivot.quaternion.copy(_invQ).multiply(_swingQ).multiply(trunkParentQ);
       }
+
+      /* tail lights fade ON as the rear (vision) shot arrives —
+         pure function of p, so they dim back off on reverse scroll */
+      const tl = seg(p, 0.72, 0.84);
+      tailMats.forEach(m => { m.emissiveIntensity = tl * 2.4; });
+      tailGlow.intensity = tl * 1.5;
 
       renderer.render(scene, camera);
     }
