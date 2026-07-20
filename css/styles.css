@@ -2879,8 +2879,13 @@ html.pt-entering > body { opacity: 0; }
   .services__img-inner { inset: 0; transform: none !important; }
   .services__content-col { padding: var(--sp-40) var(--pad-x) var(--sp-48); }
 
-  .faq__layout { grid-template-columns: 1fr; gap: var(--sp-24); }
-  .faq__left { position: static; }
+  /* stacked FAQ: heading/hint first, accordion next, and the View-All
+     button moves UNDER the questions (display:contents promotes the
+     aside's children to flex items so they can be reordered) */
+  .faq__layout { display: flex; flex-direction: column; gap: var(--sp-24); }
+  .faq__left { display: contents; }
+  .faq__list { order: 1; }
+  .faq__left .btn { order: 2; align-self: center; margin-top: var(--sp-8); }
 
   .cta-split__grid { grid-template-columns: 1fr; }
 
