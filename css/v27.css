@@ -34,7 +34,7 @@
 /* ─── Unified section headlines ──────────────────────────── */
 .v27-ext-h2, .v27-brand-h2, .eg-h2, .v27-about-h2, .v27-gallery-h2,
 .v27-interior-h2, .v27-tech-h2, .v27-safety-h2, .v27-charging-h2,
-.v27-trims-h2, .v27-reserve-h2 {
+.v27-trims-h2 {
   font-size: clamp(2.2rem, 3.8vw, 3.6rem) !important;
   font-weight: 700 !important;
   line-height: .96 !important;
@@ -48,26 +48,52 @@
 #v27-hero {
   position: relative;
   height: 160vh;
-  /* cream lives on .v27-hyper-wrap (fixed, z0) so the road renders
-     UNDER the 3D car and cross-fades to white on the hero exit */
   background: transparent;
 }
-/* Hero speed-lines road — fixed behind the 3D car (z0 < canvas-wrap z1) */
+/* Speed-lines road — fixed behind the 3D car (z0 < canvas-wrap z1).
+   Lives in the OVERVIEW section only; js/v27.js drives the opacity from
+   that section's live geometry. The mask keeps the lanes off the copy
+   column on the left, so only the car half of the split reads as road. */
 .v27-hyper-wrap {
   position: fixed; inset: 0; z-index: 0;
-  pointer-events: none; background: #ECEAE6;
+  pointer-events: none; background: transparent; opacity: 0;
+  -webkit-mask-image: linear-gradient(to right, transparent 4%, #000 30%);
+          mask-image: linear-gradient(to right, transparent 4%, #000 30%);
 }
 .v27-hyper-wrap canvas { display: block; width: 100%; height: 100%; }
 .v27-hero-sticky {
   position: sticky; top: 0; height: 100vh;
-  overflow: hidden; background: transparent;
+  overflow: hidden;
+  /* dark fallback so the copy stays readable if the video can't load */
+  background: #0D0B09;
   z-index: 10;
+  /* all hero copy stacks at the BOTTOM of the video frame */
+  display: flex; flex-direction: column; justify-content: flex-end;
 }
-/* Top text block: badge + headline + sub */
+
+/* Full-bleed background video */
+.v27-hero-video {
+  position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%; object-fit: cover;
+  display: block; pointer-events: none;
+}
+/* Black gradient rising from the bottom — guarantees copy contrast */
+.v27-hero-scrim {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(to top,
+    rgba(0,0,0,.92) 0%,
+    rgba(0,0,0,.72) 18%,
+    rgba(0,0,0,.38) 40%,
+    rgba(0,0,0,.10) 62%,
+    rgba(0,0,0,0)   80%);
+}
+
+/* Copy block — bottom-anchored, white on the scrim */
 .v27-hero-top {
-  position: absolute; top: 0; left: 0; right: 0; z-index: 6;
+  position: relative; z-index: 6;
   display: flex; flex-direction: column; align-items: center;
-  padding-top: clamp(88px, 12vh, 120px); text-align: center;
+  padding: 0 var(--px); text-align: center;
+  margin-bottom: clamp(16px, 2.4vh, 28px);
   pointer-events: none;
 }
 /* V27 model badge */
@@ -82,20 +108,22 @@
 .v27-hero-h1 {
   font-size: clamp(2rem, 5.2vw, 5rem);
   font-weight: 700; line-height: 1; letter-spacing: -.04em;
-  margin: 0 0 clamp(12px, 1.6vh, 18px); color: #231815;
+  margin: 0 0 clamp(12px, 1.6vh, 18px); color: #fff;
   white-space: nowrap;
+  text-shadow: 0 2px 24px rgba(0,0,0,.35);
 }
 .v27-hero-h1 em { font-style: normal; color: var(--orange); }
 /* Short paragraph */
 .v27-hero-sub {
   font-size: clamp(.88rem, 1.05vw, .98rem); font-weight: 400;
-  line-height: 1.7; color: rgba(35,24,21,.65); max-width: 40ch;
+  line-height: 1.7; color: rgba(255,255,255,.82); max-width: 40ch;
   margin: 0; opacity: 0;
+  text-shadow: 0 1px 16px rgba(0,0,0,.4);
 }
-/* Bottom CTA */
+/* CTA — sits under the copy at the bottom of the video */
 .v27-hero-bottom {
-  position: absolute; bottom: clamp(88px, 12vh, 130px);
-  left: 0; right: 0; z-index: 6;
+  position: relative; z-index: 6;
+  margin-bottom: clamp(56px, 9vh, 110px);
   display: flex; justify-content: center;
   pointer-events: all; opacity: 0;
 }
@@ -109,6 +137,8 @@
   margin-left: .12em;
   position: relative;
   top: .05em;
+  /* white to match the headline over the video */
+  filter: brightness(0) invert(1);
 }
 .v27-hero-reserve-btn { pointer-events: all; }
 
@@ -294,6 +324,31 @@
   color: rgba(35,24,21,.45); transition: color .3s;
 }
 .v27-swatch.active .v27-swatch-name { color: #231815; }
+
+/* Mobile 360: the 7 swatches used to wrap into 3 rows and climb over
+   the 3D car. Collapse them into a single horizontal-scroll strip on a
+   frosted band pinned at the bottom, so the car has clear room above. */
+@media (max-width: 768px) {
+  .v27-ext-header { padding: clamp(64px,9vh,84px) var(--px) 10px; }
+  .v27-swatches-wrap {
+    padding: 10px 0 calc(10px + env(safe-area-inset-bottom, 0px));
+    background: rgba(247,245,241,.82);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 -8px 24px rgba(0,0,0,.06);
+  }
+  .v27-swatches {
+    flex-wrap: nowrap; justify-content: flex-start;
+    gap: 14px; padding: 0 16px 2px;
+    overflow-x: auto; overflow-y: hidden;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    scroll-snap-type: x proximity;
+  }
+  .v27-swatches::-webkit-scrollbar { display: none; }
+  .v27-swatch { flex: 0 0 auto; scroll-snap-align: center; }
+  .v27-swatch img { width: 54px; }
+  .v27-swatch.active img { width: 70px; }
+  .v27-swatch-name { font-size: .5rem; letter-spacing: .06em; white-space: nowrap; }
+}
 
 /* ══════════════════════════════════════════════════════
    EXTERIOR DESIGN — photo carousel (replaces brand)
@@ -603,13 +658,13 @@
 .v27-carousel-slide img {
   width: 100%; height: clamp(300px,54vw,660px); object-fit: cover; display: block;
 }
+/* Slide tag — same orange chip as the exterior gallery's .v27-eg-tag */
 .v27-carousel-slide-label {
-  position: absolute; bottom: 14px; left: 18px; z-index: 5;
-  padding: 4px 10px; border-radius: 999px;
-  background: rgba(10,6,4,.48); backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,.12);
-  color: rgba(255,255,255,.88); font-size: .6rem; font-weight: 600;
-  letter-spacing: .18em; text-transform: uppercase;
+  position: absolute; left: 16px; bottom: 16px; z-index: 5;
+  background: var(--orange); color: #fff;
+  font-size: .72rem; font-weight: 600; letter-spacing: .05em;
+  text-transform: uppercase;
+  padding: 8px 14px; border-radius: 6px;
 }
 .v27-carousel-vignette {
   position: absolute; bottom: 0; left: 0; right: 0; height: 28%;
@@ -640,7 +695,9 @@
 .v27-hotspot-dot {
   width: 18px; height: 18px; border-radius: 50%;
   background: rgba(255,255,255,.88); border: 1.5px solid rgba(255,255,255,.98);
-  cursor: pointer; position: relative; z-index: 2;
+  /* the brand arrow stays the cursor everywhere — no native pointer icon
+     swap on hover (js/main.js scales the arrow instead) */
+  cursor: none; position: relative; z-index: 2;
   box-shadow: 0 0 12px rgba(255,255,255,.7), 0 0 28px rgba(255,255,255,.35);
   animation: v27HsDotGlow 2.6s ease-in-out infinite;
   transition: transform .2s, background .2s;
@@ -654,6 +711,9 @@
   animation: none; transform: scale(1.4); background: #fff;
   box-shadow: 0 0 16px rgba(255,255,255,1), 0 0 40px rgba(255,255,255,.7);
 }
+/* The dot whose popup is open reads orange, so it's obvious which
+   hotspot the visible card belongs to */
+.v27-hotspot-dot.active::after { background: var(--orange); }
 .v27-annot-card {
   position: absolute; width: 222px; border-radius: 16px; overflow: hidden;
   background: #F5EFE5; z-index: 10;
@@ -1066,7 +1126,7 @@
 }
 
 /* ── Overview heading logo (client V5) ────────── */
-.v27-ov-logo { height: .92em; width: auto; display: inline-block; vertical-align: baseline; }
+.v27-ov-logo { height: .4em; width: auto; display: inline-block; vertical-align: baseline; }
 
 /* ── Call centre number in reserve brick (client V8) ────────── */
 .v27-callcenter {
@@ -1106,63 +1166,23 @@
   line-height: 1.08; letter-spacing: -.02em;
   color: #1F0F08; margin: 0 0 clamp(36px, 5vh, 56px);
 }
-.v27-dl-grid {
-  display: flex; flex-wrap: wrap; gap: 12px;
-  justify-content: center;
+/* Downloads use the shared .white-hover-cards component (css/styles.css);
+   this is only the 4-up layout override — .dl-cards is a 2-up 620px grid. */
+.v27-dl-cards {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 1180px;
 }
-.v27-dl-pill {
-  display: flex; align-items: center; gap: 12px;
-  background: #fff; border-radius: 18px;
-  padding: 11px 16px 11px 11px; text-decoration: none;
-  box-shadow: 0 2px 12px rgba(31,15,8,.07), 0 1px 3px rgba(31,15,8,.05);
-  transition: box-shadow .25s, transform .2s;
-  cursor: pointer;
+@media (max-width: 1100px) {
+  .v27-dl-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 680px; }
 }
-.v27-dl-pill:hover {
-  box-shadow: 0 8px 28px rgba(31,15,8,.12), 0 2px 8px rgba(31,15,8,.07);
-  transform: translateY(-2px);
-}
-.v27-dl-pill:hover .v27-dl-arrow { color: var(--orange); }
-.v27-dl-badge {
-  flex-shrink: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px; width: 34px; height: 40px; border-radius: 7px;
-  background: var(--orange);
-  font-size: .38rem; font-weight: 800; letter-spacing: .08em;
-  text-transform: uppercase; color: #fff;
-}
-.v27-dl-badge svg { display: block; width: 11px; height: 14px; }
-.v27-dl-info {
-  display: flex; flex-direction: column; gap: 2px; min-width: 0;
-}
-.v27-dl-name {
-  font-size: .75rem; font-weight: 600; color: #1F0F08;
-  letter-spacing: -.01em; white-space: nowrap;
-}
-.v27-dl-size { font-size: .62rem; color: rgba(31,15,8,.4); }
-.v27-dl-arrow {
-  flex-shrink: 0; color: rgba(31,15,8,.25); transition: color .2s;
-  display: flex; align-items: center; margin-left: 4px;
+@media (max-width: 620px) {
+  .v27-dl-cards { grid-template-columns: 1fr; max-width: 420px; }
 }
 
-/* ══════════════════════════════════════════════════════
-   RESERVE CTA
-══════════════════════════════════════════════════════ */
-#v27-reserve {
-  position: relative; z-index: 5;
-  background: var(--dark); padding: clamp(80px,10vh,120px) var(--px);
-  text-align: center;
-}
-.v27-reserve-eyebrow {
-  color: var(--orange); letter-spacing: .32em; font-size: .7rem;
-  font-weight: 700; text-transform: uppercase; margin-bottom: 20px;
-}
-.v27-reserve-h2 {
-  font-size: clamp(2.4rem,6vw,5.5rem); font-weight: 500; line-height: .95;
-  letter-spacing: -.03em; color: #fff; margin-bottom: clamp(32px,5vh,48px);
-}
-.v27-reserve-h2 em { font-style: normal; color: var(--orange); }
-.v27-reserve-ctas { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+/* RESERVE CTA — nothing lives here on purpose. The section is now the
+   plain shared component (<section class="cta-video" id="cta">), so
+   css/styles.css governs it and this page matches every other page.
+   Anything re-added here would fork it again. */
 
 /* ═══════════════════════════════════════════════════════════
    MOBILE — V27 Page
@@ -1210,7 +1230,4 @@
 
   /* ─── Charging section ─── */
   .v27-charging-top { grid-template-columns: 1fr; }
-
-  /* ─── Reserve CTA ─── */
-  .v27-reserve-ctas { flex-direction: column; align-items: center; }
 }

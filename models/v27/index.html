@@ -41,7 +41,7 @@
   <!-- Site nav (injected by components.js) -->
   <div id="site-header"></div>
 
-  <!-- ─── Hero speed-lines road (fixed, BEHIND the 3D car — z0 < z1) ─── -->
+  <!-- ─── Overview speed-lines road (fixed, BEHIND the 3D car — z0 < z1) ─── -->
   <div class="v27-hyper-wrap" aria-hidden="true"></div>
 
   <!-- ─── DotGrid (fixed, BEHIND the 3D car — z0 < z1) ─────────── -->
@@ -53,12 +53,31 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════
-       HERO — centered 3D model layout
+       HERO — full-bleed video with bottom-anchored copy
   ══════════════════════════════════════════════════════ -->
   <section id="v27-hero">
     <div class="v27-hero-sticky">
 
-      <!-- Top text block -->
+      <!-- Background video + bottom-up black scrim for contrast -->
+      <video class="v27-hero-video" id="v27HeroVideo"
+             src="https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev/v27-single-model.mp4"
+             autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+      <div class="v27-hero-scrim" aria-hidden="true"></div>
+      <script>
+        /* The hero video is remote, so the initial autoplay attempt can fire
+           before enough data has buffered. Nudge it once it's playable. */
+        (function () {
+          var v = document.getElementById('v27HeroVideo');
+          if (!v) return;
+          var tryPlay = function () { var p = v.play(); if (p) p.catch(function () {}); };
+          if (v.paused) tryPlay();
+          ['loadeddata', 'canplay'].forEach(function (e) {
+            v.addEventListener(e, function () { if (v.paused) tryPlay(); });
+          });
+        })();
+      </script>
+
+      <!-- Copy block (sits at the bottom, above the CTA) -->
       <div class="v27-hero-top" id="v27-hero-top">
 
         <h1 class="v27-hero-h1" id="v27-hero-h1">
@@ -70,7 +89,7 @@
         </p>
       </div>
 
-      <!-- CTA pinned to bottom -->
+      <!-- CTA -->
       <div class="v27-hero-bottom" id="v27-hero-bottom">
         <a href="/reserve/" class="v27-cta-btn v27-cta-btn--dark v27-hero-reserve-btn" id="v27-hero-cta">
           Reserve V27
@@ -227,61 +246,35 @@
   <section id="v27-resources">
     <p class="eyebrow v27-res-eyebrow">V27 Resources</p>
     <h2 class="v27-res-h2">Everything You Need.</h2>
-  <div class="v27-dl-grid">
-    <a class="v27-dl-pill" href="/assets/docs/iCAUR-V27-Brochure.pdf" download aria-label="Download V27 Brochure">
-      <span class="v27-dl-badge">
-        <svg width="16" height="20" viewBox="0 0 16 20" fill="none"><rect width="16" height="20" rx="3" fill="#fff" fill-opacity=".15"/><path d="M3 13.5h10M3 10.5h10M3 7.5h6" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M10 1v4h4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        PDF
-      </span>
-      <span class="v27-dl-info">
-        <span class="v27-dl-name">V27 Brochure</span>
-        <span class="v27-dl-size">8.4 MB</span>
-      </span>
-      <span class="v27-dl-arrow" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-      </span>
+  <!-- Same white-hover-cards component as the Services pages (amber card,
+       chip flips to black, arrow nudges, 3D tilt from initTiltCards) -->
+  <div class="white-hover-cards dl-cards v27-dl-cards reveal reveal--up" data-delay="2">
+    <a class="white-hover-card" href="/assets/docs/iCAUR-V27-Brochure.pdf" download aria-label="Download V27 Brochure">
+      <span class="white-hover-card__icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/><path d="M9 9h1"/></svg></span>
+      <h3 class="white-hover-card__h">V27 Brochure</h3>
+      <p class="white-hover-card__p">PDF &middot; 8.4 MB</p>
+      <span class="white-hover-card__link">Download <span class="arrow">&rarr;</span></span>
     </a>
 
-    <a class="v27-dl-pill" href="/assets/docs/iCAUR-V27-Warranty.pdf" download aria-label="Download V27 Warranty">
-      <span class="v27-dl-badge">
-        <svg width="16" height="20" viewBox="0 0 16 20" fill="none"><rect width="16" height="20" rx="3" fill="#fff" fill-opacity=".15"/><path d="M3 13.5h10M3 10.5h10M3 7.5h6" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M10 1v4h4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        PDF
-      </span>
-      <span class="v27-dl-info">
-        <span class="v27-dl-name">V27 Warranty</span>
-        <span class="v27-dl-size">2 MB</span>
-      </span>
-      <span class="v27-dl-arrow" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-      </span>
+    <a class="white-hover-card" href="/assets/docs/iCAUR-V27-Warranty.pdf" download aria-label="Download V27 Warranty">
+      <span class="white-hover-card__icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/><path d="M9 9h1"/></svg></span>
+      <h3 class="white-hover-card__h">V27 Warranty</h3>
+      <p class="white-hover-card__p">PDF &middot; 2 MB</p>
+      <span class="white-hover-card__link">Download <span class="arrow">&rarr;</span></span>
     </a>
 
-    <a class="v27-dl-pill" href="/assets/docs/iCAUR-V27-Maintenance.pdf" download aria-label="Download V27 Maintenance Schedule">
-      <span class="v27-dl-badge">
-        <svg width="16" height="20" viewBox="0 0 16 20" fill="none"><rect width="16" height="20" rx="3" fill="#fff" fill-opacity=".15"/><path d="M3 13.5h10M3 10.5h10M3 7.5h6" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M10 1v4h4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        PDF
-      </span>
-      <span class="v27-dl-info">
-        <span class="v27-dl-name">Maintenance Schedule</span>
-        <span class="v27-dl-size">1.2 MB</span>
-      </span>
-      <span class="v27-dl-arrow" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-      </span>
+    <a class="white-hover-card" href="/assets/docs/iCAUR-V27-Maintenance.pdf" download aria-label="Download V27 Maintenance Schedule">
+      <span class="white-hover-card__icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M8 14h3"/><path d="M8 18h6"/></svg></span>
+      <h3 class="white-hover-card__h">Maintenance Schedule</h3>
+      <p class="white-hover-card__p">PDF &middot; 1.2 MB</p>
+      <span class="white-hover-card__link">Download <span class="arrow">&rarr;</span></span>
     </a>
 
-    <a class="v27-dl-pill" href="/assets/docs/iCAUR-V27-Insurance.pdf" download aria-label="Download V27 Insurance Program">
-      <span class="v27-dl-badge">
-        <svg width="18" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-        PDF
-      </span>
-      <span class="v27-dl-info">
-        <span class="v27-dl-name">Insurance Program</span>
-        <span class="v27-dl-size">3.1 MB</span>
-      </span>
-      <span class="v27-dl-arrow" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-      </span>
+    <a class="white-hover-card" href="/assets/docs/iCAUR-V27-Insurance.pdf" download aria-label="Download V27 Insurance Program">
+      <span class="white-hover-card__icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+      <h3 class="white-hover-card__h">Insurance Program</h3>
+      <p class="white-hover-card__p">PDF &middot; 3.1 MB</p>
+      <span class="white-hover-card__link">Download <span class="arrow">&rarr;</span></span>
     </a>
   </div>
   </section>
@@ -516,16 +509,16 @@
   <!-- ══════════════════════════════════════════════════════
        RESERVE CTA
   ══════════════════════════════════════════════════════ -->
-  <section class="cta-video" id="v27-reserve">
+  <section class="cta-video" id="cta">
   <video class="cta-video__bg" src="/assets/images/CTA-bg.webm" poster="/assets/images/CTA.webp" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
   <div class="cta-video__overlay" aria-hidden="true"></div>
   <div class="cta-video__glass reveal reveal--up">
     <span class="cta-video__dash" aria-hidden="true"></span>
     <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
-    <p class="cta-video__body">Secure your place with a fully refundable deposit. Our team will guide you through every step — or call us directly at <a href="tel:19000" class="cta-video__tel">19000</a>.</p>
+    <p class="cta-video__body">Your next car is waiting — let's get you behind the wheel and show you what electric really means.</p>
     <div class="cta-video__actions">
-      <a href="/reserve/" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Now <span class="arrow">→</span></a>
-      <a href="/contact/" class="btn btn--outline btn--arrow btn--magnetic">Book Now <span class="arrow">→</span></a>
+      <a href="/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
+      <a href="/contact" class="btn btn--outline btn--arrow btn--magnetic">Contact Us <span class="arrow">→</span></a>
     </div>
   </div>
 </section>
@@ -542,7 +535,7 @@
   <script src="/js/main.js"></script>
   <script src="/js/transitions.js"></script>
   <script src="/js/game.js"></script>
-  <script type="module" src="/js/v27.js?v=30"></script>
+  <script type="module" src="/js/v27.js?v=31"></script>
 
 </body>
 </html>

@@ -12,6 +12,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
 
+  <!-- Three.js importmap — same pins as the V27 page, for the
+       mission/vision 3D cinema (js/about-cinema.js) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/",
+      "meshopt_decoder": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/libs/meshopt_decoder.module.js"
+    }
+  }
+  </script>
+
   <script
   src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
   data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
@@ -44,10 +56,29 @@
 <main id="main">
 
 <!-- ═══════ HERO — spotlight reveal (same as the service heroes) ═══════ -->
-<section class="spot-hero" id="hero">
-  <div class="spot-hero__base" style="background-image:url('/assets/images/about-hero.webp')" aria-hidden="true"></div>
-  <div class="spot-hero__reveal" style="background-image:url('/assets/images/about-hero.webp')" aria-hidden="true"></div>
+<section class="spot-hero spot-hero--video" id="hero">
+  <!-- One video in full colour; .spot-hero__reveal is a masked dim layer
+       over it. Two videos (base + reveal) would drift out of sync and the
+       flashlight would show a different frame than the surrounding image. -->
+  <video class="spot-hero__video" id="aboutHeroVideo"
+         src="https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev/about-hero.mp4"
+         poster="/assets/images/about-hero.webp"
+         autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+  <div class="spot-hero__reveal" aria-hidden="true"></div>
   <div class="spot-hero__shade" aria-hidden="true"></div>
+  <script>
+    /* The video is remote, so the first autoplay attempt can fire before
+       enough has buffered. Nudge it once it's playable. */
+    (function () {
+      var v = document.getElementById('aboutHeroVideo');
+      if (!v) return;
+      var tryPlay = function () { var p = v.play(); if (p) p.catch(function () {}); };
+      if (v.paused) tryPlay();
+      ['loadeddata', 'canplay'].forEach(function (e) {
+        v.addEventListener(e, function () { if (v.paused) tryPlay(); });
+      });
+    })();
+  </script>
 
   <div class="spot-hero__head">
     <p class="eyebrow eyebrow--warm spot-anim spot-anim--fade" style="animation-delay:.1s">Our Story</p>
@@ -168,68 +199,41 @@
     </div>
 
     <!-- Hover image preview — floats over the left side -->
+    <!-- src matches the first .usp-row's data-img so the idle preview is
+         correct before JS runs (initUspList keeps it in sync after that) -->
     <div class="usp-preview" id="uspPreview" aria-hidden="true">
-      <img src="" alt="">
+      <img src="/assets/images/v27/v27-01.webp" alt="" loading="lazy">
     </div>
   </div>
 </section>
 
-<!-- ═══════ OUR MISSION — horizontal carousel (headline → statement), floating images, dot-grid bg ═══════ -->
-<div class="diff-scroll-driver" id="missionDriver">
-<section class="section diff mission-diff" id="missionSection">
+<!-- ═══════ MISSION + VISION — 3D cinematic scroll ═══════
+     One continuous scroll-scrubbed drone sequence (js/about-cinema.js):
+     the V27 GLB standing in the desert plate (model-bg.webp) → camera
+     starts far top-down, orbits down to the side (car framed right,
+     MISSION scales up + writes itself) → swings around to the rear
+     (tailgate swings open, car framed left, VISION on the right).
+     Fully reversible (pure function of scroll); mobile runs the same
+     cut centred. Reduced-motion: CSS swaps in a static fallback. -->
+<div class="cinema-driver" id="cinemaDriver">
+<section class="cinema" id="missionSection" aria-label="Our mission and vision">
+  <div class="cinema__stage" id="cinemaStage">
+    <canvas id="cinemaCanvas" aria-hidden="true"></canvas>
 
-  <!-- Light dot grid behind the carousel -->
-  <div class="ms-dots" aria-hidden="true"></div>
-
-  <div class="diff__curve" aria-hidden="true">
-    <svg viewBox="0 0 1440 140" preserveAspectRatio="none"><path d="M0,100 C360,0 1080,0 1440,100 L1440,140 L0,140 Z"/></svg>
-  </div>
-
-  <div class="diff__glow diff__glow--1" aria-hidden="true"></div>
-  <div class="diff__glow diff__glow--2" aria-hidden="true"></div>
-
-  <!-- floating parallax images drifting around the statement -->
-  <div class="mission-floats" aria-hidden="true">
-    <div class="mission-float" data-depth="0.05" style="top:6%;left:4%;width:clamp(160px,18vw,280px)"><div class="mission-float__inner"><img src="/assets/images/ICUAR V27 brochure 03 18.webp" alt=""></div></div>
-    <div class="mission-float" data-depth="0.12" style="top:52%;left:5%;width:clamp(140px,16vw,250px)"><div class="mission-float__inner"><img src="/assets/images/ICUAR V27 brochure 03 23.webp" alt=""></div></div>
-    <div class="mission-float" data-depth="0.07" style="top:6%;right:4%;width:clamp(150px,17vw,270px)"><div class="mission-float__inner"><img src="/assets/images/iCAUR INTL_V27 REV_cam027 copy.webp" alt=""></div></div>
-    <div class="mission-float" data-depth="0.14" style="top:52%;right:5%;width:clamp(140px,16vw,250px)"><div class="mission-float__inner"><img src="/assets/images/ICUAR V27 brochure 03 20.webp" alt=""></div></div>
-  </div>
-
-  <div class="diff__viewport">
-  <div class="diff__stage" id="missionStage">
-    <div class="diff__panel diff__panel--intro" id="missionIntro">
-      <div class="diff__intro-content">
-        <h2 class="diff__headline mission-headline">Our <em>Mission</em></h2>
+    <div class="cinema__overlay cinema__overlay--mission" id="cinMission">
+      <div class="cinema__card">
+        <h2 class="cinema__h">Our <em>Mission</em></h2>
+        <p class="cinema__par" id="cinMissionPar">We exist to put Egypt on the global EV map — engineering world-class electric vehicles at home, for the heat, the highways, and the people who drive them. <em>Mobility, reimagined for real life.</em></p>
       </div>
     </div>
 
-    <div class="diff__panel mission-statement">
-      <p class="mission-statement__text">We exist to put Egypt on the global EV map — engineering world-class electric vehicles at home, for the heat, the highways, and the people who drive them. <em>Mobility, reimagined for real life.</em></p>
+    <div class="cinema__overlay cinema__overlay--vision" id="cinVision">
+      <div class="cinema__card">
+        <h2 class="cinema__h">Our <em>Vision</em></h2>
+        <p class="cinema__par" id="cinVisionPar">To put Egypt on the global stage of electric mobility — engineering vehicles that don't just compete with the world's best, but define what's next for an entire generation.</p>
+      </div>
     </div>
   </div>
-  </div>
-
-</section>
-</div>
-
-<!-- ═══════ OUR VISION ═══════ -->
-<div class="vision-driver" id="visionDriver">
-<section class="vision" id="vision">
-
-  <span class="vision__dash" aria-hidden="true"></span>
-  <h2 class="vision__title">Our <em>Vision</em></h2>
-
-  <div class="vision__img-stage">
-    <div class="vision__img-wrap" id="visionImgWrap">
-      <img src="/assets/images/about-hero.webp" alt="iCAUR Vision" class="vision__img" loading="lazy">
-    </div>
-  </div>
-
-  <div class="vision__body">
-    <p class="vision__statement" id="visionStatement">To put Egypt on the global stage of electric mobility — engineering vehicles that don't just compete with the world's best, but define what's next for an entire generation.</p>
-  </div>
-
 </section>
 </div>
 
@@ -240,7 +244,7 @@
   <div class="cta-video__glass reveal reveal--up">
     <span class="cta-video__dash" aria-hidden="true"></span>
     <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
-    <p class="cta-video__body">The V27 is waiting — let's get you behind the wheel and show you what electric really means.</p>
+    <p class="cta-video__body">Your next car is waiting — let's get you behind the wheel and show you what electric really means.</p>
     <div class="cta-video__actions">
       <a href="/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
       <a href="/contact" class="btn btn--outline btn--arrow btn--magnetic">Contact Us <span class="arrow">→</span></a>
@@ -260,5 +264,6 @@
   <script src="/js/about-story.js" defer></script>
   <script src="/js/dot-field.js" defer></script>
   <script src="/js/doodles.js" defer></script>
+  <script type="module" src="/js/about-cinema.js"></script>
 </body>
 </html>

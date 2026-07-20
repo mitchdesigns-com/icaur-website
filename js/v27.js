@@ -35,10 +35,19 @@ let scrollBaseRotY  = HERO_POSE.rotY;
 let dragExtraRot    = 0;
 let smoothRotY      = HERO_POSE.rotY; /* what the render loop lerps toward */
 
-/* Hero road wave — written by initHeroRoad each frame, read by the
-   render loop so the car bobs in sync with the lines (on: 0..1);
-   speed feeds the wheel spin so it matches the road flow */
-const heroWave = { y: 0, roll: 0, on: 0, speed: 0 };
+/* Camera rig — shared with the 2D road layer so its perspective can be
+   built from the SAME lens/position as the WebGL camera (see initRoad) */
+const CAM = { fov: 50, x: 0.2, y: 3.8, z: 9.2 };
+
+/* Yaw the car is baked at inside the GLB (radians, world-frame when the
+   group's own rotation is 0). Measured off the wheel hubs in prepModel;
+   the road layer adds the pose rotation on top to get the true heading. */
+let modelYaw = 0;
+
+/* Road wave — written by initRoad each frame, read by the render loop
+   so the car bobs in sync with the lines (on: 0..1); speed feeds the
+   wheel spin so it matches the road flow */
+const roadWave = { y: 0, roll: 0, on: 0, speed: 0 };
 
 /* ─── Car colors — one GLB per paint (same sources as the landing page) ── */
 const R2 = 'https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev';
@@ -103,6 +112,20 @@ function prepModel(scene) {
   });
 
   scene.userData.spinners = spinners;
+
+  /* Longitudinal axis of the model, measured from the wheel hubs. The GLB
+     is authored at its own baked yaw, so this is the only honest way to
+     know which way the car actually points — the road layer needs it to
+     lay its lanes parallel to the car instead of to the world axes. */
+  const hubMid = (re) => {
+    const g = wheels.filter((w) => re.test(w.name));
+    if (!g.length) return null;
+    const c = new THREE.Vector3();
+    g.forEach((w) => c.add(new THREE.Box3().setFromObject(w).getCenter(new THREE.Vector3())));
+    return c.divideScalar(g.length);
+  };
+  const front = hubMid(/^Wheel_F/), back = hubMid(/^Wheel_B/);
+  if (front && back) modelYaw = Math.atan2(front.x - back.x, front.z - back.z);
   /* Normalize every variant to the camel reference so poses,
      shadow and scale stay identical across color swaps */
   const box = new THREE.Box3().setFromObject(scene);
@@ -138,8 +161,8 @@ function initScene() {
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
-  const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0.2, 3.8, 9.2);
+  const camera = new THREE.PerspectiveCamera(CAM.fov, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(CAM.x, CAM.y, CAM.z);
 
   /* Lights — ported from the landing page rig */
   scene.add(new THREE.AmbientLight(0xd8ccc5, 0.55));
@@ -244,6 +267,34 @@ function initScene() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
+  /* ── Bridge for the 2D road layer ────────────────────────────────
+     The road can't approximate this camera and stay glued to the car
+     through every pose scrub, so it borrows the real one. Projection
+     goes through THREE and the result is nudged by the same -9vh the
+     canvas wrap is translated by, putting both layers in one space. */
+  const projVec = new THREE.Vector3();
+  window.__v27Road = {
+    /* world point → [cssX, cssY, distanceFromCamera] */
+    project(wx, wy, wz) {
+      projVec.set(wx, wy, wz);
+      const dist = projVec.distanceTo(camera.position);
+      projVec.project(camera);
+      return [
+        (projVec.x * 0.5 + 0.5) * window.innerWidth,
+        (-projVec.y * 0.5 + 0.5) * window.innerHeight - window.innerHeight * 0.09,
+        dist,
+      ];
+    },
+    /* live ground anchor + heading of the car, whatever pose it's in */
+    car() {
+      if (!car) return null;
+      return {
+        x: car.position.x, y: car.position.y, z: car.position.z,
+        yaw: modelYaw + car.rotation.y,
+      };
+    },
+  };
+
   /* Render loop — smooth lerp rotation so drag and scroll never snap */
   let lastFrameT = performance.now();
   function animate() {
@@ -256,17 +307,17 @@ function initScene() {
       smoothRotY = lerp(smoothRotY, target, 0.10);
       car.rotation.y = smoothRotY;
     }
-    /* ride the hero road's wave — gentle bob + roll on the body only,
+    /* ride the road's wave — gentle bob + roll on the body only,
        so the pose group (scroll scrubs / drag) is never fought */
     if (carBody) {
-      const k = heroWave.on;
-      carBody.position.y = heroWave.y * 0.05 * k;
-      carBody.rotation.z = heroWave.roll * 0.016 * k;
+      const k = roadWave.on;
+      carBody.position.y = roadWave.y * 0.05 * k;
+      carBody.rotation.z = roadWave.roll * 0.016 * k;
 
-      /* wheels roll at the road's speed while the hero drives */
+      /* wheels roll at the road's speed while the car drives */
       const spinners = carBody.userData.spinners;
       if (spinners && k > 0.01) {
-        const step = heroWave.speed * 0.9 * k * dt;
+        const step = roadWave.speed * 0.9 * k * dt;
         spinners.forEach(p => { p.rotation[p.userData.axis] -= step; });
       }
     }
@@ -351,12 +402,10 @@ function showDragHint(visible) {
 }
 
 function setDragCursor(state) {
+  /* The brand arrow is the cursor everywhere, so this surface no longer
+     swaps in native grab/grabbing — those would replace it on hover. */
   const extWin = $('.v27-ext-window');
-  if (extWin) {
-    if (state === 'grabbing') extWin.style.cursor = 'grabbing';
-    else if (state === 'hover') extWin.style.cursor = 'grab';
-    else extWin.style.cursor = 'default';
-  }
+  if (extWin) extWin.style.cursor = 'none';
   /* Custom cursor label (if element exists) */
   const cursor = $('#cursor');
   const label  = $('#cursorLabel');
@@ -438,33 +487,39 @@ function initHeroEntrance() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   HERO ROAD — light take on React Bits <Hyperspeed />.
-   A fixed 2D-canvas layer UNDER the 3D car (z0 < canvas z1):
-   perspective speed lines flowing from a vanishing point on
-   the upper right down past the car's wheels, so the model
-   reads as driving over them. Line speed surges with scroll
-   velocity, and the whole layer whooshes + cross-fades to
-   white as the hero hands off to the Overview section.
+   OVERVIEW ROAD — light take on React Bits <Hyperspeed />.
+   A fixed 2D-canvas layer UNDER the 3D car (z0 < canvas z1),
+   live only while the Overview section is on screen.
+
+   Every point goes through the WebGL camera itself (see the
+   __v27Road bridge in initScene) and lanes are laid on the
+   model's own heading, so the lanes converge on the model's
+   vanishing point and stay glued to its ground plane through
+   the whole pose scrub — the car reads as genuinely sitting
+   on this road rather than pasted over it.
 ══════════════════════════════════════════════════════════ */
-function initHeroRoad() {
+function initRoad() {
   const wrap = document.querySelector('.v27-hyper-wrap');
-  const hero = document.getElementById('v27-hero');
-  if (!wrap || !hero) return;
+  const ov   = document.getElementById('v27-overview');
+  if (!wrap || !ov) return;
+
+  /* Half a track width: ~0.95 m half-body × the Overview scale */
+  const HALF_CAR = 0.95 * OVERVIEW_POSE.scale;
 
   const CFG = {
-    /* world lane x positions — mostly negative so the fan sweeps
-       down-LEFT beneath the car (front-left quarter pose) */
-    lanes: [-5.2, -3.9, -2.7, -1.7, -0.85, -0.1, 0.75, 1.7],
+    /* Lateral lane offsets from the car's centreline (world units) — two
+       straddling the wheels, the rest fanning out to either shoulder */
+    lanes: [-4.4, -3.0, -1.85, -HALF_CAR, HALF_CAR, 1.85, 3.0, 4.4],
     dashPerLane: 11,
-    dashLen: [2.2, 4.6],
+    dashLen: [2.6, 5.4],
     streakCount: 22,
-    streakLen: [7, 17],
-    near: 1.7, far: 48,
-    camH: 1.28,
-    baseSpeed: 11,
+    streakLen: [8, 20],
+    /* v spans from IN FRONT of the car (negative — lanes sweep past the
+       bumper and out of frame) to the horizon behind it */
+    near: -7, far: 62,
+    baseSpeed: 13,
     /* gentle traveling ground wave (world amp / spatial freq / rad-per-s) */
     wave: { amp: 0.09, freq: 0.35, om: 1.2 },
-    carZ: 6.5,                 /* road depth the car visually sits at */
     dashRgb: '206, 193, 173',                                   /* warm gray */
     streakRgbs: ['243, 112, 33', '224, 169, 109', '164, 128, 94'],  /* orange / amber / brown */
   };
@@ -480,22 +535,26 @@ function initHeroRoad() {
     canvas.width = W * dpr; canvas.height = H * dpr;
     canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    focal = H * 0.95;
+    /* Focal length in px of the shared camera, for line weight only —
+       positions come from the camera itself via the bridge */
+    focal = (H / 2) / Math.tan((CAM.fov * Math.PI / 180) / 2);
   }
   window.addEventListener('resize', resize);
   resize();
 
+  /* Segments live in ROAD space, not world space: u = lateral offset from
+     the car's centreline, v = distance back along its travel axis. */
   const rand = (a, b) => a + Math.random() * (b - a);
   const dashes = [];
-  CFG.lanes.forEach(x => {
+  CFG.lanes.forEach(u => {
     for (let i = 0; i < CFG.dashPerLane; i++)
-      dashes.push({ x, z: rand(CFG.near, CFG.far), len: rand(CFG.dashLen[0], CFG.dashLen[1]) });
+      dashes.push({ u, v: rand(CFG.near, CFG.far), len: rand(CFG.dashLen[0], CFG.dashLen[1]) });
   });
   const streaks = [];
   for (let i = 0; i < CFG.streakCount; i++) {
     streaks.push({
-      x: CFG.lanes[Math.floor(Math.random() * CFG.lanes.length)] + rand(-0.3, 0.3),
-      z: rand(CFG.near, CFG.far),
+      u: CFG.lanes[Math.floor(Math.random() * CFG.lanes.length)] + rand(-0.3, 0.3),
+      v: rand(CFG.near, CFG.far),
       len: rand(CFG.streakLen[0], CFG.streakLen[1]),
       rgb: CFG.streakRgbs[Math.floor(Math.random() * CFG.streakRgbs.length)],
     });
@@ -510,44 +569,64 @@ function initHeroRoad() {
     requestAnimationFrame(frame);
     const dt = Math.min((t - lastT) / 1000, 0.05); lastT = t;
 
-    /* hero exit progress from live geometry: 0 pinned … 1 fully gone */
-    const heroBottom = hero.getBoundingClientRect().bottom;
-    const exit = clamp01(1 - heroBottom / window.innerHeight);
-    wrap.style.opacity = (1 - exit).toFixed(3);
-    heroWave.on = 1 - exit;
-    if (heroBottom <= 0) { heroWave.on = 0; return; }   /* off-screen — skip all work */
+    /* Overview visibility from live geometry — the road only exists
+       while that section is on screen: fades up as it arrives, whooshes
+       out as it hands off to the 360 stage. */
+    const r   = ov.getBoundingClientRect();
+    const vh  = window.innerHeight;
+    const rig = window.__v27Road;
+    const anchor = rig && rig.car();
+    if (!anchor) return;                                /* car not loaded — nothing to sit on */
+    if (r.top > vh || r.bottom <= 0) {                  /* off-screen — skip all work */
+      if (roadWave.on !== 0) { roadWave.on = 0; wrap.style.opacity = '0'; ctx.clearRect(0, 0, W, H); }
+      return;
+    }
+    const enter = clamp01((vh - r.top) / (vh * 0.45));  /* 0 arriving … 1 in place */
+    const exit  = clamp01(1 - r.bottom / vh);           /* 0 pinned … 1 fully gone */
+    const on    = enter * (1 - exit);
+    wrap.style.opacity = on.toFixed(3);
+    roadWave.on = on;
 
     const dy = window.scrollY - lastScrollY; lastScrollY = window.scrollY;
     boost += (Math.min(Math.abs(dy) * 0.07, 10) - boost) * 0.08;
 
     /* cruise + scroll surge + exit whoosh */
     const speed = CFG.baseSpeed * (1 + exit * 2.4) + boost;
-    heroWave.speed = speed;
-
-    /* vanishing point sways gently — playful, alive */
-    const vpX = W * 0.63 + Math.sin(t * 0.00033) * W * 0.012;
-    const vpY = H * 0.345 + Math.cos(t * 0.00026) * H * 0.008;
+    roadWave.speed = speed;
 
     ctx.clearRect(0, 0, W, H);
 
     /* traveling ground wave — the same phase drives the car's bob,
        so the model reads as riding these lines */
     const tw = t * 0.001;
-    const waveAt = z => Math.sin(z * CFG.wave.freq - tw * CFG.wave.om) * CFG.wave.amp;
-    heroWave.y    = Math.sin(CFG.carZ * CFG.wave.freq - tw * CFG.wave.om);
-    heroWave.roll = Math.cos(CFG.carZ * CFG.wave.freq - tw * CFG.wave.om);
+    const waveAt = v => Math.sin(v * CFG.wave.freq - tw * CFG.wave.om) * CFG.wave.amp;
+    roadWave.y    = Math.sin(-tw * CFG.wave.om);               /* phase at the car (v = 0) */
+    roadWave.roll = Math.cos(-tw * CFG.wave.om);
 
-    const project = (x, z) => [vpX + focal * x / z, vpY + focal * (CFG.camH - waveAt(z)) / z];
+    /* The car's live heading — the GLB's baked yaw plus whatever the pose
+       has rotated it to. Lanes are laid out on that axis, so they run
+       exactly parallel to the model and converge on ITS vanishing point. */
+    const nx = Math.sin(anchor.yaw), nz = Math.cos(anchor.yaw);  /* nose direction */
+    const px = nz,                   pz = -nx;                   /* lateral, across the lanes */
+
+    /* Road space (u across, v back along the axis) → world → screen,
+       through the WebGL camera itself */
+    const project = (u, v) => rig.project(
+      anchor.x + px * u - nx * v,
+      anchor.y + waveAt(v),
+      anchor.z + pz * u - nz * v,
+    );
     const drawSeg = (s, rgb, aMul, wMul, glow) => {
-      /* lines RECEDE toward the horizon — ground flows nose-to-tail,
+      /* lines RECEDE along the car's axis — ground flows nose-to-tail,
          so the car reads as driving forward */
-      s.z += speed * dt;
-      if (s.z > CFG.far) s.z -= CFG.far - CFG.near;            /* recycle */
-      const z1 = Math.max(s.z, CFG.near), z2 = s.z + s.len;
-      if (z1 >= z2) return;
-      const [x1, y1] = project(s.x, z1);
-      const [x2, y2] = project(s.x, z2);
-      const a = (1 - z2 / CFG.far) * aMul;                     /* fade to horizon */
+      s.v += speed * dt;
+      if (s.v > CFG.far) s.v -= CFG.far - CFG.near;            /* recycle */
+      const v1 = Math.max(s.v, CFG.near), v2 = s.v + s.len;
+      if (v1 >= v2) return;
+      const [x1, y1, d1] = project(s.u, v1);
+      const [x2, y2, d2] = project(s.u, v2);
+      if (d1 < 0.8 || d2 < 0.8) return;                        /* at/behind the lens */
+      const a = clamp01(1 - v2 / CFG.far) * aMul;              /* fade to horizon */
       if (a <= 0.01) return;
       /* bright head near the camera fading down the tail — the
          streaks read as lit, with real depth */
@@ -555,7 +634,7 @@ function initHeroRoad() {
       grad.addColorStop(0, `rgba(${rgb}, ${a.toFixed(3)})`);
       grad.addColorStop(1, `rgba(${rgb}, ${(a * 0.15).toFixed(3)})`);
       ctx.strokeStyle = grad;
-      ctx.lineWidth = Math.max(Math.min(focal * 0.014 / z1, 5.5) * wMul, 0.8);
+      ctx.lineWidth = Math.max(Math.min(focal * 0.014 / d1, 5.5) * wMul, 0.8);
       ctx.shadowBlur = glow ? 12 : 0;
       ctx.shadowColor = glow ? `rgba(${rgb}, .5)` : 'transparent';
       ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
@@ -1123,6 +1202,36 @@ const GAP  = 10;
 
 let carouselCur  = 0;
 let carouselTrackEl = null;
+/* ── Annotation popups ────────────────────────────────────────────────
+   Every card registers a controller here so the section can drive them
+   as a guided tour: one popup at a time, each holding for ANNOT_DWELL
+   before the next opens (opening the next closes the current one).
+   Registry is keyed by slide so only the visible slide's tour runs. */
+const ANNOT_DWELL = 5000;          /* ms each popup stays open */
+const annots      = [];            /* { slide, setOpen(bool) } */
+let annotTimer    = null;
+let annotAuto     = true;          /* a manual hotspot click hands over control */
+let sectionInView = false;
+
+function closeAllAnnots() { annots.forEach(a => a.setOpen(false)); }
+function stopAnnotCycle() { clearTimeout(annotTimer); annotTimer = null; }
+
+/* Open the i-th popup of the current slide and queue the next one */
+function showAnnot(i) {
+  const list = annots.filter(a => a.slide === carouselCur);
+  if (!list.length) return;
+  const idx = ((i % list.length) + list.length) % list.length;
+  list.forEach((a, k) => a.setOpen(k === idx));
+  annotTimer = setTimeout(() => showAnnot(idx + 1), ANNOT_DWELL);
+}
+
+/* Restart the tour for whatever slide is showing. Only runs while the
+   section is actually on screen, so an off-screen carousel stays idle. */
+function startAnnotCycle(delay = 700) {
+  stopAnnotCycle();
+  if (!annotAuto || !sectionInView) return;
+  annotTimer = setTimeout(() => showAnnot(0), delay);
+}
 
 function initCarousel() {
   const track   = $('#v27-carousel-track');
@@ -1171,7 +1280,7 @@ function initCarousel() {
         el.appendChild(dot);
 
         /* Annotation card */
-        const card = buildAnnotCard(hs, dot, dotBtn);
+        const card = buildAnnotCard(hs, dot, dotBtn, i);
         el.appendChild(card);
       });
     }
@@ -1187,26 +1296,80 @@ function initCarousel() {
 
   window.addEventListener('resize', setSlideWidths);
 
-  /* Head reveal */
-  ScrollTrigger.create({
-    trigger: '#v27-interior', start: 'top 75%', once: true,
-    onEnter() { gsap.to('#v27-interior-head', { opacity: 1, y: 0, duration: .7 }); }
+  /* ── Section entrance ──────────────────────────────────────────
+     Replays on EVERY entry (both directions), so the section always
+     arrives animated rather than only the first time: the header
+     lifts, the carousel wipes up while the photo settles out of a
+     slow zoom, then the tags and hotspots pop in behind it.
+     Nothing here touches slide opacity/scale or the track's x —
+     those belong to goTo(), and fighting them would jitter. */
+  const enterTl = gsap.timeline({
+    paused: true,
+    /* the guided tour picks up once everything has landed */
+    onComplete: () => startAnnotCycle(400),
   });
+  enterTl
+    .fromTo('#v27-interior-head',
+      { opacity: 0, y: 28 },
+      { opacity: 1, y: 0, duration: .7, ease: 'power3.out' })
+    /* Photo opens as a mask splitting from the centre line — the top and
+       bottom halves part together */
+    .fromTo('#v27-carousel-outer',
+      { clipPath: 'inset(50% 0 50% 0)' },
+      { clipPath: 'inset(0% 0 0% 0)', duration: 1.2, ease: 'power3.inOut' }, '-=.42')
+    /* img scale is free — goTo() animates the SLIDE's scale, not the photo's */
+    .fromTo('#v27-carousel-track img',
+      { scale: 1.18 },
+      { scale: 1, duration: 1.5, ease: 'power3.out' }, '<')
+    .fromTo('.v27-carousel-slide-label',
+      { opacity: 0, y: 14 },
+      { opacity: 1, y: 0, duration: .5, ease: 'power2.out', stagger: .06 }, '-=.75')
+    /* xPercent/yPercent restate the CSS translate(-50%,-50%) so GSAP owns
+       the whole transform and the dots stay centred on their hotspot */
+    .fromTo('.v27-hotspot',
+      { opacity: 0, scale: 0, xPercent: -50, yPercent: -50 },
+      { opacity: 1, scale: 1, xPercent: -50, yPercent: -50,
+        duration: .55, ease: 'back.out(2.2)', stagger: .09 }, '-=.5');
+
+  /* IntersectionObserver rather than ScrollTrigger: this is a plain
+     "is the section on screen" toggle, and IO measures live. ScrollTrigger
+     caches start/end at refresh time, which on this page (sticky hero +
+     pinned 360 stage + late-loading images above) can leave the section
+     stuck hidden. Fires on every entry, both directions. */
+  const section = $('#v27-interior');
+  new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      sectionInView = e.isIntersecting;
+      stopAnnotCycle();
+      closeAllAnnots();
+      if (e.isIntersecting) {
+        annotAuto = true;          /* a fresh visit restarts the tour */
+        enterTl.restart();         /* its onComplete starts the cycle */
+      } else {
+        enterTl.pause(0);
+      }
+    });
+  }, { threshold: 0.15 }).observe(section);
 }
 
-function buildAnnotCard(hs, dotWrap, dotBtn) {
+function buildAnnotCard(hs, dotWrap, dotBtn, slideIndex) {
   const card = document.createElement('div');
   card.className = 'v27-annot-card';
-  card.style.cssText = 'opacity:0;transform:scale(.88);pointer-events:none;';
+  card.style.pointerEvents = 'none';
 
-  /* Position: right of hotspot unless near right edge */
+  /* Position: alongside the hotspot — right of it unless near the right
+     edge. `top` is the hotspot's own y and yPercent:-50 (kept on every
+     tween below) centres the card on the dot, so it sits beside the dot
+     rather than hanging below it. */
   const pctX = parseFloat(hs.x);
+  const GAP_PCT = 1.5;                 /* horizontal breathing room, % of slide */
   card.style.top = hs.y;
   if (pctX > 65) {
-    card.style.right = (100 - pctX + 2) + '%';
+    card.style.right = (100 - pctX + GAP_PCT) + '%';
   } else {
-    card.style.left = (pctX + 3) + '%';
+    card.style.left = (pctX + GAP_PCT) + '%';
   }
+  gsap.set(card, { opacity: 0, scale: .6, yPercent: -50 });
 
   const img = document.createElement('img');
   img.src = hs.img || '';
@@ -1223,17 +1386,41 @@ function buildAnnotCard(hs, dotWrap, dotBtn) {
   closeBtn.innerHTML = '&#x2715;';
   card.appendChild(closeBtn);
 
+  /* Grow out of the edge nearest its hotspot, so the card reads as
+     springing from the dot rather than inflating in place */
+  card.style.transformOrigin = pctX > 65 ? 'right center' : 'left center';
+
   let open = false;
-  function toggleCard() {
-    open = !open;
+  function setOpen(v) {
+    if (v === open) return;
+    open = v;
     dotBtn.classList.toggle('active', open);
-    gsap.to(card, { opacity: open ? 1 : 0, scale: open ? 1 : .88, duration: .32, ease: 'back.out(1.4)' });
     card.style.pointerEvents = open ? 'all' : 'none';
+    /* yPercent:-50 is restated on every tween so the card stays vertically
+       centred on its dot while GSAP owns the transform */
+    if (open) {
+      gsap.fromTo(card,
+        { opacity: 0, scale: .6, y: 8, yPercent: -50 },
+        { opacity: 1, scale: 1, y: 0, yPercent: -50, duration: .52, ease: 'back.out(1.9)' });
+    } else {
+      gsap.to(card, { opacity: 0, scale: .72, y: 6, yPercent: -50, duration: .28, ease: 'power2.in' });
+    }
   }
 
-  dotBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleCard(); });
-  dotBtn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCard(); } });
-  closeBtn.addEventListener('click', (e) => { e.stopPropagation(); if (open) toggleCard(); });
+  annots.push({ slide: slideIndex, setOpen });
+
+  /* Any manual interaction hands control to the visitor — the auto tour
+     stops rather than yanking their card shut mid-read */
+  const manual = () => {
+    annotAuto = false;
+    stopAnnotCycle();
+    if (!open) annots.filter(a => a.slide === slideIndex).forEach(a => a.setOpen(false));
+    setOpen(!open);
+  };
+
+  dotBtn.addEventListener('click', (e) => { e.stopPropagation(); manual(); });
+  dotBtn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); manual(); } });
+  closeBtn.addEventListener('click', (e) => { e.stopPropagation(); if (open) manual(); });
 
   return card;
 }
@@ -1269,6 +1456,12 @@ function goTo(idx, animate = true) {
     const isCur  = i === carouselCur;
     gsap.to(s, { opacity: isCur ? 1 : 0.55, scale: isCur ? 1 : 0.93, duration: .4, ease: 'power2.out' });
   });
+
+  /* New slide gets its own tour. startAnnotCycle() no-ops when the section
+     is off screen or the visitor has taken manual control. */
+  stopAnnotCycle();
+  closeAllAnnots();
+  startAnnotCycle(600);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1580,19 +1773,14 @@ function interpolateColor(hex1, hex2, t) {
 
 /* Trims section removed (hidden on the landing page too) */
 
-/* ══════════════════════════════════════════════════════════
-   13. RESERVE SECTION
-══════════════════════════════════════════════════════════ */
-function initReserve() {
-  if (!document.getElementById('v27-reserve')) return;
-  ScrollTrigger.create({
-    trigger: '#v27-reserve', start: 'top 70%', once: true,
-    onEnter() {
-      gsap.from('#v27-reserve .cta-split__h', { opacity: 0, y: 30, duration: .8, stagger: .1, ease: 'power3.out' });
-      gsap.from('#v27-reserve .btn', { opacity: 0, y: 20, duration: .6, stagger: .1, delay: .35 });
-    }
-  });
-}
+/* 13. RESERVE SECTION — removed. The CTA is now the shared .cta-video
+   component (id="cta", same as every other page), so it animates in via
+   the site-wide `.reveal reveal--up` observer in main.js like everywhere
+   else. The old initReserve() ScrollTrigger here was staggering
+   `#v27-reserve .btn` with gsap.from(), which left inline
+   translate/rotate/scale/opacity on the buttons and gave this one page a
+   visibly different entrance — plus it targeted `.cta-split__h`, a class
+   from an older CTA structure that no longer exists in the markup. */
 
 /* ══════════════════════════════════════════════════════════
    INIT
@@ -1600,7 +1788,7 @@ function initReserve() {
 function init() {
   initScene();
   initHeroEntrance();
-  initHeroRoad();
+  initRoad();
   initExterior();
   initLightbox();
   initBrand();
@@ -1611,7 +1799,6 @@ function init() {
   initTech();
   initSafety();
   initCharging();
-  initReserve();
 }
 
 if (document.readyState === 'loading') {

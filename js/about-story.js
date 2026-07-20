@@ -30,9 +30,36 @@
   const lerp  = (a, b, t) => a + (b - a) * t;
   const seg   = (p, a, b) => ss((p - a) / (b - a));
 
+  /* Entry / parked / rail car sizes. The drive-in runs a touch larger
+     than the parked pose, so arriving reads as the car easing off the
+     throttle rather than one static scale throughout. */
+  const SCL_ENTER = 2.4;
+  const SCL_PARK  = 2.1;
+
   /* smoothed car state, so every move glides */
-  const cur = { x: window.innerWidth + 300, y: 0, rot: 0, scl: 1.75 };
+  const cur = { x: window.innerWidth + 300, y: 0, rot: 0, scl: SCL_ENTER };
   let smoothRp = 0;
+
+  /* ── Cartoon speed lines ──────────────────────────────────
+     Four streaks parked behind the car along its live motion
+     vector — they exist only while the car is actually moving
+     (velocity measured in pin-local space, so riding along with
+     the page scroll doesn't count as "moving"). Each has its own
+     trail distance, side offset and attack rate so the group
+     flickers in playfully instead of blinking as one block. */
+  const STREAKS = [
+    { a: 0.85, side: -32, len: 74, op: .85, k: .30, cls: '' },
+    { a: 1.15, side: -10, len: 96, op: .60, k: .22, cls: ' story-speed-line--deep' },
+    { a: 0.95, side:  12, len: 60, op: .75, k: .34, cls: ' story-speed-line--soft' },
+    { a: 1.30, side:  32, len: 84, op: .70, k: .18, cls: '' },
+  ].map(cfg => {
+    const el = document.createElement('span');
+    el.className = 'story-speed-line' + cfg.cls;
+    el.setAttribute('aria-hidden', 'true');
+    pin.appendChild(el);
+    return { ...cfg, el, cur: 0 };
+  });
+  let prevCar = null, prevT = 0;
 
   function frame() {
     const sr = scene.getBoundingClientRect();
@@ -80,13 +107,13 @@
       tx   = lerp(vw + 260, parkX, t);
       ty   = sr.top + parkY;
       trot = 0;                                     // png faces left — driving in
-      tscl = 1.75;                                  // large on arrival
+      tscl = SCL_ENTER;                             // extra large on arrival
     } else if (p < 0.22) {
       // Overview: parked large on the right side
       tx   = parkX;
       ty   = parkY;
       trot = 0;
-      tscl = 1.75;
+      tscl = SCL_PARK;
     } else if (p < 0.42) {
       // Transition: swing across onto the rail, shrinking while
       // rotating nose-DOWN (png faces left → -90°)
@@ -94,7 +121,7 @@
       tx   = lerp(parkX, railX, t);
       ty   = lerp(parkY, railTop, t);
       trot = -90 * t;
-      tscl = lerp(1.75, 1, t);
+      tscl = lerp(SCL_PARK, 1, t);
     } else {
       // Story: ride the line, nose down
       tx   = railX;
@@ -112,11 +139,47 @@
     // here would read as vertical drift against the copy
     if (sr.top > 0) cur.y = ty;
 
-    car.style.left = (cur.x - pinRect.left).toFixed(1) + 'px';
-    car.style.top  = (cur.y - pinRect.top).toFixed(1) + 'px';
+    const carL = cur.x - pinRect.left;
+    const carT = cur.y - pinRect.top;
+    car.style.left = carL.toFixed(1) + 'px';
+    car.style.top  = carT.toFixed(1) + 'px';
     car.style.setProperty('--rot', cur.rot.toFixed(2) + 'deg');
     car.style.setProperty('--scl', cur.scl.toFixed(3));
     car.style.setProperty('--op', visible ? '1' : '0');
+
+    // ── Speed lines: keyed off the car's REAL velocity ────────────
+    // Measured in pin-local space, so the car merely riding along with
+    // the scroll (entry phase y-lock) contributes nothing — streaks
+    // appear only when the car visibly travels across the page.
+    const now = performance.now();
+    if (prevCar) {
+      const dt    = Math.max((now - prevT) / 1000, 1e-3);
+      const vx    = (carL - prevCar.x) / dt;
+      const vy    = (carT - prevCar.y) / dt;
+      const speed = Math.hypot(vx, vy);
+      // silent below ~140 px/s, fully drawn by ~800 px/s
+      const show  = visible ? clamp((speed - 140) / 660, 0, 1) : 0;
+      const ang   = speed > 1 ? Math.atan2(vy, vx) : null;
+
+      STREAKS.forEach(s => {
+        s.cur += (show * s.op - s.cur) * s.k;
+        if (s.cur < 0.015) { s.el.style.opacity = '0'; return; }
+        if (ang !== null) {
+          // trail behind the bumper: clear the car body (75px half-size
+          // × scale) plus each streak's own gap along the motion vector
+          const dist = (80 + s.a * 70) * cur.scl * 0.9;
+          const cos = Math.cos(ang), sin = Math.sin(ang);
+          s.el.style.left = (carL - cos * dist - sin * s.side).toFixed(1) + 'px';
+          s.el.style.top  = (carT - sin * dist + cos * s.side).toFixed(1) + 'px';
+          s.el.style.width = (s.len * (0.5 + show * 0.9)
+            * clamp(cur.scl * 0.55, 0.6, 1.4)).toFixed(1) + 'px';
+          s.el.style.setProperty('--a', (ang * 180 / Math.PI).toFixed(1) + 'deg');
+        }
+        s.el.style.opacity = s.cur.toFixed(3);
+      });
+    }
+    prevCar = { x: carL, y: carT };
+    prevT   = now;
 
     // Steps light up as the car passes
     const active = stOp < 0.5 ? -1 : (smoothRp < 0.5 ? 0 : 1);

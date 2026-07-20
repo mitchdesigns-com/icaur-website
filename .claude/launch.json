@@ -4,14 +4,22 @@
     {
       "name": "icaur-website",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "."],
-      "autoPort": true
+      "runtimeArgs": ["serve", ".", "-l", "3000"],
+      "port": 3000,
+      "autoPort": false
     },
     {
       "name": "exception-static",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "/Users/markamir/Documents/GitHub/Exception - Redesign", "-l", "8899"],
       "port": 8899,
+      "autoPort": false
+    },
+    {
+      "name": "abuauf-static",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "/Users/markamir/Documents/GitHub/Abu Auf - Redesign", "-l", "8877"],
+      "port": 8877,
       "autoPort": false
     }
   ]

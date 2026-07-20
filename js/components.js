@@ -21,7 +21,7 @@ const SITE_HEADER = `
     <ul class="nav__links" role="list">
       <li><a href="/about"    class="nav__link">About</a></li>
       <li class="nav__item--has-drop">
-        <a href="/models" class="nav__link nav__drop-trigger" aria-haspopup="true" aria-expanded="false">
+        <a href="/models/v27" class="nav__link nav__drop-trigger" aria-haspopup="true" aria-expanded="false">
           Models
           <svg class="nav__drop-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
             <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -221,7 +221,7 @@ const SITE_HEADER = `
     <ul role="list">
       <li><a href="/about">About</a></li>
       <li class="mobile-menu__has-sub">
-        <a href="/models/v27">Models</a>
+        <span class="mobile-menu__label" role="heading" aria-level="2">Models</span>
         <ul class="mobile-menu__sub" role="list">
           <li><a href="/models/v27">V27</a></li>
           <li><a href="/models/v27">O3T</a></li>
@@ -286,9 +286,9 @@ const SITE_FOOTER = `
         <p class="footer__nl-legal">By subscribing you agree to our <a href="/privacy">Privacy Policy</a> and consent to receive updates from iCAUR.</p>
 
         <div class="footer__contact">
-          <a href="tel:+20221234567" class="footer__contact-item">
+          <a href="tel:17833" class="footer__contact-item">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.72A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-            <span>+20 (2) 2123-4567</span>
+            <span>17833</span>
           </a>
           <a href="mailto:hello@icaur.com" class="footer__contact-item">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>

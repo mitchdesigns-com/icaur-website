@@ -41,12 +41,32 @@
 
 <main id="main">
 
-<!-- ═══════ HERO + FEATURED ═══════ -->
-<section class="section news-hero" id="hero">
+<!-- ═══════ HERO — reuses the FAQ page-hero pattern (eyebrow + h1 +
+     short tagline, centered, no breadcrumb) so every plain listing
+     page in the site opens the same way ═══════ -->
+<section class="faq-page-hero news-hero" id="hero">
+  <div class="container" style="max-width:720px">
+    <p class="eyebrow reveal reveal--up" data-delay="0" style="justify-content:center">Newsroom</p>
+    <h1 class="reveal reveal--up" data-delay="1">Media Center</h1>
+    <p class="reveal reveal--up" data-delay="2">The latest from iCAUR — news, stories, and updates.</p>
+  </div>
+</section>
+
+<!-- ═══════ FILTERS ═══════ -->
+<section class="section news-filters" id="filters" style="padding:0">
   <div class="container">
-    <nav class="breadcrumb breadcrumb--dark reveal reveal--up" data-delay="0" aria-label="Breadcrumb">
-      <a href="/">Home</a><span>›</span><span aria-current="page">News</span>
+    <nav class="news-filters__inner" aria-label="Article categories">
+      <button class="filter-btn is-active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="blog">Blog</button>
+      <button class="filter-btn" data-filter="news">News</button>
+      <button class="filter-btn" data-filter="event">Event</button>
     </nav>
+  </div>
+</section>
+
+<!-- ═══════ FEATURED — now sits under the filters instead of above them ═══════ -->
+<section class="section news-featured-section" id="featured">
+  <div class="container">
     <div class="news-featured reveal reveal--up" data-delay="1">
       <a class="news-featured__img" href="/news/electric-wiring" data-cursor-label="Read">
         <img src="../assets/images/iCAUR INTL_V27 REV_cam025.webp" alt="iCAUR V27 Studio Design Revealed" loading="eager" width="800" height="500">
@@ -61,18 +81,6 @@
         <a href="/news/electric-wiring" class="btn btn--dark btn--arrow btn--magnetic">Read Article <span class="arrow">→</span></a>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- ═══════ FILTERS + GRID ═══════ -->
-<section class="section news-filters" id="filters" style="padding:0">
-  <div class="container">
-    <nav class="news-filters__inner" aria-label="Article categories">
-      <button class="filter-btn is-active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="blog">Blog</button>
-      <button class="filter-btn" data-filter="news">News</button>
-      <button class="filter-btn" data-filter="event">Event</button>
-    </nav>
   </div>
 </section>
 

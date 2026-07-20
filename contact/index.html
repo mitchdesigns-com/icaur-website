@@ -46,11 +46,11 @@
       <p class="rs-tagline">Whether you're ready to reserve, have questions, or just want to learn more — our team is here for you.</p>
 
       <div class="rs-contact-links">
-        <a href="tel:19000" class="rs-contact-link">
+        <a href="tel:17833" class="rs-contact-link">
           <span class="rs-contact-icon">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.86a16 16 0 0 0 5.98 5.98l.95-.95a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           </span>
-          <span class="rs-contact-text">19000</span>
+          <span class="rs-contact-text">17833</span>
         </a>
         <a href="mailto:hello@icauregypt.com" class="rs-contact-link">
           <span class="rs-contact-icon">
@@ -60,10 +60,28 @@
         </a>
       </div>
 
+      <!-- Fills the space the taller form leaves under the contact details,
+           bleeding to the card's edges rather than floating in the padding -->
+      <figure class="rs-left-media">
+        <img src="/assets/images/contact-us.webp"
+             alt="A customer smiling while holding an EV charging connector"
+             loading="lazy" decoding="async">
+      </figure>
+
     </div>
 
     <!-- RIGHT — chips + form -->
     <div class="rs-right">
+
+      <!-- Request type — swaps the contextual fields below -->
+      <div class="rs-chips" role="tablist" aria-label="Request type">
+        <button type="button" class="rs-chip is-active" role="tab" id="rschip-inquiry"
+                data-panel="inquiry" aria-selected="true" aria-controls="rspanel-inquiry">General Inquiry</button>
+        <button type="button" class="rs-chip" role="tab" id="rschip-testdrive"
+                data-panel="testdrive" aria-selected="false" aria-controls="rspanel-testdrive">Test Drive</button>
+        <button type="button" class="rs-chip" role="tab" id="rschip-maintenance"
+                data-panel="maintenance" aria-selected="false" aria-controls="rspanel-maintenance">Book Maintenance</button>
+      </div>
 
       <!-- Form — mirrors the Chery EG contact structure -->
       <form id="rsForm" aria-label="Contact form" novalidate>
@@ -101,7 +119,9 @@
             <label class="rs-label" for="rs-phone">Phone Number</label>
             <input class="rs-input" id="rs-phone" type="tel" autocomplete="tel">
           </div>
-          <div class="rs-select-wrap">
+          <!-- Second cell swaps with the chip: city for a general inquiry,
+               an actual branch for a test drive or a service booking -->
+          <div class="rs-select-wrap rs-slot" data-panel="inquiry">
             <span class="rs-select-label">City</span>
             <select class="rs-select" id="rs-city" aria-label="City">
               <option value="" disabled selected></option>
@@ -121,6 +141,28 @@
               <option value="suez">Suez</option>
             </select>
           </div>
+
+          <!-- Showrooms only (Find Us locations badged "showroom") -->
+          <div class="rs-select-wrap rs-slot" data-panel="testdrive" hidden>
+            <span class="rs-select-label">Showroom</span>
+            <select class="rs-select" id="rs-showroom" aria-label="Showroom">
+              <option value="" disabled selected></option>
+              <option value="qattamya">Qattamya Heights — New Cairo</option>
+              <option value="zayed">Sheikh Zayed — 6th of October</option>
+              <option value="maadi">Maadi Center — Maadi</option>
+            </select>
+          </div>
+
+          <!-- Service centres only (locations badged "service") -->
+          <div class="rs-select-wrap rs-slot" data-panel="maintenance" hidden>
+            <span class="rs-select-label">Service Center</span>
+            <select class="rs-select" id="rs-centre" aria-label="Service center">
+              <option value="" disabled selected></option>
+              <option value="qattamya">Qattamya Heights — New Cairo</option>
+              <option value="newcairo">North Teseen Center — Fifth Settlement</option>
+              <option value="maadi">Maadi Center — Maadi</option>
+            </select>
+          </div>
         </div>
 
         <!-- Email -->
@@ -129,21 +171,102 @@
           <input class="rs-input" id="rs-email" type="email" required autocomplete="email">
         </div>
 
-        <!-- Request Category + dependent Sub-category -->
-        <div class="rs-ctx-row">
-          <div class="rs-select-wrap">
-            <span class="rs-select-label">Request Category</span>
-            <select class="rs-select" id="rs-category" aria-label="Request category">
-              <option value="" disabled selected></option>
-              <option value="inquiry">Inquiry</option>
-              <option value="complaint">Complaint</option>
-            </select>
+        <!-- ── Panel: General Inquiry ── -->
+        <div class="rs-panel" id="rspanel-inquiry" data-panel="inquiry"
+             role="tabpanel" aria-labelledby="rschip-inquiry">
+          <!-- Request Category + dependent Sub-category -->
+          <div class="rs-ctx-row">
+            <div class="rs-select-wrap">
+              <span class="rs-select-label">Request Category</span>
+              <select class="rs-select" id="rs-category" aria-label="Request category">
+                <option value="" disabled selected></option>
+                <option value="inquiry">Inquiry</option>
+                <option value="complaint">Complaint</option>
+              </select>
+            </div>
+            <div class="rs-select-wrap is-disabled" id="rs-subwrap">
+              <span class="rs-select-label" id="rs-sublabel">Sub-category</span>
+              <select class="rs-select" id="rs-subcategory" disabled aria-label="Sub-category">
+                <option value="" disabled selected></option>
+              </select>
+            </div>
           </div>
-          <div class="rs-select-wrap is-disabled" id="rs-subwrap">
-            <span class="rs-select-label" id="rs-sublabel">Sub-category</span>
-            <select class="rs-select" id="rs-subcategory" disabled aria-label="Sub-category">
-              <option value="" disabled selected></option>
-            </select>
+        </div>
+
+        <!-- ── Panel: Test Drive ── -->
+        <div class="rs-panel" id="rspanel-testdrive" data-panel="testdrive"
+             role="tabpanel" aria-labelledby="rschip-testdrive" hidden>
+          <div class="rs-ctx-row">
+            <div class="rs-select-wrap">
+              <span class="rs-select-label">Model</span>
+              <select class="rs-select" id="rs-td-model" aria-label="Model">
+                <option value="" disabled selected></option>
+                <option value="v27">iCAUR V27</option>
+                <option value="o3t">iCAUR O3T</option>
+              </select>
+            </div>
+            <!-- date pickers render their own mm/dd/yyyy hint, so the label
+                 stays floated up rather than sitting on top of it -->
+            <div class="rs-field" data-label-static>
+              <label class="rs-label" for="rs-td-date">Preferred Date</label>
+              <input class="rs-input" id="rs-td-date" type="date">
+            </div>
+          </div>
+          <div class="rs-ctx-row">
+            <div class="rs-select-wrap">
+              <span class="rs-select-label">Preferred Time</span>
+              <select class="rs-select" id="rs-td-time" aria-label="Preferred time">
+                <option value="" disabled selected></option>
+                <option value="10-12">10:00 — 12:00</option>
+                <option value="12-14">12:00 — 14:00</option>
+                <option value="14-16">14:00 — 16:00</option>
+                <option value="16-18">16:00 — 18:00</option>
+              </select>
+            </div>
+            <div class="rs-select-wrap">
+              <span class="rs-select-label">Driving License</span>
+              <select class="rs-select" id="rs-td-license" aria-label="Valid driving license">
+                <option value="" disabled selected></option>
+                <option value="yes">I hold a valid license</option>
+                <option value="no">Not yet</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Panel: Book Maintenance ── -->
+        <div class="rs-panel" id="rspanel-maintenance" data-panel="maintenance"
+             role="tabpanel" aria-labelledby="rschip-maintenance" hidden>
+          <div class="rs-ctx-row">
+            <div class="rs-select-wrap">
+              <span class="rs-select-label">Model</span>
+              <select class="rs-select" id="rs-mt-model" aria-label="Model">
+                <option value="" disabled selected></option>
+                <option value="v27">iCAUR V27</option>
+                <option value="o3t">iCAUR O3T</option>
+              </select>
+            </div>
+            <div class="rs-select-wrap">
+              <span class="rs-select-label">Service Type</span>
+              <select class="rs-select" id="rs-mt-type" aria-label="Service type">
+                <option value="" disabled selected></option>
+                <option value="periodic">Periodic Maintenance</option>
+                <option value="repair">Repair</option>
+                <option value="bodywork">Body &amp; Paint</option>
+                <option value="warranty">Warranty Claim</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="rs-ctx-row">
+            <div class="rs-field" id="rsf-mileage">
+              <label class="rs-label" for="rs-mt-mileage">Current Mileage (km)</label>
+              <input class="rs-input" id="rs-mt-mileage" type="number" min="0" step="1" inputmode="numeric">
+            </div>
+            <div class="rs-field" data-label-static>
+              <label class="rs-label" for="rs-mt-date">Preferred Date</label>
+              <input class="rs-input" id="rs-mt-date" type="date">
+            </div>
           </div>
         </div>
 
@@ -217,25 +340,59 @@
 
   if (catSel) catSel.addEventListener('change', function () { setCategory(catSel.value); });
 
-  /* ── Legacy quick-nav links (?tab=maintenance / ?tab=test-drive)
-        map onto a preselected inquiry ── */
-  var urlTab = new URLSearchParams(location.search).get('tab');
-  if (catSel && (urlTab === 'maintenance' || urlTab === 'test-drive')) {
-    catSel.value = 'inquiry';
-    catSel.closest('.rs-select-wrap').classList.add('is-active');
-    setCategory('inquiry', urlTab === 'maintenance' ? 'service-follow-up' : 'sales');
+  /* ── Request-type chips ──────────────────────────────────────────
+     One chip is active at a time; its .rs-panel and its .rs-slot (the
+     second cell of the phone row) are the only ones left in the DOM
+     flow. Everything outside those — name, phone, email, message,
+     channels — is shared by all three request types. */
+  var chips  = Array.prototype.slice.call(document.querySelectorAll('.rs-chip'));
+  var swaps  = Array.prototype.slice.call(document.querySelectorAll('.rs-panel, .rs-slot'));
+
+  function setPanel(name) {
+    chips.forEach(function (c) {
+      var on = c.dataset.panel === name;
+      c.classList.toggle('is-active', on);
+      c.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    swaps.forEach(function (el) { el.hidden = el.dataset.panel !== name; });
   }
 
-  /* ── Floating labels (text inputs) ── */
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () { setPanel(c.dataset.panel); });
+  });
+
+  /* ── Deep links: ?tab=test-drive / ?tab=maintenance now open the
+        matching chip rather than pre-filling a generic inquiry ── */
+  var urlTab = new URLSearchParams(location.search).get('tab');
+  if (urlTab === 'test-drive')      setPanel('testdrive');
+  else if (urlTab === 'maintenance') setPanel('maintenance');
+
+  /* ── No booking a slot in the past ── */
+  var today = new Date().toISOString().slice(0, 10);
+  ['rs-td-date', 'rs-mt-date'].forEach(function (id) {
+    var d = document.getElementById(id);
+    if (d) d.min = today;
+  });
+
+  /* ── Floating labels (text inputs) ──
+        [data-label-static] keeps the label floated up permanently — date
+        inputs paint their own mm/dd/yyyy hint, which the resting label
+        would otherwise sit on top of. */
   document.querySelectorAll('.rs-field').forEach(function (wrap) {
     var input = wrap.querySelector('.rs-input');
     if (!input) return;
+    var pinned = wrap.hasAttribute('data-label-static');
     function refresh() {
-      wrap.classList.toggle('is-active', document.activeElement === input || input.value.length > 0);
+      wrap.classList.toggle('is-active',
+        pinned || document.activeElement === input || input.value.length > 0);
+      // date inputs always render their dd/mm/yyyy skeleton — .has-value
+      // is what tells CSS a real date was picked vs. that hint showing
+      if (input.type === 'date') wrap.classList.toggle('has-value', input.value.length > 0);
     }
     input.addEventListener('focus', refresh);
     input.addEventListener('blur', refresh);
     input.addEventListener('input', refresh);
+    refresh();
   });
 
   /* ── Floating labels (selects) ── */
@@ -249,6 +406,141 @@
     refresh();
   });
 
+  /* ── Compact dropdowns ─────────────────────────────────────────
+     The OS-native <select> popup can't be made to look like a small
+     rounded menu sitting right under the field — styling it is either
+     unsupported (Firefox/Safari) or partial (Chrome). So mouse users
+     get a small custom panel instead; the real <select> stays the
+     source of truth (value + a genuine 'change' event on pick), so
+     the category → sub-category dependency and the floating-label
+     refresh() above don't need to know this exists.
+
+     Keyboard/assistive-tech users are untouched: the hit-button that
+     opens the panel is tabindex="-1" and aria-hidden, so Tab still
+     lands on the real <select>, and its native arrow-key / Enter /
+     typeahead behaviour (including its own OS popup) works exactly
+     as before — this is a mouse-only visual replacement, not a
+     rebuild of the control's accessibility. */
+  (function () {
+    var openPanel = null, openHit = null;
+
+    function closePanel() {
+      if (!openPanel) return;
+      var p = openPanel;
+      p.classList.remove('is-open');
+      setTimeout(function () { if (p.parentNode) p.parentNode.removeChild(p); }, 160);
+      if (openHit) openHit.setAttribute('aria-expanded', 'false');
+      openPanel = null; openHit = null;
+    }
+
+    function buildPanel(select, hit) {
+      var panel = document.createElement('div');
+      panel.className = 'rs-select-panel';
+      panel.setAttribute('role', 'listbox');
+
+      // read live — the sub-category list is rebuilt by setCategory()
+      // above, so a stale/cached option set would drift out of sync
+      var opts = Array.prototype.filter.call(select.options, function (o) { return o.value !== ''; });
+      opts.forEach(function (o) {
+        var row = document.createElement('div');
+        row.className = 'rs-select-opt' + (o.value === select.value ? ' is-selected' : '');
+        row.setAttribute('role', 'option');
+        row.textContent = o.textContent;
+        row.addEventListener('click', function () {
+          select.value = o.value;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+          closePanel();
+        });
+        panel.appendChild(row);
+      });
+
+      document.body.appendChild(panel);
+
+      var r  = hit.getBoundingClientRect();
+      var vh = window.innerHeight;
+      var spaceBelow = vh - r.bottom;
+      var spaceAbove = r.top;
+      var openUp = spaceBelow < 200 && spaceAbove > spaceBelow;
+
+      panel.style.left  = r.left + 'px';
+      panel.style.width = r.width + 'px';
+      if (openUp) {
+        panel.classList.add('rs-select-panel--up');
+        panel.style.bottom    = (vh - r.top + 6) + 'px';
+        panel.style.maxHeight = Math.max(120, spaceAbove - 12) + 'px';
+      } else {
+        panel.style.top       = (r.bottom + 6) + 'px';
+        panel.style.maxHeight = Math.max(120, spaceBelow - 12) + 'px';
+      }
+
+      requestAnimationFrame(function () { panel.classList.add('is-open'); });
+      hit.setAttribute('aria-expanded', 'true');
+      openPanel = panel; openHit = hit;
+    }
+
+    document.querySelectorAll('.rs-select-wrap').forEach(function (wrap) {
+      var select = wrap.querySelector('.rs-select');
+      if (!select) return;
+
+      var hit = document.createElement('button');
+      hit.type = 'button';
+      hit.className = 'rs-select-hit';
+      hit.tabIndex = -1;
+      hit.setAttribute('aria-hidden', 'true');
+      hit.setAttribute('aria-expanded', 'false');
+      wrap.appendChild(hit);
+
+      hit.addEventListener('click', function () {
+        if (select.disabled) return;
+        if (openHit === hit) { closePanel(); return; }
+        closePanel();
+        buildPanel(select, hit);
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!openPanel || openPanel.contains(e.target) || e.target === openHit) return;
+      closePanel();
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePanel(); });
+    window.addEventListener('scroll', closePanel, { passive: true });
+    window.addEventListener('resize', closePanel, { passive: true });
+  })();
+
+  /* ── Stabilize panel height ────────────────────────────────────
+     Inquiry has one contextual row; Test Drive and Book Maintenance
+     have two — swapping chips visibly jumped the whole card's height
+     (and, via .rs-left-media's flex:1, the photo's height with it).
+     Measure every panel's natural height once and floor them all at
+     the tallest, so only one panel is ever visible but the space it
+     holds never changes when you switch. */
+  (function stabilizePanelHeight() {
+    var panels = document.querySelectorAll('.rs-panel');
+    if (!panels.length) return;
+
+    function measure() {
+      panels.forEach(function (p) { p.style.minHeight = ''; });
+      var max = 0;
+      panels.forEach(function (p) {
+        var wasHidden = p.hidden;
+        p.hidden = false;              // synchronous — no paint happens mid-script
+        max = Math.max(max, p.offsetHeight);
+        p.hidden = wasHidden;
+      });
+      panels.forEach(function (p) { p.style.minHeight = max + 'px'; });
+    }
+
+    measure();
+    // custom font swapping in can change text metrics after first paint
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+    var resizeT;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(measure, 150);
+    }, { passive: true });
+  })();
+
   /* ── Floating labels (textarea) ── */
   document.querySelectorAll('.rs-textarea-wrap').forEach(function (wrap) {
     var ta = wrap.querySelector('.rs-textarea');
@@ -261,16 +553,53 @@
     ta.addEventListener('blur', refresh);
   });
 
-  /* ── Parallax background ── */
+  /* ── Parallax: section backdrop + the left-column photo ──────────
+        Both run off one coalesced rAF rather than a frame request per
+        scroll event. Skipped entirely for reduced-motion users. */
   var rsBg      = document.querySelector('.rs-bg');
   var rsSection = document.getElementById('contact');
-  if (rsBg && rsSection) {
+  var rsMedia   = document.querySelector('.rs-left-media');
+  var rsMediaImg = rsMedia && rsMedia.querySelector('img');
+  var noMotion  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if ((rsBg && rsSection) || rsMediaImg) {
+    // drift range = the slack --par gives the image on each side, so the
+    // photo can never travel far enough to reveal its own edge
+    var par = rsMedia
+      ? parseFloat(getComputedStyle(rsMedia).getPropertyValue('--par')) || 46
+      : 46;
+    // travel a little short of the full slack — at exactly --par the image
+    // edge lands flush with the frame, leaving no room for rounding
+    var drift = par * 0.9;
+    var ticking = false;
+
     function updateParallax() {
-      var rect = rsSection.getBoundingClientRect();
-      var progress = -rect.top;
-      rsBg.style.transform = 'translateY(' + (progress * 0.3).toFixed(1) + 'px)';
+      ticking = false;
+
+      if (rsBg && rsSection) {
+        rsBg.style.transform =
+          'translateY(' + (-rsSection.getBoundingClientRect().top * 0.3).toFixed(1) + 'px)';
+      }
+
+      if (rsMediaImg && !noMotion) {
+        var r  = rsMedia.getBoundingClientRect();
+        var vh = window.innerHeight;
+        if (r.bottom > 0 && r.top < vh) {
+          // +1 while still below the fold … 0 at centre … -1 once past the top
+          var p = (r.top + r.height / 2 - vh / 2) / (vh / 2 + r.height / 2);
+          p = Math.max(-1, Math.min(1, p));
+          // negated so the photo drifts down as the frame rides up — it
+          // reads as moving slower than the page
+          rsMediaImg.style.transform =
+            'translate3d(0,' + (-p * drift).toFixed(1) + 'px,0)';
+        }
+      }
     }
-    window.addEventListener('scroll', function () { requestAnimationFrame(updateParallax); }, { passive: true });
+
+    window.addEventListener('scroll', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(updateParallax); }
+    }, { passive: true });
+    window.addEventListener('resize', updateParallax, { passive: true });
     updateParallax();
   }
 

@@ -274,30 +274,47 @@
       </div>
     </div>
 
+    <!-- Each card is a 3D "brick box": .diff-card__box is the white front
+         (carries the clip/shadow the card itself used to), and the two
+         .diff-card__edge slabs are orange lego-studded side faces rotated
+         90° into depth — visible only while the carousel angles the card,
+         so the sides "appear on swapping" like box covers. -->
     <div class="diff-card diff-card--media diff__panel">
-      <div class="diff-card__media" aria-hidden="true" style="background-image:url('/assets/images/iCAUR INTL_V27 REV_cam025.webp');background-size:cover;background-position:center"></div>
-      <div class="diff-card__body">
-        <h4>Warranty</h4>
-        <p>Comprehensive coverage that protects your vehicle and gives you complete peace of mind — so you can focus on the drive.</p>
-        <a href="/services/warranty" class="diff-card__link btn btn--dark btn--sm btn--arrow">Explore Warranty <span class="arrow">→</span></a>
+      <span class="diff-card__edge diff-card__edge--l" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="diff-card__edge diff-card__edge--r" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <div class="diff-card__box">
+        <div class="diff-card__media" aria-hidden="true" style="background-image:url('/assets/images/iCAUR INTL_V27 REV_cam025.webp');background-size:cover;background-position:center"></div>
+        <div class="diff-card__body">
+          <h4>Warranty</h4>
+          <p>Comprehensive coverage that protects your vehicle and gives you complete peace of mind — so you can focus on the drive.</p>
+          <a href="/services/warranty" class="diff-card__link btn btn--dark btn--sm btn--arrow">Explore Warranty <span class="arrow">→</span></a>
+        </div>
       </div>
     </div>
 
     <div class="diff-card diff-card--media diff__panel">
-      <div class="diff-card__media" aria-hidden="true" style="background-image:url('/assets/images/v27/interior-01.webp');background-size:cover;background-position:center"></div>
-      <div class="diff-card__body">
-        <h4>Service Center</h4>
-        <p>Expert care from certified technicians, ensuring your iCAUR stays at peak performance every day.</p>
-        <a href="/services/maintenance" class="diff-card__link btn btn--dark btn--sm btn--arrow">Explore Service Center <span class="arrow">→</span></a>
+      <span class="diff-card__edge diff-card__edge--l" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="diff-card__edge diff-card__edge--r" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <div class="diff-card__box">
+        <div class="diff-card__media" aria-hidden="true" style="background-image:url('/assets/images/v27/interior-01.webp');background-size:cover;background-position:center"></div>
+        <div class="diff-card__body">
+          <h4>Service Center</h4>
+          <p>Expert care from certified technicians, ensuring your iCAUR stays at peak performance every day.</p>
+          <a href="/services/maintenance" class="diff-card__link btn btn--dark btn--sm btn--arrow">Explore Service Center <span class="arrow">→</span></a>
+        </div>
       </div>
     </div>
 
     <div class="diff-card diff-card--media diff__panel">
-      <div class="diff-card__media" aria-hidden="true" style="background-image:url('/assets/images/ICUAR V27 brochure 03 20.webp');background-size:cover;background-position:center"></div>
-      <div class="diff-card__body">
-        <h4>Insurance Programs</h4>
-        <p>Flexible insurance solutions built around your lifestyle, offering simple, reliable protection wherever you go.</p>
-        <a href="/services/programs" class="diff-card__link btn btn--dark btn--sm btn--arrow">Explore Insurance Programs <span class="arrow">→</span></a>
+      <span class="diff-card__edge diff-card__edge--l" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="diff-card__edge diff-card__edge--r" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <div class="diff-card__box">
+        <div class="diff-card__media" aria-hidden="true" style="background-image:url('/assets/images/ICUAR V27 brochure 03 20.webp');background-size:cover;background-position:center"></div>
+        <div class="diff-card__body">
+          <h4>Insurance Programs</h4>
+          <p>Flexible insurance solutions built around your lifestyle, offering simple, reliable protection wherever you go.</p>
+          <a href="/services/programs" class="diff-card__link btn btn--dark btn--sm btn--arrow">Explore Insurance Programs <span class="arrow">→</span></a>
+        </div>
       </div>
     </div>
   </div>
@@ -334,8 +351,10 @@
     </div>
 
     <!-- Hover image preview — left side -->
+    <!-- src matches the first .usp-row's data-img so the idle preview is
+         correct before JS runs (initUspList keeps it in sync after that) -->
     <div class="usp-preview" id="uspPreview" aria-hidden="true">
-      <img src="" alt="">
+      <img src="/assets/images/iCAUR INTL_V27 REV_cam027 copy.webp" alt="" loading="lazy">
     </div>
   </div>
 </section>
@@ -459,7 +478,7 @@
   <div class="cta-video__glass reveal reveal--up">
     <span class="cta-video__dash" aria-hidden="true"></span>
     <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
-    <p class="cta-video__body">The V27 is waiting — let's get you behind the wheel and show you what electric really means.</p>
+    <p class="cta-video__body">Your next car is waiting — let's get you behind the wheel and show you what electric really means.</p>
     <div class="cta-video__actions">
       <a href="/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
       <a href="/contact" class="btn btn--outline btn--arrow btn--magnetic">Contact Us <span class="arrow">→</span></a>

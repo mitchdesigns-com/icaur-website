@@ -93,14 +93,11 @@ function splitHeadlineLetters(headline) {
 
 
 // ============================================================
-// CUSTOM CURSOR — dot + ring with spring-physics lag
+// CUSTOM CURSOR — brand arrow, tracking the pointer 1:1
 // ============================================================
 (function initCursor() {
   const cursor = $('#cursor');
-  const dot    = $('#cursorDot');
-  const ring   = $('#cursorRing');
-  const label  = $('#cursorLabel');
-  if (!cursor || !dot || !ring) return;
+  if (!cursor) return;   // the arrow is built here — no dot/ring needed
 
   // Only on devices with a fine pointer (mouse)
   if (!window.matchMedia('(pointer: fine)').matches) {
@@ -109,142 +106,79 @@ function splitHeadlineLetters(headline) {
     return;
   }
 
-  let mouseX = -100, mouseY = -100;
-  let ringX  = -100, ringY  = -100;
-  const RING_SPRING = 0.18;  // lower = more lag
-  let hoverEl = null;        // element the ring should fit/snap to
+  // Brand arrow, injected here so the 19 pages carrying the old
+  // dot/ring/label markup don't each need editing. The SVG ships its own
+  // colours and glow, so nothing here or in CSS restyles it — only size
+  // and the tip offset (see .cursor__arrow in styles.css).
+  cursor.insertAdjacentHTML('beforeend',
+    '<img class="cursor__arrow" src="/assets/images/cursor.svg" alt="" ' +
+    'aria-hidden="true" draggable="false">');
 
-  // RAF loop — spring physics
-  function rafLoop() {
-    let targetX = mouseX, targetY = mouseY;
-
-    if (hoverEl) {
-      const r = hoverEl.getBoundingClientRect();
-      targetX = r.left + r.width / 2;
-      targetY = r.top + r.height / 2;
-      ring.style.width  = `${r.width}px`;
-      ring.style.height = `${r.height}px`;
-      ring.style.borderRadius = getComputedStyle(hoverEl).borderRadius;
-    } else {
-      ring.style.width  = '';
-      ring.style.height = '';
-      ring.style.borderRadius = '';
-    }
-
-    // Ease ring toward target
-    ringX += (targetX - ringX) * RING_SPRING;
-    ringY += (targetY - ringY) * RING_SPRING;
-
-    // Dot and label always share the ring's position — perfectly centered
-    const transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
-    dot.style.transform   = transform;
-    ring.style.transform  = transform;
-    label.style.transform = transform;
-
-    requestAnimationFrame(rafLoop);
+  // Track the pointer 1:1 — an arrow that lags behind the real hit point
+  // reads as broken, so there's no spring smoothing here.
+  let rafId = null, mouseX = 0, mouseY = 0;
+  function paint() {
+    rafId = null;
+    cursor.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
   }
-  requestAnimationFrame(rafLoop);
-
-  // Track mouse position
   document.addEventListener('mousemove', e => {
     mouseX = e.clientX;
     mouseY = e.clientY;
     cursor.classList.add('is-visible');
+    if (!rafId) rafId = requestAnimationFrame(paint);
   }, { passive: true });
 
   document.addEventListener('mouseleave', () => cursor.classList.remove('is-visible'));
   document.addEventListener('mouseenter', () => cursor.classList.add('is-visible'));
 
-  // Hover states
-  function addHoverListeners() {
-    // Grow on links / buttons — ring morphs to fit the element
-    $$('a, button, [role="button"], .btn, label, input, textarea, select').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursor.classList.add('is-hover');
-        // FAQ questions: the ring keeps following the mouse across the
-        // row — only the plus icon itself (handled below) snaps the ring
-        if (el.matches('.faq-item__q')) return;
-        // Color swatches: keep the round cursor (a fitted ring reads as
-        // an awkward square around the tall thumbnail+label button)
-        if (el.matches('.v27-swatch')) return;
-        if (el.matches('.btn, button, [role="button"], .v27-cta-btn')) {
-          cursor.classList.add('is-fit');
-          hoverEl = el;
-        }
-      });
-      el.addEventListener('mouseleave', () => {
-        cursor.classList.remove('is-hover');
-        if (hoverEl === el) {
-          cursor.classList.remove('is-fit');
-          hoverEl = null;
-        }
-      });
-    });
+  // Press feedback — the only state the arrow keeps
+  document.addEventListener('mousedown', () => cursor.classList.add('is-pressed'));
+  document.addEventListener('mouseup',   () => cursor.classList.remove('is-pressed'));
 
-    // FAQ plus icons: the ring wraps just the icon while the mouse is on it
-    $$('.faq-item__plus').forEach(plus => {
-      plus.addEventListener('mouseenter', () => {
-        cursor.classList.add('is-fit');
-        hoverEl = plus;
-      });
-      plus.addEventListener('mouseleave', () => {
-        if (hoverEl === plus) {
-          cursor.classList.remove('is-fit');
-          hoverEl = null;
-        }
-      });
-    });
-
-    // Image hover — show label
-    $$('[data-cursor-label]').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        const txt = el.dataset.cursorLabel || '';
-        label.textContent = txt;
-        cursor.classList.add('is-label');
-      });
-      el.addEventListener('mouseleave', () => {
-        cursor.classList.remove('is-label');
-        label.textContent = '';
-      });
-    });
-
-    // Active / press state
-    document.addEventListener('mousedown', () => cursor.classList.add('is-pressed'));
-    document.addEventListener('mouseup',   () => cursor.classList.remove('is-pressed'));
+  // ── Hotspot hover + auto-contrast ──────────────────────────────
+  // No swap to a native pointer icon on hotspots (that would break the
+  // arrow illusion) — just a small scale-up so the target still reads
+  // as interactive. Separately, an actual WCAG-style contrast check
+  // against whatever's under the tip: the arrow's own amber can sit on
+  // amber buttons/chips/CTAs (this site uses --amber everywhere) where
+  // it nearly disappears, so low-contrast spots force it to a flat
+  // white silhouette instead of hand-listing "orange sections" by class.
+  function relLuminance(r, g, b) {
+    const chan = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+    return 0.2126 * chan(r) + 0.7152 * chan(g) + 0.0722 * chan(b);
   }
-  addHoverListeners();
+  function contrastRatio(l1, l2) {
+    const [a, b] = l1 > l2 ? [l1, l2] : [l2, l1];
+    return (a + 0.05) / (b + 0.05);
+  }
+  const AMBER_LUM = relLuminance(243, 112, 33);   // --amber, the arrow's own colour
+  const LOW_CONTRAST_THRESHOLD = 2.3;             // below this, amber-on-amber is unreadable
 
-  // Real-time cursor contrast — sample background luminance under cursor
-  function parseBgRgb(str) {
-    const m = str.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-    return m ? [+m[1], +m[2], +m[3]] : null;
-  }
-  function luminance(r, g, b) {
-    return [r, g, b].reduce((acc, c, i) => {
-      const s = c / 255;
-      const lin = s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-      return acc + lin * [0.2126, 0.7152, 0.0722][i];
-    }, 0);
-  }
-  function bgLumAt(x, y) {
+  function bgColorAt(x, y) {
     let el = document.elementFromPoint(x, y);
+    const hotEl = el;
     while (el && el !== document.documentElement) {
       const bg = getComputedStyle(el).backgroundColor;
-      if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
-        const rgb = parseBgRgb(bg);
-        if (rgb) return luminance(...rgb);
+      const m = bg && bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+      if (m && (m[4] === undefined || +m[4] > 0.4)) {
+        return { rgb: [+m[1], +m[2], +m[3]], hotEl };
       }
       el = el.parentElement;
     }
-    return 1;
+    return { rgb: [255, 255, 255], hotEl }; // no ancestor paints a background — assume light page bg
   }
-  let lastLumMs = 0;
+
+  let lastSampleMs = 0;
   document.addEventListener('mousemove', e => {
-    const now = Date.now();
-    if (now - lastLumMs < 80) return;
-    lastLumMs = now;
-    const lum = bgLumAt(e.clientX, e.clientY);
-    cursor.classList.toggle('is-dark', lum < 0.35);
+    const now = performance.now();
+    if (now - lastSampleMs < 80) return;   // elementFromPoint + style reads are not free
+    lastSampleMs = now;
+
+    const { rgb, hotEl } = bgColorAt(e.clientX, e.clientY);
+    const ratio = contrastRatio(AMBER_LUM, relLuminance(rgb[0], rgb[1], rgb[2]));
+    cursor.classList.toggle('is-low-contrast', ratio < LOW_CONTRAST_THRESHOLD);
+
+    cursor.classList.toggle('is-hotspot', !!(hotEl && hotEl.closest('.v27-hotspot-dot')));
   }, { passive: true });
 })();
 
@@ -374,6 +308,7 @@ function splitHeadlineLetters(headline) {
   const nav    = $('#nav');
   const driver = $('#heroScrollDriver'); // use driver height for sticky hero
   const hero   = $('#hero');
+  const footer = $('#footer');
   if (!nav) return;
 
   const darkIds  = ['hero', 'cta', 'why-icaur'];
@@ -414,8 +349,29 @@ function splitHeadlineLetters(headline) {
     }
   }
 
-  window.addEventListener('scroll', updateNav, { passive: true });
+  /* Fade the nav out while the footer scrolls in — gone by the time
+     the footer fills the viewport, so the fixed bar doesn't sit over
+     the newsletter form / game canvas at the very end of the page. */
+  function updateNavFooterFade() {
+    if (!footer) return;
+    const vh = window.innerHeight;
+    const top = footer.getBoundingClientRect().top;
+    // 0 while the footer is still below the fold … 1 once its top edge
+    // has scrolled up past the top of the screen
+    const progress = Math.max(0, Math.min(1, (vh - top) / vh));
+    const opacity = 1 - progress;
+    nav.style.opacity = opacity.toFixed(3);
+    nav.style.pointerEvents = opacity < 0.05 ? 'none' : '';
+  }
+
+  function onScroll() {
+    updateNav();
+    updateNavFooterFade();
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', updateNavFooterFade, { passive: true });
   updateNav();
+  updateNavFooterFade();
 })();
 
 
@@ -633,20 +589,11 @@ function splitHeadlineLetters(headline) {
       step.style.opacity = String(opacity);
       step.classList.toggle('is-active', opacity > 0.5);
 
-      // Orange mask-wipe tied to the entrance fade
-      let localP;
-      if (p <= segStart)            localP = 0;
-      else if (p < segStart + FADE) localP = (p - segStart) / FADE;
-      else                           localP = 1;
-
+      // Text rises in linearly with the same opacity value above — a
+      // straight 1:1 mapping (no easing curve), rather than the amber
+      // block this used to wipe across before uncovering the paragraph.
       const mask = $('.ov-mask', step);
-      if (mask) {
-        let left, width;
-        if (localP < 0.45) { left = 0; width = (localP / 0.45) * 100; }
-        else { const t = (localP - 0.45) / 0.55; left = t * 100; width = 100 - t * 100; }
-        mask.style.setProperty('--mask-left', left + '%');
-        mask.style.setProperty('--mask-width', width + '%');
-      }
+      if (mask) mask.style.transform = `translateY(${(1 - opacity) * 18}px)`;
     });
   }
 
@@ -668,7 +615,28 @@ function splitHeadlineLetters(headline) {
 
   const cards = $$('.diff__panel', stage);
   const intro = $('#diffIntro', stage);
-  const MOBILE_BREAKPOINT = 760;
+  // MUST match the stacked-layout media query in styles.css (860px) —
+  // when this sat at 760 there was a 761–860 dead zone where CSS had
+  // already stacked the panels but the carousel JS kept writing
+  // transforms and --card-fade over them
+  const MOBILE_BREAKPOINT = 860;
+
+  // Phones (≤767 = the CSS snap-strip breakpoint): the intro used to be
+  // the strip's first SLIDE — left-aligned, with the next card peeking —
+  // which read as broken. Centered header above the strip is the ask, and
+  // that's a reparent, not a restyle: the intro moves out of the stage on
+  // phones and back in as the first panel on anything wider.
+  const viewport = stage.parentElement; // .diff__viewport
+  function placeIntro() {
+    if (!intro || !viewport) return;
+    if (window.innerWidth <= 767) {
+      if (intro.parentElement === stage) viewport.parentNode.insertBefore(intro, viewport);
+    } else {
+      if (intro.parentElement !== stage) stage.insertBefore(intro, stage.firstChild);
+    }
+  }
+  placeIntro();
+  window.addEventListener('resize', placeIntro);
 
   // Play the headline's entrance animation once, when the section
   // first scrolls into view
@@ -689,7 +657,10 @@ function splitHeadlineLetters(headline) {
 
   function tick() {
     if (window.innerWidth <= MOBILE_BREAKPOINT) {
-      cards.forEach(card => { card.style.transform = ''; card.style.opacity = ''; card.style.zIndex = ''; });
+      cards.forEach(card => {
+        card.style.transform = ''; card.style.opacity = ''; card.style.zIndex = '';
+        card.style.removeProperty('--card-fade');
+      });
       return;
     }
 
@@ -707,10 +678,24 @@ function splitHeadlineLetters(headline) {
       const offset = i - virtualIndex;
       const abs    = Math.abs(offset);
       const scale  = Math.max(1 - abs * 0.18, 0.55);
-      const opacity = Math.max(1 - abs * 0.55, 0);
+      // Side panels stay clearly readable at the stage edges (coverflow
+      // style) instead of fading out almost immediately — they carry the
+      // 3D lego flank, so they need to be seen while angled
+      const opacity = Math.max(1 - abs * 0.38, 0);
 
-      card.style.transform = `translateX(${offset * spacing}px) translateZ(${-abs * 160}px) rotateY(${-offset * 28}deg) scale(${scale})`;
-      card.style.opacity   = opacity.toString();
+      // 38° keeps the lego edge slabs visibly presented to the camera
+      // while a card is off-centre
+      card.style.transform = `translateX(${offset * spacing}px) translateZ(${-abs * 160}px) rotateY(${-offset * 38}deg) scale(${scale})`;
+      // Media cards must not carry opacity themselves — it's a grouping
+      // property that flattens their preserve-3d and kills the lego edge
+      // slabs. Their fade rides the --card-fade var (box + edges consume
+      // it); the intro panel has no 3D children so plain opacity is fine.
+      if (card.classList.contains('diff-card')) {
+        card.style.setProperty('--card-fade', opacity.toFixed(3));
+        card.style.opacity = '';
+      } else {
+        card.style.opacity = opacity.toString();
+      }
       card.style.zIndex    = Math.round(100 - abs * 10).toString();
     });
   }
@@ -730,8 +715,8 @@ function splitHeadlineLetters(headline) {
       const r   = btn.getBoundingClientRect();
       const cx  = r.left + r.width  / 2;
       const cy  = r.top  + r.height / 2;
-      const dx  = (e.clientX - cx) * 0.28;
-      const dy  = (e.clientY - cy) * 0.28;
+      const dx  = (e.clientX - cx) * 0.22;
+      const dy  = (e.clientY - cy) * 0.22;
       btn.style.transform = `translate(${dx}px, ${dy}px)`;
     });
 
@@ -802,6 +787,18 @@ function splitHeadlineLetters(headline) {
     preview.style.top = (rowRect.top - wrapRect.top + rowRect.height / 2) + 'px';
   };
 
+  // Idle state: show the first row's image centred on the stack, so the
+  // section doesn't open on empty space. Inline top from a previous hover
+  // is cleared so the CSS top:50% centring takes over again.
+  const rest = () => {
+    preview.classList.remove('is-active');
+    preview.style.top = '';
+    if (rows[0] && img.getAttribute('src') !== rows[0].dataset.img) {
+      img.src = rows[0].dataset.img;
+    }
+  };
+  rest();
+
   rows.forEach(row => {
     row.addEventListener('mouseenter', () => {
       if (img.getAttribute('src') !== row.dataset.img) img.src = row.dataset.img;
@@ -814,7 +811,7 @@ function splitHeadlineLetters(headline) {
       preview.classList.add('is-active');
     });
   });
-  stack.addEventListener('mouseleave', () => preview.classList.remove('is-active'));
+  stack.addEventListener('mouseleave', rest);
 })();
 
 
@@ -827,36 +824,49 @@ function splitHeadlineLetters(headline) {
   const reveal = hero.querySelector('.spot-hero__reveal');
   if (!reveal) return;
 
+  // Image build: .spot-hero__reveal is the BRIGHT layer, fully dark
+  // underneath at rest — a cursor-follow flashlight fades it in/out.
+  // Video build: there's only one (bright) video, so .spot-hero__reveal
+  // is instead a DIM layer over it (--r is its mask hole's radius, kept
+  // at 0 — no interactive reveal here, just a flat, permanent dim).
+  const isVideo = hero.classList.contains('spot-hero--video');
+
   // Touch devices: no cursor — show the reveal layer as a gentle
   // roaming spotlight instead of hiding the effect entirely.
   const fine = window.matchMedia('(pointer: fine)').matches;
 
   let mx = -999, my = -999;   // raw target
   let sx = -999, sy = -999;   // smoothed
+  let targetR = 0, r = 0;     // video build's hole radius
 
-  if (fine) {
+  if (isVideo) {
+    // Flashlight removed — the reveal layer stays a flat, permanent dim
+    // over the video (its mask hole never opens: --r stays 0). No mouse
+    // or touch listeners attached at all — static on every input type.
+    reveal.style.setProperty('--r', '0px');
+  } else if (fine) {
     // Fade the light in/out at the edges instead of dragging it away —
     // a position of -999 would streak the circle across the image.
     reveal.style.opacity = '0';
     reveal.style.transition = 'opacity .45s ease';
     hero.addEventListener('mouseenter', e => {
-      const r = hero.getBoundingClientRect();
-      // snap to the entry point so the light doesn't travel from its old spot
-      mx = sx = e.clientX - r.left;
-      my = sy = e.clientY - r.top;
+      const rect = hero.getBoundingClientRect();
+      // snap to entry point so the light doesn't travel from its old spot
+      mx = sx = e.clientX - rect.left;
+      my = sy = e.clientY - rect.top;
       reveal.style.opacity = '1';
     });
     hero.addEventListener('mousemove', e => {
-      const r = hero.getBoundingClientRect();
-      mx = e.clientX - r.left;
-      my = e.clientY - r.top;
+      const rect = hero.getBoundingClientRect();
+      mx = e.clientX - rect.left;
+      my = e.clientY - rect.top;
       reveal.style.opacity = '1';
     }, { passive: true });
     hero.addEventListener('mouseleave', () => {
       reveal.style.opacity = '0';   // dim in place, no run-away
     });
   } else {
-    // slow autonomous drift for touch screens
+    // slow autonomous drift for touch screens (image build only)
     let t = 0;
     setInterval(() => {
       t += 0.02;
@@ -870,6 +880,10 @@ function splitHeadlineLetters(headline) {
     sy += (my - sy) * 0.1;
     reveal.style.setProperty('--sx', sx.toFixed(1) + 'px');
     reveal.style.setProperty('--sy', sy.toFixed(1) + 'px');
+    if (isVideo) {
+      r += (targetR - r) * 0.12;
+      reveal.style.setProperty('--r', r.toFixed(1) + 'px');
+    }
     requestAnimationFrame(loop);
   })();
 })();
@@ -1585,6 +1599,8 @@ document.addEventListener('click', e => {
   }
 
   const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+  const ss    = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
+  const seg   = (p, a, b) => ss((p - a) / (b - a));
 
   function progress() {
     const rect = driver.getBoundingClientRect();
@@ -1592,22 +1608,69 @@ document.addEventListener('click', e => {
     return clamp(-rect.top / scrollable, 0, 1);
   }
 
+  /* ── Reference choreography (client video, serverobotics.com) ──
+     The title holds centered exactly as it enters, then on scroll it
+     SWELLS toward the camera while blurring away into a soft wash —
+     staying as a faint ghost behind — while the statement writes
+     itself word by word over it. No horizontal sweep. */
+  const statement = stage.querySelector('.mission-statement');
+  const stText    = statement && statement.querySelector('.mission-statement__text');
+
+  // Word units to reveal. On fine-pointer devices initVariableProximity
+  // has already split the statement into .vp-word spans (it runs before
+  // this IIFE) — reuse those so the two effects share one DOM. On touch
+  // it never runs, so fall back to a plain word wrap that preserves
+  // inline elements like the <em>.
+  let msWords = stText ? [...stText.querySelectorAll('.vp-word')] : [];
+  if (stText && !msWords.length) {
+    (function wrap(root) {
+      [...root.childNodes].forEach(node => {
+        if (node.nodeType === 1) { wrap(node); return; }
+        if (node.nodeType !== 3) return;
+        const frag = document.createDocumentFragment();
+        (node.textContent || '').split(/(\s+)/).forEach(part => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
+          const w = document.createElement('span');
+          w.className = 'ms-word';
+          w.textContent = part;
+          frag.appendChild(w);
+          msWords.push(w);
+        });
+        root.replaceChild(frag, node);
+      });
+    })(stText);
+  }
+
   function tick() {
     if (window.innerWidth <= MOBILE) {
-      cards.forEach(c => { c.style.transform = ''; c.style.opacity = ''; c.style.zIndex = ''; });
+      cards.forEach(c => { c.style.transform = ''; c.style.opacity = ''; c.style.zIndex = ''; c.style.filter = ''; });
+      msWords.forEach(w => { w.style.opacity = ''; });
       return;
     }
     const p = progress();
-    const vi = p * (cards.length - 1);
-    const spacing = Math.max(stage.getBoundingClientRect().width * 0.62, 240);
-    cards.forEach((card, i) => {
-      const offset = i - vi, abs = Math.abs(offset);
-      const scale = Math.max(1 - abs * 0.18, 0.62);
-      card.style.transform = `translateX(${offset * spacing}px) translateZ(${-abs * 160}px) rotateY(${-offset * 28}deg) scale(${scale})`;
-      // intro fully fades out before the statement fades in (no overlap)
-      const op = i === 0 ? clamp((0.55 - p) / 0.30, 0, 1) : clamp((p - 0.45) / 0.30, 0, 1);
-      card.style.opacity = op.toString();
-      card.style.zIndex = Math.round(100 - abs * 10).toString();
+
+    // Title: as-is while entering, then scales up + blurs into a ghost
+    if (intro) {
+      const g = seg(p, 0.05, 0.55);
+      intro.style.transform = `translateX(0px) scale(${(1 + g * 2.2).toFixed(3)})`;
+      intro.style.filter    = `blur(${(g * 24).toFixed(1)}px)`;
+      intro.style.opacity   = (1 - seg(p, 0.10, 0.55) * 0.88).toFixed(3);
+      intro.style.zIndex    = '1';
+    }
+
+    // Statement: fixed centered over the ghost; the WORDS carry the
+    // reveal — each fades in on its own slice of the scroll, so the
+    // paragraph types itself with a soft frontier like the reference
+    if (statement) {
+      statement.style.transform = 'translateX(0px)';
+      statement.style.opacity   = '1';
+      statement.style.zIndex    = '2';
+    }
+    const n = msWords.length || 1;
+    msWords.forEach((w, i) => {
+      const wStart = 0.28 + (i / n) * 0.55;
+      w.style.opacity = seg(p, wStart, wStart + 0.12).toFixed(3);
     });
   }
 
