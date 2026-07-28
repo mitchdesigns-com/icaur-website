@@ -205,11 +205,13 @@
                 <option value="o3t">iCAUR O3T</option>
               </select>
             </div>
-            <!-- date pickers render their own mm/dd/yyyy hint, so the label
-                 stays floated up rather than sitting on top of it -->
-            <div class="rs-field" data-label-static>
+            <!-- the native dd/mm/yyyy skeleton is hidden in CSS; .rs-date-text
+                 shows the picked date and a custom calendar panel opens under
+                 the field (initDatePickers) — same UX as the selects -->
+            <div class="rs-field rs-field--date">
               <label class="rs-label" for="rs-td-date">Preferred Date</label>
               <input class="rs-input" id="rs-td-date" type="date">
+              <span class="rs-date-text" aria-hidden="true"></span>
             </div>
           </div>
           <div class="rs-ctx-row">
@@ -263,9 +265,10 @@
               <label class="rs-label" for="rs-mt-mileage">Current Mileage (km)</label>
               <input class="rs-input" id="rs-mt-mileage" type="number" min="0" step="1" inputmode="numeric">
             </div>
-            <div class="rs-field" data-label-static>
+            <div class="rs-field rs-field--date">
               <label class="rs-label" for="rs-mt-date">Preferred Date</label>
               <input class="rs-input" id="rs-mt-date" type="date">
+              <span class="rs-date-text" aria-hidden="true"></span>
             </div>
           </div>
         </div>
@@ -374,10 +377,10 @@
     if (d) d.min = today;
   });
 
-  /* ── Floating labels (text inputs) ──
-        [data-label-static] keeps the label floated up permanently — date
-        inputs paint their own mm/dd/yyyy hint, which the resting label
-        would otherwise sit on top of. */
+  /* ── Floating labels (text inputs, incl. dates) ──
+        Date fields behave like every other field now: the native
+        dd/mm/yyyy skeleton is hidden in CSS, so the label can rest over
+        an empty field and spring up once a date is picked. */
   document.querySelectorAll('.rs-field').forEach(function (wrap) {
     var input = wrap.querySelector('.rs-input');
     if (!input) return;
@@ -385,13 +388,11 @@
     function refresh() {
       wrap.classList.toggle('is-active',
         pinned || document.activeElement === input || input.value.length > 0);
-      // date inputs always render their dd/mm/yyyy skeleton — .has-value
-      // is what tells CSS a real date was picked vs. that hint showing
-      if (input.type === 'date') wrap.classList.toggle('has-value', input.value.length > 0);
     }
     input.addEventListener('focus', refresh);
     input.addEventListener('blur', refresh);
     input.addEventListener('input', refresh);
+    input.addEventListener('change', refresh);
     refresh();
   });
 
@@ -495,6 +496,175 @@
         if (openHit === hit) { closePanel(); return; }
         closePanel();
         buildPanel(select, hit);
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!openPanel || openPanel.contains(e.target) || e.target === openHit) return;
+      closePanel();
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePanel(); });
+    window.addEventListener('scroll', closePanel, { passive: true });
+    window.addEventListener('resize', closePanel, { passive: true });
+  })();
+
+  /* ── Date pickers ──────────────────────────────────────────────
+     Same deal as the compact dropdowns above: the native control stays
+     the source of truth (and keyboard/AT users keep its own picker via
+     Tab + typing), while a tabindex="-1" hit-button over the field
+     opens OUR calendar panel for mouse users, so picking a date feels
+     identical to picking from a select. */
+  (function initDatePickers() {
+    var MONTHS = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+    var MON    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var DOWS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+    var openPanel = null, openHit = null;
+
+    function iso(y, m, d) {
+      return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    }
+    function pretty(value) {                       // "2026-07-28" → "28 Jul 2026"
+      var p = value.split('-');
+      if (p.length !== 3) return '';
+      return Number(p[2]) + ' ' + MON[Number(p[1]) - 1] + ' ' + p[0];
+    }
+
+    function closePanel() {
+      if (!openPanel) return;
+      var p = openPanel;
+      p.classList.remove('is-open');
+      setTimeout(function () { if (p.parentNode) p.parentNode.removeChild(p); }, 160);
+      if (openHit) openHit.setAttribute('aria-expanded', 'false');
+      openPanel = null; openHit = null;
+    }
+
+    document.querySelectorAll('.rs-field--date').forEach(function (wrap) {
+      var input = wrap.querySelector('input[type="date"]');
+      var text  = wrap.querySelector('.rs-date-text');
+      if (!input || !text) return;
+
+      function syncText() { text.textContent = pretty(input.value); }
+      input.addEventListener('change', syncText);
+      syncText();
+
+      var hit = document.createElement('button');
+      hit.type = 'button';
+      hit.className = 'rs-select-hit';
+      hit.tabIndex = -1;
+      hit.setAttribute('aria-hidden', 'true');
+      hit.setAttribute('aria-expanded', 'false');
+      wrap.appendChild(hit);
+
+      function buildPanel() {
+        var panel = document.createElement('div');
+        panel.className = 'rs-select-panel rs-date-panel';
+
+        /* min: today (set above) — earlier days are disabled, and the
+           month the calendar opens on never sits below it */
+        var minParts = (input.min || '').split('-');
+        var minY = minParts.length === 3 ? Number(minParts[0]) : null;
+        var minM = minParts.length === 3 ? Number(minParts[1]) - 1 : null;
+        var minD = minParts.length === 3 ? Number(minParts[2]) : null;
+
+        var cur = input.value ? input.value.split('-').map(Number) : null;
+        var view = cur ? { y: cur[0], m: cur[1] - 1 }
+                       : (minY !== null ? { y: minY, m: minM } : null);
+        if (!view) {                                  // no value, no min
+          var n = new Date();
+          view = { y: n.getFullYear(), m: n.getMonth() };
+        }
+
+        var todayStr = input.min || '';
+
+        function render() {
+          panel.innerHTML = '';
+
+          var head = document.createElement('div');
+          head.className = 'rs-date-head';
+          var prev = document.createElement('button');
+          prev.type = 'button'; prev.className = 'rs-date-nav';
+          prev.textContent = '‹'; prev.setAttribute('aria-label', 'Previous month');
+          if (minY !== null && (view.y < minY || (view.y === minY && view.m <= minM))) prev.disabled = true;
+          var title = document.createElement('span');
+          title.className = 'rs-date-title';
+          title.textContent = MONTHS[view.m] + ' ' + view.y;
+          var next = document.createElement('button');
+          next.type = 'button'; next.className = 'rs-date-nav';
+          next.textContent = '›'; next.setAttribute('aria-label', 'Next month');
+          prev.addEventListener('click', function () {
+            view.m--; if (view.m < 0) { view.m = 11; view.y--; } render();
+          });
+          next.addEventListener('click', function () {
+            view.m++; if (view.m > 11) { view.m = 0; view.y++; } render();
+          });
+          head.appendChild(prev); head.appendChild(title); head.appendChild(next);
+          panel.appendChild(head);
+
+          var dows = document.createElement('div');
+          dows.className = 'rs-date-dows';
+          DOWS.forEach(function (d) {
+            var s = document.createElement('span'); s.textContent = d; dows.appendChild(s);
+          });
+          panel.appendChild(dows);
+
+          var grid = document.createElement('div');
+          grid.className = 'rs-date-grid';
+          var firstDow = new Date(view.y, view.m, 1).getDay();
+          var days     = new Date(view.y, view.m + 1, 0).getDate();
+          for (var i = 0; i < firstDow; i++) {
+            var pad = document.createElement('span');
+            pad.className = 'rs-date-day rs-date-day--pad';
+            grid.appendChild(pad);
+          }
+          for (var d = 1; d <= days; d++) {
+            var value = iso(view.y, view.m, d);
+            var cell = document.createElement('button');
+            cell.type = 'button';
+            cell.className = 'rs-date-day';
+            cell.textContent = d;
+            if (value === input.value) cell.classList.add('is-selected');
+            if (value === todayStr)    cell.classList.add('is-today');
+            if (minY !== null && value < iso(minY, minM, minD)) cell.disabled = true;
+            cell.addEventListener('click', function (ev) {
+              input.value = ev.currentTarget.dataset.value;
+              input.dispatchEvent(new Event('input',  { bubbles: true }));
+              input.dispatchEvent(new Event('change', { bubbles: true }));
+              closePanel();
+            });
+            cell.dataset.value = value;
+            grid.appendChild(cell);
+          }
+          panel.appendChild(grid);
+        }
+        render();
+
+        document.body.appendChild(panel);
+
+        var r  = hit.getBoundingClientRect();
+        var vh = window.innerHeight;
+        var spaceBelow = vh - r.bottom;
+        var spaceAbove = r.top;
+        var openUp = spaceBelow < 300 && spaceAbove > spaceBelow;
+
+        panel.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 296)) + 'px';
+        if (openUp) {
+          panel.classList.add('rs-select-panel--up');
+          panel.style.bottom = (vh - r.top + 6) + 'px';
+        } else {
+          panel.style.top = (r.bottom + 6) + 'px';
+        }
+
+        requestAnimationFrame(function () { panel.classList.add('is-open'); });
+        hit.setAttribute('aria-expanded', 'true');
+        openPanel = panel; openHit = hit;
+      }
+
+      hit.addEventListener('click', function () {
+        if (openHit === hit) { closePanel(); return; }
+        closePanel();
+        buildPanel();
       });
     });
 

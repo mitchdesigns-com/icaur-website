@@ -15,9 +15,16 @@
   hosts.forEach(setup);
 
   function setup(host) {
+    /* per-host overrides: data-df-from / data-df-to (dot gradient CSS
+       colours) and data-df-glow ("r,g,b" triplet) — a soft cursor glow
+       drawn in the HOST BACKGROUND's own colour, so the hover reads as
+       a spotlight rather than introducing a new hue */
     const cfg = {
       dotRadius: 2.6, dotSpacing: 17, cursorRadius: 320, bulgeStrength: 48,
-      gradientFrom: 'rgba(255,255,255,0.55)', gradientTo: 'rgba(255,255,255,0.18)',
+      gradientFrom: host.dataset.dfFrom || 'rgba(255,255,255,0.55)',
+      gradientTo:   host.dataset.dfTo   || 'rgba(255,255,255,0.18)',
+      glowRGB:      host.dataset.dfGlow || null,
+      glowRadius:   170,
     };
 
     const canvas = document.createElement('canvas');
@@ -93,6 +100,17 @@
         ctx.arc(d.sx, d.sy, rad, 0, TWO_PI);
       }
       ctx.fill();
+
+      /* cursor glow in the host background's own colour — dots melt
+         into the background near the pointer, no extra hue */
+      if (cfg.glowRGB && eng > 0.01) {
+        const gr = cfg.glowRadius;
+        const g2 = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, gr);
+        g2.addColorStop(0, `rgba(${cfg.glowRGB},${(eng * 0.9).toFixed(3)})`);
+        g2.addColorStop(1, `rgba(${cfg.glowRGB},0)`);
+        ctx.fillStyle = g2;
+        ctx.fillRect(m.x - gr, m.y - gr, gr * 2, gr * 2);
+      }
       raf = requestAnimationFrame(tick);
     }
 

@@ -2,6 +2,13 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "biography",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "/Users/markamir/Documents/GitHub/biography website", "run", "dev", "--", "--port", "5175", "--strictPort"],
+      "port": 5175,
+      "autoPort": false
+    },
+    {
       "name": "icaur-website",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", ".", "-l", "3000"],
@@ -20,6 +27,20 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "/Users/markamir/Documents/GitHub/Abu Auf - Redesign", "-l", "8877"],
       "port": 8877,
+      "autoPort": false
+    },
+    {
+      "name": "abuauf",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "serve",
+        "/Users/markamir/Documents/GitHub/Abuauf order-base-ecommerce/static-export",
+        "-l",
+        "8000",
+        "-c",
+        "/private/tmp/claude-501/-Users-markamir-Documents-GitHub-icaure-website/216bfa39-da82-4016-8aec-13fab2273c91/scratchpad/serve.json"
+      ],
+      "port": 8000,
       "autoPort": false
     }
   ]

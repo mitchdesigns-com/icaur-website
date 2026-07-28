@@ -12,8 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
 
-  <!-- Three.js importmap — same pins as the V27 page, for the
-       mission/vision 3D cinema (js/about-cinema.js) -->
+  <!-- Three.js importmap — for the mission/vision car crossing (js/about-mv.js) -->
   <script type="importmap">
   {
     "imports": {
@@ -173,28 +172,62 @@
   </div>
 </section>
 
+<!-- ═══════ VISION + MISSION — statement scroll + car crossing ═══════
+     Two-chapter scroll-scrubbed sequence (js/about-mv.js), after the
+     serverobotics.com reference: the brand dash mark opens centred,
+     scales + blurs away; the VISION title and statement build; then
+     the carbon-black V27 GLB drives in from the right, crosses the
+     stage and stops facing the camera; the MISSION title appears, the
+     car tips over the "bridge edge" and drives straight down while
+     shrinking; the mission statement then builds over it and the car
+     parks small in top view beneath. Every value is a pure function of
+     scroll progress → fully reversible (DOM order = chapter order, so
+     the reduced-motion fallback reads Vision → Mission too). -->
+<div class="mv-driver" id="mvDriver">
+<section class="mv" id="missionSection" aria-label="Our vision and mission">
+  <div class="mv__stage">
+
+    <div class="mv__mark" id="mvMark" aria-hidden="true"></div>
+    <canvas id="mvCanvas" aria-hidden="true"></canvas>
+
+    <div class="mv__panel mv__panel--vision" id="mvVision">
+      <span class="mv__ghost" aria-hidden="true">Vision</span>
+      <div class="mv__inner">
+        <h2 class="mv__title">Our <em>Vision</em></h2>
+        <p class="mv__statement" data-mv-split>To put Egypt on the <em>global stage</em> of electric mobility — engineering vehicles that don't just compete with the world's best, but <em>define what's next</em> for an entire generation.</p>
+      </div>
+    </div>
+
+    <div class="mv__panel mv__panel--mission" id="mvMission">
+      <span class="mv__ghost" aria-hidden="true">Mission</span>
+      <div class="mv__inner">
+        <h2 class="mv__title">Our <em>Mission</em></h2>
+        <p class="mv__statement" data-mv-split>We exist to put <em>Egypt</em> on the global <em>EV map</em> — engineering world-class electric vehicles at home, for the heat, the highways, and the people who drive them.</p>
+        <p class="mv__tail" data-mv-split>Mobility, <em>reimagined</em> for real life.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+</div>
+
 <!-- ═══════ BRAND VALUES — interactive (client A1) ═══════ -->
 <section class="section usp-list usp-list--dark" id="values">
   <div class="container usp-list__wrap">
     <p class="eyebrow eyebrow--warm reveal reveal--up">What We Stand For</p>
-    <h2 class="section-title section-title--light reveal reveal--up" data-delay="1">Built <em>Different.</em> On Purpose.</h2>
+    <h2 class="section-title section-title--light reveal reveal--up" data-delay="1">Built Different. On Purpose.</h2>
 
     <div class="usp-list__stack" id="uspStack">
-      <div class="usp-row" tabindex="0" data-img="/assets/images/v27/v27-01.webp">
-        <span class="usp-row__title">Bold</span>
-        <span class="usp-row__tag">Designed to stand out &mdash; and stay unforgettable.</span>
-      </div>
-      <div class="usp-row" tabindex="0" data-img="/assets/images/v27/interior-display.webp">
-        <span class="usp-row__title">Fun</span>
-        <span class="usp-row__tag">Driving should feel like play, every time.</span>
-      </div>
+      <!-- core values: the word alone (amber → white on hover) and the
+           preview image swap; no hover caption pill here -->
       <div class="usp-row" tabindex="0" data-img="/assets/images/v27/v27-26.webp">
         <span class="usp-row__title">Daring</span>
-        <span class="usp-row__tag">We take the roads others avoid.</span>
+      </div>
+      <div class="usp-row" tabindex="0" data-img="/assets/images/v27/interior-display.webp">
+        <span class="usp-row__title">Self-Expressive</span>
       </div>
       <div class="usp-row" tabindex="0" data-img="/assets/images/about-hero.webp">
-        <span class="usp-row__title">Liberating</span>
-        <span class="usp-row__tag">Electric freedom &mdash; no permission needed.</span>
+        <span class="usp-row__title">Freedom</span>
       </div>
     </div>
 
@@ -202,40 +235,10 @@
     <!-- src matches the first .usp-row's data-img so the idle preview is
          correct before JS runs (initUspList keeps it in sync after that) -->
     <div class="usp-preview" id="uspPreview" aria-hidden="true">
-      <img src="/assets/images/v27/v27-01.webp" alt="" loading="lazy">
+      <img src="/assets/images/v27/v27-26.webp" alt="" loading="lazy">
     </div>
   </div>
 </section>
-
-<!-- ═══════ MISSION + VISION — 3D cinematic scroll ═══════
-     One continuous scroll-scrubbed drone sequence (js/about-cinema.js):
-     the V27 GLB standing in the desert plate (model-bg.webp) → camera
-     starts far top-down, orbits down to the side (car framed right,
-     MISSION scales up + writes itself) → swings around to the rear
-     (tailgate swings open, car framed left, VISION on the right).
-     Fully reversible (pure function of scroll); mobile runs the same
-     cut centred. Reduced-motion: CSS swaps in a static fallback. -->
-<div class="cinema-driver" id="cinemaDriver">
-<section class="cinema" id="missionSection" aria-label="Our mission and vision">
-  <div class="cinema__stage" id="cinemaStage">
-    <canvas id="cinemaCanvas" aria-hidden="true"></canvas>
-
-    <div class="cinema__overlay cinema__overlay--mission" id="cinMission">
-      <div class="cinema__card">
-        <h2 class="cinema__h">Our <em>Mission</em></h2>
-        <p class="cinema__par" id="cinMissionPar">We exist to put Egypt on the global EV map — engineering world-class electric vehicles at home, for the heat, the highways, and the people who drive them. <em>Mobility, reimagined for real life.</em></p>
-      </div>
-    </div>
-
-    <div class="cinema__overlay cinema__overlay--vision" id="cinVision">
-      <div class="cinema__card">
-        <h2 class="cinema__h">Our <em>Vision</em></h2>
-        <p class="cinema__par" id="cinVisionPar">To put Egypt on the global stage of electric mobility — engineering vehicles that don't just compete with the world's best, but define what's next for an entire generation.</p>
-      </div>
-    </div>
-  </div>
-</section>
-</div>
 
 <!-- ═══════ CTA ═══════ -->
 <section class="cta-video" id="cta">
@@ -264,6 +267,6 @@
   <script src="/js/about-story.js" defer></script>
   <script src="/js/dot-field.js" defer></script>
   <script src="/js/doodles.js" defer></script>
-  <script type="module" src="/js/about-cinema.js"></script>
+  <script type="module" src="/js/about-mv.js"></script>
 </body>
 </html>

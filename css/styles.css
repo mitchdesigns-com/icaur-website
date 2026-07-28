@@ -2492,7 +2492,7 @@ html.pt-entering > body { opacity: 0; }
    hovered row (top set per-row by initUspList) */
 .usp-preview {
   position: absolute; left: clamp(8px, 4vw, 64px); top: 50%;
-  width: clamp(200px, 24vw, 330px); aspect-ratio: 4/3;
+  width: clamp(170px, 19vw, 260px); aspect-ratio: 4/3;
   border-radius: 16px; overflow: hidden;
   box-shadow: 0 24px 56px rgba(0, 0, 0, .28);
   /* Always visible now — idle state shows the first row's image,
@@ -2524,6 +2524,15 @@ html.pt-entering > body { opacity: 0; }
 .usp-list--dark .usp-row:focus-visible .usp-row__title { color: var(--white); }
 @media (max-width: 860px) {
   .usp-list--dark .usp-row__title { color: rgba(255, 255, 255, .5); }
+}
+/* Core values (About) — amber words that go white on hover/focus while
+   the preview image swaps. Scoped to #values so the homepage's
+   Why-iCAUR list keeps its dim-white treatment. */
+#values .usp-row__title { color: var(--amber); }
+#values .usp-row:hover .usp-row__title,
+#values .usp-row:focus-visible .usp-row__title { color: var(--white); }
+@media (max-width: 860px) {
+  #values .usp-row__title { color: var(--amber); }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -3313,6 +3322,8 @@ html.pt-entering > body { opacity: 0; }
 /* Brand figures — orange band, white content, counts up on scroll-in */
 .about-figures { background: var(--brown); color: var(--white); position: relative; overflow: hidden; }
 .about-figures .dot-field { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+/* homepage services carousel — light-black dot grid behind the cards */
+.diff .dot-field { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
 .about-figures .container { position: relative; z-index: 1; }
 .figures-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(24px, 4vw, 56px); }
 .figure { display: flex; flex-direction: column; gap: 8px; text-align: center; }
@@ -3534,92 +3545,102 @@ html.pt-entering > body { opacity: 0; }
    ═══════════════════════════════════════════════════════════ */
 
 /* ═══════════════════════════════════════════════════════════
-   MISSION + VISION 3D CINEMA (About page)
-   Scroll-scrubbed Three.js drone sequence in js/about-cinema.js.
-   The car renders on a transparent canvas over the desert plate
-   (model-bg.webp) darkened 30% for text contrast — no boxes
-   under the copy, plain type over the scene.
+   MISSION + VISION — EDITORIAL STATEMENT SCROLL (About page)
+   js/about-mv.js scrubs everything from scroll progress: giant
+   word-masked statements, ghost word, tilted photo cards, amber
+   curtain between chapters. landonorris.com/on-track energy in
+   iCAUR's own type + amber system.
    ═══════════════════════════════════════════════════════════ */
-.cinema-driver { position: relative; height: 460vh; }
-.cinema {
+.mv-driver { position: relative; height: 420vh; }
+.mv {
   position: sticky; top: 0; height: 100vh;
-  overflow: hidden; background: #0d0a07;
+  overflow: hidden; background: var(--black);
 }
-.cinema__stage, #cinemaCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-/* desert plate + 30% black overlay, behind the transparent canvas */
-.cinema__stage {
-  background:
-    linear-gradient(rgba(0, 0, 0, .30), rgba(0, 0, 0, .30)),
-    url('/assets/images/model-bg03.webp') center / cover no-repeat;
-}
-.cinema__overlay {
-  position: absolute; inset: 0; z-index: 3;
-  display: flex; align-items: center;
-  padding: 0 var(--pad-x);
-  opacity: 0;                    /* JS drives per scroll frame */
+/* soft pool of light behind the type */
+.mv::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(120% 90% at 50% 42%, rgba(255,255,255,.055), transparent 62%);
   pointer-events: none;
 }
-/* boxless copy — contrast comes from the plate overlay + text shadow */
-.cinema__card {
-  max-width: min(560px, 42vw);
-  text-align: left;
-  text-shadow: 0 2px 24px rgba(0,0,0,.45);
+.mv__stage { position: absolute; inset: 0; }
+.mv__panel {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
 }
-/* mission chapter: copy LEFT, the side shot owns the right of frame */
-.cinema__overlay--mission { justify-content: flex-start; }
-.cinema__overlay--mission .cinema__card { margin-left: clamp(24px, 6vw, 110px); }
-/* vision chapter: copy RIGHT, the rear open-gate shot owns the left */
-.cinema__overlay--vision { justify-content: flex-end; }
-.cinema__overlay--vision .cinema__card { margin-right: clamp(24px, 6vw, 110px); }
-.cinema__h {
+.mv__panel--vision { visibility: hidden; }
+.mv__inner {
+  position: relative; z-index: 2;
+  max-width: 1080px; padding: 0 var(--pad-x);
+  text-align: center;
+}
+/* the brand dash mark opens the sequence centre-stage, then scales up
+   and blurs away (JS scrubs it) */
+.mv__mark {
+  position: absolute; top: 50%; left: 50%; z-index: 3;
+  width: clamp(90px, 9vw, 140px); aspect-ratio: 34/9;
+  margin: calc(clamp(90px, 9vw, 140px) * -0.132) 0 0 calc(clamp(90px, 9vw, 140px) / -2);
+  background: url('../assets/images/dashes.svg') no-repeat center / contain;
+  will-change: transform, filter, opacity;
+  pointer-events: none;
+}
+/* the 3D car crossing lives on this transparent canvas, above the
+   ghosts (z3-) but under the statements (panels are z6) */
+#mvCanvas {
+  position: absolute; inset: 0; z-index: 4;
+  width: 100%; height: 100%;
+  opacity: 0; pointer-events: none;
+}
+/* chapter title — pops in before its statement */
+.mv__title {
   font-family: var(--f-display);
-  font-size: clamp(2rem, 4vw, 3.6rem); font-weight: 800;
-  letter-spacing: -.035em; line-height: 1.02;
-  color: var(--white); margin: 0 0 16px;
-  transform-origin: left center;   /* scales up from its anchor */
-  will-change: transform, opacity;
+  font-size: clamp(2.1rem, 4.4vw, 4rem);
+  font-weight: 900; letter-spacing: -.03em; line-height: 1;
+  color: var(--white); margin: 0 0 clamp(16px, 2.6vh, 26px);
+  opacity: 0; will-change: transform, filter, opacity;
 }
-.cinema__h em { font-style: normal; color: var(--amber); }
-.cinema__par {
-  font-size: clamp(15px, 1.35vw, 18px); line-height: 1.75;
-  color: rgba(255,255,255,.94); margin: 0;
+.mv__title em { font-style: normal; color: var(--amber); }
+.mv__statement {
+  font-family: var(--f-display);
+  font-size: clamp(1.7rem, 3.6vw, 3.3rem);
+  font-weight: 900; letter-spacing: -.03em; line-height: 1.14;
+  color: var(--white); margin: 0; text-wrap: balance;
 }
-.cinema__par em { font-style: normal; color: var(--amber); font-weight: 700; }
-/* words start invisible; about-cinema.js writes them in with scroll */
-.cinema__par .cin-word { opacity: 0; display: inline-block; will-change: transform, opacity; }
-
-/* Mobile: same animation, framing centred */
+.mv__statement em, .mv__tail em { font-style: normal; color: var(--amber); }
+.mv__tail {
+  font-family: var(--f-display);
+  font-size: clamp(1.05rem, 1.6vw, 1.5rem); font-weight: 700;
+  color: rgba(255,255,255,.72);
+  margin: clamp(16px, 2.6vh, 26px) 0 0;
+}
+/* words pop free-standing (elastic zoom in JS) — no clipping masks */
+.mv-w { display: inline-block; opacity: 0; will-change: transform, opacity; }
+/* oversized SOLID ghost word — zooms + de-blurs in (JS drives it) */
+.mv__ghost {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--f-display); font-weight: 900;
+  font-size: clamp(150px, 30vw, 440px); line-height: 1;
+  letter-spacing: -.04em; text-transform: uppercase;
+  color: rgba(255, 255, 255, .06);
+  opacity: 0;
+  white-space: nowrap; user-select: none; pointer-events: none;
+  will-change: transform, filter, opacity;
+}
+/* statements read above the car canvas */
+.mv__panel { z-index: 6; }
 @media (max-width: 860px) {
-  .cinema__overlay,
-  .cinema__overlay--mission,
-  .cinema__overlay--vision { justify-content: center; }
-  .cinema__overlay--mission .cinema__card,
-  .cinema__overlay--vision .cinema__card {
-    margin: 0; max-width: min(520px, 88vw); text-align: center;
-  }
-  .cinema__h { transform-origin: center center; }
-  /* keep the copy clear of the car in portrait framing (and clear of
-     the floating header pill at the top) */
-  .cinema__overlay--mission { align-items: flex-start; padding-top: clamp(150px, 22vh, 240px); }
-  .cinema__overlay--vision  { align-items: flex-end;   padding-bottom: 12vh; }
+  .mv__statement { font-size: clamp(1.45rem, 6.4vw, 2.2rem); }
+  .mv__ghost { font-size: 34vw; }
 }
-
-/* Static fallback — reduced motion gets plain stacked sections;
-   the 3D module bails and never renders */
-@media (prefers-reduced-motion: reduce) {
-  .cinema-driver { height: auto; }
-  .cinema { position: static; height: auto; overflow: visible; background: var(--black); }
-  .cinema__stage { position: static; }
-  #cinemaCanvas { display: none; }
-  .cinema__overlay {
-    position: static; opacity: 1 !important;
-    padding: var(--sp-48) var(--pad-x);
-  }
-  .cinema__overlay--vision { padding-top: 0; }
-  .cinema__card { transform: none !important; }
-  .cinema__h { transform: none !important; opacity: 1 !important; }
-  .cinema__par .cin-word { opacity: 1 !important; transform: none !important; }
-}
+/* Static fallback — reduced motion (js/about-mv.js adds .mv--static) */
+.mv--static { height: auto; }
+.mv--static .mv { position: static; height: auto; }
+.mv--static .mv__stage { position: static; }
+.mv--static .mv__panel { position: static; visibility: visible !important; padding: var(--sp-48) 0; }
+.mv--static .mv-w { opacity: 1 !important; transform: none !important; }
+.mv--static .mv__title { opacity: 1 !important; transform: none !important; filter: none !important; }
+.mv--static .mv__ghost,
+.mv--static .mv__mark, .mv--static #mvCanvas { display: none; }
 
 /* Tall driver — 100vh overlap + 200vh net scroll */
 .vision-driver {
@@ -4030,13 +4051,76 @@ html.pt-entering > body { opacity: 0; }
   -webkit-appearance: none;
 }
 .rs-input::placeholder { color: transparent; }
-/* Native date text ("dd/mm/yyyy") renders unconditionally — unlike a
-   text input, there's no empty state to hide it in — so it inherited
-   .rs-input's near-black colour and read as an already-filled field.
-   Stay light until initSpotHero-style JS marks the field .has-value. */
-.rs-input[type="date"] { color: rgba(35,24,21,.4); }
-.rs-field.has-value .rs-input[type="date"] { color: #0A0A0A; }
-.rs-input[type="date"]::-webkit-calendar-picker-indicator { opacity: .55; }
+/* ── Date fields — dropdown-style experience ──────────────────
+   A native [type=date] always paints its own dd/mm/yyyy skeleton in
+   the browser's styling, which read as an already-filled field and
+   couldn't carry the floating label. So the native text is made
+   invisible (the input itself stays in place, focusable, and remains
+   the form's source of truth) and .rs-date-text renders the chosen
+   date in the site's own type. Mouse clicks land on .rs-select-hit
+   above it and open our calendar panel instead of the OS picker —
+   exactly the select pattern. */
+.rs-input[type="date"] { color: transparent; }
+.rs-input[type="date"]::-webkit-datetime-edit { opacity: 0; }
+.rs-input[type="date"]::-webkit-calendar-picker-indicator { display: none; }
+.rs-date-text {
+  position: absolute; left: 0; right: 22px; bottom: 7px;
+  font-family: var(--f-display);
+  font-size: clamp(.88rem, .8vw, .98rem);
+  font-weight: 500; letter-spacing: -.01em; line-height: 1.3;
+  color: #0A0A0A;
+  pointer-events: none; white-space: nowrap; overflow: hidden;
+}
+/* calendar glyph (the selects carry a chevron; a date field reads
+   better with its own icon), in the same muted stroke colour */
+.rs-field--date::after {
+  content: ''; position: absolute; right: 3px; bottom: 8px;
+  width: 14px; height: 14px; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='1.4' y='2.8' width='11.2' height='9.8' rx='2' stroke='%238A8480' stroke-width='1.3'/%3E%3Cpath d='M1.4 5.9h11.2' stroke='%238A8480' stroke-width='1.3'/%3E%3Cpath d='M4.6 1.4v2.6M9.4 1.4v2.6' stroke='%238A8480' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+/* Calendar panel — shares .rs-select-panel's shell (fixed position,
+   radius, shadow, open/flip animation); this adds the month grid. */
+.rs-date-panel { padding: 10px; width: 288px; }
+.rs-date-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin-bottom: 8px;
+}
+.rs-date-title {
+  font-family: var(--f-display); font-size: .82rem; font-weight: 700;
+  letter-spacing: -.005em; color: #1F0F08;
+}
+.rs-date-nav {
+  width: 26px; height: 26px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(35,24,21,.12); border-radius: 8px;
+  background: #fff; color: #1F0F08;
+  font-family: var(--f-display); font-size: .8rem; line-height: 1;
+  cursor: none; transition: background .15s, border-color .15s;
+}
+.rs-date-nav:hover { background: rgba(243,112,33,.10); border-color: rgba(243,112,33,.35); }
+.rs-date-nav[disabled] { opacity: .3; pointer-events: none; }
+.rs-date-dows, .rs-date-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+}
+.rs-date-dows span {
+  font-family: var(--f-display); font-size: .58rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(35,24,21,.38); text-align: center; padding: 4px 0 6px;
+}
+.rs-date-day {
+  aspect-ratio: 1; border: none; background: transparent;
+  border-radius: 8px;
+  font-family: var(--f-display); font-size: .78rem; font-weight: 500;
+  color: #1F0F08; cursor: none;
+  transition: background .15s, color .15s;
+}
+.rs-date-day--pad { visibility: hidden; }
+.rs-date-day:hover { background: rgba(243,112,33,.10); }
+.rs-date-day[disabled] { color: rgba(35,24,21,.24); pointer-events: none; }
+.rs-date-day.is-today { box-shadow: inset 0 0 0 1px rgba(243,112,33,.45); }
+.rs-date-day.is-selected {
+  background: var(--amber); color: var(--white); font-weight: 700;
+}
 .rs-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .rs-field-row + .rs-field { margin-top: 12px; }
 

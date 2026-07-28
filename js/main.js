@@ -780,11 +780,20 @@ function splitHeadlineLetters(headline) {
   const img  = preview.querySelector('img');
   const rows = $$('.usp-row', stack);
 
-  // Center the preview vertically on whichever row is hovered
+  // Center the preview vertically on whichever row is hovered — but
+  // clamp its travel to the stack's own band, so tracking the first or
+  // last row never pushes the image up over the section heading (or
+  // down past the list)
   const alignTo = row => {
-    const wrapRect = preview.parentElement.getBoundingClientRect();
-    const rowRect  = row.getBoundingClientRect();
-    preview.style.top = (rowRect.top - wrapRect.top + rowRect.height / 2) + 'px';
+    const wrapRect  = preview.parentElement.getBoundingClientRect();
+    const stackRect = stack.getBoundingClientRect();
+    const rowRect   = row.getBoundingClientRect();
+    const h = preview.offsetHeight;
+    let top = rowRect.top - wrapRect.top + rowRect.height / 2;
+    const min = (stackRect.top - wrapRect.top) + h / 2 - 6;
+    const max = (stackRect.bottom - wrapRect.top) - h / 2 + 6;
+    top = Math.min(Math.max(top, min), Math.max(min, max));
+    preview.style.top = top + 'px';
   };
 
   // Idle state: show the first row's image centred on the stack, so the
@@ -798,6 +807,30 @@ function splitHeadlineLetters(headline) {
     }
   };
   rest();
+
+  // The image must NEVER cover the titles (site-wide rule for this
+  // component): measure the widest row title's left edge and fit the
+  // preview into the free gutter beside the text — shrinking it when
+  // the gutter narrows and hiding it when there's no useful room.
+  // offsetLeft (not a rect) for the preview so its rotate/scale
+  // transform doesn't distort the measurement; 18px margin absorbs the
+  // corner overhang of the -2° tilt.
+  const fitPreview = () => {
+    const wrapRect = preview.parentElement.getBoundingClientRect();
+    let minLeft = Infinity;
+    rows.forEach(r => {
+      const t = r.querySelector('.usp-row__title');
+      if (t) minLeft = Math.min(minLeft, t.getBoundingClientRect().left);
+    });
+    if (!isFinite(minLeft)) return;
+    const room = (minLeft - wrapRect.left) - preview.offsetLeft - 28;
+    if (room < 140) { preview.style.display = 'none'; return; }
+    preview.style.display = '';
+    preview.style.width = Math.min(room, 260) + 'px';
+  };
+  fitPreview();
+  window.addEventListener('resize', fitPreview, { passive: true });
+  window.addEventListener('load', fitPreview);   /* re-measure once fonts settle */
 
   rows.forEach(row => {
     row.addEventListener('mouseenter', () => {
