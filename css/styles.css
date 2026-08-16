@@ -6129,7 +6129,16 @@ body:has(.post-hero) { background: #fff; }
   background: var(--black); border-color: var(--black); color: var(--white);
 }
 .faq-page-body { background: var(--white); padding: clamp(40px,6vh,64px) 0 clamp(64px,8vh,100px); }
+/* The .faq-group wrappers are filter containers only — this page renders no
+   group titles — so they must not read as sections. Left alone they stacked
+   a doubled rule between every group: the last item's border-bottom, a 48px
+   gap, then the next group's :first-child border-top. The list is now one
+   continuous run with NO opening rule — the section border above the filters
+   already closes the header — just one line under each item. Scoped to this
+   page so the homepage FAQ block keeps its own framing. */
 .faq-page-body .container { max-width: 800px; }
+.faq-page-body .faq-group { margin-bottom: 0; }
+.faq-page-body .faq-item:first-child { border-top: 0; }
 .faq-group { margin-bottom: 48px; }
 .faq-group__title {
   font-family: var(--f-display); font-size: .68rem; font-weight: 700;
