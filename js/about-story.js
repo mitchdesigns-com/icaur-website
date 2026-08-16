@@ -82,18 +82,22 @@
     });
   }
 
-  // eased retract, with a tiny delay between consecutive lines
-  const LINE_STAGGER = 0.10;   // fraction of the paragraph's own window
-  const LINE_DUR     = 0.55;
+  /* eased retract, with a tiny delay between consecutive lines.
+     PHONES: the same copy wraps to ~9 lines instead of 6, so a per-line
+     stagger turned a snappy effect into a slow "still loading" crawl —
+     there the lines clear almost together, in a single quick pass. */
+  const narrow       = () => window.innerWidth <= 860;
+  const LINE_STAGGER = narrow() ? 0.02 : 0.10;   // fraction of the para's window
+  const LINE_DUR     = narrow() ? 0.35 : 0.55;
   /* The overview paragraph runs on its OWN clock rather than the scroll:
      tied to scroll, the bars park over the copy for as long as the reader
      pauses, which reads as broken rather than as an effect. 700ms carries
      the last line past full retract in a little under a second. */
-  const OV_PLAY_MS = 700;
+  const OV_PLAY_MS = narrow() ? 420 : 700;
   let ovPlaying = false, ovStart = 0;
   /* Story steps share the clock but fire one after another — the gap keeps
      the two paragraphs reading as separate beats rather than one flash. */
-  const ST_STEP_DELAY = 260;
+  const ST_STEP_DELAY = narrow() ? 120 : 260;
   let stPlaying = false, stStart = 0;
   const easeOutCubic = t => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
   function playLines(bars, T) {
@@ -196,31 +200,53 @@
     /* Start: up top, pushed far enough left that the screen edge crops it.
        Land: dead centre UNDER the paragraph, in the CTA's old place. The
        lead's rect is read LIVE — it already carries the panel's slide
-       transform — so once parked, the car rides up glued to the copy. */
-    const startX = vw * 0.08, startY = vh * 0.26;
+       transform — so once parked, the car rides up glued to the copy.
+       PHONES: no side theatre — the car sits centred ABOVE the eyebrow,
+       descends straight down the middle (spin intact) and stops at the
+       end of the paragraph, centred the whole way. */
+    const mob    = vw <= 960;
     const leadR  = ovLead ? ovLead.getBoundingClientRect() : null;
+    const eyeR   = mob ? scene.querySelector('.about-overview__inner .eyebrow')?.getBoundingClientRect() : null;
+    /* mobile keeps the CTA button (desktop hides it in the car's favour) —
+       the car must settle BELOW it, not on top of it */
+    const ctaR   = mob ? scene.querySelector('.about-overview__cta')?.getBoundingClientRect() : null;
+    const sEnter = mob ? 1.15 : SCL_ENTER;
+    const sLand  = mob ? 0.8  : SCL_LAND;
+    const startX = mob ? vw / 2 : vw * 0.08;
+    const startY = mob ? (eyeR ? eyeR.top - 96 : vh * 0.14) : vh * 0.26;
     const landX  = leadR ? leadR.left + leadR.width / 2 : vw * 0.5;
-    const landY  = leadR ? leadR.bottom + 92 : vh * 0.78;
+    const landY  = mob && ctaR ? ctaR.bottom + 78
+                 : leadR ? leadR.bottom + (mob ? 64 : 92) : vh * 0.78;
     let tx, ty, trot, tscl;
 
-    if (sr.top > 0) {
-      // Entering: held at the top-left crop, locked vertically to the
-      // section so it rides with it rather than floating against it
+    /* Phones: the drive is synced to the SCREEN from the first scroll —
+       the section's entry covers the opening stretch of the descent, the
+       pinned scroll carries the rest, one continuous progress. */
+    const ENTRY_SHARE = 0.45;
+    const entry = clamp(1 - sr.top / vh, 0, 1);
+    const mobT  = clamp(entry * ENTRY_SHARE
+                + ss(clamp(p / DRIVE_END, 0, 1)) * (1 - ENTRY_SHARE), 0, 1);
+
+    if (sr.top > 0 && !mob) {
+      // Entering (desktop): locked vertically to the section so it rides
+      // with it rather than floating against it
       tx   = startX;
       ty   = sr.top + startY;
       trot = 0;
-      tscl = SCL_ENTER;
-    } else if (p < DRIVE_END) {
+      tscl = sEnter;
+    } else if (mob ? mobT < 1 : p < DRIVE_END) {
       // Overview: the descent past the copy. Down and inward on a shallow
       // bow — a straight line between the two points reads as a slide, the
       // bow reads as steering — shrinking to the parked size on arrival.
       // The 360° turn belongs to the MODEL, not the path: js/about-glb.js
       // spins it about its own axis across this same window.
-      const t = ss(p / DRIVE_END);
-      tx   = lerp(startX, landX, t) + Math.sin(t * Math.PI) * vw * 0.05;
+      // (phones: no bow — the descent stays dead centre, and t is the
+      // combined entry+pin progress so it moves with the very first scroll)
+      const t = mob ? mobT : ss(p / DRIVE_END);
+      tx   = lerp(startX, landX, t) + (mob ? 0 : Math.sin(t * Math.PI) * vw * 0.05);
       ty   = lerp(startY, landY, t);
       trot = 0;
-      tscl = lerp(SCL_ENTER, SCL_LAND, t);
+      tscl = lerp(sEnter, sLand, t);
     } else {
       /* Landed. It stays parked on the overview — landY reads the live,
          already-translated rect, so when the panel slides up and away the
@@ -228,7 +254,7 @@
       tx   = landX;
       ty   = landY;
       trot = 0;
-      tscl = SCL_LAND;
+      tscl = sLand;
     }
 
     const K = 0.16;

@@ -94,8 +94,16 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
        spin through a whole turn — front-right three-quarter, round past both
        side profiles and the tail, back to square-on — as it descends. The
        window here is DRIVE_END in js/about-story.js: the same one the car
-       falls down, so the spin finishes on the frame it parks. */
-    const t = top > 0 ? 0 : MathUtils.smoothstep(p, 0, 0.20);
+       falls down, so the spin finishes on the frame it parks.
+       Phones mirror the choreography's combined progress: the section's
+       ENTRY carries the first 45% of the spin, so it turns with the very
+       first scroll instead of waiting for the pin. */
+    const mob = window.innerWidth <= 960;
+    const t = mob
+      ? MathUtils.clamp(
+          MathUtils.clamp(1 - top / window.innerHeight, 0, 1) * 0.45 +
+          MathUtils.smoothstep(p, 0, 0.20) * 0.55, 0, 1)
+      : (top > 0 ? 0 : MathUtils.smoothstep(p, 0, 0.20));
     const deg = reduce ? ANGLE_FRONT
                        : ANGLE_ENTER + (ANGLE_FRONT - ANGLE_ENTER) * t;
     // eased, so the spin keeps running on after the scroll stops

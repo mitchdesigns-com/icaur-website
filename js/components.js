@@ -227,13 +227,25 @@ const SITE_HEADER = `
           <li><a href="/models/v27">O3T</a></li>
         </ul>
       </li>
-      <li><a href="/services">Services</a></li>
+      <li class="mobile-menu__has-sub">
+        <span class="mobile-menu__label" role="heading" aria-level="2"><a href="/services">Services</a></span>
+        <ul class="mobile-menu__sub" role="list">
+          <li><a href="/services/maintenance">Maintenance Schedules</a></li>
+          <li><a href="/services/programs">Programs</a></li>
+          <li><a href="/services/warranty">Warranty</a></li>
+        </ul>
+      </li>
       <li><a href="/innovation">Innovation</a></li>
       <li><a href="/news">Media Center</a></li>
+      <li><a href="/faq">FAQs</a></li>
       <li><a href="/contact">Contact Us</a></li>
     </ul>
   </nav>
   <div class="mobile-menu__actions">
+    <div class="mobile-menu__tools">
+      <button class="mobile-menu__tool" id="mobileLangToggle" lang="ar" aria-label="التبديل إلى العربية">العربية</button>
+      <button class="mobile-menu__tool" id="mobileCompareToggle" aria-label="Compare models">Compare <span class="nav__compare-count" data-count="0">0</span></button>
+    </div>
     <a href="/reserve" class="btn btn--filled btn--lg">Reserve Your iCAUR</a>
   </div>
 </div>

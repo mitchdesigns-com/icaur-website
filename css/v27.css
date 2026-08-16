@@ -422,7 +422,79 @@
 /* Mobile 360: the 7 swatches used to wrap into 3 rows and climb over
    the 3D car. Collapse them into a single horizontal-scroll strip on a
    frosted band pinned at the bottom, so the car has clear room above. */
+/* ══════════════════════════════════════════════════════
+   OVERVIEW on phones — ONE column, read top to bottom:
+   title → V27 mark → paragraph → the car → price → CTA.
+   The 44/56 split squeezed the copy to one word per line and
+   let the fixed car canvas sit on top of it. The car itself is
+   a FIXED 3D layer, so the flow reserves a slot for it
+   (.v27-overview-right becomes that gap) and js/v27.js drops
+   the model to centre it in that gap.
+══════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
+  /* flat 16px gutter on phones — matches the rest of the site */
+  :root { --px: 16px; }
+
+  /* the hero headline is nowrap (it carries the inline V27 mark) — at
+     phone sizes it must SCALE to fit rather than push the page wide,
+     which is what opened sideways scroll on real devices */
+  .v27-hero-h1 { font-size: clamp(1.4rem, 6.4vw, 3rem); max-width: 100%; }
+
+  /* 360 stage ENDS at the swatches: the window takes every pixel between
+     the header and the swatch row, and the row is the last thing in the
+     column — no empty band underneath it. */
+  .v27-ext-sticky { height: 100dvh; justify-content: flex-start; }
+  .v27-ext-window { flex: 1 1 auto; min-height: 0; }
+  .v27-swatches-wrap { margin-top: auto; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+
+  /* The CAR rides in FRONT on phones: above the price, the CTA and the
+     360 header, so the Overview→360 handover reads as the model passing
+     over the page. The canvas is pointer-events:none, so the CTA and
+     swatches stay fully tappable underneath. */
+  #v27-canvas-wrap { z-index: 3; }
+
+  /* Shorter section: the copy needs nowhere near a full screen here, and
+     200vh of scroll left the car floating in dead space. The sticky box
+     shrinks to fit its content and the driver's scroll length follows. */
+  #v27-overview { height: 150vh; }
+  .v27-overview-sticky {
+    align-items: stretch;
+    height: auto; min-height: 82vh;
+    padding-bottom: clamp(12px, 3vh, 24px);
+  }
+  .v27-overview-inner {
+    grid-template-columns: 1fr;
+    /* one row PER block — a shared row would stack them in the same cell */
+    grid-template-rows: auto auto 1fr auto auto auto;
+    align-items: start;
+    height: 100%;
+    /* the gutter belongs to the CONTAINER, not the items: as per-item
+       padding it only inset the TEXT, while backgrounded items (the CTA
+       pill, the divider rule) still painted edge to edge — which is what
+       made the button look wider than the copy */
+    padding-inline: var(--px);
+    box-sizing: border-box;
+  }
+  .v27-overview-left {
+    display: contents;              /* children join the parent grid */
+  }
+  .v27-ov-h2          { grid-row: 1; margin: 0 0 10px; }
+  .v27-ov-para        { grid-row: 2; }
+  .v27-overview-right { grid-row: 3; min-height: 34vh; }   /* the car's slot */
+  .v27-ov-divider     { grid-row: 4; margin: 0 0 14px; }
+  .v27-ov-price-wrap  { grid-row: 5; }
+  .v27-ov-cta         { grid-row: 6; }
+
+  .v27-ov-h2, .v27-ov-para, .v27-ov-divider,
+  .v27-ov-price-wrap, .v27-ov-cta {
+    grid-column: 1;
+    padding-inline: 0;
+    max-width: none;
+  }
+  .v27-ov-h2   { padding-top: clamp(80px, 11vh, 104px); }
+  .v27-ov-para { font-size: .92rem; line-height: 1.65; margin: 0 0 6px; }
+  .v27-ov-cta  { margin-bottom: clamp(18px, 3.5vh, 32px); }
+
   .v27-ext-header { padding: clamp(64px,9vh,84px) var(--px) 10px; }
   .v27-swatches-wrap {
     padding: 10px 0 calc(10px + env(safe-area-inset-bottom, 0px));
@@ -598,6 +670,11 @@
 .v27-eg-card:focus-visible .v27-eg-tag { opacity: 1; transform: translateY(0); }
 @media (max-width: 640px) {
   .v27-eg-grid { grid-template-columns: 1fr; }
+}
+/* Touch devices have no hover, so the caption would never appear —
+   show every tag from the start there. */
+@media (hover: none) {
+  .v27-eg-tag { opacity: 1; transform: none; }
 }
 
 /* ─── Lightbox ───────────────────────────────────────── */
@@ -1072,6 +1149,42 @@
   .v27-sf-row-wrap { grid-template-columns: 1fr; }
   .v27-sf-img-wrap { display: none; }
   .sf-title { font-size: clamp(1.3rem,6vw,1.9rem) !important; white-space: normal !important; }
+
+  /* SCROLL-driven rows (no hover on touch): js/v27.js marks the row
+     nearest the viewport centre .is-scroll-on — its copy opens and its
+     own picture slides in INLINE beside the title. Row 1 is open by
+     default so the list never starts flat. */
+  /* picture beside the TITLE; the description sits under the headline,
+     spanning the row so it reads as a full line rather than a squeezed
+     column next to the thumbnail */
+  .v27-sf-row { align-items: center; }
+  .v27-sf-row-body {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: 0; row-gap: 6px;
+  }
+  .v27-sf-row-body::before {
+    content: ''; grid-row: 1; grid-column: 1; align-self: center;
+    width: 0; height: clamp(48px, 14vw, 66px); aspect-ratio: 4/3;
+    background-image: var(--sf-img);
+    background-size: cover; background-position: center;
+    border-radius: 8px; opacity: 0;
+    transition: width .5s cubic-bezier(.22,1,.36,1),
+                margin .5s cubic-bezier(.22,1,.36,1),
+                opacity .35s ease;
+  }
+  .v27-sf-row-body .sf-title { grid-row: 1; grid-column: 2; }
+  /* full-width row of its own, under the headline */
+  .v27-sf-row-body .sf-disc-wrap { grid-row: 2; grid-column: 1 / -1; }
+  .v27-sf-row.is-scroll-on .v27-sf-row-body::before {
+    width: clamp(64px, 19vw, 88px); margin-right: 12px; opacity: 1;
+  }
+  /* the open row: same treatment the desktop hover gives */
+  .v27-sf-row.is-scroll-on .sf-title { color: #1F0F08; }
+  .v27-sf-row.is-scroll-on .sf-disc-wrap { grid-template-rows: 1fr; }
+  .v27-sf-row.is-scroll-on .sf-disc { opacity: 1; transform: translateY(0); }
+  .v27-sf-row.is-scroll-on .sf-num { color: #015699; }
 }
 
 /* ══════════════════════════════════════════════════════

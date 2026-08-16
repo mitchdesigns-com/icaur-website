@@ -416,6 +416,11 @@ function splitHeadlineLetters(headline) {
 
   $$('a', mobileMenu).forEach(a => a.addEventListener('click', close));
 
+  // the menu's العربية / Compare mirror the desktop pill's — same handlers,
+  // reached by delegating to the originals so the logic lives in one place
+  $('#mobileLangToggle')?.addEventListener('click', () => { $('#langToggle')?.click(); });
+  $('#mobileCompareToggle')?.addEventListener('click', () => { close(); $('#compareToggle')?.click(); });
+
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && isOpen) close();
   });
@@ -716,9 +721,11 @@ function splitHeadlineLetters(headline) {
   const headGroup = $('#svcHeadGroup');
   if (!driver || !track) return;
 
-  const MOBILE = 860;   // must match the stacked-layout media query
+  // live at EVERY width now — mobile gets the same pinned story
+  // (client: scroll effects must appear on mobile); only reduced
+  // motion falls back to the static stacked layout
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isStatic = () => window.innerWidth <= MOBILE || reduce;
+  const isStatic = () => reduce;
 
   const clamp01 = v => Math.min(1, Math.max(0, v));
   const seg = (p, a, b) => clamp01((p - a) / (b - a));
@@ -846,7 +853,9 @@ function splitHeadlineLetters(headline) {
       const hgR = headGroup ? headGroup.getBoundingClientRect() : null;
       const halfW = d.width / 2, halfH = d.height / 2;
       const maxX = W / 2 - halfW - 24;               // keep it fully on screen
-      const startX = Math.min(W * 0.25, maxX);
+      // phones: the right-half anchor reads as off-centre clutter in a
+      // single-column layout — fly the deck straight down the middle
+      const startX = W <= 767 ? 0 : Math.min(W * 0.25, maxX);
       // vertically: in the gap between the headline and the paragraph
       const startY = hgR
         ? ((hgR.bottom - secTop) + 34 + halfH) - (H * 0.44)
@@ -1194,6 +1203,31 @@ function splitHeadlineLetters(headline) {
     });
   });
   stack.addEventListener('mouseleave', rest);
+
+  // MOBILE: there is no hover, so the SCROLL drives the rows instead —
+  // whichever row sits nearest the viewport centre is "on": its title
+  // lights up and its own image fades in small behind the word (the
+  // floating side preview stays a desktop thing). CSS owns the look via
+  // .is-scroll-on; each row carries its image as a custom property.
+  rows.forEach(r => r.style.setProperty('--row-img', `url("${r.dataset.img}")`));
+  let mRaf = null;
+  function scrollSpot() {
+    mRaf = null;
+    if (window.innerWidth > 860) { rows.forEach(r => r.classList.remove('is-scroll-on')); return; }
+    const mid = window.innerHeight / 2;
+    let best = null, bd = Infinity;
+    rows.forEach(r => {
+      const c = r.getBoundingClientRect();
+      const d = Math.abs(c.top + c.height / 2 - mid);
+      if (d < bd) { bd = d; best = r; }
+    });
+    rows.forEach(r =>
+      r.classList.toggle('is-scroll-on', r === best && bd < window.innerHeight * 0.5));
+  }
+  const onSpot = () => { if (!mRaf) mRaf = requestAnimationFrame(scrollSpot); };
+  window.addEventListener('scroll', onSpot, { passive: true });
+  window.addEventListener('resize', onSpot, { passive: true });
+  scrollSpot();
 })();
 
 
@@ -1528,7 +1562,8 @@ function splitHeadlineLetters(headline) {
   if (!strips.length) return;
 
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isStatic = () => window.innerWidth <= 860 || reduce;
+  // live on mobile too — only reduced motion gets the pre-drawn state
+  const isStatic = () => reduce;
 
   // Split each headline into per-letter spans (keeping any <em> wrapper
   // intact) so letters can carry their own offset — the reference does
@@ -1679,10 +1714,6 @@ function splitHeadlineLetters(headline) {
   const easeOut = t => 1 - Math.pow(1 - t, 3);
 
   function paint() {
-    if (window.innerWidth <= 860) {                 // stacked layout — flat
-      tiles.forEach(el => { el.style.transform = ''; el.style.opacity = ''; });
-      return;
-    }
     const vh = window.innerHeight;
     tiles.forEach((el, i) => {
       const r = el.getBoundingClientRect();
@@ -1795,9 +1826,11 @@ const MEDIA_TILE_RADIUS = 16;
   const big    = $('#mediaBig');
   if (!driver || !stage || !veil || !target || !head) return;
 
-  const MOBILE = 860;   // must match the stacked layout media query
+  // live at every width — the morph measures its geometry from the live
+  // layout, so the stacked mobile grid scrubs just as well; only reduced
+  // motion opts out
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isStatic = () => window.innerWidth <= MOBILE || reduce;
+  const isStatic = () => reduce;
 
   const clamp01 = v => Math.min(1, Math.max(0, v));
   const seg = (p, a, b) => clamp01((p - a) / (b - a));
@@ -1860,6 +1893,10 @@ const MEDIA_TILE_RADIUS = 16;
         left:   (t.left   - s.left)   / s.width  * 100
       },
       k,
+      // single-column layouts: the landing tile spans (nearly) the full
+      // stage width, so the edge-clears-headline colour flip can't fire —
+      // paint() falls back to scene progress when this is set
+      tileNearFull: t.width / s.width > 0.7,
       // scene-1 anchor: inset from the left, vertically centred
       dx: (s.left + s.width * 0.07) - h.left,
       dy: (s.top + s.height * 0.52 - (h.height * k) / 2) - h.top,
@@ -1967,7 +2004,12 @@ const MEDIA_TILE_RADIUS = 16;
     const headRightPx = geo.headX + geo.dx * (1 - t) + geo.headW * sc;
     // commit once it is nearly clear, over a short ramp, so the half-way grey
     // is a brief pass rather than a readable state
-    const cw = clamp01((picLeftPx - (headRightPx - 30)) / 45 + 1);
+    // single-column layouts land the picture at full container width, so
+    // its left edge NEVER clears the headline — there the flip rides the
+    // scene progress instead, committing as the veil settles into the tile
+    const geomCw = clamp01((picLeftPx - (headRightPx - 30)) / 45 + 1);
+    const fullBleedTile = geo.tileNearFull ? clamp01((p - 0.62) / 0.10) : 0;
+    const cw = Math.max(geomCw, fullBleedTile);
     const g = Math.round(lerp(255, 10, cw));
     head.style.color = `rgb(${g}, ${g}, ${g})`;
 
@@ -2094,8 +2136,11 @@ document.addEventListener('click', e => {
 
   function syncCount() {
     const n = selections.length;
-    countBadge.textContent = n;
-    countBadge.dataset.count = n;
+    // every badge — the nav pill's AND the mobile menu's mirror
+    document.querySelectorAll('#compareCount, .nav__compare-count').forEach(b => {
+      b.textContent = n;
+      b.dataset.count = n;
+    });
     if (selCountEl) selCountEl.textContent = n;
   }
 

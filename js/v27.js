@@ -30,6 +30,18 @@ const OVERVIEW_POSE = { rotY:  0.06, posX:  1.55, posY:  0.85, scale: 1.55 };
    thumbnails — sitting lower, closer to the swatch row */
 const SIDE_POSE     = { rotY: -0.78, posX:  0.2,  posY:  1.55, scale: 1.12 };
 
+/* PHONES: both stages centre the car and hold it at ONE size, so the
+   Overview → 360 handover has nothing to jump between. Read through
+   these helpers — never the raw constants — or the two triggers lerp
+   between different poses and the model snaps at the boundary. */
+const isNarrow  = () => window.innerWidth <= 768;
+const ovPose    = () => isNarrow()
+  ? { rotY: OVERVIEW_POSE.rotY, posX: 0, posY: 2.45, scale: 0.62 }
+  : OVERVIEW_POSE;
+const sidePose  = () => isNarrow()
+  ? { rotY: SIDE_POSE.rotY, posX: 0.25, posY: 1.85, scale: 0.72 }
+  : SIDE_POSE;
+
 /* Smooth scroll-driven rotation target (drag is additive on top) */
 let scrollBaseRotY  = HERO_POSE.rotY;
 let dragExtraRot    = 0;
@@ -289,10 +301,14 @@ function setupCarScrollAnim() {
     onUpdate(self) {
       if (!car) return;
       const p = self.progress;
-      scrollBaseRotY = lerp(HERO_POSE.rotY, OVERVIEW_POSE.rotY, p);
-      car.position.x  = lerp(HERO_POSE.posX,  OVERVIEW_POSE.posX,  p);
-      car.position.y  = lerp(HERO_POSE.posY,  OVERVIEW_POSE.posY,  p);
-      car.scale.setScalar(lerp(HERO_POSE.scale, OVERVIEW_POSE.scale, p));
+      /* Phones stack the Overview into one column with a reserved gap
+         for the car between the paragraph and the price — so the model
+         sits CENTRED and smaller there, not off in a right-hand half. */
+      const OV = ovPose();
+      scrollBaseRotY = lerp(HERO_POSE.rotY, OV.rotY, p);
+      car.position.x  = lerp(HERO_POSE.posX,  OV.posX,  p);
+      car.position.y  = lerp(HERO_POSE.posY,  OV.posY,  p);
+      car.scale.setScalar(lerp(HERO_POSE.scale, OV.scale, p));
     },
   });
 
@@ -303,10 +319,13 @@ function setupCarScrollAnim() {
     onUpdate(self) {
       if (!car) return;
       const p = self.progress;
-      scrollBaseRotY = lerp(OVERVIEW_POSE.rotY, SIDE_POSE.rotY,  p);
-      car.position.x  = lerp(OVERVIEW_POSE.posX,  SIDE_POSE.posX,  p);
-      car.position.y  = lerp(OVERVIEW_POSE.posY,  SIDE_POSE.posY,  p);
-      car.scale.setScalar(lerp(OVERVIEW_POSE.scale, SIDE_POSE.scale, p));
+      // FROM the same pose the Overview trigger settled on — using the raw
+      // desktop constant here made the car jump to full size on phones
+      const A = ovPose(), B = sidePose();
+      scrollBaseRotY = lerp(A.rotY, B.rotY,  p);
+      car.position.x  = lerp(A.posX,  B.posX,  p);
+      car.position.y  = lerp(A.posY,  B.posY,  p);
+      car.scale.setScalar(lerp(A.scale, B.scale, p));
     },
   });
 
@@ -1368,6 +1387,7 @@ function initTech() {
    10. SAFETY — hover-image list (port of SafetySection.jsx)
 ══════════════════════════════════════════════════════════ */
 function initSafety() {
+  window.__sfEntered = true;
   const section    = $('#v27-safety');
   const imgWrap    = $('#v27-sf-img-wrap');
   const defaultImg = $('#v27-sf-default-img');
@@ -1459,6 +1479,37 @@ function initSafety() {
 
   /* Reset when cursor leaves the whole list */
   if (list) list.addEventListener('mouseleave', showDefault);
+
+  /* ── MOBILE: scroll opens the rows ──────────────────────────────
+     No hover on touch, so the row nearest the viewport centre is the
+     open one — its copy expands and its own picture slides in beside
+     the title (the floating crossfade panel is desktop-only). Row 1
+     starts open so the section never reads as a plain list. */
+  rows.forEach((row) => {
+    const idx = parseInt(row.dataset.idx, 10);
+    const src = featImgs[idx] && featImgs[idx].getAttribute('src');
+    if (src) row.style.setProperty('--sf-img', `url("${src}")`);
+  });
+  let sfRaf = null;
+  function sfSpot() {
+    sfRaf = null;
+    if (window.innerWidth > 767) { rows.forEach(r => r.classList.remove('is-scroll-on')); return; }
+    const mid = window.innerHeight / 2;
+    let best = null, bd = Infinity;
+    rows.forEach(r => {
+      const c = r.getBoundingClientRect();
+      const d = Math.abs(c.top + c.height / 2 - mid);
+      if (d < bd) { bd = d; best = r; }
+    });
+    // nothing near the middle yet → keep the FIRST row open as the default
+    if (!best || bd > window.innerHeight * 0.55) best = rows[0];
+    rows.forEach(r => r.classList.toggle('is-scroll-on', r === best));
+  }
+  window.__sfReached = true;
+  const onSf = () => { if (!sfRaf) sfRaf = requestAnimationFrame(sfSpot); };
+  window.addEventListener('scroll', onSf, { passive: true });
+  window.addEventListener('resize', onSf, { passive: true });
+  sfSpot();
 }
 
 /* ══════════════════════════════════════════════════════════

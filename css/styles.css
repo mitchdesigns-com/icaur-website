@@ -999,7 +999,32 @@ html.pt-entering > body { opacity: 0; }
   transition: opacity var(--dur-lg) var(--ease-expo), transform var(--dur-lg) var(--ease-expo);
 }
 .mobile-menu.is-open .mobile-menu__nav li:nth-child(2) .mobile-menu__label { opacity: 1; transform: none; transition-delay: .10s; }
-.mobile-menu__actions { display: flex; flex-direction: column; gap: var(--sp-6); align-items: center; }
+.mobile-menu.is-open .mobile-menu__nav li:nth-child(3) .mobile-menu__label { opacity: 1; transform: none; transition-delay: .15s; }
+/* a label that IS a link (Services) — the inner anchor must not re-hide
+   itself inside the already-animated label wrapper */
+.mobile-menu__label a { opacity: 1 !important; transform: none !important; color: var(--black); }
+.mobile-menu__actions {
+  display: flex; flex-direction: column; gap: var(--sp-6); align-items: center;
+  width: min(100%, 360px); padding: 0 var(--pad-x);
+  /* clear the home-indicator strip on notched phones */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.mobile-menu__actions .btn { width: 100%; justify-content: center; min-height: 48px; }
+/* العربية + Compare, mirroring the desktop pill's actions */
+.mobile-menu__tools { display: flex; gap: 8px; width: 100%; }
+.mobile-menu__tool {
+  flex: 1; min-height: 44px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: var(--f-display); font-size: 12px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--black); background: none;
+  border: 1.5px solid rgba(0,0,0,.14); border-radius: 100px;
+}
+.mobile-menu__tool .nav__compare-count {
+  min-width: 20px; height: 20px; border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; background: var(--amber); color: var(--white);
+}
 
 /* ═══════════════════════════════════════════════════════════
    SCROLL REVEAL SYSTEM
@@ -2530,6 +2555,36 @@ html.pt-entering > body { opacity: 0; }
   .usp-preview { display: none; }
   .usp-row__tag { display: none; }
   .usp-row__title { color: rgba(10,10,10,.4); }
+
+  /* SCROLL-driven rows (no hover on touch): js/main.js marks the row
+     nearest the viewport centre .is-scroll-on — a SMALL thumbnail opens
+     up INLINE beside that row's word and the title lights up, one value
+     at a time. Inline, not a backdrop: a full-bleed image behind the
+     words swamped them and bled across neighbouring rows. */
+  .usp-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0;
+  }
+  .usp-row::before {
+    content: ''; display: block; flex: none;
+    width: 0; height: clamp(38px, 11vw, 52px);
+    aspect-ratio: 4/3;
+    background-image: var(--row-img);
+    background-size: cover; background-position: center;
+    border-radius: 8px; opacity: 0;
+    transition: width .5s var(--ease-spring), margin .5s var(--ease-spring),
+                opacity .35s var(--ease-out);
+    pointer-events: none;
+  }
+  .usp-row.is-scroll-on::before {
+    width: clamp(50px, 15vw, 70px);
+    margin-right: 12px;
+    opacity: 1;
+  }
+  .usp-row__title { transition: color .35s var(--ease-out); }
+  .usp-row.is-scroll-on .usp-row__title { color: var(--black); }
+  /* dark #values variant: amber → white, like the desktop hover */
+  #values .usp-row.is-scroll-on .usp-row__title { color: var(--white); }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -2727,7 +2782,9 @@ html.pt-entering > body { opacity: 0; }
 .svc__media--sm-d { width: 44%; aspect-ratio: 4/5; right: 2%; top: 8%; }
 
 /* ── stacked fallback (phones + reduced motion via .svc--static) ── */
-@media (max-width: 860px) {
+/* STATIC fallback for the services run — reduced-motion only now: the
+   pinned story itself plays on mobile (js/main.js isStatic) */
+@media (prefers-reduced-motion: reduce) {
   .svc-driver { height: auto !important; }
   .svc { position: static; height: auto; overflow: visible; }
   .svc__track { position: static; display: block; transform: none !important; }
@@ -2967,11 +3024,25 @@ html.pt-entering > body { opacity: 0; }
   background: linear-gradient(180deg, rgba(0,0,0,.58) 0%, rgba(0,0,0,.34) 46%, rgba(0,0,0,.66) 100%);
 }
 
-@media (max-width: 860px) {
-  /* no pinning on phones: the scene becomes a plain stacked block —
+/* STATIC fallback for the media morph — reduced-motion only now: the
+   pinned morph itself plays on mobile (js/main.js isStatic) */
+@media (prefers-reduced-motion: reduce) {
+  /* no pinning: the scene becomes a plain stacked block —
      photo header, then the two cards, then the brief */
   .media-driver { height: auto; }
   .media { position: static; height: auto; overflow: visible; padding-bottom: var(--sp-16); }
+}
+/* LAYOUT only at phone widths — the grid stacks to one column, which is
+   also the landing geometry the live morph measures. Nothing here may
+   fight the scene's inline transforms. */
+@media (max-width: 860px) {
+  /* Single-column media content is ~2 viewports tall — a 100vh pinned
+     box with overflow:hidden CROPPED the cards and buried the brief +
+     "View Media Center" CTA. Let the stage take its content height: the
+     morph plays in the first viewport, then the rest of the section
+     scrolls into view normally once the pin releases. */
+  .media { height: auto; min-height: 100dvh; overflow: visible; }
+  .media-driver { height: 240vh; }
   /* the veil is a sibling of the grid, so the stage does the stacking */
   .media__stage { display: flex; flex-direction: column; }
   .media__grid {
@@ -2979,14 +3050,15 @@ html.pt-entering > body { opacity: 0; }
     gap: var(--sp-16); padding: 0 var(--sp-20) var(--sp-16);
   }
   .media__col { display: contents; }
-  .media__head {
-    order: -1; transform: none !important; color: var(--black) !important;
-    max-width: none; margin-top: var(--sp-20);
-  }
-  .media__brief { order: 3; max-width: none; opacity: 1 !important; transform: none !important; }
+  .media__head { order: -1; max-width: none; margin-top: var(--sp-20); }
+  .media__brief { order: 3; max-width: none; }
+}
+/* SCENE-off rules — reduced motion only: freeze the choreography and show
+   the flat stacked layout with the photo back inside its tile */
+@media (prefers-reduced-motion: reduce) {
+  .media__head { transform: none !important; color: var(--black) !important; }
+  .media__brief { opacity: 1 !important; transform: none !important; }
   .media-card { opacity: 1 !important; transform: none !important; }
-  /* stacked layout: the photo lives back inside the lead tile (js moves the
-     node), so the hero frame has nothing to show */
   .media__veil { display: none; }
 }
 
@@ -3171,15 +3243,17 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
 }
 
 @media (max-width: 860px) {
-  /* bands are not rotated here, so there is no overhang to hide — the
-     negative margins would just eat the neighbouring sections */
-  .why { margin-block: 0; }
+  /* SAME parallelogram language as desktop: the bands stay rotated with
+     their overhang, so every strip enters and exits on a diagonal edge —
+     only compacted. The JS counter-rotates the content, so the copy sits
+     LEVEL on the tilted band and drifts in from the sides, exactly like
+     the wide layout. */
   .why-strip {
-    transform: none; width: 100%; margin-inline: 0;
-    margin-block: 0; min-height: 62vh;
+    min-height: 62vh;
+    margin-block: clamp(-110px, -11vh, -70px);
     padding-block: clamp(44px, 8vh, 72px);
   }
-  .why-strip__inner { transform: none; align-items: flex-start; text-align: left; }
+  .why-strip__inner { align-items: flex-start; text-align: left; }
   .why-strip__word { font-size: clamp(34px, 9vw, 56px); }
   .why-strip__eyebrow { margin-bottom: 12px; }
   /* left-aligned column here, so the scene leads the word from the left
@@ -3490,7 +3564,8 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
 }
 
 @media (max-width: 860px) {
-  :root { --pad-x: 28px; --sp-64: 100px; --sp-56: 80px; --sp-48: 64px; }
+  /* one flat 16px gutter across all mobile widths (client spec) */
+  :root { --pad-x: 16px; --sp-64: 100px; --sp-56: 80px; --sp-48: 64px; }
 
   .hero__vehicle { position: relative; right: auto; top: auto; transform: none; width: 100%; max-width: 100%; margin: var(--sp-12) 0; }
   .hero__headline { font-size: clamp(52px, 12vw, 88px); }
@@ -3964,7 +4039,9 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
 .story-speed-line--soft { background: var(--brown-light); height: 5px; }
 .story-speed-line--deep { background: var(--amber-mid); }
 @media (max-width: 960px) {
-  .story-scene-car, .story-speed-line { display: none; }
+  /* the CAR stays on mobile (centred descent — js/about-story.js runs a
+     phone path); only the trailing speed lines go, they need side room */
+  .story-speed-line { display: none; }
 }
 
 /* Right image stack — each shot piles over the previous */
@@ -3989,8 +4066,29 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
 }
 
 @media (max-width: 960px) {
-  .story-rail, .story-stack { display: none; }
+  .story-rail { display: none; }
   .about-saga__inner { padding-left: 0; max-width: 100%; }
+  /* keep ONE picture at the TOP of the Story panel — the whole stack was
+     hidden here, leaving the section text-only. The lead shot sits above
+     the copy at a readable size; the other two stay out of the way. */
+  .story-stack {
+    /* clear the desktop anchors (absolute/right/top/translate) or the box
+       stretches to the panel and the picture fills the screen */
+    position: relative; right: auto; top: auto; order: -1;
+    width: 100%; height: auto; aspect-ratio: 16/10;
+    max-height: 34vh;
+    transform: none; margin-bottom: var(--sp-12);
+  }
+  .story-stack__img:not(:first-child) { display: none; }
+  .story-stack__img:first-child {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; object-fit: cover;
+    opacity: 1; transform: none !important;
+    border-radius: 12px;
+  }
+  /* the stack is a SIBLING of .about-saga__inner, so the panel itself
+     does the ordering — flex here, image first */
+  .scene-panel--story { display: flex; flex-direction: column; justify-content: center; }
 }
 /* Marker highlight — a hand-drawn orange scribble sitting BEHIND a word,
    like it was struck through with a highlighter. The strokes are thick and
@@ -6693,12 +6791,24 @@ body:has(.post-hero) { background: #fff; }
   }
 
   /* ─── Contain carousel horizontal overflow at section level ── */
-  /* (NOT on body — that clips fixed nav on iOS Safari) */
   #services, #innovation { overflow-x: hidden; }
+
+  /* ─── Page-level guard: NOTHING may open sideways scroll ──────
+     `clip` (unlike `hidden`) does not turn the element into a scroll
+     container, so fixed chrome and programmatic scrolling stay intact
+     on iOS — the `hidden` line is only the older-browser fallback. */
+  html, body { overflow-x: hidden; overflow-x: clip; }
 
   /* ─── Nav: tighter pill padding so hamburger is always visible ── */
   .nav { padding-left: 12px; padding-right: 12px; }
-  .nav__inner { padding-left: 16px; padding-right: 16px; gap: 12px; }
+  .nav__inner { padding-left: 16px; padding-right: 16px; gap: 12px; align-items: center; }
+  /* a finger-sized hamburger that stays CENTRED inside the pill — the
+     44px floor alone let it lean out of the pill's vertical middle */
+  .nav__hamburger {
+    height: 44px; width: 44px;
+    display: flex; align-items: center; justify-content: center;
+    align-self: center; margin-block: 0;
+  }
 
   /* ─── Section vertical rhythm ──────────────────────── */
   .section { padding: clamp(48px, 7vh, 72px) 0; }
@@ -6718,15 +6828,38 @@ body:has(.post-hero) { background: #fff; }
   .hero__sub   { font-size: 14px; }
 
   /* ═══════════════════════════════════════════════════
-     MODELS
+     MODELS — decluttered card: small logo up top on a clean
+     photo, everything else in ONE readable band at the bottom
+     over a scrim, price as its own full-width row instead of a
+     chip overlapping the specs.
      ═══════════════════════════════════════════════════ */
   .models-grid--feature {
     grid-template-columns: 1fr;
     padding-inline: var(--pad-x);
     margin-inline: 0;
-    gap: 8px;
+    gap: 12px;
   }
-  .mfc { aspect-ratio: 4/3; }
+  .mfc { aspect-ratio: 4/4.6; }
+  .mfc__logo { height: 34px; top: 14px; left: 14px; }
+  /* scrim under the info band so the copy never fights the photo */
+  .mfc__inner::after {
+    content: ''; position: absolute; inset: 45% 0 0 0; z-index: 4;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,.72) 78%);
+    pointer-events: none;
+  }
+  .mfc__bottom { inset: auto 14px 14px 14px; gap: 8px; }
+  .mfc__name { font-size: 18px; }
+  .mfc__specs { gap: 6px; }
+  .mfc__specs span { font-size: 10px; padding: 5px 10px; }
+  /* the desktop price chip floats over the specs row — on mobile it
+     becomes a static, full-width row of its own */
+  .mfc__bottom:has(.mfc__price) .mfc__specs { padding-right: 0; }
+  .mfc__price {
+    position: static;
+    flex-direction: row; align-items: baseline; justify-content: space-between;
+    width: 100%; margin-top: 2px;
+    padding: 10px 14px; border-radius: 12px;
+  }
 
   /* ═══════════════════════════════════════════════════
      OVERVIEW (sticky scroll section)
@@ -6925,7 +7058,12 @@ body:has(.post-hero) { background: #fff; }
      FAQ
      ═══════════════════════════════════════════════════ */
   .faq__layout { grid-template-columns: 1fr; gap: 20px; }
-  .faq__left { position: static; }
+  /* one alignment for the whole block: everything centred — the eyebrow
+     is a flex box, so text-align alone can't centre it */
+  .faq__left { position: static; text-align: center; }
+  .faq__left .eyebrow { justify-content: center; }
+  .faq__left .btn { margin-inline: auto; }
+  .faq__hint { margin-inline: auto; }
   .faq-item__q { font-size: 14px; }
 
   /* ═══════════════════════════════════════════════════
@@ -7008,11 +7146,86 @@ body:has(.post-hero) { background: #fff; }
   .services__content-col .btn,
   .post-hero__inner .btn,
   .rv-hero .btn,
-  .svc-book .btn {
+  .svc-book .btn,
+  .about-overview__cta,
+  .cta-video__glass .btn,
+  .usp-list__footer .btn,
+  .v27-cta-btn:not(.nav-btn-reserve) {
     display: flex;
     width: 100%;
     justify-content: center;
     box-sizing: border-box;
   }
+
+  /* ═══════════════════════════════════════════════════
+     SERVICES PINNED RUN — now LIVE on mobile (the static
+     fallback is reduced-motion only). Compact the panels so
+     the horizontal story reads on a phone: single-column
+     features, shorter media windows, statement type a notch
+     down, deck flight kept modest.
+     ═══════════════════════════════════════════════════ */
+  .svc__headline { font-size: clamp(34px, 9.5vw, 48px); }
+  .svc__sub { font-size: clamp(22px, 6.4vw, 30px); max-width: 20ch; }
+  .svc__panel--feature {
+    width: 92vw;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: clamp(56px, 9vh, 90px) 16px 24px;
+    align-content: center;
+  }
+  .svc__media--lg { height: min(38vh, 320px); }
+  .svc__panel--cluster { width: 70vw; }
+  .svc__deck { width: clamp(150px, 44vw, 200px); }
+  .svc__num { font-size: 11px; }
+
+  /* MEDIA morph + WHY strips are live here too — trim the pinned
+     stage type so scene copy fits a phone */
+  .media__headline { font-size: clamp(30px, 9vw, 44px); }
+  .why-strip__word { font-size: clamp(30px, 8.5vw, 44px); }
+
+  /* ═══════════════════════════════════════════════════
+     FINGER-SIZED TARGETS — 44px floor on every control
+     ═══════════════════════════════════════════════════ */
+  .btn, .filter-btn, .faq-cat-btn, .faq-item__q,
+  .nav__hamburger, .mobile-menu__close, .v27-cta-btn {
+    min-height: 44px;
+  }
+  .filter-btn, .faq-cat-btn { padding-top: 11px; padding-bottom: 11px; }
+  /* menu links: 30px type in a 33px box is a miss magnet — pad the
+     hit area without changing the look; sub-links get most of it */
+  .mobile-menu__nav a { padding: 6px 14px; display: inline-block; }
+  .mobile-menu__sub a { padding: 12px 14px; }
+  .mobile-menu__nav ul { gap: 2px; }
+  .mobile-menu { overflow-y: auto; }
+
+  /* ═══════════════════════════════════════════════════
+     COMPACT TYPE — one notch down across the board
+     ═══════════════════════════════════════════════════ */
+  h1 { font-size: clamp(34px, 10vw, 54px); }
+  h2 { font-size: clamp(27px, 7.5vw, 44px); }
+  .hero__headline { font-size: clamp(44px, 11vw, 72px); }
+  .section-title { letter-spacing: -0.02em; }
+  body { font-size: 15px; }
+  p { line-height: 1.65; }
+
+  /* ═══════════════════════════════════════════════════
+     VIEWPORT-TRUE SECTIONS — pinned stages sized to the
+     REAL visible area, not 100vh: mobile browser chrome
+     eats into vh and either crops the stage bottom or
+     leaves the copy under the toolbar. dvh tracks the
+     browser UI as it collapses/expands.
+     ═══════════════════════════════════════════════════ */
+  /* (.media is NOT here: on mobile it takes its content height so the
+     stacked cards + CTA are never cropped by the pin) */
+  @supports (height: 100dvh) {
+    .hero, .overview, .svc,
+    .about-scene__pin, .mv, .mission-story,
+    .v27-hero-sticky, .v27-overview-sticky, .v27-ext-sticky {
+      height: 100dvh;
+    }
+    .media { min-height: 100dvh; height: auto; }
+  }
+  /* fixed/bottom-anchored chrome clears the home indicator */
+  .cta-video__glass { margin-bottom: env(safe-area-inset-bottom, 0px); }
 
 }
