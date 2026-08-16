@@ -1,0 +1,117 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>svc story</title>
+<link rel="stylesheet" href="/css/styles.css">
+<style>html,body{margin:0;background:#ECE6DC}.pad{height:40vh}</style>
+</head><body class="dark-hero-page">
+<div class="pad"></div>
+<div class="svc-driver" id="svcDriver">
+<section class="svc" id="services">
+  <div class="svc__track" id="svcTrack">
+
+    <!-- 0 · intro -->
+    <div class="svc__panel svc__panel--intro">
+      <div class="svc__intro-inner">
+        <!-- beat 1: only this group is visible; it slides UP and out as the
+             statement paragraph takes the screen -->
+        <div class="svc__headgroup" id="svcHeadGroup">
+          <p class="eyebrow svc__eyebrow">iCAUR Services</p>
+          <h2 class="svc__headline" id="svcHeadline">We've Got<br>You <em>Covered</em></h2>
+        </div>
+        <p class="svc__sub">Warranty, maintenance and ownership programs, we handle everything so you can focus on the drive.</p>
+        <span class="svc__slot" id="svcSlot" aria-hidden="true"></span>
+      </div>
+
+      <!-- ONE line that travels with the picture, morphing from one doodle
+           shape into the next as it goes (js/main.js lerps the path data —
+           every shape has the same command structure so it can tween). -->
+      <svg class="svc__trace" id="svcTrace" viewBox="0 0 100 100" aria-hidden="true">
+        <path id="svcTracePath" d="M10 70 C 30 20, 70 20, 90 60"/>
+      </svg>
+      <!-- Travelling deck: 8 frames, one per step of the path. The picture
+           never swaps in place — each new frame arrives at the next position
+           and a smaller size, so the change always reads as movement. -->
+      <div class="svc__deck" id="svcDeck" aria-hidden="true">
+        <!-- inner layer drifts against the frame while it travels (parallax) -->
+        <div class="svc__deck-inner">
+          <img src="assets/images/Maintainance.webp" alt="" loading="lazy">
+          <img src="assets/images/iCAUR INTL_V27 REV_cam025.webp" alt="" loading="lazy">
+          <img src="assets/images/v27/car-side.webp" alt="" loading="lazy">
+          <img src="assets/images/ICUAR V27 brochure 03 20.webp" alt="" loading="lazy">
+          <img src="assets/images/v27/interior-display.webp" alt="" loading="lazy">
+          <img src="assets/images/ICUAR V27 brochure 03 18.webp" alt="" loading="lazy">
+          <img src="assets/images/iCAUR INTL_V27 REV_cam026 copy.webp" alt="" loading="lazy">
+          <img src="assets/images/v27/interior-01.webp" alt="" loading="lazy">
+        </div>
+      </div>
+    </div>
+
+    <!-- 1 · Maintenance Schedules -->
+    <article class="svc__panel svc__panel--feature">
+      <figure class="svc__media svc__media--lg">
+        <img src="assets/images/Maintainance.webp" alt="iCAUR maintenance bay" loading="lazy" data-par="0.10">
+      </figure>
+      <div class="svc__body">
+        <span class="svc__num">01 — Service</span>
+        <h3 class="svc__title">Maintenance <em>Schedules</em></h3>
+        <p class="svc__text">Factory-trained technicians, genuine parts and clear service intervals — book in minutes, drive out the same day.</p>
+        <a href="/services/maintenance" class="btn btn--dark btn--sm btn--arrow btn--magnetic">Explore Maintenance <span class="arrow">→</span></a>
+      </div>
+    </article>
+
+    <!-- small cluster -->
+    <div class="svc__panel svc__panel--cluster" aria-hidden="true">
+      <figure class="svc__media svc__media--sm svc__media--sm-a">
+        <img src="assets/images/v27/interior-01.webp" alt="" loading="lazy" data-par="0.18">
+      </figure>
+      <figure class="svc__media svc__media--sm svc__media--sm-b">
+        <img src="assets/images/v27-18.webp" alt="" loading="lazy" data-par="-0.12">
+      </figure>
+    </div>
+
+    <!-- 2 · Programs (mirrored) -->
+    <article class="svc__panel svc__panel--feature svc__panel--flip">
+      <figure class="svc__media svc__media--lg">
+        <img src="assets/images/iCAUR INTL_V27 REV_cam026 copy.webp" alt="iCAUR ownership programs" loading="lazy" data-par="0.10">
+      </figure>
+      <div class="svc__body">
+        <span class="svc__num">02 — Ownership</span>
+        <h3 class="svc__title"><em>Programs</em></h3>
+        <p class="svc__text">Financing, insurance and trade-in programs built around real life in Egypt — one plan, zero surprises.</p>
+        <a href="/services/programs" class="btn btn--dark btn--sm btn--arrow btn--magnetic">Explore Programs <span class="arrow">→</span></a>
+      </div>
+    </article>
+
+    <!-- small cluster -->
+    <div class="svc__panel svc__panel--cluster" aria-hidden="true">
+      <figure class="svc__media svc__media--sm svc__media--sm-c">
+        <img src="assets/images/ICUAR V27 brochure 03 18.webp" alt="" loading="lazy" data-par="0.16">
+      </figure>
+      <figure class="svc__media svc__media--sm svc__media--sm-d">
+        <img src="assets/images/v27/interior-display.webp" alt="" loading="lazy" data-par="-0.10">
+      </figure>
+    </div>
+
+    <!-- 3 · Warranty -->
+    <article class="svc__panel svc__panel--feature">
+      <figure class="svc__media svc__media--lg">
+        <img src="assets/images/iCAUR INTL_V27 REV_cam027 copy.webp" alt="iCAUR warranty coverage" loading="lazy" data-par="0.10">
+      </figure>
+      <div class="svc__body">
+        <span class="svc__num">03 — Peace of mind</span>
+        <h3 class="svc__title"><em>Warranty</em></h3>
+        <p class="svc__text">Comprehensive coverage that protects your vehicle and gives you complete peace of mind — so you can focus on the drive.</p>
+        <a href="/services/warranty" class="btn btn--dark btn--sm btn--arrow btn--magnetic">Explore Warranty <span class="arrow">→</span></a>
+      </div>
+    </article>
+
+  </div>
+</section>
+</div>
+<div class="pad" style="height:60vh"></div>
+<script>
+  const y = parseFloat(new URLSearchParams(location.search).get('y')||'0');
+  if (y) { const p = document.querySelector('.pad'); if (p) p.style.marginTop = (-y*100)+'vh'; }
+</script>
+<script src="/js/main.js" defer></script>
+</body></html>

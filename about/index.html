@@ -95,7 +95,9 @@
 
     <!-- Story car — drives in from the left during Overview, then
          swings onto the rail and rotates to ride it down -->
-    <img src="/assets/images/about-3d.webp" alt="" class="story-scene-car" id="storySceneCar" aria-hidden="true">
+    <!-- The scene car is a live GLB (js/about-glb.js) rather than a PNG. about-story.js still positions this element exactly as before; the
+         module only renders into it and turns the model in 3D. -->
+    <canvas class="story-scene-car" id="storySceneCar" aria-hidden="true"></canvas>
 
     <div class="container about-scene__stage">
 
@@ -103,9 +105,11 @@
       <div class="scene-panel scene-panel--overview" data-panel="overview">
         <div class="about-overview__inner">
           <p class="eyebrow">Overview</p>
-          <h2 class="about-overview__h">The Future<br>Feels Different</h2>
+          <h2 class="about-overview__h">The Future<br>Feels <span class="hl-word" id="aboutHlWord"><span>Different</span><svg class="head-scribble" id="aboutHeadScribble" viewBox="0 0 300 60" preserveAspectRatio="none" fill="none" aria-hidden="true"><path pathLength="1" d="M10 22c60-9 120-12 180-8 34 2 68 7 100 3"/><path pathLength="1" d="M14 40c62-7 126-9 188-5 32 2 64 6 94 2"/></svg></span></h2>
           <p class="about-overview__lead">iCAUR is a new generation automotive brand redefining intelligent mobility through bold design, advanced technology, and expressive driving experiences. Built for the young and young-at-heart, iCAUR combines rugged character, smart innovation, and lifestyle-driven thinking to create vehicles that feel as exciting as they look.</p>
-          <a href="/reserve" class="btn btn--dark btn--arrow btn--magnetic">Get Your iCAUR <span class="arrow">→</span></a>
+          <!-- Desktop: the scene car lands here instead, so this is hidden
+               above 960px — exactly where the car is available to replace it. -->
+          <a href="/reserve" class="btn btn--dark btn--arrow btn--magnetic about-overview__cta">Get Your iCAUR <span class="arrow">→</span></a>
         </div>
       </div>
 
@@ -185,25 +189,26 @@
      the reduced-motion fallback reads Vision → Mission too). -->
 <div class="mv-driver" id="mvDriver">
 <section class="mv" id="missionSection" aria-label="Our vision and mission">
+  <!-- The black stage itself: js/about-mv.js slides this sheet up over the
+       stats section as the chapter arrives, so the dark scene ENTERS rather
+       than cutting in on a hard edge. -->
+  <div class="mv__bg" id="mvBg" aria-hidden="true"></div>
   <div class="mv__stage">
 
     <div class="mv__mark" id="mvMark" aria-hidden="true"></div>
     <canvas id="mvCanvas" aria-hidden="true"></canvas>
 
     <div class="mv__panel mv__panel--vision" id="mvVision">
-      <span class="mv__ghost" aria-hidden="true">Vision</span>
       <div class="mv__inner">
         <h2 class="mv__title">Our <em>Vision</em></h2>
-        <p class="mv__statement" data-mv-split>To put Egypt on the <em>global stage</em> of electric mobility — engineering vehicles that don't just compete with the world's best, but <em>define what's next</em> for an entire generation.</p>
+        <p class="mv__statement" data-mv-split>To put Egypt on the <span class="mv-chip" aria-hidden="true"><img src="/assets/images/about-hero.webp" alt="" loading="lazy"></span> <em>global stage</em> of electric mobility — engineering vehicles <span class="mv-chip" aria-hidden="true"><img src="/assets/images/v27/car-side.webp" alt="" loading="lazy"></span> that don't just compete with the world's best, but <em>define what's next</em> for an entire generation.</p>
       </div>
     </div>
 
     <div class="mv__panel mv__panel--mission" id="mvMission">
-      <span class="mv__ghost" aria-hidden="true">Mission</span>
       <div class="mv__inner">
         <h2 class="mv__title">Our <em>Mission</em></h2>
-        <p class="mv__statement" data-mv-split>We exist to put <em>Egypt</em> on the global <em>EV map</em> — engineering world-class electric vehicles at home, for the heat, the highways, and the people who drive them.</p>
-        <p class="mv__tail" data-mv-split>Mobility, <em>reimagined</em> for real life.</p>
+        <p class="mv__statement" data-mv-split>We exist to put <em>Egypt</em> <span class="mv-chip" aria-hidden="true"><img src="/assets/images/ICUAR V27 brochure 03 20.webp" alt="" loading="lazy"></span> on the global <em>EV map</em> — engineering world-class electric vehicles <span class="mv-chip" aria-hidden="true"><img src="/assets/images/v27/interior-display.webp" alt="" loading="lazy"></span> at home, for the heat, the highways, and the people who drive them.</p>
       </div>
     </div>
 
@@ -231,7 +236,7 @@
       </div>
     </div>
 
-    <!-- Hover image preview — floats over the left side -->
+    <!-- Hover image preview — one fixed spot: section centre, left gutter -->
     <!-- src matches the first .usp-row's data-img so the idle preview is
          correct before JS runs (initUspList keeps it in sync after that) -->
     <div class="usp-preview" id="uspPreview" aria-hidden="true">
@@ -267,6 +272,11 @@
   <script src="/js/about-story.js" defer></script>
   <script src="/js/dot-field.js" defer></script>
   <script src="/js/doodles.js" defer></script>
+  <script src="/js/about-thread.js" defer></script>
+  <!-- about-mv.js drives the Mission/Vision statement choreography; its
+       car rendering is switched off inside the module (MV_CAR = false)
+       so the 3D model appears only in the Overview/Story scene. -->
   <script type="module" src="/js/about-mv.js"></script>
+  <script type="module" src="/js/about-glb.js"></script>
 </body>
 </html>

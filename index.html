@@ -248,177 +248,299 @@
 <!-- ═══════════════════════════════════════════════════════
      DIFFERENTIATORS
 ═══════════════════════════════════════════════════════ -->
-<div class="diff-scroll-driver" id="diffScrollDriver">
-<section class="section diff" id="services" data-dotfield
-         data-df-from="rgba(10,10,10,0.14)" data-df-to="rgba(10,10,10,0.05)"
-         data-df-glow="236,230,220">
+<!-- ═══════════════════════════════════════════════════════
+     SERVICES — editorial horizontal story (off-track style)
+     One tall driver pins the section. Phase A: the intro's
+     flipbook deck cycles OVER the headline, then FLIPs down to
+     a small slot under the paragraph. Phase B: the track slides
+     horizontally through the three services from the nav —
+     Maintenance Schedules, Programs, Warranty — every image
+     window parallaxing at its own rate (js/main.js initSvcScroll).
+═══════════════════════════════════════════════════════ -->
+<div class="svc-driver" id="svcDriver">
+<section class="svc" id="services">
+  <div class="svc__track" id="svcTrack">
 
-  <!-- Curved divider echoing the section above -->
-  <div class="diff__curve" aria-hidden="true">
-    <svg viewBox="0 0 1440 140" preserveAspectRatio="none"><path d="M0,100 C360,0 1080,0 1440,100 L1440,140 L0,140 Z"/></svg>
-  </div>
-
-  <!-- Ambient drifting light glows -->
-  <div class="diff__glow diff__glow--1" aria-hidden="true"></div>
-  <div class="diff__glow diff__glow--2" aria-hidden="true"></div>
-  <div class="diff__glow diff__glow--3" aria-hidden="true"></div>
-
-  <!-- Carousel stage — the headline panel and each service card sweep in
-       from the right, pass through center with a 3D perspective, and
-       exit to the left as you scroll -->
-  <div class="diff__viewport">
-  <div class="diff__stage" id="diffStage">
-    <div class="diff__panel diff__panel--intro" id="diffIntro">
-      <div class="diff__intro-content">
-        <p class="eyebrow" style="justify-content:center">iCAUR Services</p>
-        <h2 class="diff__headline">We've Got You <em>Covered</em></h2>
-        <p class="diff__sub">From warranty to maintenance, we handle everything so you can focus on driving.</p>
+    <!-- 0 · intro -->
+    <div class="svc__panel svc__panel--intro">
+      <div class="svc__intro-inner">
+        <!-- beat 1: only this group is visible; it slides UP and out as the
+             statement paragraph takes the screen -->
+        <div class="svc__headgroup" id="svcHeadGroup">
+          <p class="eyebrow svc__eyebrow">iCAUR Services</p>
+          <h2 class="svc__headline" id="svcHeadline">We've Got<br>You <em>Covered</em></h2>
+        </div>
+        <p class="svc__sub">Warranty, maintenance and ownership programs, we handle everything so you can focus on the drive.</p>
+        <span class="svc__slot" id="svcSlot" aria-hidden="true"></span>
       </div>
-    </div>
 
-    <!-- Each card is a 3D "brick box": .diff-card__box is the white front
-         (carries the clip/shadow the card itself used to), and the two
-         .diff-card__edge slabs are orange lego-studded side faces rotated
-         90° into depth — visible only while the carousel angles the card,
-         so the sides "appear on swapping" like box covers. -->
-    <div class="diff-card diff-card--media diff__panel">
-      <span class="diff-card__edge diff-card__edge--l" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <span class="diff-card__edge diff-card__edge--r" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <div class="diff-card__box">
-        <div class="diff-card__media" aria-hidden="true" style="background-image:url('/assets/images/iCAUR INTL_V27 REV_cam025.webp');background-size:cover;background-position:center"></div>
-        <div class="diff-card__body">
-          <h4>Warranty</h4>
-          <p>Comprehensive coverage that protects your vehicle and gives you complete peace of mind — so you can focus on the drive.</p>
-          <a href="/services/warranty" class="diff-card__link btn btn--dark btn--sm btn--arrow">Explore Warranty <span class="arrow">→</span></a>
+      <!-- ONE line that travels with the picture, morphing from one doodle
+           shape into the next as it goes (js/main.js lerps the path data —
+           every shape has the same command structure so it can tween). -->
+      <svg class="svc__trace" id="svcTrace" viewBox="0 0 100 100" aria-hidden="true">
+        <path id="svcTracePath" d="M10 70 C 30 20, 70 20, 90 60"/>
+      </svg>
+      <!-- Travelling deck: 8 frames, one per step of the path. The picture
+           never swaps in place — each new frame arrives at the next position
+           and a smaller size, so the change always reads as movement. -->
+      <div class="svc__deck" id="svcDeck" aria-hidden="true">
+        <!-- inner layer drifts against the frame while it travels (parallax) -->
+        <div class="svc__deck-inner">
+          <img src="assets/images/Maintainance.webp" alt="" loading="lazy">
+          <img src="assets/images/iCAUR INTL_V27 REV_cam025.webp" alt="" loading="lazy">
+          <img src="assets/images/v27/car-side.webp" alt="" loading="lazy">
+          <img src="assets/images/ICUAR V27 brochure 03 20.webp" alt="" loading="lazy">
+          <img src="assets/images/v27/interior-display.webp" alt="" loading="lazy">
+          <img src="assets/images/ICUAR V27 brochure 03 18.webp" alt="" loading="lazy">
+          <img src="assets/images/iCAUR INTL_V27 REV_cam026 copy.webp" alt="" loading="lazy">
+          <img src="assets/images/v27/interior-01.webp" alt="" loading="lazy">
         </div>
       </div>
     </div>
 
-    <div class="diff-card diff-card--media diff__panel">
-      <span class="diff-card__edge diff-card__edge--l" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <span class="diff-card__edge diff-card__edge--r" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <div class="diff-card__box">
-        <div class="diff-card__media" aria-hidden="true" style="background-image:url('/assets/images/v27/interior-01.webp');background-size:cover;background-position:center"></div>
-        <div class="diff-card__body">
-          <h4>Service Center</h4>
-          <p>Expert care from certified technicians, ensuring your iCAUR stays at peak performance every day.</p>
-          <a href="/services/maintenance" class="diff-card__link btn btn--dark btn--sm btn--arrow">Explore Service Center <span class="arrow">→</span></a>
-        </div>
+    <!-- 1 · Maintenance Schedules -->
+    <article class="svc__panel svc__panel--feature">
+      <figure class="svc__media svc__media--lg">
+        <img src="assets/images/Maintainance.webp" alt="iCAUR maintenance bay" loading="lazy" data-par="0.10">
+      </figure>
+      <div class="svc__body">
+        <span class="svc__num">01 — Service</span>
+        <h3 class="svc__title">Maintenance <em>Schedules</em></h3>
+        <p class="svc__text">Factory-trained technicians, genuine parts and clear service intervals — book in minutes, drive out the same day.</p>
+        <a href="/services/maintenance" class="btn btn--dark btn--sm btn--arrow btn--magnetic">Explore Maintenance <span class="arrow">→</span></a>
       </div>
+    </article>
+
+    <!-- small cluster -->
+    <div class="svc__panel svc__panel--cluster" aria-hidden="true">
+      <figure class="svc__media svc__media--sm svc__media--sm-a">
+        <img src="assets/images/v27/interior-01.webp" alt="" loading="lazy" data-par="0.18">
+      </figure>
+      <figure class="svc__media svc__media--sm svc__media--sm-b">
+        <img src="assets/images/v27-18.webp" alt="" loading="lazy" data-par="-0.12">
+      </figure>
     </div>
 
-    <div class="diff-card diff-card--media diff__panel">
-      <span class="diff-card__edge diff-card__edge--l" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <span class="diff-card__edge diff-card__edge--r" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <div class="diff-card__box">
-        <div class="diff-card__media" aria-hidden="true" style="background-image:url('/assets/images/ICUAR V27 brochure 03 20.webp');background-size:cover;background-position:center"></div>
-        <div class="diff-card__body">
-          <h4>Insurance Programs</h4>
-          <p>Flexible insurance solutions built around your lifestyle, offering simple, reliable protection wherever you go.</p>
-          <a href="/services/programs" class="diff-card__link btn btn--dark btn--sm btn--arrow">Explore Insurance Programs <span class="arrow">→</span></a>
-        </div>
+    <!-- 2 · Programs (mirrored) -->
+    <article class="svc__panel svc__panel--feature svc__panel--flip">
+      <figure class="svc__media svc__media--lg">
+        <img src="assets/images/iCAUR INTL_V27 REV_cam026 copy.webp" alt="iCAUR ownership programs" loading="lazy" data-par="0.10">
+      </figure>
+      <div class="svc__body">
+        <span class="svc__num">02 — Ownership</span>
+        <h3 class="svc__title"><em>Programs</em></h3>
+        <p class="svc__text">Financing, insurance and trade-in programs built around real life in Egypt — one plan, zero surprises.</p>
+        <a href="/services/programs" class="btn btn--dark btn--sm btn--arrow btn--magnetic">Explore Programs <span class="arrow">→</span></a>
       </div>
-    </div>
-  </div>
-  </div>
+    </article>
 
+    <!-- small cluster -->
+    <div class="svc__panel svc__panel--cluster" aria-hidden="true">
+      <figure class="svc__media svc__media--sm svc__media--sm-c">
+        <img src="assets/images/ICUAR V27 brochure 03 18.webp" alt="" loading="lazy" data-par="0.16">
+      </figure>
+      <figure class="svc__media svc__media--sm svc__media--sm-d">
+        <img src="assets/images/v27/interior-display.webp" alt="" loading="lazy" data-par="-0.10">
+      </figure>
+    </div>
+
+    <!-- 3 · Warranty -->
+    <article class="svc__panel svc__panel--feature">
+      <figure class="svc__media svc__media--lg">
+        <img src="assets/images/iCAUR INTL_V27 REV_cam027 copy.webp" alt="iCAUR warranty coverage" loading="lazy" data-par="0.10">
+      </figure>
+      <div class="svc__body">
+        <span class="svc__num">03 — Peace of mind</span>
+        <h3 class="svc__title"><em>Warranty</em></h3>
+        <p class="svc__text">Comprehensive coverage that protects your vehicle and gives you complete peace of mind — so you can focus on the drive.</p>
+        <a href="/services/warranty" class="btn btn--dark btn--sm btn--arrow btn--magnetic">Explore Warranty <span class="arrow">→</span></a>
+      </div>
+    </article>
+
+  </div>
 </section>
 </div>
 
 
 <!-- ═══════════════════════════════════════════════════════
-     WHY ICAUR — dark hover list with image preview
+     WHY ICAUR — diagonal band strips (telescope-style)
+     Pure document flow — NO pinning, NO opacity games. Each
+     reason is a rotated full-bleed colour strip carrying its
+     giant word; scrolling wipes it diagonally through the
+     viewport exactly like the reference. JS (initWhyStrips)
+     only adds the word's subtle horizontal drift, the doodle
+     draw-on and the HUD counter.
 ═══════════════════════════════════════════════════════ -->
-<section class="section usp-list usp-list--dark" id="why-icaur">
-  <div class="container usp-list__wrap">
-    <p class="eyebrow eyebrow--warm reveal reveal--up">Why iCAUR</p>
+<section class="why" id="why-icaur">
 
-    <div class="usp-list__stack" id="uspStack">
-      <div class="usp-row" tabindex="0" data-img="/assets/images/iCAUR INTL_V27 REV_cam027 copy.webp">
-        <span class="usp-row__title">Power Without Limits</span>
-        <span class="usp-row__tag">Instant torque, EV performance on every road.</span>
-      </div>
-      <div class="usp-row" tabindex="0" data-img="/assets/images/about-hero.webp">
-        <span class="usp-row__title">Built for Egypt Roads</span>
-        <span class="usp-row__tag">From city streets to desert highways.</span>
-      </div>
-      <div class="usp-row" tabindex="0" data-img="/assets/images/v27/interior-display.webp">
-        <span class="usp-row__title">Smart Tech Inside</span>
-        <span class="usp-row__tag">Connected cabin, OTA updates, AI features.</span>
-      </div>
-      <div class="usp-row" tabindex="0" data-img="/assets/images/ICUAR V27 brochure 03 18.webp">
-        <span class="usp-row__title">Designed to Stand Out</span>
-        <span class="usp-row__tag">Bold proportions that turn heads.</span>
-      </div>
+  <article class="why-strip why-strip--amber" data-side="l">
+    <div class="why-strip__inner">
+      <p class="eyebrow why-strip__eyebrow">Why iCAUR</p>
+      <svg class="why-viz" viewBox="0 0 300 170" aria-hidden="true">
+      <!-- Luxury SUV profile (Range-Rover-ish): LONG hood behind a raked
+           windscreen, shallow glass over a high beltline, slim rails, big
+           wheels. The long hood is what separates SUV from van — the stubby
+           front on earlier passes was the van tell. Stroke line-art at the
+           shared weight, drawn by the scroll; settles into a suspension bob. -->
+      <g class="viz-car">
+        <path data-draw="0.15 0.20" pathLength="1" d="M76 34H156M86 44V34M146 44V34"/>
+        <path data-draw="0.16 0.34" pathLength="1" d="M52 112V54Q52 44 62 44H160Q166 44 170 48L196 66Q199 69 204 69H238Q250 71 250 82V110Q250 118 242 118H228V106Q228 100 222 100H190Q184 100 184 106V118H114V106Q114 100 108 100H76Q70 100 70 106V118H60Q52 118 52 112Z"/>
+        <path data-draw="0.30 0.38" pathLength="1" d="M60 64H162M116 44V64M166 46L192 64"/>
+        <!-- mirror, flush handles, headlight slit, character line -->
+        <path data-draw="0.34 0.40" pathLength="1" d="M198 60l9 -6M92 72h12M136 72h12M238 78l10 2M60 86H180"/>
+        <circle data-draw="0.34 0.44" pathLength="1" cx="92" cy="120" r="20"/>
+        <circle data-draw="0.36 0.46" pathLength="1" cx="206" cy="120" r="20"/>
+        <circle data-draw="0.41 0.45" pathLength="1" cx="92" cy="120" r="7"/>
+        <circle data-draw="0.42 0.46" pathLength="1" cx="206" cy="120" r="7"/>
+      </g>
+      <!-- speed dashes off the tail, pulsing once the scene is in -->
+      <path class="viz-pop" data-draw="0.46 0.50" pathLength="1" d="M42 54H28"/>
+      <path class="viz-pop" data-draw="0.47 0.50" pathLength="1" d="M40 74H26"/>
+      <path class="viz-pop" data-draw="0.48 0.50" pathLength="1" d="M42 94H28"/>
+    </svg>
+      <h3 class="why-strip__word">Power without <em>limits</em></h3>
+      <p class="why-strip__tag">Instant torque and EV performance on every road.</p>
     </div>
+  </article>
 
-    <!-- Hover image preview — left side -->
-    <!-- src matches the first .usp-row's data-img so the idle preview is
-         correct before JS runs (initUspList keeps it in sync after that) -->
-    <div class="usp-preview" id="uspPreview" aria-hidden="true">
-      <img src="/assets/images/iCAUR INTL_V27 REV_cam027 copy.webp" alt="" loading="lazy">
+  <article class="why-strip why-strip--dark" data-side="r">
+    <div class="why-strip__inner">
+      <svg class="why-viz" viewBox="0 0 240 150" aria-hidden="true">
+      <!-- wavy road first… -->
+      <path data-draw="0.16 0.30" pathLength="1" d="M10 116Q40 98 70 112T130 110T190 112T232 108"/>
+      <path data-draw="0.20 0.34" pathLength="1" d="M6 132Q40 116 74 128T138 126T198 128T236 124"/>
+      <path data-draw="0.30 0.38" pathLength="1" d="M60 122q8 -4 14 0M120 120q8 -4 14 0M178 121q8 -4 14 0"/>
+      <!-- …then the sun, which pulses with its rays -->
+      <g class="viz-sun">
+        <circle data-draw="0.36 0.46" pathLength="1" cx="186" cy="40" r="17"/>
+        <path data-draw="0.44 0.50" pathLength="1" d="M186 15v-8M203 23l6-6M210 40h8M203 57l6 6M169 23l-6-6M162 40h-8M169 57l-6 6M186 65v6"/>
+      </g>
+    </svg>
+      <h3 class="why-strip__word">Built for <em>Egypt roads</em></h3>
+      <p class="why-strip__tag">From crowded city streets to open desert highways.</p>
     </div>
-  </div>
+  </article>
+
+  <article class="why-strip why-strip--amber" data-side="l">
+    <div class="why-strip__inner">
+      <svg class="why-viz" viewBox="0 0 260 160" aria-hidden="true">
+      <!-- The client's techinside drawing (V27 wheel left, floating display
+           right — LHD) redrawn as stroke line-art at the shared weight. -->
+      <g class="viz-wheel">
+        <circle data-draw="0.16 0.30" pathLength="1" cx="64" cy="90" r="42"/>
+        <circle data-draw="0.22 0.34" pathLength="1" cx="64" cy="90" r="33"/>
+        <rect data-draw="0.30 0.38" pathLength="1" x="50" y="80" width="28" height="22" rx="7"/>
+        <rect data-draw="0.34 0.40" pathLength="1" x="33" y="83" width="13" height="15" rx="5"/>
+        <rect data-draw="0.35 0.41" pathLength="1" x="82" y="83" width="13" height="15" rx="5"/>
+        <path data-draw="0.38 0.44" pathLength="1" d="M59 130l2 -18M69 130l-2 -18"/>
+      </g>
+      <rect data-draw="0.28 0.42" pathLength="1" x="142" y="36" width="102" height="64" rx="10"/>
+      <rect data-draw="0.36 0.46" pathLength="1" x="149" y="43" width="88" height="50" rx="6"/>
+      <path data-draw="0.42 0.47" pathLength="1" d="M142 44l-7 5v52l7 5"/>
+      <!-- pop! marks off the screen corner -->
+      <path class="viz-pop" data-draw="0.46 0.50" pathLength="1" d="M248 26l8 -8"/>
+      <path class="viz-pop" data-draw="0.47 0.50" pathLength="1" d="M254 42l12 -3"/>
+      <path class="viz-pop" data-draw="0.48 0.50" pathLength="1" d="M240 16l4 -12"/>
+    </svg>
+      <h3 class="why-strip__word">Smart tech <em>inside</em></h3>
+      <p class="why-strip__tag">Connected cabin, OTA updates and AI on board.</p>
+    </div>
+  </article>
+
+  <article class="why-strip why-strip--dark" data-side="r">
+    <div class="why-strip__inner">
+      <svg class="why-viz viz-spin" viewBox="0 0 1064 1064" aria-hidden="true">
+      <path data-draw="0.20 0.32" pathLength="1" d="M531.996 0V1064"/>
+        <path data-draw="0.28 0.40" pathLength="1" d="M908.18 155.815L155.818 908.177"/>
+        <path data-draw="0.36 0.46" pathLength="1" d="M1064 531.995L0 531.995"/>
+        <path data-draw="0.42 0.50" pathLength="1" d="M908.184 908.177L155.822 155.815"/>
+    </svg>
+      <h3 class="why-strip__word">Designed to <em>stand out</em></h3>
+      <p class="why-strip__tag">Bold proportions and details that turn heads.</p>
+    </div>
+  </article>
+
 </section>
 
 
 <!-- ═══════════════════════════════════════════════════════
-     NEWS
+     MEDIA CENTER — two-scene pinned sequence
+     Scene 1: the featured story's image is FULL BLEED under a
+     black scrim, eyebrow + headline huge and white over it.
+     Scene 2 (driven by scroll): the image's frame shrinks into
+     the featured card's picture slot while the picture itself
+     pulls back (parallax), the headline flies to the top-left
+     at small/dark, a larger second story slides in beside it,
+     and the media-center brief resolves bottom-left.
+     The morph is a clip-path inset on #mediaVeil measured
+     against the real card's image box, so it LANDS exactly on
+     the laid-out card at any viewport (js/main.js initMediaScene).
 ═══════════════════════════════════════════════════════ -->
-<section class="section news" id="news">
-  <div class="container">
-    <header class="news__head news__head--center">
-      <div class="reveal reveal--up" data-stagger="parent">
-        <p class="eyebrow" style="justify-content:center">Media Center</p>
-        <h2 class="section-title" style="text-align:center">What's Happening Now</h2>
-      </div>
-    </header>
+<div class="media-driver" id="mediaDriver">
+<section class="media" id="news">
+  <div class="media__stage" id="mediaStage">
 
-    <div class="news__grid">
-      <article class="news-card reveal reveal--up" data-delay="1">
-        <div class="news-card__header">
-          <div class="news-card__meta-row">
-            <span class="news-card__type">News</span>
-            <div class="news-card__date-loc">
-              <time datetime="2026-05-28">May 28, 2026</time>
-            </div>
-          </div>
-          <h4>iCAUR V27 Studio Design Revealed</h4>
+    <div class="media__grid">
+      <!-- LEFT: headline (top) + brief (bottom) -->
+      <div class="media__col">
+        <header class="media__head" id="mediaHead">
+          <p class="eyebrow media__eyebrow">Media Center</p>
+          <h2 class="media__title">What's Happening Now</h2>
+        </header>
+
+        <div class="media__brief" id="mediaBrief">
+          <p>All iCAUR updates, launches and stories in one place — so you always
+             know what we're building, and what's coming next.</p>
+          <a href="/news" class="btn btn--outline btn--sm btn--arrow">View Media Center <span class="arrow">→</span></a>
         </div>
-        <a href="/news/electric-wiring" class="news-card__img" data-cursor-label="Read">
+      </div>
+
+      <!-- MIDDLE: the notched tile the full-bleed image shrinks into.
+           Deliberately NOT a boxed card — an image tile with a stepped
+           corner cut, meta and title sitting under it on the bare surface. -->
+      <article class="media-card media-card--lead" id="mediaLead">
+        <a href="/news/v23-design" class="media-card__img" id="mediaLeadImg" data-cursor-label="Read">
           <img src="assets/images/iCAUR INTL_V27 REV_cam025.webp" alt="iCAUR V27 Studio Design Revealed" loading="lazy">
         </a>
-        <div class="news-card__body">
-          <p>A first look at the design philosophy behind Egypt's most anticipated EV.</p>
+        <div class="media-card__meta">
+          <span class="media-card__type">News</span>
+          <time datetime="2026-05-28">May 28, 2026</time>
         </div>
+        <h4 class="media-card__title">iCAUR V27 Studio Design Revealed</h4>
       </article>
 
-      <article class="news-card reveal reveal--up" data-delay="2">
-        <div class="news-card__header">
-          <div class="news-card__meta-row">
-            <span class="news-card__type news-card__type--blog">Blog</span>
-            <div class="news-card__date-loc">
-              <time datetime="2026-05-20">May 20, 2026</time>
-            </div>
-          </div>
-          <h4>Electric Wiring Matrix Optimized for Egypt</h4>
-        </div>
-        <a href="/news/electric-wiring" class="news-card__img" data-cursor-label="Read">
+      <!-- RIGHT: the larger story, slides in beside the lead -->
+      <article class="media-card media-card--big" id="mediaBig">
+        <a href="/news/electric-wiring" class="media-card__img" data-cursor-label="Read">
           <img src="assets/images/v27/car-side.webp" alt="Electric Wiring Matrix Optimized for Egypt" loading="lazy">
         </a>
-        <div class="news-card__body">
-          <p>How engineers rebuilt the EV powertrain for Egypt's unique climate and roads.</p>
+        <div class="media-card__meta">
+          <span class="media-card__type media-card__type--blog">Blog</span>
+          <time datetime="2026-05-20">May 20, 2026</time>
         </div>
+        <h4 class="media-card__title">Electric Wiring Matrix Optimized for Egypt</h4>
       </article>
-
     </div>
 
-    <div style="text-align:center; margin-top: clamp(40px,5vh,64px);">
-      <a href="/news" class="btn btn--outline btn--sm btn--arrow btn--magnetic reveal reveal--up" data-delay="3">View Media Center <span class="arrow">→</span></a>
+    <!-- The morphing layer: full bleed at rest, clipped down onto
+         #mediaLeadImg as the scene resolves. Sits above the grid so
+         it reads as one image becoming the card. -->
+    <!-- NO src here on purpose: js/main.js copies it from the lead story's own
+         <img>, so the hero picture and the tile are literally the same asset
+         from the same source. A second hardcoded src could drift from whatever
+         the story actually carries. -->
+    <!-- The hero frame holds the lead story's OWN <img>, moved here by
+         js/main.js — there is exactly one image node on the page, so there is
+         nothing to cross-fade and nothing that can jump. The frame's box is
+         resized from full bleed down to the tile's slot and object-fit:cover
+         reframes the picture for free at every size. -->
+    <div class="media__veil" id="mediaVeil" aria-hidden="true">
+      <span class="media__scrim" id="mediaScrim"></span>
     </div>
 
   </div>
 </section>
+</div>
 
 
 <!-- ═══════════════════════════════════════════════════════
@@ -434,32 +556,32 @@
         <a href="/faq" class="btn btn--dark btn--arrow btn--magnetic">View All FAQs <span class="arrow">→</span></a>
       </aside>
 
-      <div class="faq__list reveal reveal--up" data-delay="1">
-        <div class="faq-item">
+      <div class="faq__list">
+        <div class="faq-item reveal reveal--up" data-delay="1">
           <button class="faq-item__q" aria-expanded="false">
             <span>How do I reserve my iCAUR?</span><span class="faq-item__plus" aria-hidden="true">+</span>
           </button>
           <div class="faq-item__a"><div><p>Click the Reserve button, choose your model and tier, provide your details, and submit a refundable deposit. Our team confirms within 24 hours.</p></div></div>
         </div>
-        <div class="faq-item">
+        <div class="faq-item reveal reveal--up" data-delay="2">
           <button class="faq-item__q" aria-expanded="false">
             <span>How long does it take to charge iCAUR?</span><span class="faq-item__plus" aria-hidden="true">+</span>
           </button>
           <div class="faq-item__a"><div><p>With fast charging, 20% to 80% in ~45 minutes. A full overnight home charge takes 6–8 hours — wake up to a full battery every day.</p></div></div>
         </div>
-        <div class="faq-item">
+        <div class="faq-item reveal reveal--up" data-delay="3">
           <button class="faq-item__q" aria-expanded="false">
             <span>How do I buy iCAUR?</span><span class="faq-item__plus" aria-hidden="true">+</span>
           </button>
           <div class="faq-item__a"><div><p>Start online or visit a showroom. Advisors guide you through model selection, configuration, and all financing options.</p></div></div>
         </div>
-        <div class="faq-item">
+        <div class="faq-item reveal reveal--up" data-delay="4">
           <button class="faq-item__q" aria-expanded="false">
             <span>Can I schedule a test drive?</span><span class="faq-item__plus" aria-hidden="true">+</span>
           </button>
           <div class="faq-item__a"><div><p>Yes — test drives are available at all iCAUR experience centers. Book online or call our team for a convenient time.</p></div></div>
         </div>
-        <div class="faq-item">
+        <div class="faq-item reveal reveal--up" data-delay="5">
           <button class="faq-item__q" aria-expanded="false">
             <span>What warranty comes with iCAUR?</span><span class="faq-item__plus" aria-hidden="true">+</span>
           </button>
@@ -477,7 +599,7 @@
 <section class="cta-video" id="cta">
   <video class="cta-video__bg" src="/assets/images/CTA-bg.webm" poster="/assets/images/CTA.webp" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
   <div class="cta-video__overlay" aria-hidden="true"></div>
-  <div class="cta-video__glass reveal reveal--up">
+  <div class="cta-video__glass reveal reveal--blur">
     <span class="cta-video__dash" aria-hidden="true"></span>
     <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
     <p class="cta-video__body">Your next car is waiting — let's get you behind the wheel and show you what electric really means.</p>
@@ -501,5 +623,6 @@
   <script src="/js/transitions.js" defer></script>
   <script src="/js/game.js" defer></script>
   <script src="/js/dot-field.js" defer></script>
+
 </body>
 </html>

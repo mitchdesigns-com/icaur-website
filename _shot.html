@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>shot harness</title>
+<!--
+  Generic screenshot harness for this site.
+
+  The pinned, scroll-scrubbed sections only paint correctly when the page is
+  scrolled THROUGH — a hard jump leaves reveal observers unfired and the rAF
+  drivers a frame behind, so headless screenshots of `/page` at an offset come
+  back blank cream. This harness loads the real page in a same-origin iframe
+  and *steps* it down to the target offset, letting every driver settle, so a
+  plain `--screenshot` captures the section as a user would actually see it.
+
+  Usage (extensionless URL — serve's cleanUrls drops the query string on .html):
+    http://localhost:3010/_shot?u=/about&y=1140
+    http://localhost:3010/_shot?u=/&y=6200&step=90&settle=900
+
+    u      page to load          (default "/")
+    y      target scrollY in px  (default 0)
+    yv     target in viewport multiples — overrides y
+    step   px per scroll step    (default 60; smaller = gentler)
+    settle ms to wait at the end (default 700)
+-->
+<style>
+  html, body { margin: 0; padding: 0; background: #EBE7E1; }
+  iframe { display: block; width: 100vw; height: 100vh; border: 0; }
+  /* The iframe must stay PAINTED the whole time. Hiding it until the
+     scroll-through finished (visibility/opacity/offscreen) made Chrome
+     throttle rAF inside it, so every scroll-driven module froze on its
+     first frame and the capture showed the section's initial state. */
+</style>
+</head>
+<body>
+<iframe id="f" title="page under test"></iframe>
+<script>
+(function () {
+  var q      = new URLSearchParams(location.search);
+  var url    = q.get('u') || '/';
+  var step   = +(q.get('step') || 60);
+  /* The car, the rail fill and most other drivers here are LERPED (k≈0.15
+     per frame), so they need dozens of frames to converge — and a headless
+     render only manages a handful of rAF frames per second of virtual time.
+     700ms was enough for the CSS-driven bits but left the car frozen near
+     its start pose, which read as "the car is missing". */
+  var settle = +(q.get('settle') || 2500);
+  var f      = document.getElementById('f');
+
+  f.src = url;
+  f.addEventListener('load', function () {
+    var w = f.contentWindow, d = f.contentDocument;
+    // reduce-motion is NOT forced: we want the real animated build.
+    var target = q.has('yv')
+      ? Math.round(parseFloat(q.get('yv')) * w.innerHeight)
+      : +(q.get('y') || 0);
+
+    var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+
+    (async function () {
+      // let fonts + first layout settle before measuring anything
+      if (d.fonts && d.fonts.ready) { try { await d.fonts.ready; } catch (e) {} }
+      await sleep(250);
+
+      var max = Math.max(d.documentElement.scrollHeight - w.innerHeight, 0);
+      var end = Math.min(target, max);
+      for (var y = 0; y < end; y += step) {
+        w.scrollTo(0, y);
+        await sleep(32);              // ~2 frames per step: drivers keep up
+      }
+      w.scrollTo(0, end);
+      await sleep(settle);            // lerped drivers converge on the target
+      document.title = 'shot ' + url + ' @ ' + end;
+
+      // Probe mode: evaluate an expression INSIDE the settled page and print
+      // the result into the DOM, so `--dump-dom` can read it. rAF and timers
+      // run properly in a headless render, unlike the Browser pane, which is
+      // what makes this the only reliable way to inspect a live frame.
+      if (q.has('js')) {
+        var out = document.createElement('pre');
+        out.id = 'probe';
+        try {
+          // `js` is a function expression, e.g. () => ({...}); it is called
+          // inside the iframe so it can read live geometry and WebGL buffers.
+          var v = w.eval('(' + q.get('js') + ')()');
+          v = (v && typeof v.then === 'function') ? await v : v;
+          out.textContent = 'PROBE ' + JSON.stringify(v, null, 1);
+        } catch (e) {
+          out.textContent = 'PROBE ERROR ' + e.message;
+        }
+        document.body.appendChild(out);
+      }
+    })();
+  });
+})();
+</script>
+</body>
+</html>

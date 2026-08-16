@@ -107,12 +107,19 @@ function splitHeadlineLetters(headline) {
   }
 
   // Brand arrow, injected here so the 19 pages carrying the old
-  // dot/ring/label markup don't each need editing. The SVG ships its own
-  // colours and glow, so nothing here or in CSS restyles it — only size
-  // and the tip offset (see .cursor__arrow in styles.css).
+  // dot/ring/label markup don't each need editing. Inlined (not an <img>)
+  // so the two parts can recolour independently: .cursor__body is the arrow
+  // silhouette, .cursor__logo is the iCAUR mark inside it. Fills live in CSS
+  // so the low-contrast (white) state can flip body→white, logo→orange —
+  // see .cursor__arrow in styles.css. Size and tip offset are in CSS too.
   cursor.insertAdjacentHTML('beforeend',
-    '<img class="cursor__arrow" src="/assets/images/cursor.svg" alt="" ' +
-    'aria-hidden="true" draggable="false">');
+    '<svg class="cursor__arrow" viewBox="0 0 1120 1252" fill="none" ' +
+    'aria-hidden="true" xmlns="http://www.w3.org/2000/svg">' +
+    '<path class="cursor__body" d="M348.231 1182.47L4.60199 118.008C-21.3322 37.6717 67.6479 -30.9487 138.756 14.5498L1072.93 612.28C1140.66 655.615 1132.14 757.108 1058.14 788.55L755.539 917.118C738.883 924.195 724.459 935.659 713.805 950.289L524.234 1210.62C476.114 1276.7 373.344 1260.26 348.231 1182.47Z"/>' +
+    '<path class="cursor__logo" d="M189.716 221.997L171.397 165.393C171.17 164.69 170.474 164.143 169.748 164.08L113.727 159.221C113.243 159.179 113.114 159.654 113.494 160.1L166.723 217.898C168.751 220.088 171.544 221.589 174.162 221.816L188.845 223.09C189.571 223.153 189.926 222.645 189.716 221.997Z"/>' +
+    '<path class="cursor__logo" d="M127.737 216.621L127.689 216.617L109.37 160.012C109.143 159.309 108.447 158.763 107.768 158.704L48.2602 153.542C47.5819 153.483 47.1621 153.933 47.3896 154.636L61.5162 198.287C64.0496 206.115 72.7376 213.018 80.9745 213.733L126.865 217.714C127.544 217.773 127.965 217.324 127.737 216.621Z"/>' +
+    '<path class="cursor__logo" d="M198.337 434.775L255.335 496.643L217.292 493.343L198.337 434.775ZM263.828 820.009L283.415 773.277L283.433 773.332L308.187 800.19C312.253 804.607 317.877 807.577 323.014 808.022L366.095 811.759C374.333 812.474 378.924 806.722 376.385 798.876L357.444 740.349C355.743 735.093 352.515 729.778 348.159 725.048L305.405 678.661C304.899 678.114 304.153 678.282 304.345 678.875L328.723 754.203L308.612 752.459L296.911 739.737L272.431 664.093L319.685 668.192C327.872 668.902 332.457 663.14 329.927 655.322L315.812 611.707C315.601 611.054 314.875 610.475 314.189 610.416L224.436 602.63L225.386 602.332L208.569 550.369L283.633 556.88C291.871 557.595 296.462 551.842 293.929 544.015L270.214 470.738C268.514 465.483 265.292 460.186 260.935 455.455L132.852 316.402L122.63 284.817L178.455 289.66L199.294 354.052C200.995 359.308 204.223 364.623 208.574 369.336L251.284 415.736C251.785 416.264 252.537 416.115 252.345 415.522L198.072 247.82C195.533 239.975 186.852 233.089 178.614 232.374L84.3615 224.198C76.1221 223.484 71.5264 229.218 74.0654 237.064L102.803 325.864C104.504 331.119 107.725 336.416 112.082 341.146L147.233 379.319L173.81 461.441C175.511 466.696 178.731 471.992 183.088 476.723L196.759 491.562L170.14 489.253C161.901 488.539 157.305 494.273 159.844 502.118L195.337 611.792L195.622 611.704C197.451 615.619 200.067 619.463 203.318 622.992L238.464 661.147L252.153 703.446L240.386 737.531C238.927 741.756 239.048 746.785 240.749 752.04L262.612 819.598C262.804 820.191 263.657 820.499 263.828 820.009Z"/>' +
+    '</svg>');
 
   // Track the pointer 1:1 — an arrow that lags behind the real hit point
   // reads as broken, so there's no spring smoothing here.
@@ -416,6 +423,95 @@ function splitHeadlineLetters(headline) {
 
 
 // ============================================================
+// SMOOTH SCROLL — lerped wheel scrolling (Lenis-style, vanilla)
+// Nearly every big section on this site is SCRUBBED by scroll
+// position (hero mask, overview, services carousel, why strips,
+// media morph), so the feel of the whole page is the feel of the
+// scroll itself. Raw wheel input steps; this eases it: wheel
+// deltas move a TARGET, and a rAF loop lerps the real scroll
+// toward it, so every scrubbed animation inherits the glide.
+//
+// Desktop fine-pointer only — touch momentum is already smooth,
+// and reduced-motion users get native scrolling untouched.
+// Keyboard, scrollbar drags and anchor jumps stay native: any
+// scroll we didn't write ourselves just becomes the new target.
+// ============================================================
+(function initSmoothScroll() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!window.matchMedia('(pointer: fine)').matches) return;
+
+  // The stylesheet sets `html { scroll-behavior: smooth }` — with that live,
+  // every per-frame write below would start a NATIVE smooth animation and the
+  // two easings would fight (rubbery, laggy). This module takes over wheel
+  // smoothing entirely, so it turns the CSS behaviour off; the anchor handler
+  // requests its own smooth glide explicitly and keeps working.
+  document.documentElement.style.scrollBehavior = 'auto';
+
+  const RATE = 10;           // 1/s — ~100ms time constant, settled in ~1/3s
+  const MAX_STEP = 400;      // sanity cap for one wheel event, not a speed limit
+  let target = window.scrollY;
+  let current = window.scrollY;
+  let lastWritten = -1;
+  let rafId = null;
+  let prevT = 0;
+
+  const maxScroll = () =>
+    Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+
+  function loop(t) {
+    // frame-rate independent: the glide takes the same real time at 30fps
+    // (lego pit + carousel busy) as at 120fps
+    const dt = prevT ? Math.min((t - prevT) / 1000, 0.05) : 1 / 60;
+    prevT = t;
+    current += (target - current) * (1 - Math.exp(-RATE * dt));
+    if (Math.abs(target - current) < 0.5) {
+      current = target;
+      rafId = null;
+      prevT = 0;
+    } else {
+      rafId = requestAnimationFrame(loop);
+    }
+    // whole pixels only — sub-pixel writes kept firing scroll handlers for a
+    // long invisible tail after motion had visually stopped
+    const px = Math.round(current);
+    if (px !== lastWritten) {
+      lastWritten = px;
+      window.scrollTo(0, px);
+    }
+  }
+
+  window.addEventListener('wheel', (e) => {
+    if (e.ctrlKey) return;                       // pinch-zoom — never intercept
+    if (e.defaultPrevented) return;
+    // let scrollable sub-areas (modals, drawers, code blocks) scroll natively
+    let n = e.target instanceof Element ? e.target : null;
+    while (n && n !== document.body) {
+      const cs = getComputedStyle(n);
+      if (/(auto|scroll)/.test(cs.overflowY) && n.scrollHeight > n.clientHeight + 1) return;
+      n = n.parentElement;
+    }
+    e.preventDefault();
+    const unit = e.deltaMode === 1 ? 16 : (e.deltaMode === 2 ? window.innerHeight : 1);
+    const step = Math.max(-MAX_STEP, Math.min(MAX_STEP, e.deltaY * unit));
+    target = Math.max(0, Math.min(maxScroll(), target + step));
+    if (!rafId) rafId = requestAnimationFrame(loop);
+  }, { passive: false });
+
+  // a scroll we did not write (keyboard, scrollbar, anchor, browser find)
+  // becomes the new resting point instead of being fought
+  window.addEventListener('scroll', () => {
+    if (Math.abs(window.scrollY - lastWritten) > 1 && !rafId) {
+      target = current = window.scrollY;
+    }
+  }, { passive: true });
+
+  window.addEventListener('resize', () => {
+    target = Math.min(target, maxScroll());
+  }, { passive: true });
+})();
+
+
+// ============================================================
 // SCROLL REVEAL — IntersectionObserver for .reveal elements
 // ============================================================
 (function initReveal() {
@@ -604,105 +700,316 @@ function splitHeadlineLetters(headline) {
 
 
 // ============================================================
-// SERVICES — vertical scroll drives a horizontal track of
-// service cards, like a circular "carousel" reveal
+// SERVICES — editorial horizontal story (off-track style)
+// Phase A (intro, pinned): the flipbook deck cycles OVER the
+// headline, then FLIPs down into .svc__slot — measured, so it
+// lands exactly on the reserved box at any viewport. Phase B:
+// the track slides horizontally through the three services;
+// every [data-par] image drifts inside its window at its own
+// rate, which is what gives the run its depth.
 // ============================================================
-(function initDiffScroll() {
-  const driver = $('#diffScrollDriver');
-  const section = $('#services');
-  const stage  = $('#diffStage', section || document);
-  if (!driver || !section || !stage) return;
+(function initSvcScroll() {
+  const driver = $('#svcDriver');
+  const track  = $('#svcTrack');
+  const deck   = $('#svcDeck');
+  const slot   = $('#svcSlot');
+  const headGroup = $('#svcHeadGroup');
+  if (!driver || !track) return;
 
-  const cards = $$('.diff__panel', stage);
-  const intro = $('#diffIntro', stage);
-  // MUST match the stacked-layout media query in styles.css (860px) —
-  // when this sat at 760 there was a 761–860 dead zone where CSS had
-  // already stacked the panels but the carousel JS kept writing
-  // transforms and --card-fade over them
-  const MOBILE_BREAKPOINT = 860;
+  const MOBILE = 860;   // must match the stacked-layout media query
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isStatic = () => window.innerWidth <= MOBILE || reduce;
 
-  // Phones (≤767 = the CSS snap-strip breakpoint): the intro used to be
-  // the strip's first SLIDE — left-aligned, with the next card peeking —
-  // which read as broken. Centered header above the strip is the ask, and
-  // that's a reparent, not a restyle: the intro moves out of the stage on
-  // phones and back in as the first panel on anything wider.
-  const viewport = stage.parentElement; // .diff__viewport
-  function placeIntro() {
-    if (!intro || !viewport) return;
-    if (window.innerWidth <= 767) {
-      if (intro.parentElement === stage) viewport.parentNode.insertBefore(intro, viewport);
-    } else {
-      if (intro.parentElement !== stage) stage.insertBefore(intro, stage.firstChild);
-    }
+  const clamp01 = v => Math.min(1, Math.max(0, v));
+  const seg = (p, a, b) => clamp01((p - a) / (b - a));
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const smooth = t => t * t * (3 - 2 * t);   // gentle start + stop for the track
+  const easeInOut = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  const deckImgs = deck ? Array.from(deck.querySelectorAll('img')) : [];
+  const deckInner = deck ? deck.querySelector('.svc__deck-inner') : null;
+  // The trace line's vocabulary. Every shape is M + one cubic C, so all of
+  // them share the same 8 numbers and can be tweened into each other — that
+  // is what lets a single stroke morph instead of swapping.
+  const TRACE = [
+    [10, 70, 30, 20, 70, 20, 90, 60],   // swoosh
+    [10, 30, 35, 82, 65,  8, 90, 70],   // s-curve
+    [16, 84, 92, 58,  8, 40, 84, 20],   // loop
+    [10, 50, 35, 12, 65, 88, 90, 50],   // wave
+    [12, 86, 40, 62, 62, 34, 88, 14],   // rising line
+    [50, 12, 88, 44, 50, 88, 12, 44]    // closing arc
+  ];
+  const traceD = a =>
+    `M${a[0].toFixed(1)} ${a[1].toFixed(1)} C ${a[2].toFixed(1)} ${a[3].toFixed(1)}, ` +
+    `${a[4].toFixed(1)} ${a[5].toFixed(1)}, ${a[6].toFixed(1)} ${a[7].toFixed(1)}`;
+
+
+  const trace = $('#svcTrace');
+  const tracePath = $('#svcTracePath');
+  const panels = Array.from(track.querySelectorAll('.svc__panel'));
+  const parImgs = Array.from(track.querySelectorAll('img[data-par]'))
+    .map(el => ({ el, speed: parseFloat(el.dataset.par) || 0, center: 0 }));
+
+  // The statement paragraph lights word by word as the scroll advances
+  // (markwoodland reference). Split once, then only opacity is written.
+  const sub = $('.svc__sub', $('#svcDriver'));
+  let words = [];
+  if (sub && !sub.dataset.split) {
+    const frag = document.createDocumentFragment();
+    sub.textContent.trim().split(/\s+/).forEach(w => {
+      const mask = document.createElement('span');
+      mask.className = 'svc__wm';           // overflow-hidden window
+      const s = document.createElement('span');
+      s.className = 'svc__w';               // the word, rising inside it
+      s.textContent = w;
+      mask.appendChild(s);
+      frag.appendChild(mask);
+      frag.appendChild(document.createTextNode(' '));
+    });
+    sub.textContent = '';
+    sub.appendChild(frag);
+    sub.dataset.split = '1';
+    words = Array.from(sub.querySelectorAll('.svc__w'));
   }
-  placeIntro();
-  window.addEventListener('resize', placeIntro);
 
-  // Play the headline's entrance animation once, when the section
-  // first scrolls into view
-  if (intro) {
-    const dh = $('.diff__headline', intro);
-    splitHeadlineLetters(dh);   // pre-split so letters start hidden (no flash)
-    const introObs = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          intro.classList.add('in-view');
-          if (dh) dh.classList.add('letters-in');
-          introObs.disconnect();
-        }
-      });
-    }, { threshold: 0.2 });
-    introObs.observe(intro);
+  // split-letter entrance for the headline, same voice as the hero
+  const headline = $('#svcHeadline');
+  if (headline) {
+    splitHeadlineLetters(headline);
+    const io = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) { headline.classList.add('letters-in'); io.disconnect(); } });
+    }, { threshold: 0.4 });
+    io.observe(headline);
   }
 
-  function tick() {
-    if (window.innerWidth <= MOBILE_BREAKPOINT) {
-      cards.forEach(card => {
-        card.style.transform = ''; card.style.opacity = ''; card.style.zIndex = '';
-        card.style.removeProperty('--card-fade');
-      });
-      return;
+  let geo = null;
+  function measure() {
+    if (isStatic()) { geo = null; driver.style.height = ''; return; }
+    track.style.transform = '';
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const maxX = Math.max(0, track.scrollWidth - vw);
+
+    // clear the choreography transforms so every rect below is layout truth
+    if (headGroup) headGroup.style.transform = '';
+    // All rects here are VIEWPORT coordinates at whatever scroll position
+    // measure() happens to run — but the choreography plays inside the PINNED
+    // section, whose top is 0 while stuck. Rebase everything on the section's
+    // own top, or a page measured at scrollY 0 bakes the whole page-offset
+    // (thousands of px) into the transforms. Function-scoped: the deck's
+    // start position needs it too.
+    const secTop = track.parentElement.getBoundingClientRect().top;
+    // The paragraph RISES: it starts with its first line on the bottom edge of
+    // the pinned viewport and travels up to its laid-out spot as you scroll,
+    // so the copy is read on the way in. Layout is untouched (transform only),
+    // so the slot the picture lands on never moves.
+    let subRise = 0;
+    if (sub) {
+      // inline `none`, NOT '' — the stylesheet parks the paragraph at
+      // translateY(120vh) against the pre-JS flash, and clearing to ''
+      // would hand back to that rule and poison this measurement
+      sub.style.transform = 'none';
+      const sr = sub.getBoundingClientRect();
+      subRise = vh - (sr.top - secTop);
+      // measuring left `none` on the element — INVALIDATE paint's change
+      // guard, or the paint that follows sees an unchanged ty, skips its
+      // write, and the paragraph stays seated in full view. (This is what
+      // made it show early whenever fonts.ready / load re-measured.)
+      sub.dataset.ty = '';
+    }
+    if (sub && slot) slot.style.marginTop = '26px';
+    // FLIP: where the deck must land (the slot), from where it rests (centered)
+    let flip = null;
+    if (deck && slot) {
+      deck.style.transform = 'translate(-50%, -50%)';
+      const d = deck.getBoundingClientRect();
+      const s = slot.getBoundingClientRect();
+      const dx = (s.left + s.width / 2) - (d.left + d.width / 2);
+      const dy = (s.top + s.height / 2) - (d.top + d.height / 2);
+      const k  = s.width / d.width;
+      // ONE continuous cubic bezier, start (upper right) → slot (centred
+      // under the paragraph). A chain of stations changed direction at every
+      // stop, and each hop's little arc broke the derivative at the joins —
+      // that is what read as glitching. A single curve is smooth by
+      // construction; the pictures still swap along it, but the MOTION never
+      // kinks, never rotates, and lands exactly on the measured slot.
+      const W = vw, H = vh;
+
+      // START: anchored to the headline's accent word ("Covered") rather than
+      // to an arbitrary fraction, so it always sits under that word and in the
+      // right-hand half — never jammed against the edge. Measured, then
+      // clamped so the whole picture stays inside the viewport.
+      // Centre of the RIGHT HALF (75% of the viewport). Measuring the accent
+      // word instead looked exact but wasn't: at measure() time the headline's
+      // letters still carry their entrance transforms, so the <em> reports a
+      // collapsed rect and the picture landed dead centre.
+      const hgR = headGroup ? headGroup.getBoundingClientRect() : null;
+      const halfW = d.width / 2, halfH = d.height / 2;
+      const maxX = W / 2 - halfW - 24;               // keep it fully on screen
+      const startX = Math.min(W * 0.25, maxX);
+      // vertically: in the gap between the headline and the paragraph
+      const startY = hgR
+        ? ((hgR.bottom - secTop) + 34 + halfH) - (H * 0.44)
+        : H * 0.02;
+
+      flip = {
+        p0: { x: startX,      y: startY },
+        c1: { x: startX * 1.18, y: startY + H * 0.16 },
+        c2: { x: dx + (startX - dx) * 0.34, y: dy * 0.66 },
+        p3: { x: dx,          y: dy },
+        k
+      };
     }
 
-    const rect       = driver.getBoundingClientRect();
-    const vh         = window.innerHeight;
-    const scrollable = Math.max(driver.offsetHeight - vh, 1);
-    const p          = Math.min(Math.max(-rect.top / scrollable, 0), 1);
+    // parallax centers, in track coordinates
+    parImgs.forEach(p => {
+      const r = p.el.closest('.svc__media').getBoundingClientRect();
+      p.center = r.left + r.width / 2;    // track is untransformed right now
+      // half the horizontal overflow the picture has to give (118% wide → 9%),
+      // minus a pixel so a rounding error can never expose the window edge
+      p.room = Math.max(0, r.width * 0.09 - 1);
+    });
+    const panelLefts = panels.map(el => el.getBoundingClientRect().left);
 
-    // Continuous "virtual index" sweeps from the first card to the last
-    // as the user scrolls — cards glide right -> center -> left in 3D
-    const virtualIndex = p * (cards.length - 1);
-    const spacing      = Math.max(stage.getBoundingClientRect().width * 0.62, 240);
+    // the driver's height IS the choreography: ~1.4 viewports for the intro
+    // deck, then one px of scroll per px of horizontal travel
+    const introPx = Math.round(vh * 2.1);   // four beats need the runway
+    driver.style.height = (vh + introPx + maxX) + 'px';
 
-    cards.forEach((card, i) => {
-      const offset = i - virtualIndex;
-      const abs    = Math.abs(offset);
-      const scale  = Math.max(1 - abs * 0.18, 0.55);
-      // Side panels stay clearly readable at the stage edges (coverflow
-      // style) instead of fading out almost immediately — they carry the
-      // 3D lego flank, so they need to be seen while angled
-      const opacity = Math.max(1 - abs * 0.38, 0);
+    geo = { vw, maxX, flip, introPx, panelLefts, subRise };
+  }
 
-      // 38° keeps the lego edge slabs visibly presented to the camera
-      // while a card is off-centre
-      card.style.transform = `translateX(${offset * spacing}px) translateZ(${-abs * 160}px) rotateY(${-offset * 38}deg) scale(${scale})`;
-      // Media cards must not carry opacity themselves — it's a grouping
-      // property that flattens their preserve-3d and kills the lego edge
-      // slabs. Their fade rides the --card-fade var (box + edges consume
-      // it); the intro panel has no 3D children so plain opacity is fine.
-      if (card.classList.contains('diff-card')) {
-        card.style.setProperty('--card-fade', opacity.toFixed(3));
-        card.style.opacity = '';
-      } else {
-        card.style.opacity = opacity.toString();
+  let lastIdx = -1;
+  if (deckImgs.length) deckImgs[0].classList.add('is-on');
+  function paint() {
+    if (!geo) return;
+    const rect = driver.getBoundingClientRect();
+    const scrolled = Math.max(0, -rect.top);
+
+    // ── phase A, three beats: headline reads → the statement paragraph
+    // lights word by word → the flipbook arcs down into its slot.
+    const pA = clamp01(scrolled / geo.introPx);
+
+    // The paragraph climbs from the bottom edge into place — a steady,
+    // almost-linear rise so it reads at scroll pace rather than whipping in.
+    if (sub && geo.subRise) {
+      const rise = seg(pA, 0.04, 0.74);
+      const eased = rise * rise * (3 - 2 * rise) * 0.35 + rise * 0.65;   // mostly linear
+      const ty = (geo.subRise * (1 - eased)).toFixed(1);
+      if (sub.dataset.ty !== ty) { sub.dataset.ty = ty; sub.style.transform = `translateY(${ty}px)`; }
+    }
+
+    // beat 3 — the deck glides the curve: position and scale only, zero
+    // rotation. The frame swaps as it goes, but nothing about the motion
+    // changes at a swap, so the travel stays perfectly continuous.
+    if (deck && geo.flip && deckImgs.length) {
+      // visible from the very first frame — no fade. It is part of the
+      // opening composition, not something that arrives later.
+      const f = easeInOut(seg(pA, 0.14, 0.92));
+
+      // one frame per equal slice of the journey
+      const idx = Math.min(deckImgs.length - 1, Math.floor(f * deckImgs.length));
+      if (idx !== lastIdx) {
+        lastIdx = idx;
+        deckImgs.forEach((im, n) => im.classList.toggle('is-on', n === idx));
       }
-      card.style.zIndex    = Math.round(100 - abs * 10).toString();
+
+      const F = geo.flip, u = 1 - f;
+      const b0 = u * u * u, b1 = 3 * u * u * f, b2 = 3 * u * f * f, b3 = f * f * f;
+      const x = b0 * F.p0.x + b1 * F.c1.x + b2 * F.c2.x + b3 * F.p3.x;
+      const y = b0 * F.p0.y + b1 * F.c1.y + b2 * F.c2.y + b3 * F.p3.y;
+      deck.style.transform =
+        `translate(calc(-50% + ${x.toFixed(2)}px), calc(-50% + ${y.toFixed(2)}px)) ` +
+        `scale(${lerp(1, F.k, f).toFixed(4)})`;
+
+      // parallax inside the frame: the picture drifts against its own window
+      // as the window travels, which is what gives the flight depth
+      if (deckInner) {
+        const drift = ((1 - f) * -5).toFixed(2);
+        if (deckInner.dataset.d !== drift) {
+          deckInner.dataset.d = drift;
+          deckInner.style.transform = `translateY(${drift}%)`;
+        }
+      }
+
+      // The trace line rides the SAME curve, a little behind the picture and
+      // offset to its side, morphing shape continuously as it travels.
+      if (trace && tracePath) {
+        const ft = clamp01(f - 0.10);
+        const ut = 1 - ft;
+        const t0 = ut * ut * ut, t1 = 3 * ut * ut * ft, t2 = 3 * ut * ft * ft, t3 = ft * ft * ft;
+        const tx = t0 * F.p0.x + t1 * F.c1.x + t2 * F.c2.x + t3 * F.p3.x;
+        const ty = t0 * F.p0.y + t1 * F.c1.y + t2 * F.c2.y + t3 * F.p3.y;
+        // sits to the INNER side of the picture (toward the text), not the
+        // outer one — at 75% of the viewport an outward offset ran it off
+        // the right edge. Held WELL clear of the frame: at -165 it hugged
+        // (and partly hid behind) the image edge; the wider berth keeps the
+        // whole stroke in open air where it reads.
+        const side = lerp(-305, -215, f);
+        trace.style.opacity = (seg(f, 0.02, 0.12) * (1 - seg(f, 0.94, 1) * 0.25)).toFixed(3);
+        trace.style.transform =
+          `translate(calc(-50% + ${(tx + side).toFixed(1)}px), calc(-50% + ${(ty - 26).toFixed(1)}px)) ` +
+          `rotate(${(f * 26).toFixed(1)}deg)`;
+
+        // morph: walk the vocabulary, tweening every number between neighbours
+        const g = f * (TRACE.length - 1);
+        const i0 = Math.min(TRACE.length - 2, Math.floor(g));
+        const mt = smooth(clamp01(g - i0));
+        const A = TRACE[i0], B = TRACE[i0 + 1];
+        const d = traceD(A.map((v, n) => lerp(v, B[n], mt)));
+        if (tracePath.dataset.d !== d) { tracePath.dataset.d = d; tracePath.setAttribute('d', d); }
+      }
+    }
+
+    // ── phase B: the horizontal run
+    const pB = clamp01((scrolled - geo.introPx) / Math.max(1, geo.maxX));
+    const x = smooth(pB) * geo.maxX;
+    track.style.transform = `translate3d(${(-x).toFixed(1)}px, 0, 0)`;
+
+    // parallax: each image drifts by its window's distance from screen centre
+    parImgs.forEach(p => {
+      const screenC = p.center - x;
+      let shift = (screenC - geo.vw / 2) * -p.speed;
+      // Clamped so the drift always stays inside the picture's own cover —
+      // the frame never shows through, only the image glides within it.
+      shift = Math.max(-p.room, Math.min(p.room, shift));
+      p.el.style.transform = `translate(calc(-50% + ${shift.toFixed(1)}px), -50%)`;
+    });
+
+    // panel entrances — once its leading edge is well inside the viewport
+    panels.forEach((el, i) => {
+      if (!el.classList.contains('is-in') && geo.panelLefts[i] - x < geo.vw * 0.72) {
+        el.classList.add('is-in');
+      }
     });
   }
 
-  tick();
-  window.addEventListener('scroll', tick, { passive: true });
-  window.addEventListener('resize', tick);
+  function setStatic() {
+    driver.style.height = '';
+    track.style.transform = '';
+    if (deck) deck.style.transform = '';
+    deckImgs.forEach((im, i) => im.classList.toggle('is-on', i === 0));
+    if (headGroup) headGroup.style.transform = '';
+    // `none`, not '' — '' would fall back to the stylesheet's 120vh
+    // anti-flash park and hide the paragraph in the static layout
+    if (sub) { sub.style.transform = 'none'; sub.dataset.ty = ''; }
+    if (deck) { deck.style.opacity = ''; deck.dataset.o = ''; }
+    if (deckInner) { deckInner.style.transform = ''; deckInner.dataset.d = ''; }
+    if (slot) slot.style.marginTop = '';
+    if (trace) { trace.style.opacity = ''; trace.style.transform = ''; }
+    parImgs.forEach(p => { p.el.style.transform = 'translate(-50%, -50%)'; });
+    panels.forEach(el => el.classList.add('is-in'));
+  }
+
+  let rafId = null;
+  const onScroll = () => { if (!rafId) rafId = requestAnimationFrame(() => { rafId = null; paint(); }); };
+  const onResize = () => { if (isStatic()) { setStatic(); } else { measure(); paint(); } };
+
+  onResize();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onResize, { passive: true });
+  window.addEventListener('load', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
 })();
 
 
@@ -773,6 +1080,44 @@ function splitHeadlineLetters(headline) {
 // ============================================================
 // SERVICES HOVER LIST — homepage image preview (reference style)
 // ============================================================
+// ============================================================
+// FAQ HERO COLLAGE — MAGNET hover: the whole photo leans toward
+// the cursor a few px (btn--magnetic energy, no zoom, no pan
+// inside the frame) and springs home on leave. The frame div is
+// only an anchor — reveal rides it, the magnet rides the img —
+// so entrance and hover never share a transform. Fine pointers.
+// ============================================================
+(function initFaqHeroShots() {
+  const shots = $$('.faq-hero-shot');
+  if (!shots.length || !window.matchMedia('(pointer: fine)').matches) return;
+
+  const PULL = 10;     // max lean toward the cursor, px — a nudge, not a chase
+
+  shots.forEach(el => {
+    const img = el.querySelector('img');
+    if (!img) return;
+    // lerped state, so the lean glides and the release springs back
+    let tx = 0, ty = 0, cx = 0, cy = 0, raf = null;
+    const tick = () => {
+      cx += (tx - cx) * 0.16;
+      cy += (ty - cy) * 0.16;
+      img.style.setProperty('--mx', cx.toFixed(2) + 'px');
+      img.style.setProperty('--my', cy.toFixed(2) + 'px');
+      raf = (Math.abs(tx - cx) + Math.abs(ty - cy) < 0.06)
+        ? null : requestAnimationFrame(tick);
+    };
+    const wake = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    el.addEventListener('mousemove', e => {
+      const r = el.getBoundingClientRect();
+      tx = ((e.clientX - r.left) / r.width  - 0.5) * PULL * 2;
+      ty = ((e.clientY - r.top)  / r.height - 0.5) * PULL * 2;
+      wake();
+    });
+    el.addEventListener('mouseleave', () => { tx = 0; ty = 0; wake(); });
+  });
+})();
+
+
 (function initUspList() {
   const stack   = $('#uspStack');
   const preview = $('#uspPreview');
@@ -780,28 +1125,14 @@ function splitHeadlineLetters(headline) {
   const img  = preview.querySelector('img');
   const rows = $$('.usp-row', stack);
 
-  // Center the preview vertically on whichever row is hovered — but
-  // clamp its travel to the stack's own band, so tracking the first or
-  // last row never pushes the image up over the section heading (or
-  // down past the list)
-  const alignTo = row => {
-    const wrapRect  = preview.parentElement.getBoundingClientRect();
-    const stackRect = stack.getBoundingClientRect();
-    const rowRect   = row.getBoundingClientRect();
-    const h = preview.offsetHeight;
-    let top = rowRect.top - wrapRect.top + rowRect.height / 2;
-    const min = (stackRect.top - wrapRect.top) + h / 2 - 6;
-    const max = (stackRect.bottom - wrapRect.top) - h / 2 + 6;
-    top = Math.min(Math.max(top, min), Math.max(min, max));
-    preview.style.top = top + 'px';
-  };
-
-  // Idle state: show the first row's image centred on the stack, so the
-  // section doesn't open on empty space. Inline top from a previous hover
-  // is cleared so the CSS top:50% centring takes over again.
+  // Placement: the preview still alternates SIDES down the list (left,
+  // right, left …) but rides ONE vertical line — centred on the stack of
+  // three values (set in fitPreview) — so it never tracks rows upward
+  // into the heading or crowds a title. Hover swaps picture and side.
+  const sideFor = row => (rows.indexOf(row) % 2 === 1 ? 'right' : 'left');
   const rest = () => {
     preview.classList.remove('is-active');
-    preview.style.top = '';
+    preview.dataset.side = 'left';        // idle mirrors row 1's side
     if (rows[0] && img.getAttribute('src') !== rows[0].dataset.img) {
       img.src = rows[0].dataset.img;
     }
@@ -809,24 +1140,42 @@ function splitHeadlineLetters(headline) {
   rest();
 
   // The image must NEVER cover the titles (site-wide rule for this
-  // component): measure the widest row title's left edge and fit the
-  // preview into the free gutter beside the text — shrinking it when
-  // the gutter narrows and hiding it when there's no useful room.
-  // offsetLeft (not a rect) for the preview so its rotate/scale
-  // transform doesn't distort the measurement; 18px margin absorbs the
-  // corner overhang of the -2° tilt.
+  // component). Size the preview to the free gutter beside the centred
+  // titles and CENTER it inside that gutter (--pv-x), keeping a
+  // guaranteed, width-scaled clearance from the text at every screen
+  // size — shrinking as the gutter narrows and hiding when there's no
+  // useful room.
   const fitPreview = () => {
     const wrapRect = preview.parentElement.getBoundingClientRect();
-    let minLeft = Infinity;
+    let minLeft = Infinity, maxRight = -Infinity;
     rows.forEach(r => {
       const t = r.querySelector('.usp-row__title');
-      if (t) minLeft = Math.min(minLeft, t.getBoundingClientRect().left);
+      if (!t) return;
+      const tr = t.getBoundingClientRect();
+      minLeft  = Math.min(minLeft, tr.left);
+      maxRight = Math.max(maxRight, tr.right);
     });
     if (!isFinite(minLeft)) return;
-    const room = (minLeft - wrapRect.left) - preview.offsetLeft - 28;
-    if (room < 140) { preview.style.display = 'none'; return; }
+    const CLEAR = Math.max(48, window.innerWidth * 0.035);   // image ↔ text
+    const EDGE  = 12;                                        // image ↔ container edge
+    const gutter = Math.min(minLeft - wrapRect.left, wrapRect.right - maxRight);
+    const usable = gutter - CLEAR - EDGE;
+    if (usable < 140) { preview.style.display = 'none'; return; }
     preview.style.display = '';
-    preview.style.width = Math.min(room, 260) + 'px';
+    const w = Math.min(usable, 280);
+    preview.style.width = w + 'px';
+    /* dead-centre of the gutter, with the text clearance as a hard floor:
+       even air on both sides where there's room, never closer than CLEAR
+       to the titles where there isn't */
+    let x = (gutter - w) / 2;
+    x = Math.min(x, gutter - CLEAR - w);
+    x = Math.max(x, EDGE);
+    preview.style.setProperty('--pv-x', x.toFixed(1) + 'px');
+    /* vertical: centred on the VALUES STACK, not the wrap — the wrap's
+       midpoint sits in the wide heading's band, the stack's is the clear
+       zone beside the row titles */
+    const stackRect = stack.getBoundingClientRect();
+    preview.style.top = (stackRect.top - wrapRect.top + stackRect.height / 2).toFixed(1) + 'px';
   };
   fitPreview();
   window.addEventListener('resize', fitPreview, { passive: true });
@@ -835,12 +1184,12 @@ function splitHeadlineLetters(headline) {
   rows.forEach(row => {
     row.addEventListener('mouseenter', () => {
       if (img.getAttribute('src') !== row.dataset.img) img.src = row.dataset.img;
-      alignTo(row);
+      preview.dataset.side = sideFor(row);
       preview.classList.add('is-active');
     });
     row.addEventListener('focus', () => {
       img.src = row.dataset.img;
-      alignTo(row);
+      preview.dataset.side = sideFor(row);
       preview.classList.add('is-active');
     });
   });
@@ -1164,24 +1513,498 @@ function splitHeadlineLetters(headline) {
 
 
 // ============================================================
-// WHY ICAUR — parallax image on scroll
+// WHY ICAUR — diagonal band strips
+// The strips live in normal document flow, so the page's own
+// scroll does the wiping (see .why-strip in styles.css). This
+// only adds the extras: a subtle horizontal parallax drift on
+// each word, the side doodles drawing on with the strip's own
+// progress, and the HUD counter.
 // ============================================================
-(function initWhyParallax() {
-  const section  = document.getElementById('why-icaur');
-  const imgInner = document.getElementById('whyImgInner');
-  if (!section || !imgInner) return;
+(function initWhyStrips() {
+  const section = document.getElementById('why-icaur');
+  if (!section) return;
 
-  function tick() {
-    const rect     = section.getBoundingClientRect();
-    const vh       = window.innerHeight;
-    const progress = (vh - rect.top) / (vh + rect.height);
-    const clamped  = Math.min(Math.max(progress, 0), 1);
-    const scale    = 1 + clamped * 0.13;
-    imgInner.style.transform = `scale(${scale})`;
+  const strips = Array.from(section.querySelectorAll('.why-strip'));
+  if (!strips.length) return;
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isStatic = () => window.innerWidth <= 860 || reduce;
+
+  // Split each headline into per-letter spans (keeping any <em> wrapper
+  // intact) so letters can carry their own offset — the reference does
+  // exactly this: ±0.5em, alternating up/down. Letters are grouped inside
+  // a .why-word wrapper per word: inline-block letters are each a line-break
+  // opportunity, which split words mid-word on narrow viewports.
+  function splitLetters(word) {
+    if (!word || word.dataset.split) return [];
+    const out = [];
+    let n = 0;
+    const walk = node => {
+      Array.from(node.childNodes).forEach(child => {
+        if (child.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          // keep the original spacing: split on spaces but re-emit them
+          child.textContent.split(/(\s+)/).forEach(chunk => {
+            if (!chunk) return;
+            if (/^\s+$/.test(chunk)) { frag.appendChild(document.createTextNode(chunk)); return; }
+            const wrap = document.createElement('span');
+            wrap.className = 'why-word';
+            chunk.split('').forEach(ch => {
+              const span = document.createElement('span');
+              span.className = 'why-ltr';
+              span.textContent = ch;
+              span.dataset.i = n++;
+              wrap.appendChild(span);
+              out.push(span);
+            });
+            frag.appendChild(wrap);
+          });
+          node.replaceChild(frag, child);
+        } else if (child.nodeType === 1) {
+          walk(child);
+        }
+      });
+    };
+    walk(word);
+    word.dataset.split = '1';
+    return out;
   }
 
-  tick();
-  window.addEventListener('scroll', tick, { passive: true });
+  const items = strips.map(s => ({
+    el:      s,
+    inner:   s.querySelector('.why-strip__inner'),
+    letters: splitLetters(s.querySelector('.why-strip__word')),
+    // each vector path draws inside its own window of the strip's pass
+    // (data-draw="start end"), so scenes build in stages (road → sun)
+    paths:   Array.from(s.querySelectorAll('.why-viz :is(path, circle, rect)[data-draw]'))
+               .map(el => {
+                 const [a, b] = el.dataset.draw.split(' ').map(Number);
+                 return { el, a, b, last: -1 };
+               }),
+    // data-side: which edge the word ENTERS from. At the start of a pass
+    // t is -1, so x = -DRIFT * dir — meaning dir must be +1 for a word
+    // that should begin off the LEFT edge.
+    dir:     s.dataset.side === 'l' ? 1 : -1
+  }));
+
+
+  if (isStatic()) {
+    items.forEach(it => {
+      it.paths.forEach(p => { p.el.style.strokeDashoffset = '0'; });
+      it.letters.forEach(l => { l.style.transform = ''; });
+      it.el.classList.add('is-in');
+    });
+    return;
+  }
+
+  // The word ENTERS FROM THE SIDE: it starts well off-screen on its
+  // strip's side, sweeps in, holds centred through the middle of the
+  // pass, then leaves the other way. The easing exponent is what buys
+  // that hold — linear travel would drift the whole time.
+  // Full exit: at 100vw the block's own centre reaches the viewport edge, so
+  // the whole line has cleared the screen — the entrance now reads as text
+  // arriving from OUTSIDE its side rather than sliding a short distance.
+  const DRIFT = 108;  // vw of travel at the extremes of the pass
+  const EASE  = 3.2;  // >1 keeps the word near centre for longer
+  const LETTER_LIFT = 0.12;   // em — a subtle height offset, not a big zigzag
+  let rafId = null;
+
+  function paint() {
+    rafId = null;
+    const vh = window.innerHeight;
+
+    items.forEach((it, i) => {
+      const r = it.el.getBoundingClientRect();
+      if (r.bottom < -200 || r.top > vh + 200) return;   // off-screen — skip
+
+      // p: 0 when the strip's top hits the bottom of the viewport,
+      //    1 when its bottom leaves the top — its full pass.
+      const p = (vh - r.top) / (vh + r.height);
+      const c = Math.min(Math.max(p, 0), 1);
+
+      // Word sweeps in from its side, holds centred, then exits opposite.
+      const t = (c - 0.5) * 2;                       // -1 … 0 … 1
+      const x = Math.sign(t) * Math.pow(Math.abs(t), EASE) * DRIFT * it.dir;
+      it.inner.style.transform = `rotate(6deg) translateX(${x.toFixed(2)}vw)`;
+
+      // Letters: a small height offset that settles flat on the way IN and
+      // then STAYS flat on the way out — deliberately not reversed, so the
+      // word doesn't re-animate as it leaves.
+      const zig = c < 0.5 ? Math.min(1, (0.5 - c) / 0.34) : 0;
+      it.letters.forEach((ltr, k) => {
+        const sign = (k % 2 === 0) ? 1 : -1;
+        ltr.style.transform = zig < 0.004
+          ? ''
+          : `translateY(${(sign * zig * LETTER_LIFT).toFixed(3)}em)`;
+      });
+
+      // Vector scenes: each path draws inside its own window while the
+      // strip enters; past centre everything HOLDS fully drawn (never
+      // reversed on the way out). Writes are skipped when unchanged.
+      it.paths.forEach(pth => {
+        const k = c >= 0.5 ? 1 : Math.min(1, Math.max(0, (c - pth.a) / (pth.b - pth.a)));
+        if (k !== pth.last) {
+          pth.last = k;
+          pth.el.style.strokeDashoffset = (1 - k).toFixed(3);
+        }
+      });
+
+      // arm the looping actions (car bob, sun pulse, cabin rock, star
+      // spin, motion lines) once the scene has fully drawn
+      it.el.classList.toggle('is-in', c >= 0.46);
+    });
+  }
+  function onScroll() { if (!rafId) rafId = requestAnimationFrame(paint); }
+
+  paint();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+})();
+
+
+
+// ============================================================
+// MEDIA TILES — 3D entrance, scrubbed by scroll
+// Each tile rises out of the page: it starts pitched back on the
+// grid's shared vanishing point and pushed away in Z, then rolls
+// upright and forward as it enters. The yaw alternates by column
+// so a row opens like a hand of cards rather than one flat plane.
+// ============================================================
+(function initMediaTilt() {
+  const tiles = Array.from(document.querySelectorAll('.media-card--tile'));
+  if (!tiles.length) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const clamp01 = v => Math.min(1, Math.max(0, v));
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+
+  function paint() {
+    if (window.innerWidth <= 860) {                 // stacked layout — flat
+      tiles.forEach(el => { el.style.transform = ''; el.style.opacity = ''; });
+      return;
+    }
+    const vh = window.innerHeight;
+    tiles.forEach((el, i) => {
+      const r = el.getBoundingClientRect();
+      if (r.bottom < -200 || r.top > vh + 400) return;      // far off-screen
+      // 0 as the tile's top touches the bottom of the viewport,
+      // 1 once it has travelled a third of the screen upward
+      const p = easeOut(clamp01((vh - r.top) / (vh * 0.34)));
+      const away = 1 - p;
+      const yaw = (i % 3 === 0 ? -1 : i % 3 === 2 ? 1 : 0) * away * 9;
+      el.style.opacity = p.toFixed(3);
+      el.style.transform =
+        `translate3d(0, ${(away * 70).toFixed(1)}px, ${(-away * 260).toFixed(1)}px) ` +
+        `rotateX(${(away * 24).toFixed(2)}deg) rotateY(${yaw.toFixed(2)}deg)`;
+    });
+  }
+
+  let rafId = null;
+  const onScroll = () => { if (!rafId) rafId = requestAnimationFrame(() => { rafId = null; paint(); }); };
+  paint();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  window.addEventListener('load', paint);
+})();
+
+// ============================================================
+// STORY TILE SILHOUETTE — shared by the homepage media scene and
+// the Media Center listing. One definition of the shape: a rectangle
+// with a stepped corner cut, every corner rounded. clip-path has no
+// corner radius of its own, so the rounding is sampled — each vertex
+// becomes a short quadratic arc, which works for the notch's concave
+// corners as well as the convex outer ones.
+// ============================================================
+function mediaShapePoints(x, y, w, h, nxF, nyF, r) {
+  const nx = w * nxF, ny = h * nyF;
+  const v = [
+    [x + nx, y], [x + w, y], [x + w, y + h - ny], [x + w - nx, y + h - ny],
+    [x + w - nx, y + h], [x, y + h], [x, y + ny], [x + nx, y + ny]
+  ];
+  if (r <= 0.5) return v;
+  const toward = (from, to) => {
+    const dx = to[0] - from[0], dy = to[1] - from[1];
+    const len = Math.hypot(dx, dy) || 1, d = Math.min(r, len / 2);
+    return [from[0] + (dx / len) * d, from[1] + (dy / len) * d];
+  };
+  const out = [];
+  for (let i = 0; i < v.length; i++) {
+    const P = v[(i - 1 + v.length) % v.length], V = v[i], N = v[(i + 1) % v.length];
+    const a = toward(V, P), b = toward(V, N);
+    for (let s = 0; s <= 4; s++) {
+      const t = s / 4, u = 1 - t;
+      out.push([u * u * a[0] + 2 * u * t * V[0] + t * t * b[0],
+                u * u * a[1] + 2 * u * t * V[1] + t * t * b[1]]);
+    }
+  }
+  return out;
+}
+const mediaToClip = pts =>
+  'polygon(' + pts.map(p => `${p[0].toFixed(1)}px ${p[1].toFixed(1)}px`).join(', ') + ')';
+const MEDIA_TILE_RADIUS = 16;
+
+// Give every story tile on the page that silhouette at its own size.
+// The homepage scene re-runs this through its own measure pass; the
+// Media Center listing relies on it entirely.
+(function initMediaTiles() {
+  function clipAll() {
+    document.querySelectorAll('.media-card__img').forEach(el => {
+      // offsetWidth/Height, NOT getBoundingClientRect: the tiles carry 3D
+      // transforms (initMediaTilt) and the scene scales cards, so a rect would
+      // hand us the TRANSFORMED size and the notch would be cut at the wrong
+      // scale — the clip must be in the element's own untransformed space.
+      const w = el.offsetWidth, h = el.offsetHeight;
+      if (!w || !h) return;
+      const cs = getComputedStyle(el);
+      const nx = parseFloat(cs.getPropertyValue('--notch-x')) || 0;
+      const ny = parseFloat(cs.getPropertyValue('--notch-y')) || 0;
+      el.style.clipPath = mediaToClip(
+        mediaShapePoints(0, 0, w, h, nx / 100, ny / 100, MEDIA_TILE_RADIUS));
+    });
+  }
+  clipAll();
+  window.addEventListener('resize', clipAll, { passive: true });
+  window.addEventListener('load', clipAll);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(clipAll);
+})();
+
+// ============================================================
+// MEDIA CENTER — pinned two-scene sequence
+// Scene 1: #mediaVeil is a full-bleed photo under a scrim with
+// the headline huge and white over it. Scene 2: the veil's
+// clip-path shrinks onto #mediaLeadImg — the REAL card's picture
+// box — while the photo inside pulls back, so the hero image
+// literally becomes the lead card. The headline FLIPs down to
+// its laid-out spot top-left, the bigger story slides in from
+// the right, and the brief resolves bottom-left.
+//
+// Everything is measured from the real layout (never hardcoded
+// offsets), so the veil lands pixel-exact at any viewport.
+// ============================================================
+(function initMediaScene() {
+  const driver = $('#mediaDriver');
+  const stage  = $('#mediaStage');
+  const veil   = $('#mediaVeil');
+  const img    = $('#mediaLead img');   // the story's own photo — the only one
+  const scrim  = $('#mediaScrim');
+  const head   = $('#mediaHead');
+  const headEyebrow = head ? head.querySelector('.eyebrow') : null;
+  const brief  = $('#mediaBrief');
+  const lead   = $('#mediaLead');
+  const target = $('#mediaLeadImg');
+  const big    = $('#mediaBig');
+  if (!driver || !stage || !veil || !target || !head) return;
+
+  const MOBILE = 860;   // must match the stacked layout media query
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isStatic = () => window.innerWidth <= MOBILE || reduce;
+
+  const clamp01 = v => Math.min(1, Math.max(0, v));
+  const seg = (p, a, b) => clamp01((p - a) / (b - a));
+  const ease = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  let geo = null;
+
+  // ONE image, full stop. Rather than copying the story's photo into a second
+  // <img> and cross-fading the two (which is what produced the visible jump),
+  // the story's own node is MOVED into the hero frame while the scene is
+  // pinned, and handed back for the stacked layout. Moving a node keeps the
+  // decoded bitmap — no reload, no flash — and with a single node there is
+  // nothing left that can disagree about framing.
+  let landed = false;
+  function placeImage() {
+    if (!img) return;
+    const wanted = (isStatic() || landed) ? target : veil;
+    if (img.parentElement !== wanted) wanted.insertBefore(img, wanted.firstChild);
+    // the frame paints nothing while the tile owns the photo
+    veil.style.visibility = wanted === veil ? '' : 'hidden';
+  }
+
+  // Where the veil has to land, and how far the headline has to travel —
+  // both read off the settled layout with transforms cleared.
+  function measure() {
+    placeImage();          // the photo must be in its frame before we measure
+    head.style.transform = '';
+    // The cards carry animation transforms for most of the scene (the lead is
+    // translated 20px down until p≈0.86). Reading the landing box through
+    // those bakes the offset into geo.clip, and the photo then SNAPS that
+    // distance at the handover — the jump. Clear them for the measurement,
+    // exactly as the headline already was, then let paint() restore them.
+    const moved = [lead, big, brief].filter(Boolean);
+    const saved = moved.map(el => el.style.transform);
+    moved.forEach(el => { el.style.transform = ''; });
+
+    const s = stage.getBoundingClientRect();
+    const t = target.getBoundingClientRect();
+    const h = head.getBoundingClientRect();
+
+    moved.forEach((el, i) => { el.style.transform = saved[i]; });
+
+    if (!s.width || !s.height || !h.width) { geo = null; return; }
+
+    // Headline scale in scene 1. Capped on BOTH axes — the block wraps to
+    // three lines, so a width-only cap let it grow taller than the viewport.
+    const k = Math.min(3.1, (s.width * 0.84) / h.width, (s.height * 0.66) / h.height);
+    // the tile's corner notch, read straight off the CSS so the veil's
+    // silhouette and the tile's own clip can never drift apart
+    const cs = getComputedStyle(target);
+    geo = {
+      notchX: parseFloat(cs.getPropertyValue('--notch-x')) || 0,
+      notchY: parseFloat(cs.getPropertyValue('--notch-y')) || 0,
+      // the landing box, as edge insets (%) of the stage
+      clip: {
+        top:    (t.top    - s.top)    / s.height * 100,
+        right:  (s.right  - t.right)  / s.width  * 100,
+        bottom: (s.bottom - t.bottom) / s.height * 100,
+        left:   (t.left   - s.left)   / s.width  * 100
+      },
+      k,
+      // scene-1 anchor: inset from the left, vertically centred
+      dx: (s.left + s.width * 0.07) - h.left,
+      dy: (s.top + s.height * 0.52 - (h.height * k) / 2) - h.top,
+      // for the colour flip: the headline's box inside the stage, in px
+      headX: h.left - s.left,
+      headW: h.width,
+      headY: h.top - s.top,
+      headH: h.height,
+      stageW: s.width,
+      stageH: s.height,
+      // the photo's intrinsic size + the cover scale it gets at full bleed;
+      // the reframe maths above works back from these
+    };
+
+    // give every tile the shared silhouette at its own size
+    const nxF = geo.notchX / 100, nyF = geo.notchY / 100;
+    stage.querySelectorAll('.media-card__img').forEach(el => {
+      // untransformed box — the scene scales these cards while animating
+      const w = el.offsetWidth, h = el.offsetHeight;
+      if (!w || !h) return;
+      el.style.clipPath = mediaToClip(mediaShapePoints(0, 0, w, h, nxF, nyF, MEDIA_TILE_RADIUS));
+    });
+  }
+
+  function paint() {
+    if (isStatic()) {
+      placeImage();
+      veil.removeAttribute('style');
+      // removeAttribute wiped the visibility placeImage set — an empty but
+      // visible veil would still paint its scrim over the static layout
+      veil.style.visibility = 'hidden';
+      if (img) img.style.transform = '';
+      head.style.transform = '';
+      head.style.color = '';
+      if (headEyebrow) headEyebrow.style.transform = '';
+      [brief, lead, big].forEach(el => {
+        if (el) { el.style.opacity = ''; el.style.transform = ''; el.style.pointerEvents = ''; }
+      });
+      return;
+    }
+    if (!geo) measure();
+    if (!geo) return;
+
+    const rect = driver.getBoundingClientRect();
+    const p = clamp01(-rect.top / Math.max(driver.offsetHeight - window.innerHeight, 1));
+
+    // ── the morph: full bleed → the lead tile's notched silhouette.
+    // The hero FRAME is resized (left/top/width/height) rather than a
+    // stage-sized picture being cropped, so object-fit:cover reframes the
+    // photo for free at every step — and because the frame holds the story's
+    // own <img>, the end state IS the tile, with nothing to hand over to.
+    // Each edge runs on its own window: the LEFT edge leads and the others
+    // trail, so the picture keeps spanning the headline's full height while
+    // its left edge sweeps right past it. The headline goes from fully covered
+    // to fully clear in one pass instead of straddling the boundary with half
+    // its letters unreadable on the bare background. (Left, not top: the tall
+    // tiles land with their top ABOVE the headline's baseline, so only the
+    // horizontal gap ever fully clears it.)
+    const mLeft = ease(seg(p, 0.06, 0.46));
+    const mRt   = ease(seg(p, 0.12, 0.68));
+    const mBot  = ease(seg(p, 0.20, 0.70));
+    const mTop  = ease(seg(p, 0.26, 0.70));
+    const m = ease(seg(p, 0.06, 0.70));   // the picture's own pull-back
+    const c = geo.clip;
+    const W = geo.stageW, H = geo.stageH;
+    const bx = (c.left * mLeft / 100) * W;
+    const by = (c.top  * mTop  / 100) * H;
+    const bw = W - bx - (c.right  * mRt  / 100) * W;
+    const bh = H - by - (c.bottom * mBot / 100) * H;
+    veil.style.left   = bx.toFixed(1) + 'px';
+    veil.style.top    = by.toFixed(1) + 'px';
+    veil.style.width  = bw.toFixed(1) + 'px';
+    veil.style.height = bh.toFixed(1) + 'px';
+    // the notch and the corner radius grow in, so the full-bleed opening scene
+    // is a clean rectangle and the tile silhouette only forms as it lands
+    veil.style.clipPath = mediaToClip(mediaShapePoints(
+      0, 0, bw, bh,
+      (geo.notchX / 100) * mLeft, (geo.notchY / 100) * mTop,
+      MEDIA_TILE_RADIUS * m
+    ));
+    // a slight overshoot that settles — the pull-back feel, and exactly 1 at
+    // the end so the landed tile is the picture at its natural framing
+    if (img) img.style.transform = `scale(${lerp(1.08, 1, m).toFixed(4)})`;
+    if (scrim) scrim.style.opacity = (1 - seg(p, 0.34, 0.78)).toFixed(3);
+
+    // Landed = the morph is over: hand the photo to the TILE so its position
+    // comes from layout, not from a measured box that can drift (font loads,
+    // vh changes, browser zoom — the drift Mark saw as a gap above/below the
+    // photo). Hysteresis so the handover never thrashes at the boundary.
+    if (!landed && p >= 0.995) { landed = true; placeImage(); }
+    else if (landed && p < 0.97) { landed = false; placeImage(); }
+
+    // ── headline: scene-1 anchor (big, white) → its laid-out spot (small, dark)
+    const t = ease(seg(p, 0.04, 0.64));
+    const sc = lerp(geo.k, 1, t);
+    head.style.transform = `translate(${(geo.dx * (1 - t)).toFixed(2)}px, ${(geo.dy * (1 - t)).toFixed(2)}px) scale(${sc.toFixed(4)})`;
+    // The block's scale would drag the eyebrow up to headline size — cancel it
+    // so the label stays small from the very first frame (origin left bottom
+    // keeps it sitting right above the title as the block grows).
+    if (headEyebrow) headEyebrow.style.transform = `scale(${(1 / sc).toFixed(4)})`;
+    // White → brand black, driven by GEOMETRY rather than a fixed progress
+    // window: the headline turns dark exactly as the picture's advancing left
+    // edge clears its last letter. A fixed window left it white on bare cream.
+    const picLeftPx  = bx;
+    const headRightPx = geo.headX + geo.dx * (1 - t) + geo.headW * sc;
+    // commit once it is nearly clear, over a short ramp, so the half-way grey
+    // is a brief pass rather than a readable state
+    const cw = clamp01((picLeftPx - (headRightPx - 30)) / 45 + 1);
+    const g = Math.round(lerp(255, 10, cw));
+    head.style.color = `rgb(${g}, ${g}, ${g})`;
+
+    // ── lead card chrome resolves under the landing frame
+    if (lead) {
+      const l = ease(seg(p, 0.60, 0.86));
+      lead.style.opacity = l.toFixed(3);
+      lead.style.transform = `translateY(${lerp(20, 0, l).toFixed(1)}px)`;
+      // these cards are links — an invisible one must not be clickable
+      lead.style.pointerEvents = l < 0.6 ? 'none' : '';
+    }
+    // ── the bigger story slides in beside it
+    if (big) {
+      const b = ease(seg(p, 0.56, 0.92));
+      big.style.opacity = b.toFixed(3);
+      big.style.transform = `translateX(${lerp(96, 0, b).toFixed(1)}px) scale(${lerp(0.94, 1, b).toFixed(4)})`;
+      big.style.pointerEvents = b < 0.6 ? 'none' : '';
+    }
+    // ── the media-center brief closes the scene
+    if (brief) {
+      const bf = ease(seg(p, 0.74, 1));
+      brief.style.opacity = bf.toFixed(3);
+      brief.style.transform = `translateY(${lerp(26, 0, bf).toFixed(1)}px)`;
+      brief.style.pointerEvents = bf < 0.6 ? 'none' : '';
+    }
+  }
+
+  let rafId = null;
+  const onScroll = () => { if (!rafId) rafId = requestAnimationFrame(() => { rafId = null; paint(); }); };
+  const onResize = () => { measure(); paint(); };
+
+  measure(); paint();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onResize, { passive: true });
+  // fonts and the lead image both change where the frame has to land
+  window.addEventListener('load', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
 })();
 
 

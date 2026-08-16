@@ -1,0 +1,98 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><title>about car</title>
+<link rel="stylesheet" href="/css/styles.css">
+<style>html,body{margin:0;background:#ECE6DC}.pad{height:30vh}</style>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/" } }
+</script>
+</head><body>
+<div class="pad"></div>
+<div class="about-scene" id="aboutScene">
+  <div class="about-scene__pin">
+
+    <!-- Story car — drives in from the left during Overview, then
+         swings onto the rail and rotates to ride it down -->
+    <!-- The scene car is a live GLB (js/about-glb.js) rather than a PNG. about-story.js still positions this element exactly as before; the
+         module only renders into it and turns the model in 3D. -->
+    <canvas class="story-scene-car" id="storySceneCar" aria-hidden="true"></canvas>
+
+    <!-- Backdrop that plays with the car: a soft halo lifting it off the
+         page, a ground ellipse in perspective so it reads as standing on a
+         surface, and a light arc sweep. js/about-glb.js turns the sweep and
+         pulses the marks with the model's own rotation. -->
+    <svg class="scene-car-fx" id="sceneCarFx" viewBox="0 0 400 400" aria-hidden="true">
+      <defs>
+        <radialGradient id="carHalo" cx="50%" cy="46%" r="52%">
+          <stop offset="0%"  stop-color="#F37021" stop-opacity=".20"/>
+          <stop offset="60%" stop-color="#F37021" stop-opacity=".06"/>
+          <stop offset="100%" stop-color="#F37021" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <circle class="scene-car-fx__halo" cx="200" cy="186" r="180" fill="url(#carHalo)" stroke="none"/>
+      <ellipse class="scene-car-fx__ground" cx="200" cy="292" rx="150" ry="26"/>
+      <path class="scene-car-fx__sweep" d="M56 186a144 144 0 0 1 288 0"/>
+      <g class="scene-car-fx__marks">
+        <path d="M28 168h-34"/>
+        <path d="M20 190h-46"/>
+        <path d="M28 212h-34"/>
+      </g>
+    </svg>
+
+    <div class="container about-scene__stage">
+
+      <!-- Overview panel -->
+      <div class="scene-panel scene-panel--overview" data-panel="overview">
+        <div class="about-overview__inner">
+          <p class="eyebrow">Overview</p>
+          <h2 class="about-overview__h">The Future<br>Feels Different</h2>
+          <p class="about-overview__lead">iCAUR is a new generation automotive brand redefining intelligent mobility through bold design, advanced technology, and expressive driving experiences. Built for the young and young-at-heart, iCAUR combines rugged character, smart innovation, and lifestyle-driven thinking to create vehicles that feel as exciting as they look.</p>
+          <a href="/reserve" class="btn btn--dark btn--arrow btn--magnetic">Get Your iCAUR <span class="arrow">→</span></a>
+        </div>
+      </div>
+
+      <!-- Story panel — car rides the rail, images stack on the right -->
+      <div class="scene-panel scene-panel--story" data-panel="story">
+
+        <!-- Left rail: gray line, passed area turns orange -->
+        <div class="story-rail" aria-hidden="true">
+          <div class="story-rail__line">
+            <div class="story-rail__fill" id="storyRailFill"></div>
+          </div>
+        </div>
+
+        <div class="about-saga__inner">
+        <p class="eyebrow">iCAUR Story</p>
+        <div class="about-saga__steps">
+          <div class="saga-step is-active" data-step="0">
+            <p>Born to break the mold — rugged character, smart tech, and lifestyle-first thinking in EVs that feel as exciting as they look.</p>
+          </div>
+          <div class="saga-step" data-step="1">
+            <p>Engineered for Egypt: the heat, the dust, the drama. From Cairo traffic to the dunes, built to last and born to turn heads.</p>
+          </div>
+        </div>
+        </div>
+
+        <!-- Right: images pile over each other as the car drives down -->
+        <div class="story-stack" aria-hidden="true">
+          <img src="/assets/images/about-hero.webp" class="story-stack__img" style="--r:-5deg; --x:-14px; --y:-10px" loading="lazy" alt="">
+          <img src="/assets/images/iCAUR INTL_V27 REV_cam027 copy.webp" class="story-stack__img" style="--r:4deg; --x:12px; --y:6px" loading="lazy" alt="">
+          <img src="/assets/images/ICUAR V27 brochure 03 18.webp" class="story-stack__img" style="--r:-2deg; --x:-4px; --y:12px" loading="lazy" alt="">
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ BRAND FIGURES ═══════ -->
+
+<div class="pad" style="height:60vh"></div>
+<script>
+  const y = parseFloat(new URLSearchParams(location.search).get('y')||'0');
+  if (y) { const p = document.querySelector('.pad'); if (p) p.style.marginTop = (-y*100)+'vh'; }
+</script>
+<script src="/js/about-story.js" defer></script>
+<script type="module" src="/js/about-glb.js"></script>
+</body></html>

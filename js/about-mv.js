@@ -16,7 +16,8 @@
    1  p 0.00–0.12  the brand DASH MARK opens centre-stage, then
                    scales up and blurs away
    2  p 0.08–0.38  chapter A (VISION): title pops, statement words
-                   pop in with elastic overshoot, ghost word builds
+                   and inline picture chips pop in with elastic
+                   overshoot, one reading-order sequence
    3  p 0.40–0.66  the carbon-black V27 drives in from the RIGHT
                    (wheels rolling), crosses the stage and turns
                    to stop FACING the camera; chapter A zooms away
@@ -68,10 +69,13 @@ function init() {
     })(root);
     return words;
   }
-  const aWords = [];
-  const bWords = [];
-  chA.querySelectorAll('[data-mv-split]').forEach(el => aWords.push(...splitWords(el)));
-  chB.querySelectorAll('[data-mv-split]').forEach(el => bWords.push(...splitWords(el)));
+  chA.querySelectorAll('[data-mv-split]').forEach(splitWords);
+  chB.querySelectorAll('[data-mv-split]').forEach(splitWords);
+  /* Pose UNITS, not just words: the picture chips take their place in the
+     same sequence as the words around them (document order = reading
+     order), so nothing is ever visible before the copy it sits inside. */
+  const aUnits = [...chA.querySelectorAll('.mv-w, .mv-chip')];
+  const bUnits = [...chB.querySelectorAll('.mv-w, .mv-chip')];
 
   if (reduced) { driver.classList.add('mv--static'); return; }
 
@@ -85,8 +89,7 @@ function init() {
   };
   const lerp = (a, b, t) => a + (b - a) * t;
 
-  const aGhost = chA.querySelector('.mv__ghost');
-  const bGhost = chB.querySelector('.mv__ghost');
+  const bg     = document.getElementById('mvBg');
   const aTitle = chA.querySelector('.mv__title');
   const bTitle = chB.querySelector('.mv__title');
   const aInner = chA.querySelector('.mv__inner');
@@ -233,9 +236,10 @@ function init() {
 
   /* ── one chapter's typography pose ──
      wordsFrom/wordsSpread place the statement inside the chapter's
-     window — vision delays its words until the car has driven off
-     the "bridge edge", so the text never sits over the car */
-  function poseChapter(words, title, ghost, inner, tIn, local, wordsFrom = 0.14, wordsSpread = 0.58) {
+     window — mission delays its words until the car has driven off
+     the "bridge edge", so the text never sits over the car. `units`
+     is words AND picture chips in reading order — one sequence. */
+  function poseChapter(units, title, inner, tIn, wordsFrom = 0.14, wordsSpread = 0.58) {
     const tt = seg(tIn, 0, 0.18);
     const tb = back(tt);
     title.style.opacity = tt.toFixed(3);
@@ -245,8 +249,8 @@ function init() {
     const z = seg(tIn, 0, 0.6);
     inner.style.transform = `scale(${(0.94 + 0.06 * z).toFixed(4)})`;
 
-    const n = words.length || 1;
-    words.forEach((w, i) => {
+    const n = units.length || 1;
+    units.forEach((w, i) => {
       const start = wordsFrom + (i / n) * wordsSpread;
       const t = clamp((tIn - start) / 0.20, 0, 1);
       const b = back(t);
@@ -256,13 +260,6 @@ function init() {
         ` scale(${(0.5 + 0.5 * b).toFixed(3)})` +
         ` rotate(${((1 - b) * 5).toFixed(2)}deg)`;
     });
-
-    const g = seg(tIn, 0, 0.5);
-    ghost.style.transform =
-      `translate(${(local * -6 - 47).toFixed(2)}%, -50%)` +
-      ` scale(${(1.3 - 0.3 * g).toFixed(4)})`;
-    ghost.style.filter = `blur(${((1 - g) * 14).toFixed(1)}px)`;
-    ghost.style.opacity = (g * 0.9).toFixed(3);
   }
 
   /* ── scroll-scrubbed frame loop ── */
@@ -273,6 +270,15 @@ function init() {
     if (rect.bottom < -200 || rect.top > window.innerHeight + 200) return;
     const scrollable = Math.max(driver.offsetHeight - window.innerHeight, 1);
     const p = clamp(-rect.top / scrollable, 0, 1);
+
+    /* 0 — the black sheet slides up over the stats section as the chapter
+       arrives: eased (cubic out) so it accelerates in and settles softly,
+       fully seated by the time the pin engages and the sequence starts */
+    if (bg) {
+      const arrive = 1 - clamp(rect.top / window.innerHeight, 0, 1);
+      const be = 1 - Math.pow(1 - arrive, 3);
+      bg.style.transform = `translateY(${((1 - be) * 100).toFixed(2)}%)`;
+    }
 
     /* 1 — dash mark: centred, scales a little, blurs away */
     const mUp  = seg(p, 0.00, 0.12);
@@ -285,8 +291,8 @@ function init() {
        window ≈ p 0.79) until the car has dropped off the bridge edge. */
     const aT = seg(p, 0.08, 0.38);
     const bT = seg(p, 0.62, 0.94);
-    poseChapter(aWords, aTitle, aGhost, aInner, aT, clamp(p / 0.52, 0, 1));
-    poseChapter(bWords, bTitle, bGhost, bInner, bT, clamp((p - 0.52) / 0.48, 0, 1), 0.52, 0.36);
+    poseChapter(aUnits, aTitle, aInner, aT);
+    poseChapter(bUnits, bTitle, bInner, bT, 0.52, 0.36);
 
     /* chapter A zooms away as the car arrives; handoff at p=0.52 */
     const out = seg(p, 0.40, 0.52);
@@ -299,8 +305,10 @@ function init() {
     const inn = seg(p, 0.60, 0.72);
     chB.style.opacity = inn.toFixed(3);
 
-    /* 3 + 5 — the car crossing (all pure functions of p) */
-    canvas.style.opacity = seg(p, 0.40, 0.46).toFixed(3);
+    /* 3 + 5 — the car crossing. The model moved to the Overview/Story scene
+       (js/about-glb.js), so this canvas stays hidden; the statement
+       choreography above is still driven from here. */
+    canvas.style.opacity = '0';
     if (car) {
       const cross = seg(p, 0.42, 0.62);             /* right → centre */
       const turn  = seg(p, 0.56, 0.66);             /* side → front view */

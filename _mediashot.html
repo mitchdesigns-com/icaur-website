@@ -1,0 +1,81 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>media scene</title>
+<link rel="stylesheet" href="/css/styles.css">
+<style>html,body{margin:0;background:#ECE6DC}.pad{height:70vh;display:grid;place-items:center;font:14px sans-serif;color:#999}</style>
+</head><body class="dark-hero-page">
+<div class="pad">&darr; scroll into Media Center</div>
+<div class="media-driver" id="mediaDriver">
+<section class="media" id="news">
+  <div class="media__stage" id="mediaStage">
+
+    <div class="media__grid">
+      <!-- LEFT: headline (top) + brief (bottom) -->
+      <div class="media__col">
+        <header class="media__head" id="mediaHead">
+          <p class="eyebrow media__eyebrow">Media Center</p>
+          <h2 class="media__title">What's Happening Now</h2>
+        </header>
+
+        <div class="media__brief" id="mediaBrief">
+          <p>All iCAUR updates, launches and stories in one place — so you always
+             know what we're building, and what's coming next.</p>
+          <a href="/news" class="btn btn--outline btn--sm btn--arrow">View Media Center <span class="arrow">→</span></a>
+        </div>
+      </div>
+
+      <!-- MIDDLE: the notched tile the full-bleed image shrinks into.
+           Deliberately NOT a boxed card — an image tile with a stepped
+           corner cut, meta and title sitting under it on the bare surface. -->
+      <article class="media-card media-card--lead" id="mediaLead">
+        <a href="/news/v23-design" class="media-card__img" id="mediaLeadImg" data-cursor-label="Read">
+          <img src="assets/images/iCAUR INTL_V27 REV_cam025.webp" alt="iCAUR V27 Studio Design Revealed" loading="lazy">
+        </a>
+        <div class="media-card__meta">
+          <span class="media-card__type">News</span>
+          <time datetime="2026-05-28">May 28, 2026</time>
+        </div>
+        <h4 class="media-card__title">iCAUR V27 Studio Design Revealed</h4>
+      </article>
+
+      <!-- RIGHT: the larger story, slides in beside the lead -->
+      <article class="media-card media-card--big" id="mediaBig">
+        <a href="/news/electric-wiring" class="media-card__img" data-cursor-label="Read">
+          <img src="assets/images/v27/car-side.webp" alt="Electric Wiring Matrix Optimized for Egypt" loading="lazy">
+        </a>
+        <div class="media-card__meta">
+          <span class="media-card__type media-card__type--blog">Blog</span>
+          <time datetime="2026-05-20">May 20, 2026</time>
+        </div>
+        <h4 class="media-card__title">Electric Wiring Matrix Optimized for Egypt</h4>
+      </article>
+    </div>
+
+    <!-- The morphing layer: full bleed at rest, clipped down onto
+         #mediaLeadImg as the scene resolves. Sits above the grid so
+         it reads as one image becoming the card. -->
+    <!-- NO src here on purpose: js/main.js copies it from the lead story's own
+         <img>, so the hero picture and the tile are literally the same asset
+         from the same source. A second hardcoded src could drift from whatever
+         the story actually carries. -->
+    <!-- The hero frame holds the lead story's OWN <img>, moved here by
+         js/main.js — there is exactly one image node on the page, so there is
+         nothing to cross-fade and nothing that can jump. The frame's box is
+         resized from full bleed down to the tile's slot and object-fit:cover
+         reframes the picture for free at every size. -->
+    <div class="media__veil" id="mediaVeil" aria-hidden="true">
+      <span class="media__scrim" id="mediaScrim"></span>
+    </div>
+
+  </div>
+</section>
+</div>
+<div class="pad" style="height:80vh">next section &darr;</div>
+<script>
+  // ?y= (vh): pull the section up with a negative margin instead of scrolling.
+  // position:sticky resolves from layout + scroll, so the pin still engages.
+  const y = parseFloat(new URLSearchParams(location.search).get('y')||'0');
+  if (y) { const p = document.querySelector('.pad'); if (p) p.style.marginTop = (-y*100)+'vh'; }
+</script>
+<script src="/js/main.js" defer></script>
+</body></html>

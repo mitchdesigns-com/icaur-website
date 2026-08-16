@@ -50,17 +50,106 @@
   height: 160vh;
   background: transparent;
 }
-/* Speed-lines road — fixed behind the 3D car (z0 < canvas-wrap z1).
-   Lives in the OVERVIEW section only; js/v27.js drives the opacity from
-   that section's live geometry. The mask keeps the lanes off the copy
-   column on the left, so only the car half of the split reads as road. */
-.v27-hyper-wrap {
+/* PLASMA WASH — replaces the old speed-line road behind the Overview car.
+   Three oversized, heavily blurred colour blobs drifting on long offset
+   cycles; where they cross they read as slow plasma waves. Deliberately
+   faint — it should register as a warm shift in the light, not a graphic.
+   Transform-only animation, so it stays cheap. */
+/* FIXED at z0 — the same slot the old road layer used, i.e. UNDER the 3D
+   car canvas (z1) so the paint is never washed out. Other sections have
+   opaque backgrounds, so it only shows through the transparent Overview.
+   No fill of its own; only the blobs paint. */
+.v27-ov-plasma {
   position: fixed; inset: 0; z-index: 0;
-  pointer-events: none; background: transparent; opacity: 0;
-  -webkit-mask-image: linear-gradient(to right, transparent 4%, #000 30%);
-          mask-image: linear-gradient(to right, transparent 4%, #000 30%);
+  pointer-events: none; overflow: hidden;
 }
-.v27-hyper-wrap canvas { display: block; width: 100%; height: 100%; }
+.v27-ov-plasma span {
+  position: absolute; display: block;
+  border-radius: 50%;
+  filter: blur(90px);
+  will-change: transform;
+}
+/* Each blob travels a four-corner loop rather than an out-and-back, so the
+   wash never pauses or visibly reverses — it just keeps flowing. Linear
+   timing plus prime-ish periods (19/23/29s) means the three never resync. */
+.v27-ov-plasma span:nth-child(1) {
+  width: 60vw; height: 60vw; left: -8vw; top: -18vw;
+  background: radial-gradient(circle, rgba(243,112,33,.22), rgba(243,112,33,0) 68%);
+  animation: v27Plasma1 19s linear infinite;
+}
+.v27-ov-plasma span:nth-child(2) {
+  width: 55vw; height: 55vw; right: -10vw; top: 12vw;
+  background: radial-gradient(circle, rgba(224,169,109,.26), rgba(224,169,109,0) 68%);
+  animation: v27Plasma2 23s linear infinite;
+}
+.v27-ov-plasma span:nth-child(3) {
+  width: 48vw; height: 48vw; left: 26vw; bottom: -22vw;
+  background: radial-gradient(circle, rgba(164,128,94,.18), rgba(164,128,94,0) 70%);
+  animation: v27Plasma3 29s linear infinite;
+}
+@keyframes v27Plasma1 {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  25%  { transform: translate3d(7vw, 4vw, 0) scale(1.12); }
+  50%  { transform: translate3d(10vw, 10vw, 0) scale(1); }
+  75%  { transform: translate3d(3vw, 7vw, 0) scale(1.12); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes v27Plasma2 {
+  0%   { transform: translate3d(0, 0, 0) scale(1.06); }
+  25%  { transform: translate3d(-6vw, 5vw, 0) scale(0.96); }
+  50%  { transform: translate3d(-9vw, -3vw, 0) scale(1.06); }
+  75%  { transform: translate3d(-3vw, -6vw, 0) scale(0.96); }
+  100% { transform: translate3d(0, 0, 0) scale(1.06); }
+}
+@keyframes v27Plasma3 {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  25%  { transform: translate3d(6vw, -5vw, 0) scale(1.14); }
+  50%  { transform: translate3d(-2vw, -9vw, 0) scale(1); }
+  75%  { transform: translate3d(-7vw, -3vw, 0) scale(1.14); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+/* ── Light threads ─────────────────────────────────────────────────
+   Thin amber streaks, each a soft-ended gradient line rotated 45° and
+   gliding along its OWN axis — light passing through, not a graphic
+   sitting there. All on the car half or in the extreme corners, and at
+   45° a streak leaves its corner instead of tracking across the page,
+   so none of them ever crosses the copy column. Each rides its own
+   duration/delay, so the field never repeats visibly. */
+.v27-ov-threads { position: absolute; inset: 0; }
+.v27-ov-threads i {
+  position: absolute; display: block;
+  height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg,
+    rgba(243, 112, 33, 0),
+    rgba(243, 112, 33, var(--ta, .30)) 50%,
+    rgba(243, 112, 33, 0));
+  transform: rotate(var(--ang, -45deg)) translateX(var(--tx, 0));
+  animation: v27Thread var(--td, 12s) linear infinite;
+  animation-delay: var(--tdel, 0s);
+  will-change: transform, opacity;
+}
+/* the car half — long glides behind the model */
+.v27-ov-threads i:nth-child(1) { width: 34vw; left: 52%; top: 24%; --ta: .34; --td: 11s;  --tdel: -2s; }
+.v27-ov-threads i:nth-child(2) { width: 26vw; left: 66%; top: 55%; --ta: .26; --td: 14s;  --tdel: -9s; }
+.v27-ov-threads i:nth-child(3) { width: 40vw; left: 47%; top: 76%; --ta: .20; --td: 17s;  --tdel: -5s; }
+.v27-ov-threads i:nth-child(4) { width: 22vw; left: 80%; top: 12%; --ta: .30; --td: 12.5s; --tdel: -11s; }
+/* extreme corners, clear of the copy column */
+/* bottom-left corner runs at +45° — its diagonal heads DOWN-right, away
+   from the copy, where a -45° line from this corner would climb into it */
+.v27-ov-threads i:nth-child(5) { width: 16vw; left: -8%; top: 96%; --ang: 45deg; --ta: .24; --td: 15s; --tdel: -7s; }
+.v27-ov-threads i:nth-child(6) { width: 18vw; left: -4%; top: 6%;  --ta: .18; --td: 18s;  --tdel: -13s; }
+/* travel along the thread's own 45° axis: fade in, glide, fade out —
+   the fades make the loop's restart invisible */
+@keyframes v27Thread {
+  0%   { transform: rotate(var(--ang, -45deg)) translateX(-14vw); opacity: 0; }
+  16%  { opacity: 1; }
+  84%  { opacity: 1; }
+  100% { transform: rotate(var(--ang, -45deg)) translateX(14vw); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .v27-ov-plasma span, .v27-ov-threads i { animation: none; }
+}
 .v27-hero-sticky {
   position: sticky; top: 0; height: 100vh;
   overflow: hidden;
@@ -199,6 +288,9 @@
   overflow: hidden;
 }
 .v27-overview-inner {
+  /* above .v27-ov-plasma — a positioned z-index:0 sibling would otherwise
+     paint over this in-flow content */
+  position: relative; z-index: 1;
   width: 100%; display: grid;
   grid-template-columns: 44% 56%; gap: 0;
   align-items: stretch;
@@ -223,8 +315,10 @@
   margin-bottom: clamp(16px, 2vh, 22px);
 }
 .v27-ov-h2 {
-  font-size: clamp(2.2rem, 3.8vw, 3.6rem); font-weight: 700;
-  line-height: .96; letter-spacing: -.03em; color: #1F0F08;
+  /* "Overview" reads as a section label under the V27 mark, not a hero
+     line — the mark carries the weight, so the word is much smaller */
+  font-size: clamp(1.15rem, 1.6vw, 1.5rem); font-weight: 700;
+  line-height: 1.1; letter-spacing: -.02em; color: #1F0F08;
   margin-bottom: clamp(20px, 2.6vh, 28px);
 }
 .v27-ov-para {
@@ -787,13 +881,7 @@
   color: var(--amber); margin-bottom: 24px;
   display: flex; align-items: center; justify-content: center; gap: 10px;
 }
-/* Brand dashes — same mark as the sitewide .eyebrow */
-.v27-ct-eyebrow::before {
-  content: '';
-  flex-shrink: 0;
-  width: 34px; height: 9px;
-  background: url('../assets/images/dashes.svg') no-repeat center / contain;
-}
+/* (The dash mark before this eyebrow was removed with the sitewide one.) */
 /* Dot separator used inside eyebrows (was an unstyled, invisible span) */
 .eyebrow-dot {
   display: inline-block; width: 5px; height: 5px; border-radius: 50%;
@@ -1126,7 +1214,18 @@
 }
 
 /* ── Overview heading logo (client V5) ────────── */
-.v27-ov-logo { height: .4em; width: auto; display: inline-block; vertical-align: baseline; }
+/* The V27 mark, painted amber, sitting UNDER the black "Overview" line.
+   A mask (not an <img>) so the colour comes from CSS — the source SVG
+   has its own baked fills. Sized independently of the heading, and the
+   599:83 viewBox ratio keeps the width honest. */
+.v27-ov-logo {
+  display: inline-block; vertical-align: baseline;
+  height: clamp(22px, 2.4vw, 34px); aspect-ratio: 599 / 83;
+  background-color: var(--orange, #F37021);
+  -webkit-mask: url('../assets/images/V27-logo.svg') no-repeat center / contain;
+          mask: url('../assets/images/V27-logo.svg') no-repeat center / contain;
+  margin-top: 10px;
+}
 
 /* ── Call centre number in reserve brick (client V8) ────────── */
 .v27-callcenter {

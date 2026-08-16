@@ -1,0 +1,245 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>section seams</title>
+<link rel="stylesheet" href="/css/styles.css">
+<style>html,body{margin:0}.pad{height:40vh}</style>
+</head><body class="dark-hero-page">
+<div class="pad"></div>
+<div class="diff-scroll-driver" id="diffScrollDriver">
+<section class="section diff" id="services" data-dotfield
+         data-df-from="rgba(10,10,10,0.14)" data-df-to="rgba(10,10,10,0.05)"
+         data-df-glow="236,230,220">
+
+  <!-- Curved divider echoing the section above -->
+  <div class="diff__curve" aria-hidden="true">
+    <svg viewBox="0 0 1440 140" preserveAspectRatio="none"><path d="M0,100 C360,0 1080,0 1440,100 L1440,140 L0,140 Z"/></svg>
+  </div>
+
+  <!-- Ambient drifting light glows -->
+  <div class="diff__glow diff__glow--1" aria-hidden="true"></div>
+  <div class="diff__glow diff__glow--2" aria-hidden="true"></div>
+  <div class="diff__glow diff__glow--3" aria-hidden="true"></div>
+
+  <!-- LEGO pit — three.js canvas floor of small orange bricks that get
+       knocked around by the sweeping cards + follow the cursor
+       (js/lego-pit.js, adapted from React Bits' Ballpit physics) -->
+  <canvas class="lego-pit" id="legoPit" aria-hidden="true"></canvas>
+
+  <!-- Carousel stage — the headline panel and each service card sweep in
+       from the right, pass through center with a 3D perspective, and
+       exit to the left as you scroll -->
+  <div class="diff__viewport">
+  <div class="diff__stage" id="diffStage">
+    <div class="diff__panel diff__panel--intro" id="diffIntro">
+      <div class="diff__intro-content">
+        <p class="eyebrow" style="justify-content:center">iCAUR Services</p>
+        <h2 class="diff__headline">We've Got You <em>Covered</em></h2>
+        <p class="diff__sub">From warranty to maintenance, we handle everything so you can focus on driving.</p>
+      </div>
+    </div>
+
+    <!-- Cards are clean white panels (.diff-card__box) — the old orange
+         lego-studded edge slabs were removed per client feedback; the
+         LEGO physics moved into the #legoPit canvas floor instead. -->
+    <div class="diff-card diff-card--media diff__panel">
+      <div class="diff-card__box">
+        <div class="diff-card__media" aria-hidden="true" style="background-image:url('/assets/images/iCAUR INTL_V27 REV_cam025.webp');background-size:cover;background-position:center"></div>
+        <div class="diff-card__body">
+          <h4>Warranty</h4>
+          <p>Comprehensive coverage that protects your vehicle and gives you complete peace of mind — so you can focus on the drive.</p>
+          <a href="/services/warranty" class="diff-card__link btn btn--dark btn--sm btn--arrow">Explore Warranty <span class="arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="diff-card diff-card--media diff__panel">
+      <div class="diff-card__box">
+        <div class="diff-card__media" aria-hidden="true" style="background-image:url('/assets/images/v27/interior-01.webp');background-size:cover;background-position:center"></div>
+        <div class="diff-card__body">
+          <h4>Service Center</h4>
+          <p>Expert care from certified technicians, ensuring your iCAUR stays at peak performance every day.</p>
+          <a href="/services/maintenance" class="diff-card__link btn btn--dark btn--sm btn--arrow">Explore Service Center <span class="arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="diff-card diff-card--media diff__panel">
+      <div class="diff-card__box">
+        <div class="diff-card__media" aria-hidden="true" style="background-image:url('/assets/images/ICUAR V27 brochure 03 20.webp');background-size:cover;background-position:center"></div>
+        <div class="diff-card__body">
+          <h4>Insurance Programs</h4>
+          <p>Flexible insurance solutions built around your lifestyle, offering simple, reliable protection wherever you go.</p>
+          <a href="/services/programs" class="diff-card__link btn btn--dark btn--sm btn--arrow">Explore Insurance Programs <span class="arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+</section>
+</div>
+<section class="why" id="why-icaur">
+
+  <div class="why__hud" aria-hidden="true">
+    <p class="eyebrow why__eyebrow">Why iCAUR</p>
+  </div>
+
+  <article class="why-strip why-strip--amber" data-side="l">
+    <div class="why-strip__inner">
+      <svg class="why-viz" viewBox="0 0 300 190" aria-hidden="true">
+      <!-- The client's power-without-limits drawing (rear 3/4, open tailgate,
+           seat showing through) redrawn as stroke line-art so all four scenes
+           share the road-and-sun weight and draw themselves with the scroll. -->
+      <path data-draw="0.15 0.20" pathLength="1" d="M46 26H194M56 32V26M184 32V26"/>
+      <path data-draw="0.16 0.34" pathLength="1" d="M38 128V52Q38 44 46 42L66 34H188Q198 34 198 42V128Q198 134 192 134H176V120Q176 114 170 114H138Q132 114 132 120V134H102V120Q102 114 96 114H64Q58 114 58 120V134H44Q38 134 38 128Z"/>
+      <path data-draw="0.30 0.38" pathLength="1" d="M46 72H194M100 40V72M150 40V72"/>
+      <path data-draw="0.34 0.40" pathLength="1" d="M38 60l-12 -5v12l12 -2M64 82h16M112 82h16"/>
+      <circle data-draw="0.34 0.44" pathLength="1" cx="80" cy="134" r="17"/>
+      <circle data-draw="0.36 0.46" pathLength="1" cx="154" cy="134" r="17"/>
+      <circle data-draw="0.41 0.45" pathLength="1" cx="80" cy="134" r="6"/>
+      <circle data-draw="0.42 0.46" pathLength="1" cx="154" cy="134" r="6"/>
+      <!-- open tailgate, swung out to the right, window line inside -->
+      <path data-draw="0.36 0.46" pathLength="1" d="M202 46L244 32Q250 30 250 37V104Q250 110 244 108L202 118"/>
+      <path data-draw="0.43 0.47" pathLength="1" d="M208 52L238 42V58L208 68Z"/>
+      <!-- seat showing through the opening -->
+      <path data-draw="0.44 0.48" pathLength="1" d="M184 76q9 -2 9 7v12q0 7 -8 7M180 70q6 -1 6 5"/>
+      <!-- pop! marks bursting off the open door -->
+      <path class="viz-pop" data-draw="0.46 0.50" pathLength="1" d="M258 28l10 -8"/>
+      <path class="viz-pop" data-draw="0.47 0.50" pathLength="1" d="M264 44l12 -3"/>
+      <path class="viz-pop" data-draw="0.48 0.50" pathLength="1" d="M250 18l5 -12"/>
+    </svg>
+      <h3 class="why-strip__word">Power without <em>limits</em></h3>
+      <p class="why-strip__tag">Instant torque and EV performance on every road.</p>
+    </div>
+  </article>
+
+  <article class="why-strip why-strip--dark" data-side="r">
+    <div class="why-strip__inner">
+      <svg class="why-viz" viewBox="0 0 240 150" aria-hidden="true">
+      <!-- wavy road first… -->
+      <path data-draw="0.16 0.30" pathLength="1" d="M10 116Q40 98 70 112T130 110T190 112T232 108"/>
+      <path data-draw="0.20 0.34" pathLength="1" d="M6 132Q40 116 74 128T138 126T198 128T236 124"/>
+      <path data-draw="0.30 0.38" pathLength="1" d="M60 122q8 -4 14 0M120 120q8 -4 14 0M178 121q8 -4 14 0"/>
+      <!-- …then the sun, which pulses with its rays -->
+      <g class="viz-sun">
+        <circle data-draw="0.36 0.46" pathLength="1" cx="186" cy="40" r="17"/>
+        <path data-draw="0.44 0.50" pathLength="1" d="M186 15v-8M203 23l6-6M210 40h8M203 57l6 6M169 23l-6-6M162 40h-8M169 57l-6 6M186 65v6"/>
+      </g>
+    </svg>
+      <h3 class="why-strip__word">Built for <em>Egypt roads</em></h3>
+      <p class="why-strip__tag">From crowded city streets to open desert highways.</p>
+    </div>
+  </article>
+
+  <article class="why-strip why-strip--amber" data-side="l">
+    <div class="why-strip__inner">
+      <svg class="why-viz" viewBox="0 0 260 160" aria-hidden="true">
+      <!-- The client's techinside drawing (V27 wheel left, floating display
+           right — LHD) redrawn as stroke line-art at the shared weight. -->
+      <g class="viz-wheel">
+        <circle data-draw="0.16 0.30" pathLength="1" cx="64" cy="90" r="42"/>
+        <circle data-draw="0.22 0.34" pathLength="1" cx="64" cy="90" r="33"/>
+        <rect data-draw="0.30 0.38" pathLength="1" x="50" y="80" width="28" height="22" rx="7"/>
+        <rect data-draw="0.34 0.40" pathLength="1" x="33" y="83" width="13" height="15" rx="5"/>
+        <rect data-draw="0.35 0.41" pathLength="1" x="82" y="83" width="13" height="15" rx="5"/>
+        <path data-draw="0.38 0.44" pathLength="1" d="M59 130l2 -18M69 130l-2 -18"/>
+      </g>
+      <rect data-draw="0.28 0.42" pathLength="1" x="142" y="36" width="102" height="64" rx="10"/>
+      <rect data-draw="0.36 0.46" pathLength="1" x="149" y="43" width="88" height="50" rx="6"/>
+      <path data-draw="0.42 0.47" pathLength="1" d="M142 44l-7 5v52l7 5"/>
+      <!-- pop! marks off the screen corner -->
+      <path class="viz-pop" data-draw="0.46 0.50" pathLength="1" d="M248 26l8 -8"/>
+      <path class="viz-pop" data-draw="0.47 0.50" pathLength="1" d="M254 42l12 -3"/>
+      <path class="viz-pop" data-draw="0.48 0.50" pathLength="1" d="M240 16l4 -12"/>
+    </svg>
+      <h3 class="why-strip__word">Smart tech <em>inside</em></h3>
+      <p class="why-strip__tag">Connected cabin, OTA updates and AI on board.</p>
+    </div>
+  </article>
+
+  <article class="why-strip why-strip--dark" data-side="r">
+    <div class="why-strip__inner">
+      <svg class="why-viz viz-spin" viewBox="0 0 1064 1064" aria-hidden="true">
+      <path data-draw="0.20 0.32" pathLength="1" d="M531.996 0V1064"/>
+        <path data-draw="0.28 0.40" pathLength="1" d="M908.18 155.815L155.818 908.177"/>
+        <path data-draw="0.36 0.46" pathLength="1" d="M1064 531.995L0 531.995"/>
+        <path data-draw="0.42 0.50" pathLength="1" d="M908.184 908.177L155.822 155.815"/>
+    </svg>
+      <h3 class="why-strip__word">Designed to <em>stand out</em></h3>
+      <p class="why-strip__tag">Bold proportions and details that turn heads.</p>
+    </div>
+  </article>
+
+</section>
+<div class="media-driver" id="mediaDriver">
+<section class="media" id="news">
+  <div class="media__stage" id="mediaStage">
+
+    <div class="media__grid">
+      <!-- LEFT: headline (top) + brief (bottom) -->
+      <div class="media__col">
+        <header class="media__head" id="mediaHead">
+          <p class="eyebrow media__eyebrow">Media Center</p>
+          <h2 class="media__title">What's Happening Now</h2>
+        </header>
+
+        <div class="media__brief" id="mediaBrief">
+          <p>All iCAUR updates, launches and stories in one place — so you always
+             know what we're building, and what's coming next.</p>
+          <a href="/news" class="btn btn--outline btn--sm btn--arrow">View Media Center <span class="arrow">→</span></a>
+        </div>
+      </div>
+
+      <!-- MIDDLE: the notched tile the full-bleed image shrinks into.
+           Deliberately NOT a boxed card — an image tile with a stepped
+           corner cut, meta and title sitting under it on the bare surface. -->
+      <article class="media-card media-card--lead" id="mediaLead">
+        <a href="/news/v23-design" class="media-card__img" id="mediaLeadImg" data-cursor-label="Read">
+          <img src="assets/images/iCAUR INTL_V27 REV_cam025.webp" alt="iCAUR V27 Studio Design Revealed" loading="lazy">
+        </a>
+        <div class="media-card__meta">
+          <span class="media-card__type">News</span>
+          <time datetime="2026-05-28">May 28, 2026</time>
+        </div>
+        <h4 class="media-card__title">iCAUR V27 Studio Design Revealed</h4>
+        <p class="media-card__excerpt">A first look at the design philosophy behind Egypt's most anticipated EV.</p>
+      </article>
+
+      <!-- RIGHT: the larger story, slides in beside the lead -->
+      <article class="media-card media-card--big" id="mediaBig">
+        <a href="/news/electric-wiring" class="media-card__img" data-cursor-label="Read">
+          <img src="assets/images/v27/car-side.webp" alt="Electric Wiring Matrix Optimized for Egypt" loading="lazy">
+        </a>
+        <div class="media-card__meta">
+          <span class="media-card__type media-card__type--blog">Blog</span>
+          <time datetime="2026-05-20">May 20, 2026</time>
+        </div>
+        <h4 class="media-card__title">Electric Wiring Matrix Optimized for Egypt</h4>
+        <p class="media-card__excerpt">How engineers rebuilt the EV powertrain for Egypt's unique climate and roads.</p>
+      </article>
+    </div>
+
+    <!-- The morphing layer: full bleed at rest, clipped down onto
+         #mediaLeadImg as the scene resolves. Sits above the grid so
+         it reads as one image becoming the card. -->
+    <!-- NO src here on purpose: js/main.js copies it from the lead story's own
+         <img>, so the hero picture and the tile are literally the same asset
+         from the same source. A second hardcoded src could drift from whatever
+         the story actually carries. -->
+    <div class="media__veil" id="mediaVeil" aria-hidden="true">
+      <img alt="" id="mediaVeilImg">
+      <span class="media__scrim" id="mediaScrim"></span>
+    </div>
+
+  </div>
+</section>
+</div>
+<div class="pad" style="height:60vh"></div>
+<script>
+  const y = parseFloat(new URLSearchParams(location.search).get('y')||'0');
+  if (y) { const p = document.querySelector('.pad'); if (p) p.style.marginTop = (-y*100)+'vh'; }
+</script>
+<script type="importmap">{ "imports": { "three": "/js/vendor/three.module.min.js" } }</script>
+<script src="/js/main.js" defer></script>
+<script type="module" src="/js/lego-pit.js"></script>
+</body></html>

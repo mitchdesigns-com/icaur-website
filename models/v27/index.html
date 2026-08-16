@@ -41,8 +41,19 @@
   <!-- Site nav (injected by components.js) -->
   <div id="site-header"></div>
 
-  <!-- ─── Overview speed-lines road (fixed, BEHIND the 3D car — z0 < z1) ─── -->
-  <div class="v27-hyper-wrap" aria-hidden="true"></div>
+  <!-- ─── Overview plasma wash (fixed, BEHIND the 3D car — z0 < z1) ───────
+       Must live OUT here, not inside #v27-overview: that section is z2 and
+       makes its own stacking context, so anything nested in it paints over
+       the fixed car canvas and washes the paint out. -->
+  <div class="v27-ov-plasma" aria-hidden="true">
+    <span></span><span></span><span></span>
+    <!-- Light threads — thin amber streaks gliding along their own 45°
+         axis. Angled and placed over the car half / extreme corners, so
+         none of them ever crosses the copy column. -->
+    <div class="v27-ov-threads">
+      <i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+  </div>
 
   <!-- ─── DotGrid (fixed, BEHIND the 3D car — z0 < z1) ─────────── -->
   <div class="eg-dotgrid-wrap" aria-hidden="true"></div>
@@ -107,7 +118,9 @@
     <div class="v27-overview-sticky">
       <div class="v27-overview-inner">
         <div class="v27-overview-left" id="v27-ov-left">
-          <h2 class="v27-ov-h2"><img src="/assets/images/V27-logo.svg" alt="V27" class="v27-ov-logo"><br>Overview</h2>
+          <!-- the V27 mark is a masked span, not an <img>, so CSS can paint
+               it amber; the accessible name stays on the heading -->
+          <h2 class="v27-ov-h2">Overview<br><span class="v27-ov-logo" role="img" aria-label="V27"></span></h2>
           <p class="v27-ov-para">
             Built with extraordinary electric technology and bold V27 DNA,
             the iCAUR V27 gives you the best of both worlds — emission-free
@@ -118,7 +131,7 @@
             <span class="v27-ov-price-label">Starting from</span>
             <span class="v27-ov-price">1,490,000 <em>EGP</em></span>
           </div>
-          <a href="#" download class="v27-cta-btn v27-cta-btn--outline v27-ov-cta">
+          <a href="#" download class="v27-cta-btn v27-cta-btn--dark v27-ov-cta">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
             Download Brochure
           </a>

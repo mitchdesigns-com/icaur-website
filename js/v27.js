@@ -35,19 +35,11 @@ let scrollBaseRotY  = HERO_POSE.rotY;
 let dragExtraRot    = 0;
 let smoothRotY      = HERO_POSE.rotY; /* what the render loop lerps toward */
 
-/* Camera rig — shared with the 2D road layer so its perspective can be
-   built from the SAME lens/position as the WebGL camera (see initRoad) */
 const CAM = { fov: 50, x: 0.2, y: 3.8, z: 9.2 };
 
 /* Yaw the car is baked at inside the GLB (radians, world-frame when the
-   group's own rotation is 0). Measured off the wheel hubs in prepModel;
-   the road layer adds the pose rotation on top to get the true heading. */
+   group's own rotation is 0). Measured off the wheel hubs in prepModel. */
 let modelYaw = 0;
-
-/* Road wave — written by initRoad each frame, read by the render loop
-   so the car bobs in sync with the lines (on: 0..1); speed feeds the
-   wheel spin so it matches the road flow */
-const roadWave = { y: 0, roll: 0, on: 0, speed: 0 };
 
 /* ─── Car colors — one GLB per paint (same sources as the landing page) ── */
 const R2 = 'https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev';
@@ -267,34 +259,6 @@ function initScene() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  /* ── Bridge for the 2D road layer ────────────────────────────────
-     The road can't approximate this camera and stay glued to the car
-     through every pose scrub, so it borrows the real one. Projection
-     goes through THREE and the result is nudged by the same -9vh the
-     canvas wrap is translated by, putting both layers in one space. */
-  const projVec = new THREE.Vector3();
-  window.__v27Road = {
-    /* world point → [cssX, cssY, distanceFromCamera] */
-    project(wx, wy, wz) {
-      projVec.set(wx, wy, wz);
-      const dist = projVec.distanceTo(camera.position);
-      projVec.project(camera);
-      return [
-        (projVec.x * 0.5 + 0.5) * window.innerWidth,
-        (-projVec.y * 0.5 + 0.5) * window.innerHeight - window.innerHeight * 0.09,
-        dist,
-      ];
-    },
-    /* live ground anchor + heading of the car, whatever pose it's in */
-    car() {
-      if (!car) return null;
-      return {
-        x: car.position.x, y: car.position.y, z: car.position.z,
-        yaw: modelYaw + car.rotation.y,
-      };
-    },
-  };
-
   /* Render loop — smooth lerp rotation so drag and scroll never snap */
   let lastFrameT = performance.now();
   function animate() {
@@ -307,20 +271,9 @@ function initScene() {
       smoothRotY = lerp(smoothRotY, target, 0.10);
       car.rotation.y = smoothRotY;
     }
-    /* ride the road's wave — gentle bob + roll on the body only,
-       so the pose group (scroll scrubs / drag) is never fought */
-    if (carBody) {
-      const k = roadWave.on;
-      carBody.position.y = roadWave.y * 0.05 * k;
-      carBody.rotation.z = roadWave.roll * 0.016 * k;
-
-      /* wheels roll at the road's speed while the car drives */
-      const spinners = carBody.userData.spinners;
-      if (spinners && k > 0.01) {
-        const step = roadWave.speed * 0.9 * k * dt;
-        spinners.forEach(p => { p.rotation[p.userData.axis] -= step; });
-      }
-    }
+    /* The car sits STILL now — no bob, no roll, no wheel spin. The road
+       it used to ride is gone, so driving motion had nothing to answer
+       to; the Overview reads calmer as a static product shot. */
     renderer.render(scene, camera);
   }
   animate();
@@ -484,167 +437,6 @@ function initHeroEntrance() {
   tl.from('#v27-hero-h1',   { opacity: 0, y: 24, duration: .8, ease: 'power3.out' }, .2)
     .to('#v27-hero-sub',    { opacity: 1, y: 0,  duration: .7, ease: 'power3.out' }, .55)
     .to('#v27-hero-bottom', { opacity: 1, y: 0,  duration: .7, ease: 'power3.out' }, .72);
-}
-
-/* ══════════════════════════════════════════════════════════
-   OVERVIEW ROAD — light take on React Bits <Hyperspeed />.
-   A fixed 2D-canvas layer UNDER the 3D car (z0 < canvas z1),
-   live only while the Overview section is on screen.
-
-   Every point goes through the WebGL camera itself (see the
-   __v27Road bridge in initScene) and lanes are laid on the
-   model's own heading, so the lanes converge on the model's
-   vanishing point and stay glued to its ground plane through
-   the whole pose scrub — the car reads as genuinely sitting
-   on this road rather than pasted over it.
-══════════════════════════════════════════════════════════ */
-function initRoad() {
-  const wrap = document.querySelector('.v27-hyper-wrap');
-  const ov   = document.getElementById('v27-overview');
-  if (!wrap || !ov) return;
-
-  /* Half a track width: ~0.95 m half-body × the Overview scale */
-  const HALF_CAR = 0.95 * OVERVIEW_POSE.scale;
-
-  const CFG = {
-    /* Lateral lane offsets from the car's centreline (world units) — two
-       straddling the wheels, the rest fanning out to either shoulder */
-    lanes: [-4.4, -3.0, -1.85, -HALF_CAR, HALF_CAR, 1.85, 3.0, 4.4],
-    dashPerLane: 11,
-    dashLen: [2.6, 5.4],
-    streakCount: 22,
-    streakLen: [8, 20],
-    /* v spans from IN FRONT of the car (negative — lanes sweep past the
-       bumper and out of frame) to the horizon behind it */
-    near: -7, far: 62,
-    baseSpeed: 13,
-    /* gentle traveling ground wave (world amp / spatial freq / rad-per-s) */
-    wave: { amp: 0.09, freq: 0.35, om: 1.2 },
-    dashRgb: '206, 193, 173',                                   /* warm gray */
-    streakRgbs: ['243, 112, 33', '224, 169, 109', '164, 128, 94'],  /* orange / amber / brown */
-  };
-
-  const canvas = document.createElement('canvas');
-  wrap.appendChild(canvas);
-  const ctx = canvas.getContext('2d');
-
-  let W = 0, H = 0, focal = 0;
-  function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = wrap.clientWidth; H = wrap.clientHeight;
-    canvas.width = W * dpr; canvas.height = H * dpr;
-    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    /* Focal length in px of the shared camera, for line weight only —
-       positions come from the camera itself via the bridge */
-    focal = (H / 2) / Math.tan((CAM.fov * Math.PI / 180) / 2);
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  /* Segments live in ROAD space, not world space: u = lateral offset from
-     the car's centreline, v = distance back along its travel axis. */
-  const rand = (a, b) => a + Math.random() * (b - a);
-  const dashes = [];
-  CFG.lanes.forEach(u => {
-    for (let i = 0; i < CFG.dashPerLane; i++)
-      dashes.push({ u, v: rand(CFG.near, CFG.far), len: rand(CFG.dashLen[0], CFG.dashLen[1]) });
-  });
-  const streaks = [];
-  for (let i = 0; i < CFG.streakCount; i++) {
-    streaks.push({
-      u: CFG.lanes[Math.floor(Math.random() * CFG.lanes.length)] + rand(-0.3, 0.3),
-      v: rand(CFG.near, CFG.far),
-      len: rand(CFG.streakLen[0], CFG.streakLen[1]),
-      rgb: CFG.streakRgbs[Math.floor(Math.random() * CFG.streakRgbs.length)],
-    });
-  }
-
-  /* scroll velocity → smoothed speed boost, so lines surge as you scroll */
-  let lastScrollY = window.scrollY, boost = 0;
-  const clamp01 = v => Math.min(Math.max(v, 0), 1);
-
-  let lastT = performance.now();
-  (function frame(t) {
-    requestAnimationFrame(frame);
-    const dt = Math.min((t - lastT) / 1000, 0.05); lastT = t;
-
-    /* Overview visibility from live geometry — the road only exists
-       while that section is on screen: fades up as it arrives, whooshes
-       out as it hands off to the 360 stage. */
-    const r   = ov.getBoundingClientRect();
-    const vh  = window.innerHeight;
-    const rig = window.__v27Road;
-    const anchor = rig && rig.car();
-    if (!anchor) return;                                /* car not loaded — nothing to sit on */
-    if (r.top > vh || r.bottom <= 0) {                  /* off-screen — skip all work */
-      if (roadWave.on !== 0) { roadWave.on = 0; wrap.style.opacity = '0'; ctx.clearRect(0, 0, W, H); }
-      return;
-    }
-    const enter = clamp01((vh - r.top) / (vh * 0.45));  /* 0 arriving … 1 in place */
-    const exit  = clamp01(1 - r.bottom / vh);           /* 0 pinned … 1 fully gone */
-    const on    = enter * (1 - exit);
-    wrap.style.opacity = on.toFixed(3);
-    roadWave.on = on;
-
-    const dy = window.scrollY - lastScrollY; lastScrollY = window.scrollY;
-    boost += (Math.min(Math.abs(dy) * 0.07, 10) - boost) * 0.08;
-
-    /* cruise + scroll surge + exit whoosh */
-    const speed = CFG.baseSpeed * (1 + exit * 2.4) + boost;
-    roadWave.speed = speed;
-
-    ctx.clearRect(0, 0, W, H);
-
-    /* traveling ground wave — the same phase drives the car's bob,
-       so the model reads as riding these lines */
-    const tw = t * 0.001;
-    const waveAt = v => Math.sin(v * CFG.wave.freq - tw * CFG.wave.om) * CFG.wave.amp;
-    roadWave.y    = Math.sin(-tw * CFG.wave.om);               /* phase at the car (v = 0) */
-    roadWave.roll = Math.cos(-tw * CFG.wave.om);
-
-    /* The car's live heading — the GLB's baked yaw plus whatever the pose
-       has rotated it to. Lanes are laid out on that axis, so they run
-       exactly parallel to the model and converge on ITS vanishing point. */
-    const nx = Math.sin(anchor.yaw), nz = Math.cos(anchor.yaw);  /* nose direction */
-    const px = nz,                   pz = -nx;                   /* lateral, across the lanes */
-
-    /* Road space (u across, v back along the axis) → world → screen,
-       through the WebGL camera itself */
-    const project = (u, v) => rig.project(
-      anchor.x + px * u - nx * v,
-      anchor.y + waveAt(v),
-      anchor.z + pz * u - nz * v,
-    );
-    const drawSeg = (s, rgb, aMul, wMul, glow) => {
-      /* lines RECEDE along the car's axis — ground flows nose-to-tail,
-         so the car reads as driving forward */
-      s.v += speed * dt;
-      if (s.v > CFG.far) s.v -= CFG.far - CFG.near;            /* recycle */
-      const v1 = Math.max(s.v, CFG.near), v2 = s.v + s.len;
-      if (v1 >= v2) return;
-      const [x1, y1, d1] = project(s.u, v1);
-      const [x2, y2, d2] = project(s.u, v2);
-      if (d1 < 0.8 || d2 < 0.8) return;                        /* at/behind the lens */
-      const a = clamp01(1 - v2 / CFG.far) * aMul;              /* fade to horizon */
-      if (a <= 0.01) return;
-      /* bright head near the camera fading down the tail — the
-         streaks read as lit, with real depth */
-      const grad = ctx.createLinearGradient(x1, y1, x2, y2);
-      grad.addColorStop(0, `rgba(${rgb}, ${a.toFixed(3)})`);
-      grad.addColorStop(1, `rgba(${rgb}, ${(a * 0.15).toFixed(3)})`);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = Math.max(Math.min(focal * 0.014 / d1, 5.5) * wMul, 0.8);
-      ctx.shadowBlur = glow ? 12 : 0;
-      ctx.shadowColor = glow ? `rgba(${rgb}, .5)` : 'transparent';
-      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-    };
-
-    ctx.lineCap = 'round';
-    dashes.forEach(d => drawSeg(d, CFG.dashRgb, 0.85, 1.1, false));
-    streaks.forEach(s => drawSeg(s, s.rgb, 0.9, 2.1, true));
-    ctx.shadowBlur = 0;
-  })(performance.now());
 }
 
 
@@ -1783,12 +1575,36 @@ function interpolateColor(hex1, hex2, t) {
    from an older CTA structure that no longer exists in the markup. */
 
 /* ══════════════════════════════════════════════════════════
+   OVERVIEW BACKGROUND — plasma + threads, glued to the SECTION.
+   The layer must stay position:fixed to sit UNDER the fixed car
+   canvas (the section's own stacking context paints above it), so
+   "scrolls with the section" is done by hand: each frame it is
+   translated to exactly overlay the Overview sticky. Result: it
+   arrives, pins and leaves with the section, while the car keeps
+   its own layer above.
+══════════════════════════════════════════════════════════ */
+function initOverviewBg() {
+  const bg = document.querySelector('.v27-ov-plasma');
+  const sticky = document.querySelector('.v27-overview-sticky');
+  if (!bg || !sticky) return;
+  let lastY = null;
+  (function tick() {
+    requestAnimationFrame(tick);
+    const t = Math.round(sticky.getBoundingClientRect().top * 10) / 10;
+    if (t === lastY) return;
+    lastY = t;
+    bg.style.transform = `translate3d(0, ${t}px, 0)`;
+  })();
+}
+
+
+/* ══════════════════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════════════════ */
 function init() {
   initScene();
   initHeroEntrance();
-  initRoad();
+  initOverviewBg();
   initExterior();
   initLightbox();
   initBrand();

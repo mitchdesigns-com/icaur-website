@@ -37,8 +37,22 @@
 
 <main id="main">
 
-<!-- ═══════ HERO ═══════ -->
+<!-- ═══════ HERO + CATEGORY FILTERS — one section ═══════
+     The filter chips live INSIDE the hero so the scattered photo cards sit
+     beside both. Cards are straight (no tilt), a mix of landscape, square
+     and portrait frames, positioned to stay FULLY inside the section — no
+     card is ever clipped by an edge. Hover: a very small lift. -->
 <section class="faq-page-hero">
+  <!-- Each card is a FRAME (the reveal rides the frame) holding its photo;
+       js/main.js pans the photo softly inside the frame under the cursor -->
+  <div class="faq-hero-shots" aria-hidden="true">
+    <div class="faq-hero-shot faq-hero-shot--tall reveal reveal--up" data-delay="2"><img src="/assets/images/ICUAR V27 brochure 03 20.webp" alt="" loading="lazy"></div>
+    <div class="faq-hero-shot faq-hero-shot--sq   reveal reveal--up" data-delay="4"><img src="/assets/images/v27-model-in-homepge-01.webp" alt="" loading="lazy"></div>
+    <div class="faq-hero-shot faq-hero-shot--wide reveal reveal--up" data-delay="6"><img src="/assets/images/Maintainance.webp" alt="" loading="lazy"></div>
+    <div class="faq-hero-shot faq-hero-shot--wide reveal reveal--up" data-delay="3"><img src="/assets/images/about-hero.webp" alt="" loading="lazy"></div>
+    <div class="faq-hero-shot faq-hero-shot--tall reveal reveal--up" data-delay="5"><img src="/assets/images/v27/car-side.webp" alt="" loading="lazy"></div>
+    <div class="faq-hero-shot faq-hero-shot--sq   reveal reveal--up" data-delay="6"><img src="/assets/images/v27/interior-display.webp" alt="" loading="lazy"></div>
+  </div>
   <div class="container" style="max-width:720px">
     <nav class="breadcrumb reveal reveal--up" data-delay="0" aria-label="Breadcrumb">
       <a href="/">Home</a><span>›</span><span aria-current="page">FAQs</span>
@@ -47,16 +61,14 @@
     <h1 class="reveal reveal--up" data-delay="2">Frequently Asked<br><em style="font-style:normal;color:var(--amber)">Questions</em></h1>
     <p class="reveal reveal--up" data-delay="3">Got questions? We've got answers about your iCAUR journey.</p>
   </div>
+  <div class="faq-cat-filters">
+    <button class="faq-cat-btn is-active" data-cat="all">All FAQs</button>
+    <button class="faq-cat-btn" data-cat="sales">Sales</button>
+    <button class="faq-cat-btn" data-cat="warranty">Warranty</button>
+    <button class="faq-cat-btn" data-cat="services">Services</button>
+    <button class="faq-cat-btn" data-cat="spare-parts">Spare Parts</button>
+  </div>
 </section>
-
-<!-- ═══════ CATEGORY FILTERS ═══════ -->
-<div class="faq-cat-filters">
-  <button class="faq-cat-btn is-active" data-cat="all">All FAQs</button>
-  <button class="faq-cat-btn" data-cat="sales">Sales</button>
-  <button class="faq-cat-btn" data-cat="warranty">Warranty</button>
-  <button class="faq-cat-btn" data-cat="services">Services</button>
-  <button class="faq-cat-btn" data-cat="spare-parts">Spare Parts</button>
-</div>
 
 <!-- ═══════ FAQ BODY ═══════ -->
 <div class="faq-page-body">

@@ -105,7 +105,13 @@ body {
   overflow-x: clip;   /* clip horizontal overflow without breaking position:sticky */
   cursor: none; /* hide default — use custom cursor */
 }
-@media (hover: none) { body { cursor: auto; } }
+/* On hover-capable (non-touch) devices the brand arrow IS the only cursor.
+   Force it everywhere so the scattered cursor:pointer/grab/text/default rules
+   on links, buttons and cards can't bring the native pointer back on top. */
+@media (hover: hover) {
+  *, *::before, *::after { cursor: none !important; }
+}
+@media (hover: none) { body, * { cursor: auto !important; } }
 
 img { display: block; width: 100%; height: 100%; object-fit: cover; }
 a { text-decoration: none; color: inherit; }
@@ -154,12 +160,9 @@ small, .text-sm  { font-size: 14px; }
   border-radius: 0;
   margin-bottom: var(--sp-8);
 }
-.eyebrow::before {
-  content: '';
-  flex-shrink: 0;
-  width: 34px; height: 9px;
-  background: url('../assets/images/dashes.svg') no-repeat center / contain;
-}
+/* The dash mark that used to sit before every eyebrow was removed
+   site-wide; eyebrows are now text only. (The standalone brand dashes —
+   .cta-video__dash, .mv__mark, .vision__dash — are separate and stay.) */
 .eyebrow--warm {
   color: var(--brown);
 }
@@ -311,12 +314,16 @@ small, .text-sm  { font-size: 14px; }
    stripped from 19 HTML files; initCursor() injects .cursor__arrow. */
 .cursor__dot, .cursor__ring, .cursor__label { display: none; }
 
-/* assets/images/cursor.svg carries its own fills, glow and inner shadows —
-   deliberately not restyled here. Only size and placement live in CSS. */
+/* The arrow is inline SVG (js/main.js) with two parts: .cursor__body is the
+   silhouette, .cursor__logo is the iCAUR mark inside. Default = orange body,
+   white logo. Sizing/placement below; the white state is handled further down. */
+.cursor__body { fill: #FA6124; }   /* --amber, brand orange */
+.cursor__logo { fill: #fff; }
 .cursor__arrow {
   position: absolute;
   display: block;
-  width: var(--cursor-size, 32px); height: auto;
+  width: var(--cursor-size, 26px); height: auto;
+  overflow: visible;
   /* Hotspot = the arrow TIP, at (14,13) of the 505×640 viewBox (measured). Offsetting
      by that fraction puts the tip on the pointer, as a real cursor does. */
   transform: translate(-2.77%, -2.03%);
@@ -329,9 +336,11 @@ small, .text-sm  { font-size: 14px; }
    so the target still reads as interactive (js/main.js) */
 .cursor.is-hotspot .cursor__arrow { transform: translate(-2.77%, -2.03%) scale(1.22); }
 /* Auto-contrast (js/main.js): the arrow's own amber can land on an
-   amber button/chip/CTA and nearly vanish — flatten it to a white
-   silhouette rather than hand-listing every "orange section" by class */
-.cursor.is-low-contrast .cursor__arrow { filter: brightness(0) invert(1); }
+   amber button/chip/CTA and nearly vanish. Flip to a white body so it
+   reads against the orange — and turn the iCAUR mark inside orange so the
+   logo stays visible instead of disappearing into a white silhouette. */
+.cursor.is-low-contrast .cursor__body { fill: #fff; }
+.cursor.is-low-contrast .cursor__logo { fill: #FA6124; }
 
 /* ═══════════════════════════════════════════════════════════
    PAGE INTRO
@@ -995,10 +1004,13 @@ html.pt-entering > body { opacity: 0; }
 /* ═══════════════════════════════════════════════════════════
    SCROLL REVEAL SYSTEM
    ═══════════════════════════════════════════════════════════ */
+/* Long expo-out everywhere: elements arrive fast and settle slowly, which
+   reads as weight rather than bounce. The spring curve stays on buttons and
+   hovers — entrances share ONE personality so the page feels composed. */
 .reveal {
-  transition-property: opacity, transform, clip-path;
-  transition-duration: var(--dur-lg);
-  transition-timing-function: var(--ease-spring);
+  transition-property: opacity, transform, clip-path, filter;
+  transition-duration: .9s;
+  transition-timing-function: var(--ease-expo);
 }
 /* Delay tokens */
 .reveal[data-delay="0"] { transition-delay: 0s; }
@@ -1009,9 +1021,19 @@ html.pt-entering > body { opacity: 0; }
 .reveal[data-delay="5"] { transition-delay: .40s; }
 .reveal[data-delay="6"] { transition-delay: .50s; }
 
-/* Slide up — spring bounce */
-.reveal--up          { opacity: 0; transform: translateY(40px); }
+/* Slide up — the workhorse; more travel now that the ease is expo-out */
+.reveal--up          { opacity: 0; transform: translateY(44px); }
 .reveal--up.in-view  { opacity: 1; transform: translateY(0); }
+
+/* Rise + unblur — for hero-ish text blocks that should feel like they
+   condense into focus (kprverse-style) */
+.reveal--blur         { opacity: 0; transform: translateY(32px); filter: blur(14px); }
+.reveal--blur.in-view { opacity: 1; transform: translateY(0);   filter: blur(0); }
+
+/* Settle-down zoom — for pictures and video blocks: the frame arrives
+   while the content eases back to rest */
+.reveal--zoom         { opacity: 0; transform: scale(1.08); }
+.reveal--zoom.in-view { opacity: 1; transform: scale(1); }
 
 /* Fade */
 .reveal--fade         { opacity: 0; }
@@ -1028,6 +1050,13 @@ html.pt-entering > body { opacity: 0; }
 /* Clip vertical (bottom → full) */
 .reveal--clip-v         { clip-path: inset(0 0 100% 0); }
 .reveal--clip-v.in-view { clip-path: inset(0 0 0% 0); }
+
+/* Reduced motion: every reveal is simply visible — no travel, no blur */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .word { transition: none !important; }
+  .reveal { opacity: 1 !important; transform: none !important;
+            clip-path: none !important; filter: none !important; }
+}
 
 /* Word-by-word reveal */
 .word-mask { display: inline-block; overflow: hidden; }
@@ -1688,23 +1717,20 @@ html.pt-entering > body { opacity: 0; }
   position: absolute; left: var(--pad-x); bottom: var(--sp-64); z-index: 3;
   width: 50vw;
 }
+/* Opacity is written every scroll tick (js/main.js) — NO transition here.
+   A CSS transition on a value that's already being driven 1:1 by scroll
+   just fights it: each tick retargets the animation, so the rendered
+   opacity lags and overshoots behind the true scroll position, reading
+   as "shown, then disappear, then reveal" on anything but a dead-slow
+   scroll. The .ov-mask's translateY (the actual "rise from bottom") is
+   already instant/scroll-synced — opacity now matches it exactly. */
 .ov-step {
   position: absolute; left: 0; bottom: 0;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(36px);
-  transition: opacity .7s var(--ease-spring), transform .7s var(--ease-spring);
-  will-change: opacity, transform;
+  will-change: opacity;
 }
-.ov-step.is-active {
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-/* First paragraph trails the headline bounce by ~0.5s */
-.ov-step[data-step="0"] {
-  transition-delay: .5s, .5s;
-}
+.ov-step.is-active { pointer-events: auto; }
 
 .ov-step .overview__body {
   font-size: clamp(18px, 2.2vw, 22px);
@@ -1712,10 +1738,9 @@ html.pt-entering > body { opacity: 0; }
   color: var(--white);
 }
 
-/* Paragraph reveal — plain fade + rise, driven by the same scroll
-   progress as .ov-step's own opacity (js/main.js). Used to be an amber
-   block that swept across covering/uncovering the text; this is the
-   same scroll-scrubbed timing without the box. */
+/* Paragraph reveal — the rise. Also written every tick, in the same
+   scroll-synced pass as .ov-step's opacity above, so position and
+   opacity move together with zero lag between them. */
 .ov-mask { will-change: transform; }
 
 /* Brand insight stats — bottom right, appear with the first paragraph
@@ -1930,9 +1955,9 @@ html.pt-entering > body { opacity: 0; }
    3D brick box: the card itself is now only a transformed 3D container
    (initDiffScroll's rotateY lives on it) — overflow:hidden here would
    flatten the child planes, so the white face moved to .diff-card__box
-   and the clip/shadow went with it. The two .diff-card__edge slabs are
-   rotated 90° into depth off the left/right edges, giving the card real
-   thickness that only shows while it's angled at the sides of the sweep. */
+   and the clip/shadow went with it. (The old lego edge slabs were
+   removed per client feedback — LEGO now lives in the #legoPit floor.) */
+
 .diff-card--media.diff__panel {
   padding: 0;
   justify-content: flex-start;
@@ -1948,7 +1973,10 @@ html.pt-entering > body { opacity: 0; }
      below carry the fade individually. */
   will-change: transform;
 }
-.diff-card__box, .diff-card__edge { opacity: var(--card-fade, 1); }
+/* Clean white panel — the orange lego tray + stud rails were removed per
+   client feedback; the LEGO character now lives in the #legoPit canvas
+   floor (js/lego-pit.js) where 3D bricks react to the sweeping cards. */
+.diff-card__box { opacity: var(--card-fade, 1); }
 .diff-card__box {
   position: relative; z-index: 1;
   width: 100%; height: 100%;
@@ -1957,49 +1985,14 @@ html.pt-entering > body { opacity: 0; }
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
 }
-/* Lego side faces — the Figma side-view studs (node 614-376): a vertical
-   column of 3-D cylinders sticking straight out of the card's left and
-   right edges. IMPORTANT: these are FLAT strips in the card's own plane,
-   not slabs rotated 90° into depth — a true-3D slab foreshortens to an
-   unreadable ~16px sliver at the carousel's shallow sweep angles. Flat
-   strips stay readable at every angle and still ride the card's rotateY,
-   so perspective shades them naturally. Cylinder recipe straight from
-   the artwork: body #8D4215→#F37124, end cap reversed, recessed inner
-   ellipse, gradient direction alternating per stud. Caps point outward
-   (the right strip is the same tile mirrored). */
-/* the frame itself — ONE rounded tray behind the card, its outer
-   radius concentric with the card's own (inner 16px + 12px thickness),
-   so the orange follows the card corners instead of poking past them
-   as square rails. Darker 2px rim = the brick's outer seam. */
-.diff-card--media.diff__panel::before {
-  content: '';
-  position: absolute; inset: -12px;
-  border-radius: calc(var(--r-xl) + 12px);
-  /* hollow RING, not a filled slab — a fill sits behind the card face
-     and bleeds orange through the white box whenever --card-fade < 1,
-     tinting the whole card pink mid-sweep. Ring inner radius lands
-     exactly on the card's own radius. */
-  border: 12px solid #D95E15;
-  box-shadow: 0 0 0 2px #A44A10;   /* outer seam line */
-  opacity: var(--card-fade, 1);
+/* LEGO pit canvas — pinned to the section, behind the card viewport */
+.lego-pit {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 1;                /* glows are 0; .diff__viewport sits above */
   pointer-events: none;
 }
-.diff-card__edge {
-  /* stud rail only — the tray supplies the flange. Insets clear the
-     tray's rounded corners so studs never overlap the curve. */
-  position: absolute; top: 26px; bottom: 26px;
-  width: 18px;
-  /* SINGLE-stud tile (96px pitch): background-repeat:round distortion
-     stays under ~5%, and the outlined hard-edged cap keeps its shape
-     when the 3D transform magnifies the card's near side. */
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='96'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%238D4215'/%3E%3Cstop offset='1' stop-color='%23F37124'/%3E%3C/linearGradient%3E%3ClinearGradient id='b' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23F37124'/%3E%3Cstop offset='1' stop-color='%238D4215'/%3E%3C/linearGradient%3E%3ClinearGradient id='c' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%238D4215'/%3E%3Cstop offset='1' stop-color='%23F37124'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='6' y='24' width='12' height='48' fill='url(%23a)'/%3E%3Cellipse cx='7' cy='48' rx='6.5' ry='24' fill='url(%23b)' stroke='%237A3910' stroke-width='1'/%3E%3Cellipse cx='5.8' cy='48' rx='2.8' ry='10.5' fill='url(%23c)'/%3E%3C/svg%3E") center top / 18px 96px;
-  background-repeat: round;   /* whole studs only, at any card height */
-  pointer-events: none;
-}
-.diff-card__edge--l { left: -30px; }
-.diff-card__edge--r { right: -30px; transform: scaleX(-1); }
-/* the old slab markup's stud elements — superseded by the SVG strip */
-.diff-card__edge i { display: none; }
+@media (max-width: 860px) { .lego-pit { display: none; } }
 .diff-card__media {
   /* fills whatever height the text body leaves free, so the
      per-card CTA is never clipped by the fixed panel height */
@@ -2279,7 +2272,9 @@ html.pt-entering > body { opacity: 0; }
    NEWS
    ═══════════════════════════════════════════════════════════ */
 .news {
-  background: #EEEEEE;
+  /* was a cool #EEEEEE — warmed to the site's cream family so the
+     Why → News handoff reads as one continuous surface */
+  background: var(--cream-deep);
   position: relative;
   isolation: isolate;
 }
@@ -2448,6 +2443,23 @@ html.pt-entering > body { opacity: 0; }
   position: relative; overflow: hidden;
   padding-block: clamp(80px, 12vh, 140px);
 }
+/* Dark variant (#values). These rules were lost when the old Why-iCAUR list
+   was replaced by the diagonal strips — the section had been rendering on the
+   light default ever since. */
+.usp-list--dark { background: var(--black); }
+.usp-list--dark .section-title,
+.usp-list--dark .section-title--light { color: var(--white); }
+.usp-list--dark .usp-row { cursor: default; }
+/* Preview side alternates per hovered row: left, right, left … (js sets
+   data-side). Same --pv-x both sides, so the mirror is exact; the vertical
+   spot never changes — one line, centred on the three values. */
+.usp-preview[data-side="right"] {
+  left: auto; right: var(--pv-x, clamp(8px, 4vw, 64px));
+  transform: translateY(-46%) scale(.92) rotate(4deg);
+}
+.usp-preview[data-side="right"].is-active {
+  transform: translateY(-50%) scale(1) rotate(2deg);
+}
 .usp-list__wrap { position: relative; text-align: center; }
 .usp-list__wrap .eyebrow { justify-content: center; }
 .usp-list__stack {
@@ -2488,20 +2500,24 @@ html.pt-entering > body { opacity: 0; }
   display: flex; justify-content: center;
   margin-top: clamp(24px, 4vh, 44px);
 }
-/* Hover image preview — floats on the left, vertically tracks the
-   hovered row (top set per-row by initUspList) */
+/* Hover image preview — alternates sides per hovered row but rides ONE
+   vertical line, centred on the stack of three values (top set by
+   fitPreview), so it can never wander into the heading or crowd a
+   title (js/main.js initUspList). */
 .usp-preview {
-  position: absolute; left: clamp(8px, 4vw, 64px); top: 50%;
+  /* --pv-x (js/main.js fitPreview) centres the image inside the side
+     gutter with a guaranteed clearance from the titles; the clamp is
+     only the pre-JS fallback */
+  position: absolute; left: var(--pv-x, clamp(8px, 4vw, 64px)); top: 50%;
   width: clamp(170px, 19vw, 260px); aspect-ratio: 4/3;
   border-radius: 16px; overflow: hidden;
   box-shadow: 0 24px 56px rgba(0, 0, 0, .28);
-  /* Always visible now — idle state shows the first row's image,
-     centred (top:50%) and slightly tucked back, so the section never
-     opens on an empty gap before the first hover (js/main.js). Hover
-     wakes it up to full scale and tracks whichever row is active. */
+  /* Always visible — idle shows the first row's image slightly tucked
+     back, so the section never opens on an empty gap before the first
+     hover; is-active brings it to full scale. */
   opacity: 1; pointer-events: none; z-index: 3;
   transform: translateY(-46%) scale(.92) rotate(-4deg);
-  transition: opacity .35s var(--ease-out), transform .5s var(--ease-spring), top .45s var(--ease-spring);
+  transition: opacity .35s var(--ease-out), transform .5s var(--ease-spring);
 }
 .usp-preview.is-active {
   transform: translateY(-50%) scale(1) rotate(-2deg);
@@ -2516,14 +2532,663 @@ html.pt-entering > body { opacity: 0; }
   .usp-row__title { color: rgba(10,10,10,.4); }
 }
 
-/* Dark variant — Why iCAUR: black background, white titles */
-.usp-list--dark { background: var(--black); }
-.usp-list--dark .usp-row { cursor: default; }
-.usp-list--dark .usp-row__title { color: rgba(255, 255, 255, .18); }
-.usp-list--dark .usp-row:hover .usp-row__title,
-.usp-list--dark .usp-row:focus-visible .usp-row__title { color: var(--white); }
+/* ═══════════════════════════════════════════════════════════
+   SERVICES — editorial horizontal story (off-track style)
+   The driver supplies scroll length (set in px by initSvcScroll);
+   .svc pins and the track slides horizontally through the three
+   services. Phase A happens inside the intro panel: the flipbook
+   deck cycles over the headline, then lands in .svc__slot.
+   ═══════════════════════════════════════════════════════════ */
+.svc-driver {
+  position: relative; z-index: 1;
+  background: var(--cream-deep);
+}
+.svc-driver::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 200px 200px; background-repeat: repeat;
+  opacity: 0.32; pointer-events: none;
+}
+.svc {
+  position: sticky; top: 0; height: 100vh;
+  overflow: hidden;
+}
+.svc__track {
+  position: absolute; top: 0; left: 0; height: 100%;
+  display: flex; align-items: stretch;
+  will-change: transform;
+}
+.svc__panel { flex: none; height: 100%; position: relative; }
+
+/* ── intro ── */
+.svc__panel--intro {
+  width: 100vw;
+  display: grid; place-items: center;
+}
+.svc__intro-inner {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; gap: clamp(4px, 0.8vh, 10px);
+  padding: 0 clamp(20px, 6vw, 80px);
+  /* top padding clears the floating nav */
+  padding-top: clamp(48px, 7vh, 88px);
+}
+.svc__headline {
+  font-family: var(--f-display); font-weight: 900;
+  font-size: clamp(40px, 5.6vw, 92px);
+  line-height: .98; letter-spacing: -.03em; color: var(--black);
+  margin: 0;
+}
+.svc__headline em { font-style: normal; color: var(--amber); }
+/* Statement paragraph. LAYOUT is its final, settled size — the huge
+   on-screen moment is a transform scale (js/main.js) that later eases back
+   to 1, so the slot below never moves and the deck can land on it exactly.
+   Each word rises out of its own mask with a small unrolling lean. */
+.svc__headgroup {
+  display: flex; flex-direction: column; align-items: center;
+  will-change: transform;
+}
+.svc__sub {
+  font-family: var(--f-display); font-weight: 400;
+  /* Big statement type: the block fills ~70% of the viewport height at
+     desktop, and the picture floats over it rather than under. */
+  font-size: clamp(30px, 4.4vw, 72px); line-height: 1.16;
+  letter-spacing: -.025em;
+  /* Static now: no per-word entrance, no scale scrub — the only thing that
+     animates in this scene is the picture. Sits tight under the headline. */
+  color: var(--black); max-width: 26ch; margin: clamp(20px, 3vh, 38px) 0 0;
+  /* Parked BELOW the fold from the very first paint: main.js is deferred,
+     so without this the paragraph flashed in its laid-out spot before the
+     choreography shoved it down to rise from the bottom. The JS overrides
+     this inline every frame (and with `none` while measuring); the ≤860px
+     static block above resets it with !important. */
+  transform: translateY(120vh);
+  transform-origin: center center;
+  will-change: transform;
+}
+.svc__wm { display: inline; }
+.svc__w { display: inline-block; }
+/* where the deck lands — a reserved box under the paragraph */
+.svc__slot {
+  display: block;
+  /* centred: the picture lands exactly under the middle of the paragraph.
+     The flight still arrives from the right — the curve handles that — but
+     the resting place is dead centre. */
+  align-self: center;
+  width: clamp(110px, 11vw, 168px);
+  aspect-ratio: 4 / 5;
+  margin-top: clamp(6px, 1.4vh, 14px);
+}
+/* the flipbook — starts centered OVER the headline, z above the text */
+.svc__deck {
+  position: absolute; z-index: 2;
+  /* anchored mid-panel; floats ABOVE the statement text (z-index 4) so the
+     flight passes over the words rather than behind them */
+  left: 50%; top: 44%;
+  width: clamp(180px, 18vw, 280px);
+  z-index: 4;
+  aspect-ratio: 4 / 5;
+  transform: translate(-50%, -50%);
+  transform-origin: center;
+  will-change: transform;
+  /* the deck rides a curved path (js) — keep the corners soft at every size */
+  overflow: hidden; border-radius: 6px;
+}
+/* taller than the frame, so it has room to drift inside it */
+.svc__deck-inner {
+  position: absolute; left: 0; right: 0; top: -5%; height: 110%;
+  will-change: transform;
+}
+.svc__deck img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0;
+}
+.svc__deck img.is-on { opacity: 1; }
+
+
+/* ── travelling trace line ────────────────────────────────────
+   A single stroke that rides alongside the picture and morphs from
+   one doodle shape into the next as it goes (js/main.js tweens the
+   path data and drives the transform). */
+.svc__trace {
+  position: absolute; left: 50%; top: 44%;
+  width: clamp(64px, 7vw, 116px); height: auto;
+  fill: none; stroke: var(--amber); stroke-width: 2.4;
+  stroke-linecap: round; stroke-linejoin: round;
+  pointer-events: none; z-index: 3; opacity: 0;
+  overflow: visible;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+@media (max-width: 860px) { .svc__trace { display: none; } }
+
+/* ── feature panels ── */
+.svc__panel--feature {
+  width: min(88vw, 1180px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(26px, 4vw, 72px);
+  padding: clamp(80px, 11vh, 130px) clamp(28px, 4vw, 72px) clamp(40px, 7vh, 80px);
+}
+.svc__panel--flip .svc__media--lg { order: 2; }
+.svc__panel--flip .svc__body { order: 1; }
+.svc__media {
+  position: relative; overflow: hidden; border-radius: 8px;
+}
+.svc__media--lg { height: min(64vh, 620px); }
+/* Parallax cover: the picture is wider and taller than its window so it can
+   drift inside the frame without ever exposing an edge — js drives the shift
+   and clamps it to the overflow the picture actually has. */
+.svc__media img {
+  position: absolute; top: 50%; left: 50%;
+  width: 118%; height: 104%;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  will-change: transform;
+}
+
+.svc__body { display: flex; flex-direction: column; align-items: flex-start; gap: clamp(10px, 1.8vh, 18px); }
+.svc__num {
+  font-family: var(--f-display); font-weight: 700; font-size: 12px;
+  letter-spacing: .3em; text-transform: uppercase; color: var(--text-muted);
+}
+.svc__title {
+  font-family: var(--f-display); font-weight: 900;
+  font-size: clamp(32px, 3.6vw, 58px);
+  line-height: 1.02; letter-spacing: -.02em; color: var(--black); margin: 0;
+}
+.svc__title em { font-style: normal; color: var(--amber); }
+.svc__text {
+  font-size: clamp(14px, 1.1vw, 17px); line-height: 1.65;
+  color: var(--text-muted); max-width: 38ch; margin: 0 0 4px;
+}
+/* body entrance — scrubbed .is-in from the panel entering the viewport */
+.svc__body > * {
+  opacity: 0; transform: translateY(34px);
+  transition: opacity .8s var(--ease-expo), transform .8s var(--ease-expo);
+}
+.svc__panel.is-in .svc__body > * { opacity: 1; transform: none; }
+.svc__panel.is-in .svc__body > *:nth-child(2) { transition-delay: .07s; }
+.svc__panel.is-in .svc__body > *:nth-child(3) { transition-delay: .14s; }
+.svc__panel.is-in .svc__body > *:nth-child(4) { transition-delay: .21s; }
+.svc__media--lg { clip-path: inset(6% 8% 6% 8% round 8px); transition: clip-path 1s var(--ease-expo); }
+.svc__panel.is-in .svc__media--lg { clip-path: inset(0 0 0 0 round 8px); }
+
+/* ── small clusters — two offset windows drifting between features ── */
+.svc__panel--cluster { width: clamp(340px, 40vw, 560px); }
+.svc__media--sm { position: absolute; border-radius: 6px; }
+/* Two clear columns per cluster — the pair can never collide whatever the
+   viewport does to their heights, because their x-ranges do not intersect. */
+.svc__media--sm-a { width: 50%; aspect-ratio: 4/5; left: 2%;  top: 12%; }
+.svc__media--sm-b { width: 42%; aspect-ratio: 1/1; right: 2%; top: 56%; }
+.svc__media--sm-c { width: 46%; aspect-ratio: 1/1; left: 2%;  top: 48%; }
+.svc__media--sm-d { width: 44%; aspect-ratio: 4/5; right: 2%; top: 8%; }
+
+/* ── stacked fallback (phones + reduced motion via .svc--static) ── */
 @media (max-width: 860px) {
-  .usp-list--dark .usp-row__title { color: rgba(255, 255, 255, .5); }
+  .svc-driver { height: auto !important; }
+  .svc { position: static; height: auto; overflow: visible; }
+  .svc__track { position: static; display: block; transform: none !important; }
+  .svc__panel { width: auto; height: auto; }
+  .svc__panel--intro { padding: var(--sp-24) 0 var(--sp-8); }
+  .svc__deck {
+    position: static; transform: none !important; margin: var(--sp-8) auto 0;
+    width: min(72vw, 320px);
+  }
+  .svc__deck img { opacity: 0; }
+  .svc__deck img:first-child { opacity: 1; }
+  .svc__sub { transform: none !important; }
+  .svc__headgroup { transform: none !important; }
+  .svc__w { transform: none !important; }
+  .svc__slot { display: none; }
+  .svc__panel--feature {
+    width: auto; grid-template-columns: 1fr;
+    padding: var(--sp-16) var(--sp-20);
+  }
+  .svc__media--lg { height: 46vh; clip-path: none; }
+  .svc__panel .svc__body > * { opacity: 1; transform: none; }
+  .svc__panel--cluster { display: none; }
+  .svc__media img { transform: translate(-50%, -50%) !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MEDIA CENTER — pinned two-scene sequence
+   The driver supplies the scroll length; .media pins inside it.
+   Scene 1 = #mediaVeil full bleed (photo + scrim) with the
+   headline huge and white on top. Scene 2 = the veil's clip-path
+   has shrunk onto #mediaLeadImg (the real card's picture box),
+   so the "one image" becomes the card. js/main.js measures the
+   landing rect, so it stays exact at any viewport.
+   ═══════════════════════════════════════════════════════════ */
+.media-driver {
+  position: relative; height: 300vh; z-index: 1;
+  /* same surface as the Why strips above, grain included, so the wedge
+     the last rotated band leaves behind reads as one continuous page */
+  background: var(--cream-deep);
+}
+.media-driver::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 200px 200px; background-repeat: repeat;
+  opacity: 0.32; pointer-events: none;
+}
+.media {
+  position: sticky; top: 0; height: 100vh;
+  overflow: hidden;
+}
+.media__stage { position: relative; width: 100%; height: 100%; }
+
+/* Final-scene layout. NO z-index here on purpose: the grid must not open a
+   stacking context, or the headline (z 3) could not sit above the veil (z 2)
+   while its sibling cards stay below it. */
+.media__grid {
+  position: absolute; inset: 0;
+  display: grid;
+  grid-template-columns: minmax(260px, 1.02fr) 1fr 1.24fr;
+  gap: clamp(14px, 1.8vw, 30px);
+  align-items: center;
+  /* top clears the floating nav pill */
+  padding: clamp(104px, 13vh, 148px) clamp(20px, 5vw, 72px) clamp(36px, 6vh, 64px);
+}
+.media__col {
+  display: flex; flex-direction: column; justify-content: space-between;
+  height: 100%; min-width: 0;
+}
+.media__head {
+  position: relative; z-index: 3;
+  transform-origin: left top;      /* the FLIP grows the block from its own corner */
+  will-change: transform;
+  /* shrink-to-fit so the box matches what is actually painted: the JS reads
+     this box to scale the headline and to decide when it has cleared the
+     shrinking picture (white → black). A max-width HERE would size `ch`
+     against the 16px wrapper instead of the title, leaving the big type
+     overflowing a 137px box and the geometry wrong. */
+  align-self: flex-start;
+}
+.media__title {
+  font-family: var(--f-display); font-weight: 900;
+  font-size: clamp(30px, 3.6vw, 58px);
+  line-height: 1.02; letter-spacing: -.02em; margin: 6px 0 0;
+  color: inherit;                  /* JS lerps .media__head's colour white → black */
+  max-width: 12ch;                 /* ch against the title's own size — 3 lines */
+}
+/* nowrap: the head block is 12ch wide for the title's 3-line wrap, which
+   is just narrow enough to break "Media Center" onto two lines.
+   transform-origin pairs with the counter-scale in js/main.js. */
+.media__eyebrow {
+  margin: 0; white-space: nowrap;
+  transform-origin: left bottom;
+  will-change: transform;
+}
+.media__brief {
+  position: relative; max-width: 36ch;
+  will-change: transform, opacity;
+}
+.media__brief p {
+  font-size: clamp(14px, 1.05vw, 17px); line-height: 1.55;
+  color: var(--text-muted); margin: 0 0 clamp(14px, 2vh, 22px);
+}
+/* ── Story tiles ────────────────────────────────────────────
+   Not boxed cards: a picture tile with a stepped corner cut, and the
+   meta + title sitting under it directly on the section surface.
+   The notch is ONE shape definition shared two ways — the tile clips
+   itself with it in CSS, and the morphing veil rebuilds the same
+   polygon in stage coordinates (js/main.js reads these two vars), so
+   the flying image lands in the exact silhouette of the tile. */
+:root {
+  /* the story-tile corner notch, shared by the homepage scene and the
+     Media Center listing (js/main.js reads these to build the shape) */
+  --notch-x: 13;   /* step width, % of the tile */
+  --notch-y: 15;   /* step height, % of the tile */
+}
+.media-card {
+  position: relative; z-index: 1; will-change: transform, opacity;
+  /* the pair sits on one bottom line, so their badge rows and titles line
+     up even though the two pictures are different heights */
+  align-self: end;
+}
+.media-card__img {
+  display: block; position: relative; overflow: hidden;
+  /* no placeholder colour: the media-scene tile is EMPTY while its photo is
+     out flying, and an amber box showed through as an orange slab */
+  background: transparent;
+  /* Sharp-cornered fallback. js/main.js replaces this with the same shape
+     rounded (shapePoints/TILE_RADIUS) — clip-path has no radius of its own,
+     so the corners have to be sampled as arcs, which only JS can generate. */
+  clip-path: polygon(
+    calc(var(--notch-x) * 1%) 0%,
+    100% 0%,
+    100% calc(100% - var(--notch-y) * 1%),
+    calc(100% - var(--notch-x) * 1%) calc(100% - var(--notch-y) * 1%),
+    calc(100% - var(--notch-x) * 1%) 100%,
+    0% 100%,
+    0% calc(var(--notch-y) * 1%),
+    calc(var(--notch-x) * 1%) calc(var(--notch-y) * 1%)
+  );
+}
+.media-card__img img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform var(--dur-xl) var(--ease-expo);
+}
+.media-card__img:hover img { transform: scale(1.04); }
+.media-card__meta {
+  display: flex; align-items: center; gap: 10px;
+  /* clear the picture properly — the notch cuts the bottom-right corner
+     away, so a tight gap read as the badge touching the image */
+  margin-top: clamp(18px, 2.2vh, 26px);
+}
+.media-card__type {
+  font-family: var(--f-display); font-size: 11px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--white); background: var(--amber);
+  padding: 5px 14px; border-radius: 100px; flex-shrink: 0;
+}
+.media-card__type--blog { background: var(--black); }
+.media-card__meta time {
+  font-family: var(--f-display); font-size: 12px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted);
+}
+.media-card__title {
+  font-family: var(--f-display); font-weight: 500;   /* editorial, not heavy */
+  font-size: 16px; line-height: 1.35; letter-spacing: -.01em;
+  color: var(--black); margin: 6px 0 0;
+}
+/* Tall portrait tiles, as in the reference. Capped against the stage so the
+   picture plus its text can never outgrow the pinned viewport. */
+.media-card--lead .media-card__img { aspect-ratio: 5 / 6;  max-height: 54vh; }
+.media-card--big  .media-card__img { aspect-ratio: 4 / 5;  max-height: 62vh; }
+
+/* ── Media Center listing (news/index.html) ──────────────────
+   Same tiles as the homepage scene, on one shared baseline per row with
+   the picture heights alternating, so the tops step up and down while the
+   bottoms stay true. */
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* shared vanishing point, so the tiles tilt as one wall rather than each
+     card having its own private camera (js/main.js scrubs the angle) */
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+  gap: clamp(30px, 3.6vw, 64px) clamp(18px, 2.4vw, 40px);
+  /* every tile in a row sits on the SAME bottom line — the rhythm comes
+     from the pictures being different heights, so the tops step up and
+     down while the baseline stays true */
+  align-items: end;
+}
+/* the shared .media-card sets align-self:center for the homepage scene —
+   the listing needs its tiles pinned to the row's bottom edge instead */
+.media-card--tile {
+  align-self: end;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+/* the tilt is scroll-scrubbed by initMediaTilt; this is the pre-JS state so
+   nothing flashes in flat before the first paint */
+@media (min-width: 861px) and (prefers-reduced-motion: no-preference) {
+  .media-card--tile { opacity: 0; }
+}
+/* Alternating tall / short. Across three columns, odd-and-even by index
+   lands exactly as: tall, short, tall — then short, tall, short — and
+   keeps alternating for any number of cards. */
+.media-card--tile:nth-child(odd)  .media-card__img { aspect-ratio: 5 / 7; }
+.media-card--tile:nth-child(even) .media-card__img { aspect-ratio: 1 / 1; }
+/* two lines reserved for every title, so the text blocks are equal height
+   and the pictures share a bottom edge too, not just the cards */
+.media-card--tile .media-card__title { min-height: 2.6em; }
+
+@media (max-width: 900px) {
+  .media-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .media-grid { grid-template-columns: 1fr; gap: var(--sp-16); align-items: stretch; }
+  .media-card--tile .media-card__img { aspect-ratio: 4 / 3 !important; }
+  .media-card--tile .media-card__title { min-height: 0; }
+}
+.media-card--big  .media-card__title { font-size: 18px; font-weight: 500; }
+
+/* The hero frame. js/main.js MOVES the lead story's own <img> in here while
+   the scene is pinned and sizes this box from full bleed down to the tile's
+   slot; object-fit:cover then reframes the photo at every step. One image
+   node the whole way, so there is no handover and nothing can jump. */
+.media__veil {
+  position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+  z-index: 2; pointer-events: none; overflow: hidden;
+  will-change: width, height, clip-path;
+}
+.media__veil img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  will-change: transform;
+}
+.media__scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.58) 0%, rgba(0,0,0,.34) 46%, rgba(0,0,0,.66) 100%);
+}
+
+@media (max-width: 860px) {
+  /* no pinning on phones: the scene becomes a plain stacked block —
+     photo header, then the two cards, then the brief */
+  .media-driver { height: auto; }
+  .media { position: static; height: auto; overflow: visible; padding-bottom: var(--sp-16); }
+  /* the veil is a sibling of the grid, so the stage does the stacking */
+  .media__stage { display: flex; flex-direction: column; }
+  .media__grid {
+    position: static; display: flex; flex-direction: column;
+    gap: var(--sp-16); padding: 0 var(--sp-20) var(--sp-16);
+  }
+  .media__col { display: contents; }
+  .media__head {
+    order: -1; transform: none !important; color: var(--black) !important;
+    max-width: none; margin-top: var(--sp-20);
+  }
+  .media__brief { order: 3; max-width: none; opacity: 1 !important; transform: none !important; }
+  .media-card { opacity: 1 !important; transform: none !important; }
+  /* stacked layout: the photo lives back inside the lead tile (js moves the
+     node), so the hero frame has nothing to show */
+  .media__veil { display: none; }
+}
+
+/* ─── Why iCAUR — diagonal band strips (telescope-style) ─────
+   Measured from the reference: a colour band grows to fill the
+   viewport then travels up and out as the next enters below —
+   i.e. rotated full-bleed strips scrolling with the page, the
+   giant word riding on the band. NO pinning and NO opacity
+   fades (both of which made the old version feel detached).
+   js/main.js (initWhyStrips) adds only the word's parallax
+   drift, the doodle draw-on and the HUD counter. */
+/* The bands ARE the surface here — the section paints nothing of its own.
+   Clipping the section (or giving it a background) is exactly what produced
+   the flat horizontal seams at both ends: the diagonal resolved into a
+   straight line wherever the section box stopped. Instead the rotated bands
+   overhang their box and paint OVER the neighbours, and the triangles they
+   leave behind stay transparent so the section above and the scene below
+   show straight through — a diagonal entrance and exit, no horizontal edge. */
+.why {
+  position: relative;
+  z-index: 3;               /* over the services driver (2) and media driver (1) */
+  background: transparent;
+  /* clip sideways only: the bands are 118% wide so they must not widen the
+     page, but they MUST be free to overhang vertically — that overhang is
+     what puts the diagonal in front of the neighbouring sections */
+  overflow-x: clip;
+  overflow-y: visible;
+  padding: 0;
+  /* A band is 118% wide and rotated 6°, so it overhangs its own box vertically
+     by (1.18/2 × sin 6°) ≈ 6.2vw at each end. Overlapping the neighbours by a
+     little more than that guarantees there is always something real behind the
+     transparent triangles, never a strip of bare page background. */
+  margin-top: -7vw;
+  margin-bottom: -7vw;
+}
+/* Section label — lives INSIDE the first (amber) band rather than floating
+   over every strip as a blended HUD. (The brightness(0) rule that flattened
+   the eyebrow's dash mark went with the dash itself.) */
+.why-strip__eyebrow { margin: 0 0 clamp(4px, 1vh, 10px); color: var(--black); }
+
+/* Each strip is a rotated full-bleed band in NORMAL FLOW, so the page's
+   own scroll wipes it diagonally through the viewport. Negative margins
+   overlap consecutive strips so their diagonal edges cut into each other
+   (the reference's continuous colour rhythm) instead of leaving gaps. */
+.why-strip {
+  position: relative;
+  min-height: 100vh;                 /* colour always fills the viewport */
+  display: grid; place-items: center;
+  /* deep overlap so one band's diagonal edge cuts well into the next —
+     the colour never breaks between strips */
+  margin-block: clamp(-150px, -15vh, -90px);
+  transform: rotate(-6deg);
+  /* over-wide so the rotated ends always clear the viewport corners */
+  width: 118%; margin-inline: -9%;
+  padding-block: clamp(60px, 9vh, 110px);
+}
+.why-strip--amber { background: linear-gradient(96deg, var(--amber) 0%, #ff8a4c 100%); }
+.why-strip--dark  { background: #0E0D0C; }
+.why-strip:first-of-type { margin-top: 0; }
+.why-strip:last-of-type  {
+  margin-bottom: 0;
+  /* extra depth so the closing diagonal fully resolves on screen */
+  padding-bottom: clamp(90px, 14vh, 170px);
+}
+
+/* Content counter-rotates so the type stays level on the tilted band */
+.why-strip__inner {
+  position: relative; z-index: 2;
+  transform: rotate(6deg);
+  max-width: min(1200px, 92vw);
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(10px, 1.6vh, 18px); text-align: center;
+  padding-inline: clamp(20px, 6vw, 90px);
+  will-change: transform;
+}
+.why-strip__word {
+  font-family: var(--f-display); font-weight: 900;
+  /* min() of a width- and a height-derived size: the phrase can never
+     outgrow the viewport vertically, which is what was cropping it */
+  font-size: clamp(32px, min(7.4vw, 11vh), 124px);
+  line-height: 1;                        /* matches the reference exactly */
+  letter-spacing: -.04em; max-width: 14ch; text-wrap: balance;
+}
+/* Per-letter zigzag — letters sit ±0.5em apart and settle to the baseline
+   as the strip reaches centre (js/main.js splits and drives these). */
+.why-strip__word .why-ltr {
+  display: inline-block;
+  will-change: transform;
+}
+/* Each letter being inline-block hands the line breaker a break opportunity
+   between every glyph — narrow viewports were splitting words mid-word
+   ("Power wit / hout limits"). The per-word wrapper (js/main.js) keeps a
+   word atomic; lines still break at real spaces. */
+.why-strip__word .why-word { display: inline-block; white-space: nowrap; }
+/* the accent word is a solid colour — outlined/stroked type was too fussy */
+.why-strip__word em { font-style: normal; }
+.why-strip__tag {
+  font-family: var(--f-display); font-weight: 600;
+  font-size: clamp(14px, 1.5vw, 19px); max-width: 44ch;
+}
+/* Colour pairs — dark type on amber, cream type on dark */
+.why-strip--amber .why-strip__word { color: var(--black); }
+.why-strip--amber .why-strip__tag  { color: rgba(0,0,0,.72); }
+.why-strip--amber .why-strip__word em { color: var(--white); }
+.why-strip--dark .why-strip__word { color: var(--white); }
+.why-strip--dark .why-strip__tag  { color: rgba(255,255,255,.68); }
+.why-strip--dark .why-strip__word em { color: var(--amber); }
+
+/* Brand vector scenes — stroke line-art drawn 100% BY the scroll
+   (same mechanic as the road + sun): every path carries a
+   data-draw="start end" window of its strip's pass and its
+   stroke-dashoffset is scrubbed by scroll position — no time-based
+   draw. After the scene completes, small "pop" strokes burst off
+   the illustration and pulse; the wheel steers; the sun pulses.
+   The scene sits ABOVE the word as the first item of the flex column
+   (it is the inner's first child in the markup), so nothing overlaps
+   the type and no fitting pass is needed. */
+/* Sized by HEIGHT, not width: the four scenes have very different aspect
+   ratios (the star is 1:1, the SUV nearly 2:1) and a shared width clamp
+   made the square one tower over the rest. A shared height evens them out. */
+.why-viz {
+  display: block; margin: 0 auto;
+  height: clamp(74px, 11vh, 132px); width: auto;
+  max-width: min(86vw, 420px);
+  pointer-events: none; overflow: visible;
+}
+svg.why-viz { display: block; overflow: visible; }
+
+/* scroll-drawn strokes */
+.why-viz :is(path, circle, rect)[data-draw] {
+  fill: none; stroke-width: 3;   /* bolder line — matches the brand's confident weight */
+  stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 1; stroke-dashoffset: 1;
+  vector-effect: non-scaling-stroke;
+}
+.why-strip--amber .why-viz :is(path, circle, rect)[data-draw] { stroke: var(--black); }
+.why-strip--dark  .why-viz :is(path, circle, rect)[data-draw] { stroke: var(--white); }
+/* amber accents on the dark strips: the sun and the closing star */
+.why-strip--dark .why-viz .viz-sun :is(path, circle),
+.why-strip--dark .why-viz.viz-spin path { stroke: var(--amber); }
+
+/* pop! marks — drawn by the scroll like everything else, then a light
+   emphasis pulse so the illustration keeps a spark of action */
+.viz-pop { transform-box: fill-box; transform-origin: center; }
+.why-strip.is-in .viz-pop { animation: vizPop 2s ease-in-out infinite; }
+.why-strip.is-in .viz-pop:nth-of-type(odd) { animation-delay: .4s; }
+@keyframes vizPop {
+  0%, 100% { opacity: .35; transform: scale(.82); }
+  50%      { opacity: 1;   transform: scale(1.12); }
+}
+
+/* car bob (strip 01) — a gentle suspension settle once drawn */
+.viz-car { transform-box: fill-box; transform-origin: center; }
+.why-strip.is-in .viz-car { animation: vizBob 2.6s ease-in-out infinite; }
+@keyframes vizBob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+/* sun pulse (strip 02) */
+.viz-sun { transform-box: fill-box; transform-origin: center; }
+.why-strip.is-in .viz-sun { animation: vizPulse 2.8s ease-in-out infinite; }
+@keyframes vizPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.14); } }
+
+/* steering wheel (strip 03) — steers left/right once drawn */
+.viz-wheel { transform-box: fill-box; transform-origin: center; }
+.why-strip.is-in .viz-wheel { animation: vizSteer 3.4s ease-in-out infinite; }
+@keyframes vizSteer {
+  0%, 100% { transform: rotate(0deg); }
+  28%      { transform: rotate(-16deg); }
+  72%      { transform: rotate(16deg); }
+}
+
+/* stand-out star (strip 04) — slow spin once drawn */
+svg.viz-spin { transform-box: fill-box; transform-origin: center; }
+.why-strip.is-in svg.viz-spin { animation: vizSpin 16s linear infinite; }
+@keyframes vizSpin { to { transform: rotate(360deg); } }
+
+.viz-pop { will-change: transform, opacity; }
+@media (prefers-reduced-motion: reduce) {
+  .why-viz * { animation: none !important; transition: none !important; }
+}
+
+@media (max-width: 860px) {
+  /* bands are not rotated here, so there is no overhang to hide — the
+     negative margins would just eat the neighbouring sections */
+  .why { margin-block: 0; }
+  .why-strip {
+    transform: none; width: 100%; margin-inline: 0;
+    margin-block: 0; min-height: 62vh;
+    padding-block: clamp(44px, 8vh, 72px);
+  }
+  .why-strip__inner { transform: none; align-items: flex-start; text-align: left; }
+  .why-strip__word { font-size: clamp(34px, 9vw, 56px); }
+  .why-strip__eyebrow { margin-bottom: 12px; }
+  /* left-aligned column here, so the scene leads the word from the left
+     rather than being centred over it */
+  .why-viz { margin: 0 0 6px; height: clamp(58px, 9vh, 84px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .why-viz :is(path, circle, rect) { stroke-dashoffset: 0; }
+  .why-strip__inner { transform: rotate(6deg) !important; }
 }
 /* Core values (About) — amber words that go white on hover/focus while
    the preview image swaps. Scoped to #values so the homepage's
@@ -2867,7 +3532,7 @@ html.pt-entering > body { opacity: 0; }
   }
   /* JS may have written --card-fade before the stacked layout kicked in
      (resize) — stacked cards never fade */
-  .diff-card__box, .diff-card__edge { opacity: 1 !important; }
+  .diff-card__box { opacity: 1 !important; }
   .diff-card.diff__panel {
     margin: 0 0 var(--sp-16);
   }
@@ -2877,9 +3542,8 @@ html.pt-entering > body { opacity: 0; }
   /* Services media cards — keep 1:1 image, padded text below */
   .diff-card--media.diff__panel { padding: 0; }
   .diff-card__body { padding: var(--sp-20); }
-  /* stacked cards have no 3D sweep — the rotated lego slabs would just
+  /* stacked cards have no 3D sweep — decorative extras are hidden
      render as stray 1px seams at the card edges, so drop them */
-  .diff-card__edge { display: none; }
   .diff-card--media.diff__panel::before,
   .diff-card--media.diff__panel::after { display: none; }
 
@@ -3231,11 +3895,17 @@ html.pt-entering > body { opacity: 0; }
   font-size: clamp(34px, 5vw, 62px); letter-spacing: -0.03em;
   margin-bottom: var(--sp-20);
 }
-.about-overview__inner { max-width: 980px; }
+.about-overview__inner { max-width: 980px; margin-inline: auto; text-align: center; }
+.about-overview__inner > .eyebrow { justify-content: center; }
 .about-overview__lead {
   font-size: clamp(19px, 2.1vw, 27px); line-height: 1.5; font-weight: 400;
-  color: var(--text-mid); max-width: 760px; margin-bottom: var(--sp-24);
+  color: var(--text-mid); max-width: 760px;
+  margin-inline: auto; margin-bottom: var(--sp-24);
 }
+/* The scene car ends its run parked in the CTA's place, so the button only
+   exists at widths where the car does NOT — it is display:none under 960px,
+   and dropping the button everywhere would leave mobile with neither. */
+@media (min-width: 961px) { .about-overview__cta { display: none; } }
 
 /* iCAUR Story — car rides the left rail, images stack on the right */
 .about-saga { background: #F5F0ED; }
@@ -3263,11 +3933,21 @@ html.pt-entering > body { opacity: 0; }
 }
 /* Story car — stage-level so it can drive through the Overview
    before swinging onto the rail. JS sets left/top/--rot/--op. */
+
 .story-scene-car {
   position: absolute; left: -300px; top: 0;
-  width: 150px; height: auto; z-index: 6;
+  /* A <canvas> now (js/about-glb.js) rather than a PNG. about-story.js still
+     multiplies this element by --scl (2.4 entering, 2.1 parked, 1 on the rail)
+     — those numbers were tuned against a 150px PNG, so a big canvas made the
+     car enormous and clipped. The box stays modest and CAR_SCL rescales the
+     choreography's factor to suit it: still bigger than the old PNG, but in
+     proportion. */
+  --car-scl: 0.5;
+  width: 420px; height: 300px;
+  z-index: 6;
   pointer-events: none;
-  transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--scl, 1));
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg))
+             scale(calc(var(--scl, 1) * var(--car-scl)));
   opacity: var(--op, 0);
   transition: opacity .35s ease;
 }
@@ -3312,7 +3992,63 @@ html.pt-entering > body { opacity: 0; }
   .story-rail, .story-stack { display: none; }
   .about-saga__inner { padding-left: 0; max-width: 100%; }
 }
+/* Marker highlight — a hand-drawn orange scribble sitting BEHIND a word,
+   like it was struck through with a highlighter. The strokes are thick and
+   semi-transparent so the word still reads on top of them, and they draw
+   themselves in once the headline has arrived. */
+.hl-word { position: relative; display: inline-block; white-space: nowrap; }
+.hl-word > span { position: relative; z-index: 1; }   /* the word, on top */
+.head-scribble {
+  position: absolute; z-index: 0; pointer-events: none;
+  /* Sized to the word, NOT past it. At 112%/-6% both paths ended beyond the
+     word's right edge, and their round caps sat out there in empty space as
+     two stray dots instead of reading as the end of a stroke. */
+  left: 0; top: 8%; width: 98%; height: 90%;
+  overflow: visible;
+}
+.head-scribble path {
+  /* Full-strength amber: at .55 on the cream page this washed out to a pale
+     peach and read as a smudge behind the word rather than a marker stroke.
+     The word itself sits on z-index 1, so the stroke can carry real weight
+     without touching legibility. */
+  fill: none; stroke: var(--amber); stroke-opacity: .92;
+  stroke-width: 18; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 1; stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1s cubic-bezier(.22,1,.36,1);
+}
+.head-scribble path:nth-child(2) { transition-delay: .16s; }
+.is-scribbled .head-scribble path { stroke-dashoffset: 0; }
+
+/* Orange drifting boxes — ONE PER LINE of text. Each line starts under
+   its own amber bar; the bars slide off to the right one after another
+   with a small delay between them, uncovering the copy line by line
+   (landonorris.com/on-track). js/about-story.js measures the real line
+   boxes with a Range and drives each bar's scaleX on an eased curve. */
+.lw-boxes {
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 2;
+}
+.lw-box {
+  position: absolute;
+  background: var(--amber); border-radius: 3px;
+  transform-origin: right center;
+  transform: scaleX(1);            /* covering until the reveal runs */
+  will-change: transform;
+}
+/* the paragraph is a positioning context for its own bars */
+.saga-step p, .about-overview__lead { position: relative; }
+@media (prefers-reduced-motion: reduce) {
+  .lw-boxes { display: none; }
+}
+/* the car now drives over the copy instead of riding a vertical rail */
+.story-rail { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .saga-step__wipe { display: none; }
+  .saga-step p { opacity: 1; }
+}
+
 .saga-step {
+  position: relative;              /* positioning context for the wipe box */
   color: rgba(0,0,0,.32);
   transition: color .45s ease;
 }
@@ -3546,18 +4282,27 @@ html.pt-entering > body { opacity: 0; }
 
 /* ═══════════════════════════════════════════════════════════
    MISSION + VISION — EDITORIAL STATEMENT SCROLL (About page)
-   js/about-mv.js scrubs everything from scroll progress: giant
-   word-masked statements, ghost word, tilted photo cards, amber
-   curtain between chapters. landonorris.com/on-track energy in
-   iCAUR's own type + amber system.
+   js/about-mv.js scrubs everything from scroll progress: the black
+   sheet sliding in over the stats, giant statements whose words and
+   inline picture chips pop in as one sequence. landonorris.com/
+   on-track energy in iCAUR's own type + amber system.
    ═══════════════════════════════════════════════════════════ */
 .mv-driver { position: relative; height: 420vh; }
 .mv {
   position: sticky; top: 0; height: 100vh;
-  overflow: hidden; background: var(--black);
+  overflow: hidden;
 }
-/* soft pool of light behind the type */
-.mv::before {
+/* The black stage as a SHEET rather than a section background: js/about-mv.js
+   slides it up over the stats section with easing as the chapter arrives, so
+   the scene change is an entrance, not a hard edge. Starts parked below the
+   fold; the light pool rides on it so the glow arrives with the black. */
+.mv__bg {
+  position: absolute; inset: 0; z-index: 0;
+  background: var(--black);
+  transform: translateY(100%);
+  will-change: transform;
+}
+.mv__bg::before {
   content: ''; position: absolute; inset: 0;
   background: radial-gradient(120% 90% at 50% 42%, rgba(255,255,255,.055), transparent 62%);
   pointer-events: none;
@@ -3600,47 +4345,70 @@ html.pt-entering > body { opacity: 0; }
 }
 .mv__title em { font-style: normal; color: var(--amber); }
 .mv__statement {
-  font-family: var(--f-display);
+  /* the BODY family, not the display one: the display stack's first
+     available face renders heavy regardless of the weight asked for,
+     and these statements should read light and editorial */
+  font-family: var(--f-body);
   font-size: clamp(1.7rem, 3.6vw, 3.3rem);
-  font-weight: 900; letter-spacing: -.03em; line-height: 1.14;
+  font-weight: 300; letter-spacing: -.02em; line-height: 1.22;
   color: var(--white); margin: 0; text-wrap: balance;
 }
-.mv__statement em, .mv__tail em { font-style: normal; color: var(--amber); }
-.mv__tail {
-  font-family: var(--f-display);
-  font-size: clamp(1.05rem, 1.6vw, 1.5rem); font-weight: 700;
-  color: rgba(255,255,255,.72);
-  margin: clamp(16px, 2.6vh, 26px) 0 0;
+/* Pill-shaped pictures set INLINE with the sentence, sized off the type so
+   they scale with it and sit on the text baseline like a word would. The
+   about-mv splitter only rewrites text nodes, so these elements pass through
+   untouched and keep their place in the line. */
+.mv-chip {
+  display: inline-block; vertical-align: -0.22em;
+  width: 2.1em; height: 1.15em;
+  margin: 0 .12em;
+  border-radius: 999px; overflow: hidden;
+  background: rgba(255,255,255,.08);
+  /* hidden until posed — the chips pop in IN LINE with the words around
+     them (js/about-mv.js poses .mv-w and .mv-chip as one sequence), never
+     sitting visible on an empty stage before the copy arrives */
+  opacity: 0; will-change: transform, opacity;
 }
+.mv-chip img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (max-width: 640px) { .mv-chip { width: 1.8em; } }
+.mv__statement em { font-style: normal; color: var(--amber); }
 /* words pop free-standing (elastic zoom in JS) — no clipping masks */
 .mv-w { display: inline-block; opacity: 0; will-change: transform, opacity; }
-/* oversized SOLID ghost word — zooms + de-blurs in (JS drives it) */
-.mv__ghost {
-  position: absolute; top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  font-family: var(--f-display); font-weight: 900;
-  font-size: clamp(150px, 30vw, 440px); line-height: 1;
-  letter-spacing: -.04em; text-transform: uppercase;
-  color: rgba(255, 255, 255, .06);
-  opacity: 0;
-  white-space: nowrap; user-select: none; pointer-events: none;
-  will-change: transform, filter, opacity;
-}
 /* statements read above the car canvas */
 .mv__panel { z-index: 6; }
 @media (max-width: 860px) {
   .mv__statement { font-size: clamp(1.45rem, 6.4vw, 2.2rem); }
-  .mv__ghost { font-size: 34vw; }
 }
 /* Static fallback — reduced motion (js/about-mv.js adds .mv--static) */
 .mv--static { height: auto; }
 .mv--static .mv { position: static; height: auto; }
+.mv--static .mv__bg { transform: none; }
 .mv--static .mv__stage { position: static; }
 .mv--static .mv__panel { position: static; visibility: visible !important; padding: var(--sp-48) 0; }
 .mv--static .mv-w { opacity: 1 !important; transform: none !important; }
+.mv--static .mv-chip { opacity: 1 !important; transform: none !important; }
 .mv--static .mv__title { opacity: 1 !important; transform: none !important; filter: none !important; }
-.mv--static .mv__ghost,
 .mv--static .mv__mark, .mv--static #mvCanvas { display: none; }
+
+/* The orange rail (js/about-thread.js): a sharp technical line down the
+   left edge — long verticals, 45° lane-change jogs, small corner radii
+   (landonorris.com reference). Body-level overlay because the sections it
+   crosses clip their own overflow. A thin light-orange core over one tight
+   halo: neon discipline, not a smear. */
+.mv-thread {
+  position: absolute; left: 0; z-index: 3;
+  pointer-events: none; overflow: visible;
+  fill: none;
+}
+.mv-thread__glow {
+  stroke: rgba(243, 112, 33, .28); stroke-width: 6;
+  stroke-linecap: round; stroke-linejoin: round;
+  filter: blur(4px);
+}
+.mv-thread__core {
+  stroke: #FFB27C; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 0 5px rgba(243, 112, 33, .8));
+}
 
 /* Tall driver — 100vh overlap + 200vh net scroll */
 .vision-driver {
@@ -4426,10 +5194,14 @@ body:has(.news-hero) { background: var(--white); }
 .news-featured h2 { margin-bottom: var(--sp-8); }
 .news-filters { background: var(--white); }
 .news-filters__inner {
-  display: flex; align-items: center; gap: var(--sp-4);
-  padding: var(--sp-6) 0; border-bottom: 1px solid rgba(0,0,0,.08);
+  display: flex; align-items: center; justify-content: center;
+  gap: var(--sp-4);
+  padding: var(--sp-6) 0;
   flex-wrap: wrap;
 }
+/* the featured post follows the filters directly — no divider between
+   them, and only a small breath instead of full section padding */
+.news-featured-section { padding-top: var(--sp-8); }
 .filter-btn {
   font-family: var(--f-display); font-size: 11px; font-weight: 700;
   letter-spacing: 0.08em; text-transform: uppercase;
@@ -5285,9 +6057,48 @@ body:has(.post-hero) { background: #fff; }
    FAQ PAGE
 ════════════════════════════════════════════════════════════ */
 .faq-page-hero {
-  padding: clamp(100px,12vh,160px) 0 clamp(40px,5vh,64px);
+  /* roomier than the copy needs on purpose — the collage breathes in the
+     extra height instead of stacking onto itself */
+  padding: clamp(120px,14vh,180px) 0 clamp(72px,9vh,110px);
   background: var(--white); text-align: center;
+  position: relative; overflow: hidden;
+  border-bottom: 1px solid rgba(0,0,0,.07);
 }
+/* Scattered photo cards riding the section's side space (reference:
+   Beni-style hero collage) — STRAIGHT frames, all NEAR-SQUARE (1:1 with
+   slightly tall/wide variants), square corners, no shadow. Three per
+   side, distributed beside the headline AND the filter chips, every
+   position chosen so no card is clipped by the section's edges.
+   Each card is a frame; on hover the PHOTO pans softly inside it,
+   following the cursor (js/main.js initFaqHeroShots). */
+.faq-hero-shots { position: absolute; inset: 0; pointer-events: none; }
+.faq-hero-shot {
+  /* an invisible ANCHOR: position + reveal live here; the photo inside
+     is what the magnet moves, so the entrance and the hover never fight */
+  position: absolute;
+  border-radius: 0;
+  pointer-events: auto;
+}
+.faq-hero-shot > img {
+  width: 100%; height: 100%; object-fit: cover;
+  /* js/main.js drives --mx/--my: the whole photo leans a few px toward
+     the cursor like a magnet — no zoom, no pan inside the frame */
+  transform: translate(var(--mx, 0px), var(--my, 0px));
+  will-change: transform;
+}
+.faq-hero-shot--sq   { width: clamp(110px, 9.5vw, 140px); aspect-ratio: 1/1; }
+.faq-hero-shot--tall { width: clamp(105px, 9vw, 130px);   aspect-ratio: 4/5; }
+.faq-hero-shot--wide { width: clamp(130px, 11.5vw, 165px); aspect-ratio: 5/4; }
+/* left column: tall high, square mid, wide low — staggered so no two
+   cards share both a horizontal and a vertical band (no overlap) */
+.faq-hero-shot:nth-child(1) { left: 4%;  top: 14%; }
+.faq-hero-shot:nth-child(2) { left: 15%; top: 46%; }
+.faq-hero-shot:nth-child(3) { left: 3%;  bottom: 6%; }
+/* right column: wide high, tall mid, square low */
+.faq-hero-shot:nth-child(4) { right: 3.5%; top: 13%; }
+.faq-hero-shot:nth-child(5) { right: 16%;  top: 44%; }
+.faq-hero-shot:nth-child(6) { right: 4%;   bottom: 7%; }
+@media (max-width: 1000px) { .faq-hero-shots { display: none; } }
 .faq-page-hero h1 {
   font-family: var(--f-display);
   font-size: clamp(2rem,3.8vw,3.2rem);
@@ -5297,12 +6108,14 @@ body:has(.post-hero) { background: #fff; }
 .faq-page-hero p {
   font-size: 16px; color: var(--text-mid); max-width: 500px; margin: 0 auto; line-height: 1.7;
 }
+/* Lives inside .faq-page-hero now — same section as the headline, so the
+   scattered photo cards flank both. Transparent over the hero's white;
+   the section's own border draws the seam to the list below. */
 .faq-cat-filters {
   display: flex; align-items: center; justify-content: center;
   gap: 10px; flex-wrap: wrap;
-  padding: var(--sp-20) var(--px,40px);
-  border-bottom: 1px solid rgba(0,0,0,.07);
-  background: #fff;
+  padding: clamp(28px, 4vh, 44px) var(--px,40px) 0;
+  position: relative; z-index: 2;
 }
 .faq-cat-btn {
   padding: 9px 22px; border-radius: 99px;
