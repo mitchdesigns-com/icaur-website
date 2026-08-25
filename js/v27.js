@@ -25,7 +25,23 @@ const $$ = (s, ctx = document) => [...ctx.querySelectorAll(s)];
    angle), centered in the hero over the road's speed lines;
    pushed up to close the gap below the text */
 const HERO_POSE     = { rotY: -0.30, posX:  0.35, posY:  1.35, scale: 1.42 };
-const OVERVIEW_POSE = { rotY:  0.06, posX:  1.55, posY:  0.85, scale: 1.55 };
+/* THE PARK — the car's default state for the whole Overview: standing at
+   the LEFT edge on a front-three-quarter, nose toward the copy on the
+   right. It rides IN with the section (glued to the sticky's top, so it
+   never dangles in from above), holds this pose while the paragraph
+   writes itself in, and only then makes its single move to the 360. */
+const OV_PARK       = { rotY:  0.62, posX: -4.4, posY:  0.95, scale: 1.65 };
+/* Bezier CONTROL values for the journey's arc (controls, not maxima):
+   the x curve swings the car OUT to the right side of the page while it
+   crosses sheet B — clear of the sheet's centred copy — and the scale
+   curve dips it small over the same stretch, growing back as both curves
+   bend home into the 360 pose. With 11 the path tops out around x≈4.6,
+   with 0.35 the size bottoms out near 0.83. */
+const OV_XSWING = 11;
+const OV_DIP    = 0.35;
+/* Phones only — the centred mid pose their two-leg lerp settles on
+   (desktop no longer stops here: its one move goes straight to the 360) */
+const OVERVIEW_POSE = { rotY: -0.50, posX:  5.8, posY:  0.60, scale: 1.65 };
 /* 360 stage: front-left quarter — same angle as the color swatch
    thumbnails — sitting lower, closer to the swatch row */
 const SIDE_POSE     = { rotY: -0.78, posX:  0.2,  posY:  1.55, scale: 1.12 };
@@ -41,6 +57,12 @@ const ovPose    = () => isNarrow()
 const sidePose  = () => isNarrow()
   ? { rotY: SIDE_POSE.rotY, posX: 0.25, posY: 1.85, scale: 0.72 }
   : SIDE_POSE;
+
+/* How far below its park the car starts, in world units — one viewport of
+   height at the cam distance (2·tan(fov/2)·z ≈ 8.6), so at the first
+   revealed pixel it is fully under the fold and rises WITH the section
+   like an element parked in it, never hanging in from the top edge. */
+const OV_RIDE_IN = 8.6;
 
 /* Smooth scroll-driven rotation target (drag is additive on top) */
 let scrollBaseRotY  = HERO_POSE.rotY;
@@ -67,8 +89,8 @@ const CAR_COLORS = {
 
 let car = null;          /* pose group — poses/rotation applied here */
 let carBody = null;      /* current color GLB scene inside the group */
-let refBox = null;       /* camel bbox — variants are normalized to it */
-let activeColor = 'camel';
+let refBox = null;       /* first-loaded bbox — variants are normalized to it */
+let activeColor = 'carbon-black';
 const glbCache = new Map();   /* url → Promise<THREE.Group> */
 const glbReady = new Set();   /* urls whose model is decoded & ready (instant swap) */
 let isDragging  = false;
@@ -235,7 +257,7 @@ function initScene() {
     }
   };
 
-  loadGlb(CAR_COLORS.camel).then((body) => {
+  loadGlb(CAR_COLORS[activeColor]).then((body) => {
     car = new THREE.Group();
     carBody = body;
     car.add(carBody);
@@ -257,10 +279,10 @@ function initScene() {
     setupCarScrollAnim();
 
     /* Eagerly preload every other paint in parallel (like the landing
-       page) so swaps are instant. A short delay lets the camel model
+       page) so swaps are instant. A short delay lets the DEFAULT model
        paint first before the ~5MB variants compete for bandwidth. */
     setTimeout(() => {
-      Object.keys(CAR_COLORS).forEach((k) => { if (k !== 'camel') loadGlb(CAR_COLORS[k]); });
+      Object.keys(CAR_COLORS).forEach((k) => { if (k !== activeColor) loadGlb(CAR_COLORS[k]); });
     }, 600);
   }).catch((err) => console.warn('GLB load error:', err));
 
@@ -286,47 +308,206 @@ function initScene() {
     /* The car sits STILL now — no bob, no roll, no wheel spin. The road
        it used to ride is gone, so driving motion had nothing to answer
        to; the Overview reads calmer as a static product shot. */
+    ovElastic();        /* the copy vibrates with the scroll */
     renderer.render(scene, camera);
   }
   animate();
 }
 
+/* ── Word split — both overview paragraphs ──────────────────────────
+   Sheet A's copy and sheet B's big line are split into word spans ONCE,
+   purely so the elastic field below can move each word on its own
+   spring. No write-in any more: the words keep their paragraphs' colour
+   and are simply free to be pushed aside. */
+let ovWords = null;
+function ovSplitWords() {
+  if (ovWords) return ovWords;
+  ovWords = [];
+  ['.v27-ov-para', '.v27-ovb-para'].forEach((sel) => {
+    const para = $(sel);
+    if (!para) return;
+    const words = para.textContent.trim().split(/\s+/);
+    para.textContent = '';
+    words.forEach((w, i) => {
+      const sp = document.createElement('span');
+      sp.className = 'v27-ov-w';
+      sp.textContent = w;
+      para.appendChild(sp);
+      if (i < words.length - 1) para.appendChild(document.createTextNode(' '));
+      ovWords.push(sp);
+    });
+  });
+  return ovWords;
+}
+
+/* ── ELASTIC VIBRATION — the copy rides the scroll ───────────────────
+   All the overview words (sheet A's paragraph and sheet B's big line)
+   share ONE underdamped spring chasing the smoothed scroll velocity,
+   each word with its own stable depth factor, so the text vibrates as
+   an elastic wave while you scroll and wobbles back still when you
+   stop. VERTICAL only, resting at exactly zero with transforms cleared
+   — it can never open gaps in a line or bend the paragraph's alignment
+   the way the old horizontal parting field did. */
+const ovReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let ovLastY = window.scrollY, ovVel = 0, ovSpr = 0, ovSprV = 0, ovDriftOn = false;
+function ovElastic() {
+  if (ovReduced || isNarrow()) return;
+  const sec = document.getElementById('v27-overview');
+  if (!sec) return;
+  const sy = window.scrollY;
+  const raw = sy - ovLastY; ovLastY = sy;
+  const r = sec.getBoundingClientRect();
+  const onScreen = r.bottom > 0 && r.top < window.innerHeight;
+  if (!onScreen && !ovDriftOn) return;          /* nothing to do, nothing to undo */
+  ovVel = ovVel * 0.8 + raw * 0.2;
+  const target = onScreen ? Math.max(-18, Math.min(18, ovVel * 0.5)) : 0;
+  ovSprV += (target - ovSpr) * 0.16;            /* underdamped — it overshoots */
+  ovSprV *= 0.80;                               /* …and wobbles back (elastic) */
+  ovSpr  += ovSprV;
+  const words = ovSplitWords();
+  if (!words.length) return;
+  if (Math.abs(ovSpr) < 0.06 && Math.abs(ovSprV) < 0.06) {
+    if (ovDriftOn) { ovDriftOn = false; words.forEach(w => { if (w.style.transform) w.style.transform = ''; }); }
+    return;
+  }
+  ovDriftOn = true;
+  words.forEach((w, i) => {
+    const f = 0.55 + ((i * 7919) % 47) / 104;   /* stable per-word depth, .55–1 */
+    const t = `translateY(${(ovSpr * f).toFixed(1)}px)`;
+    if (w.dataset.t !== t) { w.dataset.t = t; w.style.transform = t; }
+  });
+}
+
+/* ══ SHEET B — the orange side-mask reveals ══════════════════════════
+   Two-phase sweep per line, scrubbed from the sheet's own arrival: the
+   orange bar wipes in from the LEFT covering the line's space, then
+   wipes out to the right while the text unclips behind it. The windows
+   are short and staggered — the open reads fast — but because they ride
+   the scrub they stay perfectly synced (and reverse) with the scroll. */
+function initOvbMasks() {
+  const lines = $$('#v27-ovb .v27-sweep').map(el => ({
+    bar: el.querySelector('.v27-sweep__bar'),
+    txt: el.querySelector('.v27-sweep__t'),
+  })).filter(l => l.bar && l.txt);
+  if (!lines.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  /* ANCHORED TO THE SPACER, NOT THE SHEET: #v27-ovb is position:sticky,
+     and ScrollTrigger must never measure a sticky element — a refresh
+     that happens mid-scroll reads the STUCK rect and every start/end
+     lands wrong. The spacer is static and sits directly above the sheet,
+     so 'bottom bottom' = the sheet entering the fold and 'bottom top' =
+     the sheet pinning, on every layout including phones. */
+  ScrollTrigger.create({
+    trigger: '.v27-ova-spacer', start: 'bottom bottom', end: 'bottom top', scrub: true,
+    onUpdate(self) {
+      const p = self.progress;
+      lines.forEach((l, i) => {
+        const a = 0.48 + i * 0.13, w = 0.26;    /* fast windows, one per line */
+        const q = Math.min(1, Math.max(0, (p - a) / w));
+        if (q <= 0.5) {
+          const c = q * 2;                       /* cover: bar wipes in */
+          l.bar.style.transform = `translateX(${(-101 + c * 101).toFixed(1)}%)`;
+          l.txt.style.clipPath  = 'inset(0 100% 0 0)';
+        } else {
+          const c = (q - 0.5) * 2;               /* reveal: bar exits, text opens */
+          l.bar.style.transform = `translateX(${(c * 101).toFixed(1)}%)`;
+          l.txt.style.clipPath  = `inset(0 ${((1 - c) * 100).toFixed(1)}% 0 0)`;
+        }
+      });
+    },
+  });
+}
+
 function setupCarScrollAnim() {
   if (!car) return;
 
-  /* Overview: car rotates to front view as section enters */
+  /* ── The Overview in three beats, one timeline, ZERO mid-journey stops ──
+     1 · RIDE IN   the parked car rises with the entering section
+     2 · WRITE     pinned; the copy loads left→right while the car holds
+     3 · THE MOVE  one continuous drive from the park to the 360 stage
+     Beat 3's trigger starts at 'top bottom' of #v27-exterior — the exact
+     scroll position where the 200vh Overview un-pins — so the drive picks
+     up the instant the dwell ends: park … park … one move … 360. */
+
+  /* 1 · RIDE IN — glued to the section, so it can never dangle in from the
+     top edge: at progress 0 the car is a full viewport below its park and
+     it climbs at exactly the section's own speed. scrub:true, not a lagged
+     scrub — any smoothing here would detach the car from the section. */
   ScrollTrigger.create({
     trigger: '#v27-overview',
-    start: 'top 90%', end: 'top top', scrub: 1.5,
+    start: 'top bottom', end: 'top top', scrub: true,
     onUpdate(self) {
       if (!car) return;
       const p = self.progress;
-      /* Phones stack the Overview into one column with a reserved gap
-         for the car between the paragraph and the price — so the model
-         sits CENTRED and smaller there, not off in a right-hand half. */
-      const OV = ovPose();
-      scrollBaseRotY = lerp(HERO_POSE.rotY, OV.rotY, p);
-      car.position.x  = lerp(HERO_POSE.posX,  OV.posX,  p);
-      car.position.y  = lerp(HERO_POSE.posY,  OV.posY,  p);
-      car.scale.setScalar(lerp(HERO_POSE.scale, OV.scale, p));
+      if (isNarrow()) {
+        /* phones keep their straight lerp into the reserved gap — the
+           Overview is a single centred column there, no left park */
+        const OV = ovPose();
+        scrollBaseRotY = lerp(HERO_POSE.rotY, OV.rotY, p);
+        car.position.x  = lerp(HERO_POSE.posX,  OV.posX,  p);
+        car.position.y  = lerp(HERO_POSE.posY,  OV.posY,  p);
+        car.scale.setScalar(lerp(HERO_POSE.scale, OV.scale, p));
+      } else {
+        scrollBaseRotY = OV_PARK.rotY;
+        car.position.x = OV_PARK.posX;
+        car.position.y = OV_PARK.posY - (1 - p) * OV_RIDE_IN;
+        car.scale.setScalar(OV_PARK.scale);
+      }
     },
   });
 
-  /* Exterior: car sweeps from front view to side profile */
+  /* 2 · THE ROLL — one continuous journey over the WHOLE overview: from
+     the moment A pins to the moment the 360 stage does, a single eased
+     path from the left park to the side pose. The ease-in exponent is the
+     entire choreography: while A is on screen the car only CREEPS forward
+     (it "starts rolling" beside the copy), it sweeps across sheet B at
+     full stride, and it settles into the 360 as the ease flattens out.
+     One trigger, one path, one gesture — nothing ever stops mid-way. */
   ScrollTrigger.create({
-    trigger: '#v27-exterior',
-    start: 'top 80%', end: 'top top', scrub: 1.5,
+    trigger: '#v27-overview',
+    start: 'top top', endTrigger: '#v27-exterior', end: 'top top', scrub: 1.5,
     onUpdate(self) {
       if (!car) return;
       const p = self.progress;
-      // FROM the same pose the Overview trigger settled on — using the raw
-      // desktop constant here made the car jump to full size on phones
-      const A = ovPose(), B = sidePose();
-      scrollBaseRotY = lerp(A.rotY, B.rotY,  p);
-      car.position.x  = lerp(A.posX,  B.posX,  p);
-      car.position.y  = lerp(A.posY,  B.posY,  p);
-      car.scale.setScalar(lerp(A.scale, B.scale, p));
+      const B = sidePose();
+      if (isNarrow()) {
+        /* phones: the car holds its centred slot in the copy column, then
+           makes the short hop to the 360 over the last leg — their column
+           has no left park to roll from */
+        const A = ovPose();
+        const q = Math.min(1, Math.max(0, (p - 0.72) / 0.28));
+        scrollBaseRotY = lerp(A.rotY, B.rotY,  q);
+        car.position.x  = lerp(A.posX,  B.posX,  q);
+        car.position.y  = lerp(A.posY,  B.posY,  q);
+        car.scale.setScalar(lerp(A.scale, B.scale, q));
+      } else {
+        const pe = Math.pow(p, 1.7);   /* slow start beside A, full stride over B */
+        const u  = 1 - pe;
+        /* one FULL revolution across the journey, riding the same ease —
+           written as -2π·pe it lands exactly on the side pose's angle
+           (visually identical, drag is additive), so the roll is part of
+           the single gesture rather than a second move */
+        scrollBaseRotY = lerp(OV_PARK.rotY, B.rotY,  pe) - Math.PI * 2 * pe;
+        /* the crossing ARCS: out to the right side of the page and down to
+           its smallest while it passes the price sheet, then back to the
+           centre growing into the 360 — two quadratic beziers on the same
+           eased progress, so the swing has no corners and no stops */
+        car.position.x = u * u * OV_PARK.posX + 2 * u * pe * OV_XSWING + pe * pe * B.posX;
+        car.position.y  = lerp(OV_PARK.posY,  B.posY,  pe);
+        car.scale.setScalar(u * u * OV_PARK.scale + 2 * u * pe * OV_DIP + pe * pe * B.scale);
+      }
     },
+  });
+
+  /* While sheet B is anywhere under the car's path, lift the canvas above
+     the section so the model visibly rolls IN FRONT of the price sheet
+     (canvas stays pointer-events:none — the CTA underneath still clicks) */
+  /* Same sticky-trigger trap as the masks: anchored to the static spacer
+     (its bottom IS the sheet's flow top), or a mid-scroll refresh left
+     this window misplaced and the sheet's white face sliced the car. */
+  ScrollTrigger.create({
+    trigger: '.v27-ova-spacer',
+    start: 'bottom bottom', endTrigger: '#v27-exterior', end: 'top top',
+    onToggle(self) { document.body.classList.toggle('v27-car-front', self.isActive); },
   });
 
   /* Exterior: enable drag while pinned; smoothly reset drag offset on leave */
@@ -975,7 +1156,12 @@ function initMarquee() {
     const track = $(`#${id}`);
     if (!track) return;
     const doubled = [...items, ...items];
-    track.innerHTML = doubled.map(t => `<span class="v27-marquee-item">${t}</span>`).join('');
+    /* The ribbon is set in text-transform: uppercase, which would flatten the
+       brand's lowercase i — so the name is wrapped to opt out of the transform
+       and keep its lockup casing (see .brand-name in css/styles.css). */
+    track.innerHTML = doubled
+      .map(t => `<span class="v27-marquee-item">${t.replace(/iCAUR/g, '<span class="brand-name">iCAUR</span>')}</span>`)
+      .join('');
   }
 
   fillTrack('v27-mq-a', itemsA);
@@ -1387,7 +1573,6 @@ function initTech() {
    10. SAFETY — hover-image list (port of SafetySection.jsx)
 ══════════════════════════════════════════════════════════ */
 function initSafety() {
-  window.__sfEntered = true;
   const section    = $('#v27-safety');
   const imgWrap    = $('#v27-sf-img-wrap');
   const defaultImg = $('#v27-sf-default-img');
@@ -1505,7 +1690,6 @@ function initSafety() {
     if (!best || bd > window.innerHeight * 0.55) best = rows[0];
     rows.forEach(r => r.classList.toggle('is-scroll-on', r === best));
   }
-  window.__sfReached = true;
   const onSf = () => { if (!sfRaf) sfRaf = requestAnimationFrame(sfSpot); };
   window.addEventListener('scroll', onSf, { passive: true });
   window.addEventListener('resize', onSf, { passive: true });
@@ -1626,36 +1810,15 @@ function interpolateColor(hex1, hex2, t) {
    from an older CTA structure that no longer exists in the markup. */
 
 /* ══════════════════════════════════════════════════════════
-   OVERVIEW BACKGROUND — plasma + threads, glued to the SECTION.
-   The layer must stay position:fixed to sit UNDER the fixed car
-   canvas (the section's own stacking context paints above it), so
-   "scrolls with the section" is done by hand: each frame it is
-   translated to exactly overlay the Overview sticky. Result: it
-   arrives, pins and leaves with the section, while the car keeps
-   its own layer above.
-══════════════════════════════════════════════════════════ */
-function initOverviewBg() {
-  const bg = document.querySelector('.v27-ov-plasma');
-  const sticky = document.querySelector('.v27-overview-sticky');
-  if (!bg || !sticky) return;
-  let lastY = null;
-  (function tick() {
-    requestAnimationFrame(tick);
-    const t = Math.round(sticky.getBoundingClientRect().top * 10) / 10;
-    if (t === lastY) return;
-    lastY = t;
-    bg.style.transform = `translate3d(0, ${t}px, 0)`;
-  })();
-}
-
-
-/* ══════════════════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════════════════ */
 function init() {
+  /* split both paragraphs up front — the elastic field needs the spans
+     from its very first frame, and the split itself changes no layout */
+  ovSplitWords();
   initScene();
   initHeroEntrance();
-  initOverviewBg();
+  initOvbMasks();
   initExterior();
   initLightbox();
   initBrand();

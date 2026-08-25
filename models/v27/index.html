@@ -41,20 +41,6 @@
   <!-- Site nav (injected by components.js) -->
   <div id="site-header"></div>
 
-  <!-- ─── Overview plasma wash (fixed, BEHIND the 3D car — z0 < z1) ───────
-       Must live OUT here, not inside #v27-overview: that section is z2 and
-       makes its own stacking context, so anything nested in it paints over
-       the fixed car canvas and washes the paint out. -->
-  <div class="v27-ov-plasma" aria-hidden="true">
-    <span></span><span></span><span></span>
-    <!-- Light threads — thin amber streaks gliding along their own 45°
-         axis. Angled and placed over the car half / extreme corners, so
-         none of them ever crosses the copy column. -->
-    <div class="v27-ov-threads">
-      <i></i><i></i><i></i><i></i><i></i><i></i>
-    </div>
-  </div>
-
   <!-- ─── DotGrid (fixed, BEHIND the 3D car — z0 < z1) ─────────── -->
   <div class="eg-dotgrid-wrap" aria-hidden="true"></div>
 
@@ -114,6 +100,15 @@
   <!-- ══════════════════════════════════════════════════════
        OVERVIEW — car rotates to front view on scroll
   ══════════════════════════════════════════════════════ -->
+  <!-- ═══ OVERVIEW — two stacked sheets (Telescope reference) ═══
+       A · the copy's first half on the right, the car parked in the left
+           lane BESIDE it — it starts rolling here, slowly.
+       B · a larger centred price sheet that slides up OVER the pinned
+           copy; the car rides in front of it (body.v27-car-front lifts
+           the canvas) and rolls across until it reaches the 360 stage.
+       A stays pinned under everything for the whole section — B covers
+       it exactly the way the reference's collection sheet covers the
+       intro paragraph. -->
   <section id="v27-overview">
     <div class="v27-overview-sticky">
       <div class="v27-overview-inner">
@@ -121,25 +116,46 @@
           <!-- the V27 mark is a masked span, not an <img>, so CSS can paint
                it amber; the accessible name stays on the heading -->
           <h2 class="v27-ov-h2">Overview<br><span class="v27-ov-logo" role="img" aria-label="V27"></span></h2>
+          <!-- first HALF of the overview copy — the second sentence lives on
+               sheet B, bigger. Static text (no write-in); js/v27.js splits it
+               into words only so the elastic field can part them for the car. -->
           <p class="v27-ov-para">
             Built with extraordinary electric technology and bold V27 DNA,
             the iCAUR V27 gives you the best of both worlds — emission-free
             electric driving with the confidence to go further, anytime.
           </p>
-          <div class="v27-ov-divider"></div>
-          <div class="v27-ov-price-wrap">
-            <span class="v27-ov-price-label">Starting from</span>
-            <span class="v27-ov-price">1,490,000 <em>EGP</em></span>
-          </div>
-          <a href="#" download class="v27-cta-btn v27-cta-btn--dark v27-ov-cta">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
-            Download Brochure
-          </a>
         </div>
         <!-- Right col is transparent — 3D canvas visible beneath -->
         <div class="v27-overview-right"></div>
       </div>
     </div>
+    <div class="v27-ova-spacer" aria-hidden="true"></div>
+
+    <!-- B · the price sheet. Every line opens behind a fast orange side
+         mask (js/v27.js initOvbMasks), scrubbed so the sweep is synced
+         to the sheet's own arrival. -->
+    <div class="v27-ovb-sticky" id="v27-ovb">
+      <div class="v27-ovb-sheet">
+        <!-- the paragraph's second half — short, and much larger than A's:
+             this line is the sheet's message, the price is just the fact.
+             The car rolls straight over it and the elastic field parts the
+             words around the body (js/v27.js ovElastic). -->
+        <div class="v27-ovb-row"><span class="v27-sweep"><p class="v27-sweep__t v27-ovb-para">
+          Designed around real life in Egypt — rugged capability, a smart
+          connected cabin, and every drive effortless, from the daily
+          commute to the open desert.
+        </p><i class="v27-sweep__bar" aria-hidden="true"></i></span></div>
+        <div class="v27-ovb-row"><span class="v27-sweep"><span class="v27-sweep__t"><span class="v27-ov-price-wrap">
+          <span class="v27-ov-price-label">Starting from</span>
+          <span class="v27-ov-price">1,490,000 <em>EGP</em></span>
+        </span></span><i class="v27-sweep__bar" aria-hidden="true"></i></span></div>
+        <div class="v27-ovb-row"><span class="v27-sweep"><span class="v27-sweep__t"><a href="#" download class="v27-cta-btn v27-cta-btn--dark v27-ov-cta">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
+          Download Brochure
+        </a></span><i class="v27-sweep__bar" aria-hidden="true"></i></span></div>
+      </div>
+    </div>
+    <div class="v27-ovb-spacer" aria-hidden="true"></div>
   </section>
 
   <!-- ══════════════════════════════════════════════════════
@@ -156,11 +172,11 @@
       <div class="v27-ext-window"></div>
       <div class="v27-swatches-wrap">
         <div class="v27-swatches" id="v27-swatches">
-          <button class="v27-swatch active" data-color="camel" aria-label="Camel">
+          <button class="v27-swatch" data-color="camel" aria-label="Camel">
             <img src="/assets/images/v27/car-color-camel.webp" alt="Camel" draggable="false">
             <span class="v27-swatch-name">Camel</span>
           </button>
-          <button class="v27-swatch" data-color="carbon-black" aria-label="Carbon Black">
+          <button class="v27-swatch active" data-color="carbon-black" aria-label="Carbon Black">
             <img src="/assets/images/v27/car-color-carbon-black.webp" alt="Carbon Black" draggable="false">
             <span class="v27-swatch-name">Carbon Black</span>
           </button>
@@ -302,7 +318,7 @@
       <div class="v27-ct-liquid-bg" id="v27-ct-liquid-bg" aria-hidden="true"></div>
       <div class="v27-ct-vignette" aria-hidden="true"></div>
       <div class="v27-ct-head" id="v27-ct-head">
-        <p class="v27-ct-eyebrow" id="v27-ct-eyebrow">Technology <span class="eyebrow-dot"></span> iCAUR V27</p>
+        <p class="v27-ct-eyebrow" id="v27-ct-eyebrow">Technology <span class="eyebrow-dot"></span> <span class="brand-name">iCAUR</span> V27</p>
         <div class="v27-ct-line-wrap">
           <div class="v27-ct-line1" id="v27-ct-line1">Built for tomorrow.</div>
           <div class="v27-ct-mask" id="v27-ct-mask1"></div>
@@ -530,7 +546,7 @@
     <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
     <p class="cta-video__body">Your next car is waiting — let's get you behind the wheel and show you what electric really means.</p>
     <div class="cta-video__actions">
-      <a href="/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
+      <a href="/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your <span class="brand-name">iCAUR</span> <span class="arrow">→</span></a>
       <a href="/contact" class="btn btn--outline btn--arrow btn--magnetic">Contact Us <span class="arrow">→</span></a>
     </div>
   </div>
@@ -548,7 +564,7 @@
   <script src="/js/main.js"></script>
   <script src="/js/transitions.js"></script>
   <script src="/js/game.js"></script>
-  <script type="module" src="/js/v27.js?v=33"></script>
+  <script type="module" src="/js/v27.js?v=58"></script>
 
 </body>
 </html>

@@ -147,11 +147,25 @@ small, .text-sm  { font-size: 14px; }
 .section-title--light { color: var(--white); }
 .body-text { font-size: 15px; line-height: 1.75; color: var(--text-mid); }
 
-/* Eyebrow — playful filled pill */
+/* The brand is a fixed lockup — lowercase i, uppercase CAUR — and it keeps
+   that spelling everywhere. Buttons, eyebrows and tags are set in
+   text-transform: uppercase, which would otherwise render the name "ICAUR",
+   so every occurrence inside one of those labels is wrapped in this span.
+   Opting OUT of the transform is the only way to protect the casing: CSS
+   cannot exempt a substring on its own. */
+.brand-name { text-transform: none; }
+
+/* Eyebrow — playful filled pill.
+   Set LIGHT on purpose: at 11px uppercase the old 700 filled the brand's
+   lowercase i into a slab that read as a capital I. The lightness comes
+   from the FAMILY as much as the number — --f-display leads with
+   GothamBold, where even 400 paints bold, so eyebrows lead with
+   GothamMedium — bolder than Book (which read too faint), still light
+   enough that the i keeps its dot and narrow stem. */
 .eyebrow {
   display: inline-flex; align-items: center; gap: 10px;
-  font-family: var(--f-display);
-  font-size: 11px; font-weight: 700;
+  font-family: 'GothamMedium', 'Montserrat', 'Futura', sans-serif;
+  font-size: 11px; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--amber);
   background: none;
@@ -162,7 +176,7 @@ small, .text-sm  { font-size: 14px; }
 }
 /* The dash mark that used to sit before every eyebrow was removed
    site-wide; eyebrows are now text only. (The standalone brand dashes —
-   .cta-video__dash, .mv__mark, .vision__dash — are separate and stay.) */
+   .cta-video__dash, .vision__dash — are separate and stay.) */
 .eyebrow--warm {
   color: var(--brown);
 }
@@ -2662,6 +2676,19 @@ html.pt-entering > body { opacity: 0; }
   transform-origin: center center;
   will-change: transform;
 }
+/* About's intro runs smaller than the services statement: it sits under a
+   two-line headline rather than standing alone, so the full 72px filled the
+   panel and pushed the copy past the fold. Scoped, so services is untouched. */
+#aboutDriver .svc__sub {
+  font-size: clamp(20px, 2.6vw, 40px);
+  /* Lighter than the services statement. The weight came from the FAMILY,
+     not the number — --f-display leads with GothamBold(700), so 400 still
+     painted bold. --f-body leads with GothamBook, and 300 lightens the
+     fallback stack too while the Gotham files are missing. */
+  font-family: var(--f-body);
+  font-weight: 300;
+  max-width: 20ch;
+}
 .svc__wm { display: inline; }
 .svc__w { display: inline-block; }
 /* where the deck lands — a reserved box under the paragraph */
@@ -3045,13 +3072,40 @@ html.pt-entering > body { opacity: 0; }
   .media-driver { height: 240vh; }
   /* the veil is a sibling of the grid, so the stage does the stacking */
   .media__stage { display: flex; flex-direction: column; }
+  /* The two posts sit SIDE BY SIDE on phones, the same pair they form on
+     desktop — headline spans the row above them, brief the row below.
+     .media__col is display:contents, so head and brief are grid children
+     here and can span the full width themselves. */
   .media__grid {
-    position: static; display: flex; flex-direction: column;
-    gap: var(--sp-16); padding: 0 var(--sp-20) var(--sp-16);
+    position: static; display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: var(--sp-16) clamp(10px, 3vw, 16px);
+    padding: 0 var(--sp-20) var(--sp-16);
   }
   .media__col { display: contents; }
-  .media__head { order: -1; max-width: none; margin-top: var(--sp-20); }
-  .media__brief { order: 3; max-width: none; }
+  .media__head { order: -1; grid-column: 1 / -1; max-width: none; margin-top: var(--sp-20); }
+  .media__brief { order: 3; grid-column: 1 / -1; max-width: none; }
+  /* One shared picture ratio so the pair lands on a common baseline — the
+     desktop 5/6 + 4/5 split reads as a mistake once they are side by side.
+     The vh caps go too: at half width they never bind, and they would only
+     desync the two heights again. */
+  .media-card--lead .media-card__img,
+  .media-card--big  .media-card__img { aspect-ratio: 4 / 5; max-height: none; }
+  /* .media-card is align-self:end so the desktop pair shares one bottom line
+     despite unequal pictures. Here the pictures ARE equal, so bottom-aligning
+     would push the shorter card down by its title's extra line and knock the
+     two photos out of line. Top-align instead: pictures and badge rows match,
+     and only the longer title runs on below. */
+  .media-card--lead, .media-card--big { align-self: start; }
+  /* half-width columns — the meta row and title need to fit without the
+     date wrapping under its pill */
+  .media-card__meta { gap: 6px; }
+  /* the pill plus the date has ~142px to live in — without nowrap the date
+     breaks after the comma and the meta row becomes two lines deep */
+  .media-card__meta time { font-size: 10px; letter-spacing: .02em; white-space: nowrap; }
+  .media-card__type { padding: 4px 8px; font-size: 10px; }
+  .media-card__title { font-size: 14px; }
 }
 /* SCENE-off rules — reduced motion only: freeze the choreography and show
    the flat stacked layout with the photo back inside its tile */
@@ -3977,10 +4031,7 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
   color: var(--text-mid); max-width: 760px;
   margin-inline: auto; margin-bottom: var(--sp-24);
 }
-/* The scene car ends its run parked in the CTA's place, so the button only
-   exists at widths where the car does NOT — it is display:none under 960px,
-   and dropping the button everywhere would leave mobile with neither. */
-@media (min-width: 961px) { .about-overview__cta { display: none; } }
+
 
 /* iCAUR Story — car rides the left rail, images stack on the right */
 .about-saga { background: #F5F0ED; }
@@ -4416,16 +4467,6 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
   max-width: 1080px; padding: 0 var(--pad-x);
   text-align: center;
 }
-/* the brand dash mark opens the sequence centre-stage, then scales up
-   and blurs away (JS scrubs it) */
-.mv__mark {
-  position: absolute; top: 50%; left: 50%; z-index: 3;
-  width: clamp(90px, 9vw, 140px); aspect-ratio: 34/9;
-  margin: calc(clamp(90px, 9vw, 140px) * -0.132) 0 0 calc(clamp(90px, 9vw, 140px) / -2);
-  background: url('../assets/images/dashes.svg') no-repeat center / contain;
-  will-change: transform, filter, opacity;
-  pointer-events: none;
-}
 /* the 3D car crossing lives on this transparent canvas, above the
    ghosts (z3-) but under the statements (panels are z6) */
 #mvCanvas {
@@ -4485,7 +4526,7 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
 .mv--static .mv-w { opacity: 1 !important; transform: none !important; }
 .mv--static .mv-chip { opacity: 1 !important; transform: none !important; }
 .mv--static .mv__title { opacity: 1 !important; transform: none !important; filter: none !important; }
-.mv--static .mv__mark, .mv--static #mvCanvas { display: none; }
+.mv--static #mvCanvas { display: none; }
 
 /* The orange rail (js/about-thread.js): a sharp technical line down the
    left edge — long verticals, 45° lane-change jogs, small corner radii
@@ -6187,16 +6228,100 @@ body:has(.post-hero) { background: #fff; }
 .faq-hero-shot--sq   { width: clamp(110px, 9.5vw, 140px); aspect-ratio: 1/1; }
 .faq-hero-shot--tall { width: clamp(105px, 9vw, 130px);   aspect-ratio: 4/5; }
 .faq-hero-shot--wide { width: clamp(130px, 11.5vw, 165px); aspect-ratio: 5/4; }
-/* left column: tall high, square mid, wide low — staggered so no two
-   cards share both a horizontal and a vertical band (no overlap) */
-.faq-hero-shot:nth-child(1) { left: 4%;  top: 14%; }
-.faq-hero-shot:nth-child(2) { left: 15%; top: 46%; }
-.faq-hero-shot:nth-child(3) { left: 3%;  bottom: 6%; }
-/* right column: wide high, tall mid, square low */
-.faq-hero-shot:nth-child(4) { right: 3.5%; top: 13%; }
-.faq-hero-shot:nth-child(5) { right: 16%;  top: 44%; }
-.faq-hero-shot:nth-child(6) { right: 4%;   bottom: 7%; }
+/* TWO cards a side, both in the hero's upper half. The third pair used to
+   sit on `bottom`, which put it level with the filter row and made the
+   section feel crowded at the very point it should be settling down. With
+   four the collage still frames the headline and the lower third stays
+   clear for the filters. */
+.faq-hero-shot:nth-child(1) { left: 3%;  top: 15%; }
+.faq-hero-shot:nth-child(2) { left: 11%; top: 45%; }
+.faq-hero-shot:nth-child(3) { right: 2.5%; top: 13%; }
+.faq-hero-shot:nth-child(4) { right: 12%;  top: 43%; }
 @media (max-width: 1000px) { .faq-hero-shots { display: none; } }
+
+/* ─── Question chips ──────────────────────────────────────────
+   Little tilted pills — "How?", "Why?", "Can I?" — floating in the
+   gutters either side of the copy, so the page says what it is before
+   a word is read: this is where questions get answered.
+
+   They live in the ONE clear band on each side: the photo collage runs
+   to 15% + its own width on the left and mirrors that on the right,
+   while the headline and paragraph are centred and much narrower than
+   the 720px container. That leaves roughly 294–390px (and its mirror)
+   free at every width down to the 1000px cut-off, which is what every
+   position below is pinned to. Padding and type are kept small for the
+   same reason — the longest chip has to fit that band.
+
+   Two layers, exactly like .faq-hero-shot: the ANCHOR carries position
+   and .reveal (which animates transform), the PILL carries the 3D tilt.
+   One element could not do both — the entrance would overwrite it. */
+.faq-asks { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+/* pointer-events back ON for the anchor only — the magnet needs the hover,
+   exactly as .faq-hero-shot does inside its own pointer-events:none parent */
+.faq-ask  { position: absolute; pointer-events: auto; }
+.faq-ask__pill {
+  position: relative; display: inline-block; white-space: nowrap;
+  /* generous padding: the ring is drawn AROUND the word, so this is the
+     gap between the letters and the stroke */
+  padding: 13px 20px;
+  font-family: var(--f-display); font-size: 13px; font-weight: 700;
+  letter-spacing: -.01em; line-height: 1;
+  /* Two effects, one transform: the magnet writes --mx/--my (js/main.js) and
+     the tilt is per-pill, so each is turned in its own space and they read as
+     scattered in depth rather than on one shared plane. Translate comes FIRST
+     so the lean is a screen-space nudge and the rotation does not steer it. */
+  transform: translate(var(--mx, 0px), var(--my, 0px))
+             perspective(700px)
+             rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) rotate(var(--rz, 0deg));
+  will-change: transform;
+}
+.faq-ask__t { position: relative; z-index: 1; }
+/* The hand-drawn oval. preserveAspectRatio:none stretches one path to fit
+   whatever the word measures — "How?" and "What if?" are very different
+   widths — and non-scaling-stroke keeps the pen weight even when it does,
+   which is what stops the wider rings looking thin and squashed. */
+.faq-ask__ring {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  overflow: visible; fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+.faq-ask__pill--amber { color: var(--black); }
+.faq-ask__pill--amber .faq-ask__ring { stroke: var(--amber); }
+.faq-ask__pill--ink   { color: var(--black); }
+.faq-ask__pill--ink   .faq-ask__ring { stroke: rgba(10, 10, 10, .78); }
+/* All six sit in the upper two thirds, around the headline — the band
+   beside the second title line is the widest clear space on the page,
+   because "Questions" is far shorter than the lines above and below it.
+   Lower down they would have run into the paragraph and then the filter
+   row, and a tilted pill directly under a row of filter pills reads as
+   another filter rather than as decoration. */
+/* The px floor keeps the top pair out from under the floating nav pill,
+   which is fixed and ~78px deep: a bare percentage put them behind it on
+   shorter heroes, where 12% is only ~50px. */
+/* TWO a side, matching the four photos. Three a side did not fit: the
+   left gutter is taken by the breadcrumb at the top and by the lead
+   paragraph — which runs nearly 500px wide — lower down, leaving only
+   two clear slots between them.
+   The px floors keep the upper pair clear of the floating nav pill
+   (fixed, ~78px deep) AND of the breadcrumb just under it; on a short
+   hero the percentages alone land right on top of both. */
+/* left band */
+.faq-ask--1 { left: 24%; top: max(150px, 20%); }
+.faq-ask--3 { left: 24%; top: 50%; }
+/* right band — mirrored, offset vertically so the two sides do not
+   read as a matched pair */
+.faq-ask--2 { right: 24%; top: max(140px, 18%); }
+.faq-ask--4 { right: 24%; top: 53%; }
+/* Below 1000px the collage is hidden because there is no side space left;
+   the chips go with it for the same reason — at phone widths they would
+   land on top of the headline. */
+/* Between 1000 and 1240 the gutters are real but tight — the chips step
+   down rather than being dropped, so the idea survives the middle widths. */
+@media (max-width: 1240px) {
+  .faq-ask__pill { padding: 11px 16px; font-size: 12px; }
+}
+@media (max-width: 1000px) { .faq-asks { display: none; } }
+
 .faq-page-hero h1 {
   font-family: var(--f-display);
   font-size: clamp(2rem,3.8vw,3.2rem);

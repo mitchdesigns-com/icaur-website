@@ -89,63 +89,65 @@
   </div>
 </section>
 
-<!-- ═══════ PINNED SCENE — Overview ⇄ iCAUR Story ═══════ -->
-<div class="about-scene" id="aboutScene">
-  <div class="about-scene__pin">
+<!-- ═══════ OVERVIEW → iCAUR STORY — horizontal run ═══════
+     Same engine as the homepage services section (initSvcScroll in
+     js/main.js): the intro reads, then the track slides sideways through
+     the story panels while every image parallaxes inside its own window.
+     Replaces the old pinned car scene — the driving 3D model is gone. -->
+<div class="svc-driver" id="aboutDriver">
+<section class="svc" id="aboutScene">
+  <div class="svc__track" id="aboutTrack">
 
-    <!-- Story car — drives in from the left during Overview, then
-         swings onto the rail and rotates to ride it down -->
-    <!-- The scene car is a live GLB (js/about-glb.js) rather than a PNG. about-story.js still positions this element exactly as before; the
-         module only renders into it and turns the model in 3D. -->
-    <canvas class="story-scene-car" id="storySceneCar" aria-hidden="true"></canvas>
-
-    <div class="container about-scene__stage">
-
-      <!-- Overview panel -->
-      <div class="scene-panel scene-panel--overview" data-panel="overview">
-        <div class="about-overview__inner">
-          <p class="eyebrow">Overview</p>
-          <h2 class="about-overview__h">The Future<br>Feels <span class="hl-word" id="aboutHlWord"><span>Different</span><svg class="head-scribble" id="aboutHeadScribble" viewBox="0 0 300 60" preserveAspectRatio="none" fill="none" aria-hidden="true"><path pathLength="1" d="M10 22c60-9 120-12 180-8 34 2 68 7 100 3"/><path pathLength="1" d="M14 40c62-7 126-9 188-5 32 2 64 6 94 2"/></svg></span></h2>
-          <p class="about-overview__lead">iCAUR is a new generation automotive brand redefining intelligent mobility through bold design, advanced technology, and expressive driving experiences. Built for the young and young-at-heart, iCAUR combines rugged character, smart innovation, and lifestyle-driven thinking to create vehicles that feel as exciting as they look.</p>
-          <!-- Desktop: the scene car lands here instead, so this is hidden
-               above 960px — exactly where the car is available to replace it. -->
-          <a href="/reserve" class="btn btn--dark btn--arrow btn--magnetic about-overview__cta">Get Your iCAUR <span class="arrow">→</span></a>
+    <!-- 0 · Overview -->
+    <div class="svc__panel svc__panel--intro">
+      <div class="svc__intro-inner">
+        <div class="svc__headgroup" id="aboutHeadGroup">
+          <p class="eyebrow svc__eyebrow">Overview</p>
+          <h2 class="svc__headline" id="aboutHeadline">The Future<br>Feels <em>Different</em></h2>
         </div>
+        <!-- plain text on purpose: initSvcScroll splits this into words and
+             lights them one by one, so inline markup would be discarded -->
+        <p class="svc__sub">Bold design. Advanced technology. Built for the young, and the young at heart.</p>
       </div>
-
-      <!-- Story panel — car rides the rail, images stack on the right -->
-      <div class="scene-panel scene-panel--story" data-panel="story">
-
-        <!-- Left rail: gray line, passed area turns orange -->
-        <div class="story-rail" aria-hidden="true">
-          <div class="story-rail__line">
-            <div class="story-rail__fill" id="storyRailFill"></div>
-          </div>
-        </div>
-
-        <div class="about-saga__inner">
-        <p class="eyebrow">iCAUR Story</p>
-        <div class="about-saga__steps">
-          <div class="saga-step is-active" data-step="0">
-            <p>Born to break the mold — rugged character, smart tech, and lifestyle-first thinking in EVs that feel as exciting as they look.</p>
-          </div>
-          <div class="saga-step" data-step="1">
-            <p>Engineered for Egypt: the heat, the dust, the drama. From Cairo traffic to the dunes, built to last and born to turn heads.</p>
-          </div>
-        </div>
-        </div>
-
-        <!-- Right: images pile over each other as the car drives down -->
-        <div class="story-stack" aria-hidden="true">
-          <img src="/assets/images/about-hero.webp" class="story-stack__img" style="--r:-5deg; --x:-14px; --y:-10px" loading="lazy" alt="">
-          <img src="/assets/images/iCAUR INTL_V27 REV_cam027 copy.webp" class="story-stack__img" style="--r:4deg; --x:12px; --y:6px" loading="lazy" alt="">
-          <img src="/assets/images/ICUAR V27 brochure 03 18.webp" class="story-stack__img" style="--r:-2deg; --x:-4px; --y:12px" loading="lazy" alt="">
-        </div>
-
-      </div>
-
     </div>
+
+    <!-- 1 · Born to break the mold -->
+    <article class="svc__panel svc__panel--feature">
+      <figure class="svc__media svc__media--lg">
+        <img src="/assets/images/about-hero.webp" alt="iCAUR V27 on the open road" loading="lazy" data-par="0.10">
+      </figure>
+      <div class="svc__body">
+        <span class="svc__num">Our Story</span>
+        <h3 class="svc__title">Born to <em>Break the Mold</em></h3>
+        <p class="svc__text">iCAUR started from a simple refusal — that an electric car has to look and drive like everything else on the road. Rugged character, smart technology and lifestyle-first thinking come together in vehicles built for people who would rather stand out than blend in.</p>
+      </div>
+    </article>
+
+    <!-- small cluster -->
+    <div class="svc__panel svc__panel--cluster" aria-hidden="true">
+      <figure class="svc__media svc__media--sm svc__media--sm-a">
+        <img src="/assets/images/v27/interior-display.webp" alt="" loading="lazy" data-par="0.18">
+      </figure>
+      <figure class="svc__media svc__media--sm svc__media--sm-b">
+        <img src="/assets/images/ICUAR V27 brochure 03 18.webp" alt="" loading="lazy" data-par="-0.12">
+      </figure>
+    </div>
+
+    <!-- 2 · Engineered for Egypt (mirrored) -->
+    <article class="svc__panel svc__panel--feature svc__panel--flip">
+      <figure class="svc__media svc__media--lg">
+        <img src="/assets/images/iCAUR INTL_V27 REV_cam027 copy.webp" alt="iCAUR V27 engineered for Egyptian roads" loading="lazy" data-par="0.10">
+      </figure>
+      <div class="svc__body">
+        <span class="svc__num">Made to Stand Out</span>
+        <h3 class="svc__title">The Heat. The Dust. The <em>Drama</em>.</h3>
+        <p class="svc__text">Every iCAUR is engineered for the roads it actually has to survive. Three years of research and testing on real Egyptian roads — from Cairo traffic to the open dunes — shaped a car built to last, and born to turn heads.</p>
+        <a href="/reserve" class="btn btn--dark btn--sm btn--arrow btn--magnetic">Get Your <span class="brand-name">iCAUR</span> <span class="arrow">→</span></a>
+      </div>
+    </article>
+
   </div>
+</section>
 </div>
 
 <!-- ═══════ BRAND FIGURES ═══════ -->
@@ -195,7 +197,6 @@
   <div class="mv__bg" id="mvBg" aria-hidden="true"></div>
   <div class="mv__stage">
 
-    <div class="mv__mark" id="mvMark" aria-hidden="true"></div>
     <canvas id="mvCanvas" aria-hidden="true"></canvas>
 
     <div class="mv__panel mv__panel--vision" id="mvVision">
@@ -254,7 +255,7 @@
     <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
     <p class="cta-video__body">Your next car is waiting — let's get you behind the wheel and show you what electric really means.</p>
     <div class="cta-video__actions">
-      <a href="/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
+      <a href="/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your <span class="brand-name">iCAUR</span> <span class="arrow">→</span></a>
       <a href="/contact" class="btn btn--outline btn--arrow btn--magnetic">Contact Us <span class="arrow">→</span></a>
     </div>
   </div>
@@ -269,7 +270,6 @@
   <script src="/js/transitions.js" defer></script>
   <script src="/js/game.js" defer></script>
   <script src="/js/about-car.js" defer></script>
-  <script src="/js/about-story.js" defer></script>
   <script src="/js/dot-field.js" defer></script>
   <script src="/js/doodles.js" defer></script>
   <script src="/js/about-thread.js" defer></script>
@@ -277,6 +277,5 @@
        car rendering is switched off inside the module (MV_CAR = false)
        so the 3D model appears only in the Overview/Story scene. -->
   <script type="module" src="/js/about-mv.js"></script>
-  <script type="module" src="/js/about-glb.js"></script>
 </body>
 </html>

@@ -95,7 +95,7 @@ const SITE_HEADER = `
         <span class="nav__compare-label">Compare</span>
         <span class="nav__compare-count" id="compareCount" data-count="0">0</span>
       </button>
-      <a href="/reserve" class="btn btn--reserve btn--sm nav-btn-reserve">Reserve iCAUR</a>
+      <a href="/reserve" class="btn btn--reserve btn--sm nav-btn-reserve">Reserve <span class="brand-name">iCAUR</span></a>
     </div>
 
     <button class="nav__hamburger" id="navHamburger" aria-expanded="false" aria-label="Toggle menu">
@@ -246,7 +246,7 @@ const SITE_HEADER = `
       <button class="mobile-menu__tool" id="mobileLangToggle" lang="ar" aria-label="التبديل إلى العربية">العربية</button>
       <button class="mobile-menu__tool" id="mobileCompareToggle" aria-label="Compare models">Compare <span class="nav__compare-count" data-count="0">0</span></button>
     </div>
-    <a href="/reserve" class="btn btn--filled btn--lg">Reserve Your iCAUR</a>
+    <a href="/reserve" class="btn btn--filled btn--lg">Reserve Your <span class="brand-name">iCAUR</span></a>
   </div>
 </div>
 `;
@@ -285,7 +285,7 @@ const SITE_FOOTER = `
           <a href="/faq">FAQs</a>
           <a href="/contact">Contact us</a>
         </nav>
-        <a href="/reserve" class="btn btn--reserve btn--sm btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
+        <a href="/reserve" class="btn btn--reserve btn--sm btn--arrow btn--magnetic">Reserve Your <span class="brand-name">iCAUR</span> <span class="arrow">→</span></a>
       </div>
 
       <!-- Right: Newsletter + Contact + Partner -->

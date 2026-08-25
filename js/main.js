@@ -713,12 +713,16 @@ function splitHeadlineLetters(headline) {
 // every [data-par] image drifts inside its window at its own
 // rate, which is what gives the run its depth.
 // ============================================================
-(function initSvcScroll() {
-  const driver = $('#svcDriver');
-  const track  = $('#svcTrack');
-  const deck   = $('#svcDeck');
-  const slot   = $('#svcSlot');
-  const headGroup = $('#svcHeadGroup');
+/* Horizontal editorial track. Written for the homepage SERVICES section and
+   now reused verbatim by the About page's Overview → Story run, so both read
+   in the same voice. Everything except driver+track is optional — a track
+   without a flipbook deck (About) simply skips those beats. */
+function initSvcScroll(sel) {
+  const driver = $(sel.driver);
+  const track  = $(sel.track);
+  const deck   = sel.deck ? $(sel.deck) : null;
+  const slot   = sel.slot ? $(sel.slot) : null;
+  const headGroup = sel.headGroup ? $(sel.headGroup) : null;
   if (!driver || !track) return;
 
   // live at EVERY width now — mobile gets the same pinned story
@@ -752,15 +756,15 @@ function splitHeadlineLetters(headline) {
     `${a[4].toFixed(1)} ${a[5].toFixed(1)}, ${a[6].toFixed(1)} ${a[7].toFixed(1)}`;
 
 
-  const trace = $('#svcTrace');
-  const tracePath = $('#svcTracePath');
+  const trace = sel.trace ? $(sel.trace) : null;
+  const tracePath = sel.tracePath ? $(sel.tracePath) : null;
   const panels = Array.from(track.querySelectorAll('.svc__panel'));
   const parImgs = Array.from(track.querySelectorAll('img[data-par]'))
     .map(el => ({ el, speed: parseFloat(el.dataset.par) || 0, center: 0 }));
 
   // The statement paragraph lights word by word as the scroll advances
   // (markwoodland reference). Split once, then only opacity is written.
-  const sub = $('.svc__sub', $('#svcDriver'));
+  const sub = $('.svc__sub', driver);
   let words = [];
   if (sub && !sub.dataset.split) {
     const frag = document.createDocumentFragment();
@@ -781,7 +785,7 @@ function splitHeadlineLetters(headline) {
   }
 
   // split-letter entrance for the headline, same voice as the hero
-  const headline = $('#svcHeadline');
+  const headline = sel.headline ? $(sel.headline) : null;
   if (headline) {
     splitHeadlineLetters(headline);
     const io = new IntersectionObserver(es => {
@@ -1019,7 +1023,21 @@ function splitHeadlineLetters(headline) {
   window.addEventListener('resize', onResize, { passive: true });
   window.addEventListener('load', onResize);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
-})();
+}
+
+/* homepage — services, with the travelling flipbook deck and trace line */
+initSvcScroll({
+  driver: '#svcDriver', track: '#svcTrack',
+  deck: '#svcDeck', slot: '#svcSlot',
+  headGroup: '#svcHeadGroup', headline: '#svcHeadline',
+  trace: '#svcTrace', tracePath: '#svcTracePath'
+});
+/* about — Overview intro, then the story panels ride past with the same
+   per-image parallax. No deck/trace here: just the copy and the run. */
+initSvcScroll({
+  driver: '#aboutDriver', track: '#aboutTrack',
+  headGroup: '#aboutHeadGroup', headline: '#aboutHeadline'
+});
 
 
 // ============================================================
@@ -1097,14 +1115,23 @@ function splitHeadlineLetters(headline) {
 // so entrance and hover never share a transform. Fine pointers.
 // ============================================================
 (function initFaqHeroShots() {
-  const shots = $$('.faq-hero-shot');
-  if (!shots.length || !window.matchMedia('(pointer: fine)').matches) return;
-
-  const PULL = 10;     // max lean toward the cursor, px — a nudge, not a chase
-
-  shots.forEach(el => {
+  // Same magnet on both families in the hero: the photo cards lean their
+  // picture, the question chips lean the whole ringed word. Each entry is
+  // [outer anchor that owns the hover, inner element that actually moves,
+  // pull distance] — the chips lean a little further because they are much
+  // smaller, and an identical 10px read as nothing on them.
+  const targets = [];
+  $$('.faq-hero-shot').forEach(el => {
     const img = el.querySelector('img');
-    if (!img) return;
+    if (img) targets.push([el, img, 10]);
+  });
+  $$('.faq-ask').forEach(el => {
+    const pill = el.querySelector('.faq-ask__pill');
+    if (pill) targets.push([el, pill, 14]);
+  });
+  if (!targets.length || !window.matchMedia('(pointer: fine)').matches) return;
+
+  targets.forEach(([el, img, PULL]) => {
     // lerped state, so the lean glides and the release springs back
     let tx = 0, ty = 0, cx = 0, cy = 0, raf = null;
     const tick = () => {
@@ -1547,7 +1574,7 @@ function splitHeadlineLetters(headline) {
 
 
 // ============================================================
-// WHY ICAUR — diagonal band strips
+// WHY iCAUR — diagonal band strips
 // The strips live in normal document flow, so the page's own
 // scroll does the wiping (see .why-strip in styles.css). This
 // only adds the extras: a subtle horizontal parallax drift on
@@ -1864,7 +1891,12 @@ const MEDIA_TILE_RADIUS = 16;
     // those bakes the offset into geo.clip, and the photo then SNAPS that
     // distance at the handover — the jump. Clear them for the measurement,
     // exactly as the headline already was, then let paint() restore them.
-    const moved = [lead, big, brief].filter(Boolean);
+    // head is in here too: dx/dy are deltas FROM the headline's laid-out spot
+    // to the scene-1 anchor, and headX/headY/headW/headH are its laid-out box.
+    // On first load its transform is still empty so that came out right, but a
+    // later re-measure (resize, font swap) read the scaled box and the numbers
+    // drifted — visibly so now that the colour flip is measured off headH.
+    const moved = [lead, big, brief, head].filter(Boolean);
     const saved = moved.map(el => el.style.transform);
     moved.forEach(el => { el.style.transform = ''; });
 
@@ -1893,10 +1925,16 @@ const MEDIA_TILE_RADIUS = 16;
         left:   (t.left   - s.left)   / s.width  * 100
       },
       k,
-      // single-column layouts: the landing tile spans (nearly) the full
-      // stage width, so the edge-clears-headline colour flip can't fire —
-      // paint() falls back to scene progress when this is set
-      tileNearFull: t.width / s.width > 0.7,
+      // The edge-clears-headline colour flip only has meaning when the tile
+      // lands to the RIGHT of the headline (the desktop 3-column scene):
+      // there the picture's advancing left edge really does sweep past the
+      // last letter. Stacked layouts land the tile BELOW the headline — full
+      // width in one column, or half width in the two-up phone grid — and in
+      // both the left edge never clears it, so the headline would stay white
+      // on bare cream forever. Those fall back to the scene-progress flip.
+      // Testing the geometry directly covers every such layout; the old
+      // width-ratio test only caught the full-width one.
+      geomFlip: t.left >= h.right - 8,
       // scene-1 anchor: inset from the left, vertically centred
       dx: (s.left + s.width * 0.07) - h.left,
       dy: (s.top + s.height * 0.52 - (h.height * k) / 2) - h.top,
@@ -2001,15 +2039,25 @@ const MEDIA_TILE_RADIUS = 16;
     // window: the headline turns dark exactly as the picture's advancing left
     // edge clears its last letter. A fixed window left it white on bare cream.
     const picLeftPx  = bx;
-    const headRightPx = geo.headX + geo.dx * (1 - t) + geo.headW * sc;
+    const picTopPx   = by;
+    const headRightPx  = geo.headX + geo.dx * (1 - t) + geo.headW * sc;
+    const headBottomPx = geo.headY + geo.dy * (1 - t) + geo.headH * sc;
     // commit once it is nearly clear, over a short ramp, so the half-way grey
     // is a brief pass rather than a readable state
     // single-column layouts land the picture at full container width, so
     // its left edge NEVER clears the headline — there the flip rides the
     // scene progress instead, committing as the veil settles into the tile
     const geomCw = clamp01((picLeftPx - (headRightPx - 30)) / 45 + 1);
-    const fullBleedTile = geo.tileNearFull ? clamp01((p - 0.62) / 0.10) : 0;
-    const cw = Math.max(geomCw, fullBleedTile);
+    // Stacked layouts land the tile BELOW the headline, so their flip rides
+    // the VERTICAL clearance — the same test, on the other axis: the headline
+    // commits to dark as the picture's top edge drops past its last line.
+    // A fixed progress window cannot work here, because how early the picture
+    // clears depends on how small the landing tile is (full width in one
+    // column, half width in the two-up phone grid).
+    const stackedCw = geo.geomFlip
+      ? 0
+      : clamp01((picTopPx - (headBottomPx - 30)) / 45 + 1);
+    const cw = Math.max(geomCw, stackedCw);
     const g = Math.round(lerp(255, 10, cw));
     head.style.color = `rgb(${g}, ${g}, ${g})`;
 

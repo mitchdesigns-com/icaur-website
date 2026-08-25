@@ -40,9 +40,8 @@ const driver = document.getElementById('mvDriver');
 /* chapter order — chA plays first, chB second (see header) */
 const chA    = document.getElementById('mvVision');
 const chB    = document.getElementById('mvMission');
-const mark   = document.getElementById('mvMark');
 const canvas = document.getElementById('mvCanvas');
-if (driver && chA && chB && mark && canvas) init();
+if (driver && chA && chB && canvas) init();
 
 function init() {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -279,13 +278,6 @@ function init() {
       const be = 1 - Math.pow(1 - arrive, 3);
       bg.style.transform = `translateY(${((1 - be) * 100).toFixed(2)}%)`;
     }
-
-    /* 1 — dash mark: centred, scales a little, blurs away */
-    const mUp  = seg(p, 0.00, 0.12);
-    const mOut = seg(p, 0.05, 0.12);
-    mark.style.opacity = (1 - mOut).toFixed(3);
-    mark.style.transform = `scale(${(1 + mUp * 0.4).toFixed(3)})`;
-    mark.style.filter = `blur(${(mOut * 14).toFixed(1)}px)`;
 
     /* 2 + 4 — chapters. Chapter B's words wait (wordsFrom 0.52 of its
        window ≈ p 0.79) until the car has dropped off the bridge edge. */

@@ -50,106 +50,6 @@
   height: 160vh;
   background: transparent;
 }
-/* PLASMA WASH — replaces the old speed-line road behind the Overview car.
-   Three oversized, heavily blurred colour blobs drifting on long offset
-   cycles; where they cross they read as slow plasma waves. Deliberately
-   faint — it should register as a warm shift in the light, not a graphic.
-   Transform-only animation, so it stays cheap. */
-/* FIXED at z0 — the same slot the old road layer used, i.e. UNDER the 3D
-   car canvas (z1) so the paint is never washed out. Other sections have
-   opaque backgrounds, so it only shows through the transparent Overview.
-   No fill of its own; only the blobs paint. */
-.v27-ov-plasma {
-  position: fixed; inset: 0; z-index: 0;
-  pointer-events: none; overflow: hidden;
-}
-.v27-ov-plasma span {
-  position: absolute; display: block;
-  border-radius: 50%;
-  filter: blur(90px);
-  will-change: transform;
-}
-/* Each blob travels a four-corner loop rather than an out-and-back, so the
-   wash never pauses or visibly reverses — it just keeps flowing. Linear
-   timing plus prime-ish periods (19/23/29s) means the three never resync. */
-.v27-ov-plasma span:nth-child(1) {
-  width: 60vw; height: 60vw; left: -8vw; top: -18vw;
-  background: radial-gradient(circle, rgba(243,112,33,.22), rgba(243,112,33,0) 68%);
-  animation: v27Plasma1 19s linear infinite;
-}
-.v27-ov-plasma span:nth-child(2) {
-  width: 55vw; height: 55vw; right: -10vw; top: 12vw;
-  background: radial-gradient(circle, rgba(224,169,109,.26), rgba(224,169,109,0) 68%);
-  animation: v27Plasma2 23s linear infinite;
-}
-.v27-ov-plasma span:nth-child(3) {
-  width: 48vw; height: 48vw; left: 26vw; bottom: -22vw;
-  background: radial-gradient(circle, rgba(164,128,94,.18), rgba(164,128,94,0) 70%);
-  animation: v27Plasma3 29s linear infinite;
-}
-@keyframes v27Plasma1 {
-  0%   { transform: translate3d(0, 0, 0) scale(1); }
-  25%  { transform: translate3d(7vw, 4vw, 0) scale(1.12); }
-  50%  { transform: translate3d(10vw, 10vw, 0) scale(1); }
-  75%  { transform: translate3d(3vw, 7vw, 0) scale(1.12); }
-  100% { transform: translate3d(0, 0, 0) scale(1); }
-}
-@keyframes v27Plasma2 {
-  0%   { transform: translate3d(0, 0, 0) scale(1.06); }
-  25%  { transform: translate3d(-6vw, 5vw, 0) scale(0.96); }
-  50%  { transform: translate3d(-9vw, -3vw, 0) scale(1.06); }
-  75%  { transform: translate3d(-3vw, -6vw, 0) scale(0.96); }
-  100% { transform: translate3d(0, 0, 0) scale(1.06); }
-}
-@keyframes v27Plasma3 {
-  0%   { transform: translate3d(0, 0, 0) scale(1); }
-  25%  { transform: translate3d(6vw, -5vw, 0) scale(1.14); }
-  50%  { transform: translate3d(-2vw, -9vw, 0) scale(1); }
-  75%  { transform: translate3d(-7vw, -3vw, 0) scale(1.14); }
-  100% { transform: translate3d(0, 0, 0) scale(1); }
-}
-
-/* ── Light threads ─────────────────────────────────────────────────
-   Thin amber streaks, each a soft-ended gradient line rotated 45° and
-   gliding along its OWN axis — light passing through, not a graphic
-   sitting there. All on the car half or in the extreme corners, and at
-   45° a streak leaves its corner instead of tracking across the page,
-   so none of them ever crosses the copy column. Each rides its own
-   duration/delay, so the field never repeats visibly. */
-.v27-ov-threads { position: absolute; inset: 0; }
-.v27-ov-threads i {
-  position: absolute; display: block;
-  height: 2px; border-radius: 2px;
-  background: linear-gradient(90deg,
-    rgba(243, 112, 33, 0),
-    rgba(243, 112, 33, var(--ta, .30)) 50%,
-    rgba(243, 112, 33, 0));
-  transform: rotate(var(--ang, -45deg)) translateX(var(--tx, 0));
-  animation: v27Thread var(--td, 12s) linear infinite;
-  animation-delay: var(--tdel, 0s);
-  will-change: transform, opacity;
-}
-/* the car half — long glides behind the model */
-.v27-ov-threads i:nth-child(1) { width: 34vw; left: 52%; top: 24%; --ta: .34; --td: 11s;  --tdel: -2s; }
-.v27-ov-threads i:nth-child(2) { width: 26vw; left: 66%; top: 55%; --ta: .26; --td: 14s;  --tdel: -9s; }
-.v27-ov-threads i:nth-child(3) { width: 40vw; left: 47%; top: 76%; --ta: .20; --td: 17s;  --tdel: -5s; }
-.v27-ov-threads i:nth-child(4) { width: 22vw; left: 80%; top: 12%; --ta: .30; --td: 12.5s; --tdel: -11s; }
-/* extreme corners, clear of the copy column */
-/* bottom-left corner runs at +45° — its diagonal heads DOWN-right, away
-   from the copy, where a -45° line from this corner would climb into it */
-.v27-ov-threads i:nth-child(5) { width: 16vw; left: -8%; top: 96%; --ang: 45deg; --ta: .24; --td: 15s; --tdel: -7s; }
-.v27-ov-threads i:nth-child(6) { width: 18vw; left: -4%; top: 6%;  --ta: .18; --td: 18s;  --tdel: -13s; }
-/* travel along the thread's own 45° axis: fade in, glide, fade out —
-   the fades make the loop's restart invisible */
-@keyframes v27Thread {
-  0%   { transform: rotate(var(--ang, -45deg)) translateX(-14vw); opacity: 0; }
-  16%  { opacity: 1; }
-  84%  { opacity: 1; }
-  100% { transform: rotate(var(--ang, -45deg)) translateX(14vw); opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .v27-ov-plasma span, .v27-ov-threads i { animation: none; }
-}
 .v27-hero-sticky {
   position: sticky; top: 0; height: 100vh;
   overflow: hidden;
@@ -279,17 +179,75 @@
 ══════════════════════════════════════════════════════ */
 #v27-overview {
   position: relative; z-index: 2;
-  height: 200vh;
+  /* height comes from the flow now: A (100vh) + A dwell + B (100vh) +
+     B dwell — the two spacers below are the choreography's runway */
   background: transparent; /* right half must stay transparent to show 3D canvas */
 }
 .v27-overview-sticky {
   position: sticky; top: 0; height: 100vh;
   display: flex; align-items: stretch;
   overflow: hidden;
+  /* under sheet B — A stays pinned for the WHOLE section, and B slides
+     up over it exactly like the reference's collection sheet */
+  z-index: 1;
 }
+/* A's dwell: a beat with the copy while the car starts its creep */
+.v27-ova-spacer { height: 50vh; }
+/* B's dwell: the sheet holds while the car rolls across it */
+.v27-ovb-spacer { height: 80vh; }
+
+/* ── SHEET B — the price, larger and centred ─────────────────
+   A full-face sticky (opaque, so it genuinely covers A) holding one big
+   cream card. The car rides IN FRONT of this sheet: body.v27-car-front
+   lifts the fixed canvas above the section for exactly this stretch. */
+.v27-ovb-sticky {
+  position: sticky; top: 0; height: 100vh; z-index: 2;
+  background: #ffffff;
+  display: grid; place-items: center;
+}
+.v27-ovb-sheet {
+  width: min(880px, 86vw);
+  background: var(--cream);
+  border-radius: 24px;
+  padding: clamp(48px, 9vh, 96px) clamp(28px, 5vw, 80px);
+  text-align: center;
+}
+.v27-ovb-row { display: block; }
+.v27-ovb-row + .v27-ovb-row { margin-top: clamp(18px, 3vh, 30px); }
+/* the sheet's message is the paragraph's SECOND HALF, stepped well up
+   from A's setting; the price sits under it at its ordinary size — the
+   line is the star, the number is just the fact */
+.v27-ovb-para {
+  font-size: clamp(1.45rem, 2.5vw, 2.15rem);
+  line-height: 1.55; font-weight: 500; color: #1F0F08;
+  max-width: 24ch; margin: 0 auto;
+}
+.v27-ovb-sheet .v27-ov-price-wrap { margin-bottom: 0; align-items: center; }
+
+/* ── ORANGE SIDE-MASK REVEAL ─────────────────────────────────
+   Each line is wrapped in a .v27-sweep: an orange bar wipes in from the
+   left covering the line, then wipes out to the right and the text is
+   unclipped behind it. js/v27.js scrubs both halves from sheet B's own
+   arrival, so the open is fast AND stays synced to the scroll. */
+.v27-sweep { position: relative; display: inline-block; overflow: hidden; vertical-align: top; }
+.v27-sweep__t { display: inline-block; clip-path: inset(0 100% 0 0); }
+.v27-sweep__bar {
+  position: absolute; inset: 0;
+  background: var(--orange);
+  transform: translateX(-101%);
+  border-radius: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .v27-sweep__t { clip-path: none !important; }
+  .v27-sweep__bar { display: none; }
+}
+
+/* the stretch where the car crosses sheet B: canvas above the section
+   (still pointer-events:none, so the brochure CTA stays clickable) —
+   phones run this permanently via their own rule further down */
+body.v27-car-front #v27-canvas-wrap { z-index: 3; }
 .v27-overview-inner {
-  /* above .v27-ov-plasma — a positioned z-index:0 sibling would otherwise
-     paint over this in-flow content */
+  /* sits above the fixed car canvas layer in the stacking order */
   position: relative; z-index: 1;
   width: 100%; display: grid;
   grid-template-columns: 44% 56%; gap: 0;
@@ -304,8 +262,31 @@
   background: transparent;
   pointer-events: none;
 }
+/* DESKTOP: the car is PARKED at the left edge (js/v27.js OV_PARK) and the
+   copy stands in the right half, set flush left — so the section reads
+   car → copy, and the left-to-right word load in the paragraph points the
+   eye from the model into the text. The markup keeps copy-first order for
+   reading; the grid mirrors it visually: spacer (car's lane) column 1,
+   copy column 2. ≤768px keeps its own stacked rules untouched. */
+@media (min-width: 769px) {
+  .v27-overview-inner {
+    grid-template-columns: 46% 54%;
+    align-items: center;
+  }
+  .v27-overview-right {
+    display: block;
+    grid-column: 1; grid-row: 1;   /* the car's lane — transparent */
+  }
+  .v27-overview-left {
+    grid-column: 2; grid-row: 1;
+    align-items: flex-start; text-align: left;
+    max-width: 640px; width: 100%;
+    padding-inline: clamp(24px, 3vw, 48px) var(--px);
+  }
+  .v27-ov-cta { align-self: flex-start; }
+}
 .v27-ov-cta {
-  align-self: flex-start;
+  align-self: center;
   width: auto !important;
 }
 .v27-ov-eyebrow {
@@ -322,10 +303,16 @@
   margin-bottom: clamp(20px, 2.6vh, 28px);
 }
 .v27-ov-para {
-  font-size: clamp(.82rem, 1.05vw, .94rem); line-height: 1.82;
+  /* stepped up to hold its own against the oversized car model */
+  font-size: clamp(1.15rem, 1.75vw, 1.6rem); line-height: 1.85;
   color: rgba(35, 24, 21, .6);
   margin-bottom: clamp(28px, 3.5vh, 38px);
 }
+/* Word spans — js/v27.js splits both overview paragraphs into these so
+   the elastic field (ovElastic) can push each word aside as the car
+   passes. No colour scrub any more: the words inherit their paragraph's
+   colour and simply move. */
+.v27-ov-w { display: inline-block; will-change: transform; }
 .v27-ov-divider {
   width: 100%; height: 1px;
   background: rgba(35, 24, 21, .1);
@@ -453,10 +440,11 @@
      swatches stay fully tappable underneath. */
   #v27-canvas-wrap { z-index: 3; }
 
-  /* Shorter section: the copy needs nowhere near a full screen here, and
-     200vh of scroll left the car floating in dead space. The sticky box
-     shrinks to fit its content and the driver's scroll length follows. */
-  #v27-overview { height: 150vh; }
+  /* Shorter runway on phones: the copy needs nowhere near a full screen,
+     and the desktop dwells left the car floating in dead space. */
+  .v27-ova-spacer { height: 26vh; }
+  .v27-ovb-spacer { height: 34vh; }
+  .v27-ovb-sheet { border-radius: 16px; }
   .v27-overview-sticky {
     align-items: stretch;
     height: auto; min-height: 82vh;
@@ -465,7 +453,7 @@
   .v27-overview-inner {
     grid-template-columns: 1fr;
     /* one row PER block — a shared row would stack them in the same cell */
-    grid-template-rows: auto auto 1fr auto auto auto;
+    grid-template-rows: auto auto 1fr;
     align-items: start;
     height: 100%;
     /* the gutter belongs to the CONTAINER, not the items: as per-item
@@ -478,15 +466,12 @@
   .v27-overview-left {
     display: contents;              /* children join the parent grid */
   }
+  /* price + CTA moved to sheet B, so A is just title → paragraph → car */
   .v27-ov-h2          { grid-row: 1; margin: 0 0 10px; }
   .v27-ov-para        { grid-row: 2; }
   .v27-overview-right { grid-row: 3; min-height: 34vh; }   /* the car's slot */
-  .v27-ov-divider     { grid-row: 4; margin: 0 0 14px; }
-  .v27-ov-price-wrap  { grid-row: 5; }
-  .v27-ov-cta         { grid-row: 6; }
 
-  .v27-ov-h2, .v27-ov-para, .v27-ov-divider,
-  .v27-ov-price-wrap, .v27-ov-cta {
+  .v27-ov-h2, .v27-ov-para {
     grid-column: 1;
     padding-inline: 0;
     max-width: none;
@@ -1442,4 +1427,16 @@
 
   /* ─── Charging section ─── */
   .v27-charging-top { grid-template-columns: 1fr; }
+}
+
+/* ── Eyebrows run LIGHT site-wide (see .eyebrow in styles.css): the bold
+   cut filled the brand's lowercase i into a capital-I slab. Same fix for
+   every V27 eyebrow variant — GothamMedium-led stack (Book read too
+   faint), weight to match. ── */
+.v27-ov-eyebrow, .v27-ext-eyebrow, .eg-eyebrow, .v27-about-eyebrow,
+.v27-gallery-eyebrow, .v27-interior-eyebrow, .v27-ct-eyebrow,
+.v27-sf-eyebrow, .v27-charging-eyebrow, .v27-trims-eyebrow,
+.v27-res-eyebrow {
+  font-family: 'GothamMedium', 'Montserrat', 'Futura', sans-serif;
+  font-weight: 600;
 }

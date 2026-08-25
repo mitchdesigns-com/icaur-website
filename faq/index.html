@@ -48,10 +48,43 @@
   <div class="faq-hero-shots" aria-hidden="true">
     <div class="faq-hero-shot faq-hero-shot--tall reveal reveal--up" data-delay="2"><img src="/assets/images/ICUAR V27 brochure 03 20.webp" alt="" loading="lazy"></div>
     <div class="faq-hero-shot faq-hero-shot--sq   reveal reveal--up" data-delay="4"><img src="/assets/images/v27-model-in-homepge-01.webp" alt="" loading="lazy"></div>
-    <div class="faq-hero-shot faq-hero-shot--wide reveal reveal--up" data-delay="6"><img src="/assets/images/Maintainance.webp" alt="" loading="lazy"></div>
     <div class="faq-hero-shot faq-hero-shot--wide reveal reveal--up" data-delay="3"><img src="/assets/images/about-hero.webp" alt="" loading="lazy"></div>
     <div class="faq-hero-shot faq-hero-shot--tall reveal reveal--up" data-delay="5"><img src="/assets/images/v27/car-side.webp" alt="" loading="lazy"></div>
-    <div class="faq-hero-shot faq-hero-shot--sq   reveal reveal--up" data-delay="6"><img src="/assets/images/v27/interior-display.webp" alt="" loading="lazy"></div>
+  </div>
+  <!-- The questions themselves, ringed in the side gutters — the page says
+       what it is before a word is read. Decorative: the real questions are
+       the accordion below, so this is aria-hidden.
+       THREE layers, each doing one job that would otherwise collide:
+         .faq-ask       anchor — position + .reveal (which animates transform)
+         .faq-ask__pill the 3D tilt AND the cursor magnet's --mx/--my
+         .faq-ask__ring a hand-drawn oval, stretched to whatever the word needs
+       The ring is an open, overshooting loop rather than a filled pill: a
+       solid one read as another filter button in the row below. -->
+  <div class="faq-asks" aria-hidden="true">
+    <div class="faq-ask faq-ask--1 reveal reveal--up" data-delay="3">
+      <span class="faq-ask__pill faq-ask__pill--amber" style="--rz:-7deg; --ry:16deg; --rx:5deg">
+        <svg class="faq-ask__ring" viewBox="0 0 120 56" preserveAspectRatio="none" aria-hidden="true"><path d="M98 12 C110 22 104 41 82 47 C60 53 26 51 13 41 C0 31 6 14 28 8 C48 3 80 3 101 15" vector-effect="non-scaling-stroke"/></svg>
+        <span class="faq-ask__t">How?</span>
+      </span>
+    </div>
+    <div class="faq-ask faq-ask--2 reveal reveal--up" data-delay="4">
+      <span class="faq-ask__pill faq-ask__pill--ink" style="--rz:6deg; --ry:-18deg; --rx:4deg">
+        <svg class="faq-ask__ring" viewBox="0 0 120 56" preserveAspectRatio="none" aria-hidden="true"><path d="M22 7 C6 15 2 33 20 42 C38 51 82 52 100 43 C118 34 114 15 96 8 C78 1 40 1 24 9" vector-effect="non-scaling-stroke"/></svg>
+        <span class="faq-ask__t">Why?</span>
+      </span>
+    </div>
+    <div class="faq-ask faq-ask--3 reveal reveal--up" data-delay="5">
+      <span class="faq-ask__pill faq-ask__pill--ink" style="--rz:5deg; --ry:13deg; --rx:-6deg">
+        <svg class="faq-ask__ring" viewBox="0 0 120 56" preserveAspectRatio="none" aria-hidden="true"><path d="M96 10 C112 19 110 39 88 46 C66 53 28 52 14 43 C0 34 3 15 25 8 C47 1 79 2 99 12" vector-effect="non-scaling-stroke"/></svg>
+        <span class="faq-ask__t">Where?</span>
+      </span>
+    </div>
+    <div class="faq-ask faq-ask--4 reveal reveal--up" data-delay="4">
+      <span class="faq-ask__pill faq-ask__pill--amber" style="--rz:-6deg; --ry:-14deg; --rx:-4deg">
+        <svg class="faq-ask__ring" viewBox="0 0 120 56" preserveAspectRatio="none" aria-hidden="true"><path d="M22 7 C6 15 2 33 20 42 C38 51 82 52 100 43 C118 34 114 15 96 8 C78 1 40 1 24 9" vector-effect="non-scaling-stroke"/></svg>
+        <span class="faq-ask__t">Can I?</span>
+      </span>
+    </div>
   </div>
   <div class="container" style="max-width:720px">
     <nav class="breadcrumb reveal reveal--up" data-delay="0" aria-label="Breadcrumb">
@@ -162,7 +195,7 @@
     <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
     <p class="cta-video__body">Your next car is waiting — let's get you behind the wheel.</p>
     <div class="cta-video__actions">
-      <a href="/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your iCAUR <span class="arrow">→</span></a>
+      <a href="/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your <span class="brand-name">iCAUR</span> <span class="arrow">→</span></a>
       <a href="/contact" class="btn btn--outline btn--arrow btn--magnetic">Contact Us <span class="arrow">→</span></a>
     </div>
   </div>
