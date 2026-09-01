@@ -1628,47 +1628,64 @@ function initOverviewScene() {
   const frame = document.getElementById('ovxFrame');
   if (!sec || !frame) return;
 
-  /* LINE masks: measure the paragraph's real wrapping (word offsetTop),
-     then rebuild it as one overflow-hidden strip per rendered line — the
-     classic line-mask reveal, immune to width changes because a resize
-     re-measures from the cached source text. */
+  /* LINE masks: measure the paragraph's REAL wrapping (word offsetTop),
+     then rebuild it as one overflow-hidden strip per rendered line.
+
+     Two things make this reliable rather than fragile:
+       · the copy's max-width is in vw, NOT a % of .ovx-frame — the frame
+         animates from (100vw-200px) to 100vw, so a %-based width made the
+         measured breaks re-wrap mid-scroll and stacked the paragraph into
+         broken half-lines (what the public link showed).
+       · measuring waits for document.fonts.ready: measuring against the
+         fallback face gives line breaks that are wrong for the real one.
+     A ResizeObserver re-measures on any genuine width change. */
   const buildLines = (el) => {
     const text = el.dataset.ovxText || (el.dataset.ovxText = el.textContent.trim());
     el.textContent = '';
-    const words = text.split(/\s+/).map((w) => {
+    const probes = text.split(/\s+/).map((w, i, arr) => {
       const sp = document.createElement('span');
-      sp.textContent = w;
-      sp.style.display = 'inline-block';
+      sp.textContent = w + (i < arr.length - 1 ? ' ' : '');
       el.appendChild(sp);
-      el.appendChild(document.createTextNode(' '));
       return sp;
     });
     const lines = [];
     let top = null, cur = [];
-    words.forEach((sp) => {
+    probes.forEach((sp) => {
       const t = sp.offsetTop;
-      if (top === null || Math.abs(t - top) < 3) { cur.push(sp.textContent); if (top === null) top = t; }
-      else { lines.push(cur.join(' ')); cur = [sp.textContent]; top = t; }
+      if (top === null) top = t;
+      if (Math.abs(t - top) < 3) cur.push(sp.textContent);
+      else { lines.push(cur.join('')); cur = [sp.textContent]; top = t; }
     });
-    if (cur.length) lines.push(cur.join(' '));
+    if (cur.length) lines.push(cur.join(''));
     el.textContent = '';
     return lines.map((l) => {
       const m = document.createElement('span'); m.className = 'ovx-line';
       const t = document.createElement('span'); t.className = 'ovx-line__t';
-      t.textContent = l; m.appendChild(t); el.appendChild(m);
+      t.textContent = l.trim(); m.appendChild(t); el.appendChild(m);
       return t;
     });
   };
+
   const paras = $$('#v27-overview [data-ovx-split]');
-  let leadWords  = paras[0] ? buildLines(paras[0]) : [];
-  let closeWords = paras[1] ? buildLines(paras[1]) : [];
-  let rebuildT = null;
+  let leadWords  = [];
+  let closeWords = [];
+  const remeasure = () => {
+    if (paras[0]) leadWords  = buildLines(paras[0]);
+    if (paras[1]) closeWords = buildLines(paras[1]);
+    ScrollTrigger.refresh();
+  };
+  remeasure();
+  /* the real font changes the breaks — rebuild once it is in */
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure);
+
+  /* width-driven rebuilds only: observing the paragraph itself would fire
+     on every reveal (its height changes), so watch a stable ancestor */
+  let lastW = window.innerWidth, rebuildT = null;
   window.addEventListener('resize', () => {
+    if (window.innerWidth === lastW) return;
+    lastW = window.innerWidth;
     clearTimeout(rebuildT);
-    rebuildT = setTimeout(() => {
-      if (paras[0]) leadWords  = buildLines(paras[0]);
-      if (paras[1]) closeWords = buildLines(paras[1]);
-    }, 150);
+    rebuildT = setTimeout(remeasure, 160);
   }, { passive: true });
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
