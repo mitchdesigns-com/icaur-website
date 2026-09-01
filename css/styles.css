@@ -174,9 +174,9 @@ small, .text-sm  { font-size: 14px; }
   border-radius: 0;
   margin-bottom: var(--sp-8);
 }
-/* The dash mark that used to sit before every eyebrow was removed
-   site-wide; eyebrows are now text only. (The standalone brand dashes —
-   .cta-video__dash, .vision__dash — are separate and stay.) */
+/* The dash mark is gone site-wide: it used to sit before every eyebrow,
+   and the standalone brand dashes (.cta-video__dash, .vision__dash) have
+   since been removed too. Eyebrows are text only. */
 .eyebrow--warm {
   color: var(--brown);
 }
@@ -3374,11 +3374,6 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
   pointer-events: none;
 }
 /* Brand dash motif above the headline */
-.cta-video__dash {
-  display: block; width: 38px; height: 10px;
-  background: url('../assets/images/dashes.svg') no-repeat center / contain;
-  margin-bottom: 10px;
-}
 .cta-video__h {
   font-family: var(--f-display);
   font-size: clamp(1.9rem, 3.4vw, 3.1rem);
@@ -4579,15 +4574,6 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
 @media (max-width: 560px) {
   .vision { padding: 28px var(--pad-x); gap: clamp(12px, 1.8vh, 20px); }
   .vision__img-stage { max-height: 26vh; }
-}
-
-/* Dash — plain flex item */
-.vision__dash {
-  display: block;
-  flex-shrink: 0;
-  width: 34px; height: 9px;
-  background: url('../assets/images/dashes.svg') no-repeat center / contain;
-  opacity: 0.6;
 }
 
 /* Title — above the image in flow */
