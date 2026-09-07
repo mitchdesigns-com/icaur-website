@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script>if(sessionStorage.getItem('pt-nav'))document.documentElement.classList.add('pt-entering');</script>
+  <link rel="icon" type="image/svg+xml" href="/icaur-website/assets/images/Favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="How iCAUR's intelligent cockpit learns your habits, predicts your needs, and makes every drive personal.">
+  <title>Inside the AI-Powered iCAUR Cabin — iCAUR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/icaur-website/css/styles.css">
+  <script src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
+    data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
+    data-endpoint="https://bugger-worker.mitchdesigns.workers.dev/functions/v1/ingest-feedback"
+    data-position="bottom-right" data-button-text="Feedback" data-accent="#4f46e5" async></script>
+</head>
+<body class="is-loading">
+
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+    <feBlend in="SourceGraphic" in2="grey" mode="multiply"/>
+  </filter>
+</svg>
+
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__dot" id="cursorDot"></div>
+  <div class="cursor__ring" id="cursorRing"></div>
+  <div class="cursor__label" id="cursorLabel"></div>
+</div>
+
+
+<div id="site-header"></div>
+
+<main id="main">
+
+<!-- ═══════ POST HERO ═══════ -->
+<section class="post-hero">
+  <div class="post-hero__inner">
+    <nav class="breadcrumb reveal reveal--up" data-delay="0" aria-label="Breadcrumb">
+      <a href="/icaur-website/">Home</a><span>›</span><a href="/icaur-website/news">Media Center</a><span>›</span><span aria-current="page">Article</span>
+    </nav>
+    <h1 class="post-hero__h reveal reveal--up" data-delay="1">Inside The AI-Powered<br>iCAUR Cabin</h1>
+    <div class="post-meta reveal reveal--up" data-delay="2">
+      <span class="post-meta__tag">Blog</span>
+      <span class="post-meta__dot">·</span>
+      <span>4 min read</span>
+      <span class="post-meta__dot">·</span>
+      <time datetime="2026-04-30">30 Apr 2026</time>
+      <div class="post-share" aria-label="Share article">
+        <a href="#" aria-label="Copy link"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></a>
+        <a href="#" aria-label="Share on LinkedIn"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg></a>
+        <a href="#" aria-label="Share on X"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ COVER IMAGE ═══════ -->
+<div class="post-cover reveal reveal--up">
+  <img src="/icaur-website/assets/images/v27/interior-display.webp" alt="iCAUR intelligent cabin display" loading="eager">
+</div>
+
+<!-- ═══════ ARTICLE BODY ═══════ -->
+<article class="post-body reveal reveal--up">
+
+  <h2>1. A Cabin That Learns</h2>
+  <p>Most car interiors respond to commands. The iCAUR cabin anticipates them. Over the first two weeks of ownership, the V27's onboard AI maps your driving patterns — your preferred cabin temperature, your most-used routes, your seat position, your music habits — and begins applying them automatically before you even ask.</p>
+  <p>This isn't novelty technology. It's the result of iCAUR's AI engineers spending two years asking one fundamental question: what does a car that genuinely knows its driver actually feel like?</p>
+
+  <div class="post-pullquote">
+    "The best interface is the one you forget exists."
+  </div>
+
+  <h2>2. The Display Architecture</h2>
+  <p>The V27's cabin centers on a 15.6-inch curved display that functions as the vehicle's primary interface. Unlike some competitors who use the display for everything — including basic controls — iCAUR maintains physical haptic buttons for the most frequently used functions: climate, volume, and seat memory. The display handles everything else.</p>
+  <p>The system runs iCAUR OS, a custom-built platform developed in collaboration with Egyptian software engineers. It loads in under two seconds from cold start, never asks for updates while driving, and remembers your last state instantly when you return to the car.</p>
+
+  <div class="post-img">
+    <img src="/icaur-website/assets/images/v27/interior-01.webp" alt="V27 interior overview" loading="lazy">
+  </div>
+
+  <h2>3. Driver Prediction In Practice</h2>
+  <p>Here's a real example of what driver prediction looks like: if you leave home for work at 8am on weekdays, the V27 will have your preferred cabin temperature set, your favourite morning playlist queued, and your route loaded with real-time traffic adjustments — all before you open the door.</p>
+  <p>It does this without any active input after the initial learning period. The system runs entirely on-device, with no personal data leaving the vehicle. Your habits stay yours.</p>
+
+  <h2>4. Arabic First</h2>
+  <p>iCAUR OS was designed Arabic-first — not translated. Voice commands, display menus, error messages, and navigation instructions all operate natively in Arabic, with English as a secondary language layer. This distinction matters: native Arabic support means the system understands Egyptian colloquial expressions, not just formal Modern Standard Arabic.</p>
+  <p>You can ask the car to "روح البيت" and it understands immediately. No spelling it out. No switching language modes. Just speak, and the car responds.</p>
+
+  <h2>5. The Experience</h2>
+  <p>The iCAUR cabin doesn't feel like technology for technology's sake. It feels like a space that was designed around how Egyptians actually live — the heat, the traffic, the music, the language. That's what makes it different. Not the specs, but the fit.</p>
+
+</article>
+
+<!-- ═══════ READ ALSO ═══════ -->
+<section class="post-read-also">
+  <div class="post-read-also__inner">
+    <h3>Read Also</h3>
+    <div class="post-read-also__grid">
+
+      <article class="news-card reveal reveal--up" data-delay="0">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type news-card__type--blog">Blog</span>
+            <div class="news-card__date-loc"><time datetime="2026-05-20">May 20, 2026</time></div>
+          </div>
+          <h4>Electric Wiring Matrix Optimized for Egypt</h4>
+        </div>
+        <a href="/icaur-website/news/electric-wiring" class="news-card__img" data-cursor-label="Read">
+          <img src="/icaur-website/assets/images/v27/car-side.webp" alt="Electric Wiring Matrix" loading="lazy" width="400" height="250">
+        </a>
+        <div class="news-card__body">
+          <p>How iCAUR's engineers rebuilt the EV powertrain for Egypt's unique climate and roads.</p>
+          <footer><a href="/icaur-website/news/electric-wiring" class="btn btn--dark btn--sm btn--arrow">Read <span class="arrow">→</span></a></footer>
+        </div>
+      </article>
+
+      <article class="news-card reveal reveal--up" data-delay="1">
+        <div class="news-card__header">
+          <div class="news-card__meta-row">
+            <span class="news-card__type news-card__type--blog">Blog</span>
+            <div class="news-card__date-loc"><time datetime="2026-03-28">Mar 28, 2026</time></div>
+          </div>
+          <h4>The V23: Designing for the City</h4>
+        </div>
+        <a href="/icaur-website/news/v23-design" class="news-card__img" data-cursor-label="Read">
+          <img src="/icaur-website/assets/images/v27-23.webp" alt="V23 Design" loading="lazy" width="400" height="250">
+        </a>
+        <div class="news-card__body">
+          <p>A deeper look at the design choices behind iCAUR's more urban model — sleek proportions and bold surfaces.</p>
+          <footer><a href="/icaur-website/news/v23-design" class="btn btn--dark btn--sm btn--arrow">Read <span class="arrow">→</span></a></footer>
+        </div>
+      </article>
+
+    </div>
+
+    <div style="text-align:center;margin-top:48px">
+      <a href="/icaur-website/news" class="btn btn--ghost btn--lg btn--magnetic">View All <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="/icaur-website/js/components.js" defer></script>
+<script src="/icaur-website/js/main.js" defer></script>
+  <script src="/icaur-website/js/transitions.js" defer></script>
+<script src="/icaur-website/js/game.js" defer></script>
+</body>
+</html>

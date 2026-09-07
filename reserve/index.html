@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script>if(sessionStorage.getItem('pt-nav'))document.documentElement.classList.add('pt-entering');</script>
+  <link rel="icon" type="image/svg+xml" href="/icaur-website/assets/images/Favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Reserve your iCAUR — Secure your V27 or O3T with a fully refundable deposit today.">
+  <title>Reserve — iCAUR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/icaur-website/css/styles.css">
+</head>
+<body class="is-loading dark-hero-page">
+
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+    <feBlend in="SourceGraphic" in2="grey" mode="multiply"/>
+  </filter>
+</svg>
+
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__dot" id="cursorDot"></div>
+  <div class="cursor__ring" id="cursorRing"></div>
+  <div class="cursor__label" id="cursorLabel"></div>
+</div>
+
+<div id="site-header"></div>
+
+<main id="main">
+
+<!-- ═══════ RESERVE — SPLIT LAYOUT ═══════ -->
+<section class="rv-section" id="reserve">
+
+  <!-- Parallax background image -->
+  <div class="rv-bg" aria-hidden="true" id="rvBg"></div>
+  <div class="rv-overlay" aria-hidden="true"></div>
+
+  <div class="rv-layout">
+
+    <!-- LEFT: Hero copy -->
+    <div class="rv-left reveal reveal--up">
+      <h1 class="rv-h1">Reserve<br>Your <em>iCAUR</em></h1>
+      <p class="rv-sub">Secure your spot and our team will guide you through every step toward owning your iCAUR.</p>
+    </div>
+
+    <!-- RIGHT: Form card -->
+    <div class="rv-right reveal reveal--up" data-delay="1">
+
+      <div class="rv-card">
+
+        <!-- Eyebrow above form -->
+        <p class="eyebrow rv-eyebrow rv-card-eyebrow">Your Next Drive Starts Here</p>
+
+        <!-- Model chooser -->
+        <div class="rv-block">
+          <p class="rv-block-label">Choose Model</p>
+          <div class="rv-models" role="radiogroup" aria-label="Select a model">
+
+            <label class="rv-model">
+              <input type="radio" name="rv-model" value="v27" checked aria-label="V27">
+              <div class="rv-model-img-wrap">
+                <img src="/icaur-website/assets/images/v27-model-in-homepge-01.webp" alt="iCAUR V27" loading="eager">
+                <div class="rv-model-overlay" aria-hidden="true"></div>
+                <img src="/icaur-website/assets/images/V27-logo.svg" alt="V27" class="rv-model-logo">
+                <span class="rv-model-dot" aria-hidden="true">
+                  <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor"/></svg>
+                </span>
+              </div>
+            </label>
+
+            <label class="rv-model">
+              <input type="radio" name="rv-model" value="o3t" aria-label="O3T">
+              <div class="rv-model-img-wrap">
+                <img src="/icaur-website/assets/images/ot3-model-in-homepage-01.webp" alt="iCAUR O3T" loading="eager">
+                <div class="rv-model-overlay" aria-hidden="true"></div>
+                <img src="/icaur-website/assets/images/T03-logo.svg" alt="O3T" class="rv-model-logo">
+                <span class="rv-model-dot" aria-hidden="true">
+                  <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor"/></svg>
+                </span>
+              </div>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="rv-divider"></div>
+
+        <!-- Form -->
+        <form id="rvForm" class="rv-form" novalidate>
+
+          <div class="rv-row">
+            <div class="rv-field" id="rvf-first">
+              <label class="rv-label" for="rv-first">First Name</label>
+              <input class="rv-input" id="rv-first" type="text" required autocomplete="given-name">
+            </div>
+            <div class="rv-field" id="rvf-last">
+              <label class="rv-label" for="rv-last">Last Name</label>
+              <input class="rv-input" id="rv-last" type="text" required autocomplete="family-name">
+            </div>
+          </div>
+
+          <div class="rv-field" id="rvf-email">
+            <label class="rv-label" for="rv-email">Email Address</label>
+            <input class="rv-input" id="rv-email" type="email" required autocomplete="email">
+          </div>
+
+          <div class="rv-field" id="rvf-phone">
+            <label class="rv-label" for="rv-phone">Phone Number</label>
+            <input class="rv-input" id="rv-phone" type="tel" autocomplete="tel">
+          </div>
+
+          <!-- Showroom dropdown -->
+          <div class="rv-select-wrap" id="rvf-showroom">
+            <span class="rv-select-label">Choose Showroom</span>
+            <select class="rv-select" id="rv-showroom">
+              <option value="" disabled selected></option>
+              <option value="new-cairo">New Cairo — Qattamya</option>
+              <option value="sheikh-zayed">Sheikh Zayed</option>
+              <option value="maadi">Maadi, Cairo</option>
+              <option value="6th-october">6th of October</option>
+            </select>
+            <span class="rv-select-arrow" aria-hidden="true">
+              <svg width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+
+          <button type="submit" class="rv-submit">Submit Your Interest</button>
+          <p class="rv-terms">By submitting you agree to our <a href="/icaur-website/terms">Terms &amp; Conditions</a></p>
+
+        </form>
+
+      </div><!-- /rv-card -->
+    </div><!-- /rv-right -->
+
+  </div><!-- /rv-layout -->
+</section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script>
+(function () {
+  /* ── Parallax background ── */
+  var bg = document.getElementById('rvBg');
+  if (bg) {
+    window.addEventListener('scroll', function () {
+      bg.style.transform = 'translateY(' + (window.scrollY * 0.35).toFixed(1) + 'px)';
+    }, { passive: true });
+  }
+
+  /* ── Floating labels ── */
+  document.querySelectorAll('.rv-field').forEach(function (wrap) {
+    var inp = wrap.querySelector('.rv-input');
+    if (!inp) return;
+    function refresh() {
+      wrap.classList.toggle('is-active', inp.value.length > 0 || document.activeElement === inp);
+    }
+    inp.addEventListener('input', refresh);
+    inp.addEventListener('focus', refresh);
+    inp.addEventListener('blur', refresh);
+    refresh();
+  });
+
+  /* ── Showroom dropdown floating label ── */
+  var showroomWrap = document.getElementById('rvf-showroom');
+  var showroomSel  = document.getElementById('rv-showroom');
+  if (showroomWrap && showroomSel) {
+    showroomSel.addEventListener('change', function () {
+      showroomWrap.classList.toggle('is-active', showroomSel.value !== '');
+    });
+  }
+
+  /* ── Compact dropdown — same mechanism (and the same global
+        .rs-select-panel / .rs-select-opt styles) as the contact form:
+        a tabindex="-1" hit-button over the native select opens a small
+        rounded panel under the field for mouse users; the real <select>
+        stays the source of truth and keyboard/AT behaviour is untouched. */
+  if (showroomWrap && showroomSel) (function () {
+    var openPanel = null;
+
+    function closePanel() {
+      if (!openPanel) return;
+      var p = openPanel;
+      p.classList.remove('is-open');
+      setTimeout(function () { if (p.parentNode) p.parentNode.removeChild(p); }, 160);
+      hit.setAttribute('aria-expanded', 'false');
+      openPanel = null;
+    }
+
+    var hit = document.createElement('button');
+    hit.type = 'button';
+    hit.className = 'rs-select-hit';
+    hit.tabIndex = -1;
+    hit.setAttribute('aria-hidden', 'true');
+    hit.setAttribute('aria-expanded', 'false');
+    showroomWrap.appendChild(hit);
+
+    hit.addEventListener('click', function () {
+      if (openPanel) { closePanel(); return; }
+      var panel = document.createElement('div');
+      panel.className = 'rs-select-panel';
+      panel.setAttribute('role', 'listbox');
+
+      Array.prototype.filter.call(showroomSel.options, function (o) { return o.value !== ''; })
+        .forEach(function (o) {
+          var row = document.createElement('div');
+          row.className = 'rs-select-opt' + (o.value === showroomSel.value ? ' is-selected' : '');
+          row.setAttribute('role', 'option');
+          row.textContent = o.textContent;
+          row.addEventListener('click', function () {
+            showroomSel.value = o.value;
+            showroomSel.dispatchEvent(new Event('change', { bubbles: true }));
+            closePanel();
+          });
+          panel.appendChild(row);
+        });
+
+      document.body.appendChild(panel);
+
+      var r  = hit.getBoundingClientRect();
+      var vh = window.innerHeight;
+      var spaceBelow = vh - r.bottom;
+      var openUp = spaceBelow < 200 && r.top > spaceBelow;
+
+      panel.style.left  = r.left + 'px';
+      panel.style.width = r.width + 'px';
+      if (openUp) {
+        panel.classList.add('rs-select-panel--up');
+        panel.style.bottom    = (vh - r.top + 6) + 'px';
+        panel.style.maxHeight = Math.max(120, r.top - 12) + 'px';
+      } else {
+        panel.style.top       = (r.bottom + 6) + 'px';
+        panel.style.maxHeight = Math.max(120, spaceBelow - 12) + 'px';
+      }
+
+      requestAnimationFrame(function () { panel.classList.add('is-open'); });
+      hit.setAttribute('aria-expanded', 'true');
+      openPanel = panel;
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!openPanel || openPanel.contains(e.target) || e.target === hit) return;
+      closePanel();
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePanel(); });
+    window.addEventListener('scroll', closePanel, { passive: true });
+    window.addEventListener('resize', closePanel, { passive: true });
+  })();
+
+  /* ── Form submit ── */
+  var form = document.getElementById('rvForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      form.innerHTML = '<div class="rv-success"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><h3>Request Received</h3><p>Our team will be in touch with you shortly.</p></div>';
+    });
+  }
+})();
+</script>
+
+<script src="/icaur-website/js/components.js" defer></script>
+<script src="/icaur-website/js/main.js" defer></script>
+<script src="/icaur-website/js/transitions.js" defer></script>
+<script src="/icaur-website/js/game.js" defer></script>
+</body>
+</html>

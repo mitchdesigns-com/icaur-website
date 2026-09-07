@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script>if(sessionStorage.getItem('pt-nav'))document.documentElement.classList.add('pt-entering');</script>
+  <link rel="icon" type="image/svg+xml" href="/icaur-website/assets/images/Favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="About iCAUR — Egypt's next-generation EV company. Our story, mission, and values.">
+  <title>About — iCAUR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/icaur-website/css/styles.css">
+
+  <!-- Three.js importmap — for the mission/vision car crossing (js/about-mv.js) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/",
+      "meshopt_decoder": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/libs/meshopt_decoder.module.js"
+    }
+  }
+  </script>
+
+  <script
+  src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
+  data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
+  data-endpoint="https://bugger-worker.mitchdesigns.workers.dev/functions/v1/ingest-feedback"
+  data-position="bottom-right"
+  data-button-text="Feedback"
+  data-accent="#4f46e5"
+  async></script>
+</head>
+<body class="is-loading">
+
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+    <feBlend in="SourceGraphic" in2="grey" mode="multiply"/>
+  </filter>
+</svg>
+
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__dot" id="cursorDot"></div>
+  <div class="cursor__ring" id="cursorRing"></div>
+  <div class="cursor__label" id="cursorLabel"></div>
+</div>
+
+
+
+<div id="site-header"></div>
+
+<main id="main">
+
+<!-- ═══════ HERO — spotlight reveal (same as the service heroes) ═══════ -->
+<section class="spot-hero spot-hero--video" id="hero">
+  <!-- One video in full colour; .spot-hero__reveal is a masked dim layer
+       over it. Two videos (base + reveal) would drift out of sync and the
+       flashlight would show a different frame than the surrounding image. -->
+  <video class="spot-hero__video" id="aboutHeroVideo"
+         src="https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev/about-hero.mp4"
+         poster="/assets/images/about-hero.webp"
+         autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+  <div class="spot-hero__reveal" aria-hidden="true"></div>
+  <div class="spot-hero__shade" aria-hidden="true"></div>
+  <script>
+    /* The video is remote, so the first autoplay attempt can fire before
+       enough has buffered. Nudge it once it's playable. */
+    (function () {
+      var v = document.getElementById('aboutHeroVideo');
+      if (!v) return;
+      var tryPlay = function () { var p = v.play(); if (p) p.catch(function () {}); };
+      if (v.paused) tryPlay();
+      ['loadeddata', 'canplay'].forEach(function (e) {
+        v.addEventListener(e, function () { if (v.paused) tryPlay(); });
+      });
+    })();
+  </script>
+
+  <div class="spot-hero__head">
+    <p class="eyebrow eyebrow--warm spot-anim spot-anim--fade" style="animation-delay:.1s">Our Story</p>
+    <h1 class="spot-hero__h">
+      <span class="spot-l1 spot-anim spot-anim--reveal" style="animation-delay:.25s">A New Generation</span>
+      <span class="spot-l2 spot-anim spot-anim--reveal" style="animation-delay:.42s"><em>Automotive</em></span>
+    </h1>
+    <p class="spot-hero__sub spot-anim spot-anim--fade" style="animation-delay:.6s">Smarter mobility. Bolder design. Real-world freedom.</p>
+  </div>
+</section>
+
+<!-- ═══════ OVERVIEW → iCAUR STORY — horizontal run ═══════
+     Same engine as the homepage services section (initSvcScroll in
+     js/main.js): the intro reads, then the track slides sideways through
+     the story panels while every image parallaxes inside its own window.
+     Replaces the old pinned car scene — the driving 3D model is gone. -->
+<div class="svc-driver" id="aboutDriver">
+<section class="svc" id="aboutScene">
+  <div class="svc__track" id="aboutTrack">
+
+    <!-- 0 · Overview -->
+    <div class="svc__panel svc__panel--intro">
+      <div class="svc__intro-inner">
+        <div class="svc__headgroup" id="aboutHeadGroup">
+          <p class="eyebrow svc__eyebrow">Overview</p>
+          <h2 class="svc__headline" id="aboutHeadline">The Future<br>Feels <em>Different</em></h2>
+        </div>
+        <!-- plain text on purpose: initSvcScroll splits this into words and
+             lights them one by one, so inline markup would be discarded -->
+        <p class="svc__sub">Bold design. Advanced technology. Built for the young, and the young at heart.</p>
+      </div>
+    </div>
+
+    <!-- 1 · Born to break the mold -->
+    <article class="svc__panel svc__panel--feature">
+      <figure class="svc__media svc__media--lg">
+        <img src="/icaur-website/assets/images/about-hero.webp" alt="iCAUR V27 on the open road" loading="lazy" data-par="0.10">
+      </figure>
+      <div class="svc__body">
+        <span class="svc__num">Our Story</span>
+        <h3 class="svc__title">Born to <em>Break the Mold</em></h3>
+        <p class="svc__text">iCAUR started from a simple refusal — that an electric car has to look and drive like everything else on the road. Rugged character, smart technology and lifestyle-first thinking come together in vehicles built for people who would rather stand out than blend in.</p>
+      </div>
+    </article>
+
+    <!-- small cluster -->
+    <div class="svc__panel svc__panel--cluster" aria-hidden="true">
+      <figure class="svc__media svc__media--sm svc__media--sm-a">
+        <img src="/icaur-website/assets/images/v27/interior-display.webp" alt="" loading="lazy" data-par="0.18">
+      </figure>
+      <figure class="svc__media svc__media--sm svc__media--sm-b">
+        <img src="/icaur-website/assets/images/ICUAR V27 brochure 03 18.webp" alt="" loading="lazy" data-par="-0.12">
+      </figure>
+    </div>
+
+    <!-- 2 · Engineered for Egypt (mirrored) -->
+    <article class="svc__panel svc__panel--feature svc__panel--flip">
+      <figure class="svc__media svc__media--lg">
+        <img src="/icaur-website/assets/images/iCAUR INTL_V27 REV_cam027 copy.webp" alt="iCAUR V27 engineered for Egyptian roads" loading="lazy" data-par="0.10">
+      </figure>
+      <div class="svc__body">
+        <span class="svc__num">Made to Stand Out</span>
+        <h3 class="svc__title">The Heat. The Dust. The <em>Drama</em>.</h3>
+        <p class="svc__text">Every iCAUR is engineered for the roads it actually has to survive. Three years of research and testing on real Egyptian roads — from Cairo traffic to the open dunes — shaped a car built to last, and born to turn heads.</p>
+        <a href="/icaur-website/reserve" class="btn btn--dark btn--sm btn--arrow btn--magnetic">Get Your <span class="brand-name">iCAUR</span> <span class="arrow">→</span></a>
+      </div>
+    </article>
+
+  </div>
+</section>
+</div>
+
+<!-- ═══════ BRAND FIGURES ═══════ -->
+<section class="section about-figures" id="figures" data-dotfield>
+  <div class="container">
+    <div class="figures-grid">
+      <div class="figure reveal reveal--up" data-delay="0">
+        <span class="figure__num" data-count-to="200" data-suffix="+">0</span>
+        <span class="figure__label">Engineers &amp; Designers</span>
+        <span class="figure__sub">All based in Egypt, building for Egypt.</span>
+      </div>
+      <div class="figure reveal reveal--up" data-delay="1">
+        <span class="figure__num" data-count-to="3" data-suffix="+">0</span>
+        <span class="figure__label">Years of R&amp;D</span>
+        <span class="figure__sub">Prototyping and testing on real roads.</span>
+      </div>
+      <div class="figure reveal reveal--up" data-delay="2">
+        <span class="figure__num" data-count-to="2">0</span>
+        <span class="figure__label">Groundbreaking Models</span>
+        <span class="figure__sub">V27 and O3T — two distinct personalities.</span>
+      </div>
+      <div class="figure reveal reveal--up" data-delay="3">
+        <span class="figure__num" data-count-to="100" data-suffix="%">0</span>
+        <span class="figure__label">Made in Egypt</span>
+        <span class="figure__sub">Designed, engineered, and assembled locally.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ VISION + MISSION — statement scroll + car crossing ═══════
+     Two-chapter scroll-scrubbed sequence (js/about-mv.js), after the
+     serverobotics.com reference: the brand dash mark opens centred,
+     scales + blurs away; the VISION title and statement build; then
+     the carbon-black V27 GLB drives in from the right, crosses the
+     stage and stops facing the camera; the MISSION title appears, the
+     car tips over the "bridge edge" and drives straight down while
+     shrinking; the mission statement then builds over it and the car
+     parks small in top view beneath. Every value is a pure function of
+     scroll progress → fully reversible (DOM order = chapter order, so
+     the reduced-motion fallback reads Vision → Mission too). -->
+<div class="mv-driver" id="mvDriver">
+<section class="mv" id="missionSection" aria-label="Our vision and mission">
+  <!-- The black stage itself: js/about-mv.js slides this sheet up over the
+       stats section as the chapter arrives, so the dark scene ENTERS rather
+       than cutting in on a hard edge. -->
+  <div class="mv__bg" id="mvBg" aria-hidden="true"></div>
+  <div class="mv__stage">
+
+    <canvas id="mvCanvas" aria-hidden="true"></canvas>
+
+    <div class="mv__panel mv__panel--vision" id="mvVision">
+      <div class="mv__inner">
+        <h2 class="mv__title">Our <em>Vision</em></h2>
+        <p class="mv__statement" data-mv-split>To put Egypt on the <span class="mv-chip" aria-hidden="true"><img src="/icaur-website/assets/images/about-hero.webp" alt="" loading="lazy"></span> <em>global stage</em> of electric mobility — engineering vehicles <span class="mv-chip" aria-hidden="true"><img src="/icaur-website/assets/images/v27/car-side.webp" alt="" loading="lazy"></span> that don't just compete with the world's best, but <em>define what's next</em> for an entire generation.</p>
+      </div>
+    </div>
+
+    <div class="mv__panel mv__panel--mission" id="mvMission">
+      <div class="mv__inner">
+        <h2 class="mv__title">Our <em>Mission</em></h2>
+        <p class="mv__statement" data-mv-split>We exist to put <em>Egypt</em> <span class="mv-chip" aria-hidden="true"><img src="/icaur-website/assets/images/ICUAR V27 brochure 03 20.webp" alt="" loading="lazy"></span> on the global <em>EV map</em> — engineering world-class electric vehicles <span class="mv-chip" aria-hidden="true"><img src="/icaur-website/assets/images/v27/interior-display.webp" alt="" loading="lazy"></span> at home, for the heat, the highways, and the people who drive them.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+</div>
+
+<!-- ═══════ BRAND VALUES — interactive (client A1) ═══════ -->
+<section class="section usp-list usp-list--dark" id="values">
+  <div class="container usp-list__wrap">
+    <p class="eyebrow eyebrow--warm reveal reveal--up">What We Stand For</p>
+    <h2 class="section-title section-title--light reveal reveal--up" data-delay="1">Built Different. On Purpose.</h2>
+
+    <div class="usp-list__stack" id="uspStack">
+      <!-- core values: the word alone (amber → white on hover) and the
+           preview image swap; no hover caption pill here -->
+      <div class="usp-row" tabindex="0" data-img="/assets/images/v27/v27-26.webp">
+        <span class="usp-row__title">Daring</span>
+      </div>
+      <div class="usp-row" tabindex="0" data-img="/assets/images/v27/interior-display.webp">
+        <span class="usp-row__title">Self-Expressive</span>
+      </div>
+      <div class="usp-row" tabindex="0" data-img="/assets/images/about-hero.webp">
+        <span class="usp-row__title">Freedom</span>
+      </div>
+    </div>
+
+    <!-- Hover image preview — one fixed spot: section centre, left gutter -->
+    <!-- src matches the first .usp-row's data-img so the idle preview is
+         correct before JS runs (initUspList keeps it in sync after that) -->
+    <div class="usp-preview" id="uspPreview" aria-hidden="true">
+      <img src="/icaur-website/assets/images/v27/v27-26.webp" alt="" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ CTA ═══════ -->
+<section class="cta-video" id="cta">
+  <video class="cta-video__bg" src="/icaur-website/assets/images/CTA-bg.webm" poster="/assets/images/CTA.webp" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+  <div class="cta-video__overlay" aria-hidden="true"></div>
+  <div class="cta-video__glass reveal reveal--up">
+    <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
+    <p class="cta-video__body">Your next car is waiting — let's get you behind the wheel and show you what electric really means.</p>
+    <div class="cta-video__actions">
+      <a href="/icaur-website/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your <span class="brand-name">iCAUR</span> <span class="arrow">→</span></a>
+      <a href="/icaur-website/contact" class="btn btn--outline btn--arrow btn--magnetic">Contact Us <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="site-footer"></div>
+
+  <script src="/icaur-website/js/components.js" defer></script>
+  <script src="/icaur-website/js/main.js" defer></script>
+  <script src="/icaur-website/js/transitions.js" defer></script>
+  <script src="/icaur-website/js/game.js" defer></script>
+  <script src="/icaur-website/js/about-car.js" defer></script>
+  <script src="/icaur-website/js/dot-field.js" defer></script>
+  <script src="/icaur-website/js/doodles.js" defer></script>
+  <script src="/icaur-website/js/about-thread.js" defer></script>
+  <!-- about-mv.js drives the Mission/Vision statement choreography; its
+       car rendering is switched off inside the module (MV_CAR = false)
+       so the 3D model appears only in the Overview/Story scene. -->
+  <script type="module" src="/icaur-website/js/about-mv.js"></script>
+</body>
+</html>

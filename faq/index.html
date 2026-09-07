@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script>if(sessionStorage.getItem('pt-nav'))document.documentElement.classList.add('pt-entering');</script>
+  <link rel="icon" type="image/svg+xml" href="/icaur-website/assets/images/Favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="iCAUR FAQs — Answers to your most common questions about iCAUR vehicles, reservations, warranty, and services.">
+  <title>FAQs — iCAUR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/icaur-website/css/styles.css">
+  <script src="https://feedback-widget.mitchdesigns.workers.dev/widget.js"
+    data-ingest-key="pk_45fe8548cf2370887b3de70a9d752080"
+    data-endpoint="https://bugger-worker.mitchdesigns.workers.dev/functions/v1/ingest-feedback"
+    data-position="bottom-right" data-button-text="Feedback" data-accent="#4f46e5" async></script>
+</head>
+<body class="is-loading">
+
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <filter id="grain-filter" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+    <feBlend in="SourceGraphic" in2="grey" mode="multiply"/>
+  </filter>
+</svg>
+
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__dot" id="cursorDot"></div>
+  <div class="cursor__ring" id="cursorRing"></div>
+  <div class="cursor__label" id="cursorLabel"></div>
+</div>
+
+
+<div id="site-header"></div>
+
+<main id="main">
+
+<!-- ═══════ HERO + CATEGORY FILTERS — one section ═══════
+     The filter chips live INSIDE the hero so the scattered photo cards sit
+     beside both. Cards are straight (no tilt), a mix of landscape, square
+     and portrait frames, positioned to stay FULLY inside the section — no
+     card is ever clipped by an edge. Hover: a very small lift. -->
+<section class="faq-page-hero">
+  <!-- Each card is a FRAME (the reveal rides the frame) holding its photo;
+       js/main.js pans the photo softly inside the frame under the cursor -->
+  <div class="faq-hero-shots" aria-hidden="true">
+    <div class="faq-hero-shot faq-hero-shot--tall reveal reveal--up" data-delay="2"><img src="/icaur-website/assets/images/ICUAR V27 brochure 03 20.webp" alt="" loading="lazy"></div>
+    <div class="faq-hero-shot faq-hero-shot--sq   reveal reveal--up" data-delay="4"><img src="/icaur-website/assets/images/v27-model-in-homepge-01.webp" alt="" loading="lazy"></div>
+    <div class="faq-hero-shot faq-hero-shot--wide reveal reveal--up" data-delay="3"><img src="/icaur-website/assets/images/about-hero.webp" alt="" loading="lazy"></div>
+    <div class="faq-hero-shot faq-hero-shot--tall reveal reveal--up" data-delay="5"><img src="/icaur-website/assets/images/v27/car-side.webp" alt="" loading="lazy"></div>
+  </div>
+  <!-- The questions themselves, ringed in the side gutters — the page says
+       what it is before a word is read. Decorative: the real questions are
+       the accordion below, so this is aria-hidden.
+       THREE layers, each doing one job that would otherwise collide:
+         .faq-ask       anchor — position + .reveal (which animates transform)
+         .faq-ask__pill the 3D tilt AND the cursor magnet's --mx/--my
+         .faq-ask__ring a hand-drawn oval, stretched to whatever the word needs
+       The ring is an open, overshooting loop rather than a filled pill: a
+       solid one read as another filter button in the row below. -->
+  <div class="faq-asks" aria-hidden="true">
+    <div class="faq-ask faq-ask--1 reveal reveal--up" data-delay="3">
+      <span class="faq-ask__pill faq-ask__pill--amber" style="--rz:-7deg; --ry:16deg; --rx:5deg">
+        <svg class="faq-ask__ring" viewBox="0 0 120 56" preserveAspectRatio="none" aria-hidden="true"><path d="M98 12 C110 22 104 41 82 47 C60 53 26 51 13 41 C0 31 6 14 28 8 C48 3 80 3 101 15" vector-effect="non-scaling-stroke"/></svg>
+        <span class="faq-ask__t">How?</span>
+      </span>
+    </div>
+    <div class="faq-ask faq-ask--2 reveal reveal--up" data-delay="4">
+      <span class="faq-ask__pill faq-ask__pill--ink" style="--rz:6deg; --ry:-18deg; --rx:4deg">
+        <svg class="faq-ask__ring" viewBox="0 0 120 56" preserveAspectRatio="none" aria-hidden="true"><path d="M22 7 C6 15 2 33 20 42 C38 51 82 52 100 43 C118 34 114 15 96 8 C78 1 40 1 24 9" vector-effect="non-scaling-stroke"/></svg>
+        <span class="faq-ask__t">Why?</span>
+      </span>
+    </div>
+    <div class="faq-ask faq-ask--3 reveal reveal--up" data-delay="5">
+      <span class="faq-ask__pill faq-ask__pill--ink" style="--rz:5deg; --ry:13deg; --rx:-6deg">
+        <svg class="faq-ask__ring" viewBox="0 0 120 56" preserveAspectRatio="none" aria-hidden="true"><path d="M96 10 C112 19 110 39 88 46 C66 53 28 52 14 43 C0 34 3 15 25 8 C47 1 79 2 99 12" vector-effect="non-scaling-stroke"/></svg>
+        <span class="faq-ask__t">Where?</span>
+      </span>
+    </div>
+    <div class="faq-ask faq-ask--4 reveal reveal--up" data-delay="4">
+      <span class="faq-ask__pill faq-ask__pill--amber" style="--rz:-6deg; --ry:-14deg; --rx:-4deg">
+        <svg class="faq-ask__ring" viewBox="0 0 120 56" preserveAspectRatio="none" aria-hidden="true"><path d="M22 7 C6 15 2 33 20 42 C38 51 82 52 100 43 C118 34 114 15 96 8 C78 1 40 1 24 9" vector-effect="non-scaling-stroke"/></svg>
+        <span class="faq-ask__t">Can I?</span>
+      </span>
+    </div>
+  </div>
+  <div class="container" style="max-width:720px">
+    <nav class="breadcrumb reveal reveal--up" data-delay="0" aria-label="Breadcrumb">
+      <a href="/icaur-website/">Home</a><span>›</span><span aria-current="page">FAQs</span>
+    </nav>
+    <p class="eyebrow reveal reveal--up" data-delay="1">Knowledge Base</p>
+    <h1 class="reveal reveal--up" data-delay="2">Frequently Asked<br><em style="font-style:normal;color:var(--amber)">Questions</em></h1>
+    <p class="reveal reveal--up" data-delay="3">Got questions? We've got answers about your iCAUR journey.</p>
+  </div>
+  <div class="faq-cat-filters">
+    <button class="faq-cat-btn is-active" data-cat="all">All FAQs</button>
+    <button class="faq-cat-btn" data-cat="sales">Sales</button>
+    <button class="faq-cat-btn" data-cat="warranty">Warranty</button>
+    <button class="faq-cat-btn" data-cat="services">Services</button>
+    <button class="faq-cat-btn" data-cat="spare-parts">Spare Parts</button>
+  </div>
+</section>
+
+<!-- ═══════ FAQ BODY ═══════ -->
+<div class="faq-page-body">
+  <div class="container" style="max-width:800px">
+
+    <!-- Sales -->
+    <div class="faq-group" data-group="sales">
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">How far does V27 go?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>The V27 delivers 500 km of real-world range on a single charge. That's enough to get you across Egypt without breaking a sweat — even with AC on in summer.</p></div></div>
+      </div>
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">How do I place a reservation?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>Visit our <a href="/icaur-website/reserve" style="color:var(--brown)">Reserve page</a> and complete the form. A fully-refundable deposit of 50,000 EGP secures your place — no commitment until you're ready to finalize your order.</p></div></div>
+      </div>
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">Is the deposit refundable?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>Yes — 100%. Your reservation deposit is fully refundable at any time before final order confirmation, no questions asked.</p></div></div>
+      </div>
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">What's the starting price?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>The V27 starts from 1,800,000 EGP and the V23 from 2,100,000 EGP. Exact pricing varies by trim level. Contact our team for a full quote tailored to your configuration.</p></div></div>
+      </div>
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">Can I schedule a test drive?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>Absolutely. Test drives are available at all three showroom locations. Book via the <a href="/icaur-website/contact" style="color:var(--brown)">contact form</a> or visit any iCAUR showroom directly.</p></div></div>
+      </div>
+    </div>
+
+    <!-- Warranty -->
+    <div class="faq-group" data-group="warranty">
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">What warranty comes standard?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>Every iCAUR comes with a comprehensive 5-year / 150,000 km bumper-to-bumper warranty, plus an 8-year / 200,000 km battery warranty. Extended plans are available.</p></div></div>
+      </div>
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">Does the warranty cover battery degradation?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>Yes. If your battery drops below 70% of its original capacity within the 8-year warranty period, iCAUR will repair or replace it at no charge.</p></div></div>
+      </div>
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">Can I transfer the warranty if I sell the car?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>Yes. All iCAUR warranties are fully transferable to subsequent owners within the coverage period, adding significant resale value to your vehicle.</p></div></div>
+      </div>
+    </div>
+
+    <!-- Services -->
+    <div class="faq-group" data-group="services">
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">How long to charge fully?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>Using a DC fast charger (150 kW), the V27 reaches 80% in approximately 28 minutes. A full charge via standard AC (22 kW) takes around 4 hours overnight — perfect for home charging.</p></div></div>
+      </div>
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">Can I charge at home?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>Yes. iCAUR provides a home charging unit with every vehicle purchase. Our team will assess your home and handle the installation — typically completed within 3–5 business days.</p></div></div>
+      </div>
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">Is there a test drive available?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>Yes. All three iCAUR showrooms offer test drives 7 days a week. Book online via the contact form, or simply walk in during business hours.</p></div></div>
+      </div>
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">How do I book a service appointment?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>Use the iCAUR mobile app to schedule maintenance in seconds. You can also call your nearest service center or visit our <a href="/icaur-website/contact" style="color:var(--brown)">contact page</a> to book online.</p></div></div>
+      </div>
+    </div>
+
+    <!-- Spare Parts -->
+    <div class="faq-group" data-group="spare-parts">
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">Are iCAUR spare parts available in Egypt?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>Yes. iCAUR maintains a comprehensive local parts inventory across all authorized service centers in Egypt. Most common parts can be sourced within 24–48 hours.</p></div></div>
+      </div>
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">Can I use third-party parts?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>We strongly recommend using genuine iCAUR parts for all repairs to maintain your warranty and optimal performance. Third-party parts may void warranty coverage for affected systems.</p></div></div>
+      </div>
+      <div class="faq-item reveal reveal--up" role="listitem">
+        <button type="button" class="faq-item__q" aria-expanded="false">How long does a parts order take?<span class="faq-item__plus" aria-hidden="true">+</span></button>
+        <div class="faq-item__a" aria-hidden="true"><div><p>Standard parts from our local inventory ship same day. Specialty or non-stocked items typically arrive within 5–10 business days from our regional distribution center.</p></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════ CTA SPLIT ═══════ -->
+<section class="cta-video" id="cta">
+  <video class="cta-video__bg" src="/icaur-website/assets/images/CTA-bg.webm" poster="/assets/images/CTA.webp" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
+  <div class="cta-video__overlay" aria-hidden="true"></div>
+  <div class="cta-video__glass reveal reveal--up">
+    <h2 class="cta-video__h">Ready For The <em>Next Step</em></h2>
+    <p class="cta-video__body">Your next car is waiting — let's get you behind the wheel.</p>
+    <div class="cta-video__actions">
+      <a href="/icaur-website/reserve" class="btn btn--filled btn--lg btn--arrow btn--magnetic">Reserve Your <span class="brand-name">iCAUR</span> <span class="arrow">→</span></a>
+      <a href="/icaur-website/contact" class="btn btn--outline btn--arrow btn--magnetic">Contact Us <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script>
+// Category filter
+document.querySelectorAll('.faq-cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.faq-cat-btn').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    const cat = btn.dataset.cat;
+    document.querySelectorAll('.faq-group').forEach(g => {
+      g.style.display = (cat === 'all' || g.dataset.group === cat) ? '' : 'none';
+    });
+  });
+});
+
+// FAQ accordion (one open at a time) is handled globally in /js/main.js
+</script>
+
+<script src="/icaur-website/js/components.js" defer></script>
+<script src="/icaur-website/js/main.js" defer></script>
+  <script src="/icaur-website/js/transitions.js" defer></script>
+<script src="/icaur-website/js/game.js" defer></script>
+</body>
+</html>
