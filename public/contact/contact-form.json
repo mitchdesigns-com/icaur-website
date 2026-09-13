@@ -1,0 +1,335 @@
+{
+  "name": "icaur-contact-form",
+  "version": "1.0.0",
+  "description": "Portable spec of the iCAUR contact form: shared fields plus three request types (General Inquiry, Test Drive, Book Maintenance) that swap the contextual fields. Field ids/names match the reference markup in contact/index.html so the two stay comparable.",
+  "locale": "en",
+  "submit": { "label": "SUBMIT", "id": "rsSubmitBtn" },
+
+  "requestTypes": [
+    { "id": "inquiry", "label": "General Inquiry", "default": false, "deepLink": null },
+    { "id": "testdrive", "label": "Test Drive", "default": true, "deepLink": "?tab=test-drive" },
+    { "id": "maintenance", "label": "Book Maintenance", "default": false, "deepLink": "?tab=maintenance" }
+  ],
+  "requestTypeUi": {
+    "control": "chips",
+    "role": "tablist",
+    "note": "One chip active at a time. Switching a chip shows that type's panel fields and its variant of the 'location' field; every other field is shared."
+  },
+
+  "sharedFields": [
+    {
+      "id": "salutation",
+      "name": "rs-salutation",
+      "label": "Salutation",
+      "type": "radio",
+      "required": false,
+      "width": "full",
+      "options": [
+        { "value": "mr", "label": "Mr." },
+        { "value": "mrs", "label": "Mrs." }
+      ]
+    },
+    {
+      "id": "firstName",
+      "name": "rs-first",
+      "label": "First Name",
+      "type": "text",
+      "required": true,
+      "autocomplete": "given-name",
+      "width": "half",
+      "row": "name"
+    },
+    {
+      "id": "lastName",
+      "name": "rs-last",
+      "label": "Last Name",
+      "type": "text",
+      "required": true,
+      "autocomplete": "family-name",
+      "width": "half",
+      "row": "name"
+    },
+    {
+      "id": "phone",
+      "name": "rs-phone",
+      "label": "Phone Number",
+      "type": "tel",
+      "required": false,
+      "autocomplete": "tel",
+      "width": "half",
+      "row": "contact"
+    },
+    {
+      "id": "location",
+      "label": "Varies by request type",
+      "type": "select",
+      "required": false,
+      "width": "half",
+      "row": "contact",
+      "ui": { "control": "custom-dropdown" },
+      "variantBy": "requestType",
+      "variants": {
+        "inquiry": {
+          "name": "rs-city",
+          "label": "City",
+          "options": [
+            { "value": "cairo", "label": "Cairo" },
+            { "value": "giza", "label": "Giza" },
+            { "value": "alexandria", "label": "Alexandria" },
+            { "value": "new-cairo", "label": "New Cairo" },
+            { "value": "6th-october", "label": "6th of October" },
+            { "value": "sheikh-zayed", "label": "Sheikh Zayed" },
+            { "value": "mansoura", "label": "Mansoura" },
+            { "value": "tanta", "label": "Tanta" },
+            { "value": "assiut", "label": "Assiut" },
+            { "value": "luxor", "label": "Luxor" },
+            { "value": "aswan", "label": "Aswan" },
+            { "value": "hurghada", "label": "Hurghada" },
+            { "value": "port-said", "label": "Port Said" },
+            { "value": "suez", "label": "Suez" }
+          ]
+        },
+        "testdrive": {
+          "name": "rs-showroom",
+          "label": "Showroom",
+          "options": [
+            { "value": "qattamya", "label": "Qattamya Heights — New Cairo" },
+            { "value": "zayed", "label": "Sheikh Zayed — 6th of October" },
+            { "value": "maadi", "label": "Maadi Center — Maadi" }
+          ]
+        },
+        "maintenance": {
+          "name": "rs-centre",
+          "label": "Service Center",
+          "options": [
+            { "value": "qattamya", "label": "Qattamya Heights — New Cairo" },
+            { "value": "newcairo", "label": "North Teseen Center — Fifth Settlement" },
+            { "value": "maadi", "label": "Maadi Center — Maadi" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "email",
+      "name": "rs-email",
+      "label": "Email Address",
+      "type": "email",
+      "required": true,
+      "autocomplete": "email",
+      "width": "full"
+    }
+  ],
+
+  "panels": {
+    "inquiry": [
+      {
+        "id": "category",
+        "name": "rs-category",
+        "label": "Request Category",
+        "type": "select",
+        "required": false,
+        "width": "half",
+        "row": "category",
+        "ui": { "control": "custom-dropdown" },
+        "options": [
+          { "value": "inquiry", "label": "Inquiry" },
+          { "value": "complaint", "label": "Complaint" }
+        ]
+      },
+      {
+        "id": "subcategory",
+        "name": "rs-subcategory",
+        "label": "Sub-category",
+        "type": "select",
+        "required": false,
+        "width": "half",
+        "row": "category",
+        "ui": { "control": "custom-dropdown" },
+        "disabledUntil": "category",
+        "dependsOn": {
+          "field": "category",
+          "labelByValue": {
+            "inquiry": "Inquiry Type",
+            "complaint": "Complaint Type"
+          },
+          "optionsByValue": {
+            "inquiry": [
+              { "value": "service-follow-up", "label": "Service Follow Up" },
+              { "value": "after-sales-general-info", "label": "After Sales General Info" },
+              { "value": "spare-parts-inquiry", "label": "Spare Parts Inquiry" },
+              { "value": "sales", "label": "Sales" }
+            ],
+            "complaint": [
+              { "value": "after-sales-complaint", "label": "After Sales Complaint" },
+              { "value": "spare-parts-complaint", "label": "Spare Parts Complaint" },
+              { "value": "sales-complaint", "label": "Sales Complaint" }
+            ]
+          }
+        }
+      }
+    ],
+
+    "testdrive": [
+      {
+        "id": "model",
+        "name": "rs-td-model",
+        "label": "Model",
+        "type": "select",
+        "required": false,
+        "width": "half",
+        "row": "model-date",
+        "ui": { "control": "custom-dropdown" },
+        "options": [
+          { "value": "v27", "label": "iCAUR V27" },
+          { "value": "o3t", "label": "iCAUR O3T" }
+        ]
+      },
+      {
+        "id": "preferredDate",
+        "name": "rs-td-date",
+        "label": "Preferred Date",
+        "type": "date",
+        "required": false,
+        "width": "half",
+        "row": "model-date",
+        "validation": { "min": "today" },
+        "ui": {
+          "control": "custom-datepicker",
+          "displayFormat": "D MMM YYYY",
+          "valueFormat": "YYYY-MM-DD",
+          "icon": "calendar",
+          "note": "Native date text hidden; a calendar panel opens under the field, matching the dropdown behaviour."
+        }
+      },
+      {
+        "id": "preferredTime",
+        "name": "rs-td-time",
+        "label": "Preferred Time",
+        "type": "select",
+        "required": false,
+        "width": "half",
+        "row": "time-license",
+        "ui": { "control": "custom-dropdown" },
+        "options": [
+          { "value": "10-12", "label": "10:00 — 12:00" },
+          { "value": "12-14", "label": "12:00 — 14:00" },
+          { "value": "14-16", "label": "14:00 — 16:00" },
+          { "value": "16-18", "label": "16:00 — 18:00" }
+        ]
+      },
+      {
+        "id": "drivingLicense",
+        "name": "rs-td-license",
+        "label": "Driving License",
+        "type": "select",
+        "required": false,
+        "width": "half",
+        "row": "time-license",
+        "ui": { "control": "custom-dropdown" },
+        "options": [
+          { "value": "yes", "label": "I hold a valid license" },
+          { "value": "no", "label": "Not yet" }
+        ]
+      }
+    ],
+
+    "maintenance": [
+      {
+        "id": "model",
+        "name": "rs-mt-model",
+        "label": "Model",
+        "type": "select",
+        "required": false,
+        "width": "half",
+        "row": "model-service",
+        "ui": { "control": "custom-dropdown" },
+        "options": [
+          { "value": "v27", "label": "iCAUR V27" },
+          { "value": "o3t", "label": "iCAUR O3T" }
+        ]
+      },
+      {
+        "id": "serviceType",
+        "name": "rs-mt-type",
+        "label": "Service Type",
+        "type": "select",
+        "required": false,
+        "width": "half",
+        "row": "model-service",
+        "ui": { "control": "custom-dropdown" },
+        "options": [
+          { "value": "periodic", "label": "Periodic Maintenance" },
+          { "value": "repair", "label": "Repair" },
+          { "value": "bodywork", "label": "Body & Paint" },
+          { "value": "warranty", "label": "Warranty Claim" },
+          { "value": "other", "label": "Other" }
+        ]
+      },
+      {
+        "id": "mileage",
+        "name": "rs-mt-mileage",
+        "label": "Current Mileage (km)",
+        "type": "number",
+        "required": false,
+        "width": "half",
+        "row": "mileage-date",
+        "inputmode": "numeric",
+        "validation": { "min": 0, "step": 1 }
+      },
+      {
+        "id": "preferredDate",
+        "name": "rs-mt-date",
+        "label": "Preferred Date",
+        "type": "date",
+        "required": false,
+        "width": "half",
+        "row": "mileage-date",
+        "validation": { "min": "today" },
+        "ui": {
+          "control": "custom-datepicker",
+          "displayFormat": "D MMM YYYY",
+          "valueFormat": "YYYY-MM-DD",
+          "icon": "calendar"
+        }
+      }
+    ]
+  },
+
+  "trailingFields": [
+    {
+      "id": "message",
+      "name": "rs-message",
+      "label": "Message",
+      "type": "textarea",
+      "required": false,
+      "width": "full",
+      "rows": 3
+    },
+    {
+      "id": "channels",
+      "name": "rs-channel",
+      "label": "Please select preferred communication channel",
+      "type": "checkbox-group",
+      "required": false,
+      "width": "full",
+      "multiple": true,
+      "options": [
+        { "value": "phone-call", "label": "Phone Call", "checked": true },
+        { "value": "email", "label": "Email", "checked": true },
+        { "value": "sms", "label": "SMS", "checked": true }
+      ]
+    }
+  ],
+
+  "fieldOrder": {
+    "note": "Render sharedFields, then the active request type's panel fields, then trailingFields. Fields sharing a 'row' value sit side by side in a two-column grid; 'full' width fields span both columns.",
+    "sequence": ["sharedFields", "panels[activeRequestType]", "trailingFields"]
+  },
+
+  "uiConventions": {
+    "floatingLabels": "Labels rest inside the field and spring up (smaller, uppercase, letterspaced) on focus or when filled.",
+    "customDropdown": "Native <select> stays the source of truth for keyboard/AT; a hit target above it opens a small rounded panel under the field for mouse users. Selected option is amber with a dot.",
+    "customDatepicker": "Same pattern as the dropdown: native date text hidden, calendar panel opens under the field. Past dates disabled, today outlined, selected day is a solid amber chip.",
+    "accent": "#F37021"
+  }
+}

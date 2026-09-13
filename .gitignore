@@ -1,3 +1,15 @@
-assets/images/abouticaurhomepage.mp4
-assets/images/abouticaurhomepage.mp4
+# Next.js
+.next/
+out/
+node_modules/
+
+# OS / editor
+.DS_Store
+*.fuse_hidden*
+
+# Local env
+.env
+.env*.local
+
+# Original large videos (kept out of git as before)
 assets/images/abouticaurhomepage.mp4

@@ -1,0 +1,111 @@
+<main id="main">
+
+<!-- ═══════ RESERVE — SPLIT LAYOUT ═══════ -->
+<section class="rv-section" id="reserve">
+
+  <!-- Parallax background image -->
+  <div class="rv-bg" aria-hidden="true" id="rvBg"></div>
+  <div class="rv-overlay" aria-hidden="true"></div>
+
+  <div class="rv-layout">
+
+    <!-- LEFT: Hero copy -->
+    <div class="rv-left reveal reveal--up">
+      <h1 class="rv-h1">Reserve<br>Your <em>iCAUR</em></h1>
+      <p class="rv-sub">Secure your spot and our team will guide you through every step toward owning your iCAUR.</p>
+    </div>
+
+    <!-- RIGHT: Form card -->
+    <div class="rv-right reveal reveal--up" data-delay="1">
+
+      <div class="rv-card">
+
+        <!-- Eyebrow above form -->
+        <p class="eyebrow rv-eyebrow rv-card-eyebrow">Your Next Drive Starts Here</p>
+
+        <!-- Model chooser -->
+        <div class="rv-block">
+          <p class="rv-block-label">Choose Model</p>
+          <div class="rv-models" role="radiogroup" aria-label="Select a model">
+
+            <label class="rv-model">
+              <input type="radio" name="rv-model" value="v27" checked aria-label="V27">
+              <div class="rv-model-img-wrap">
+                <img src="/assets/images/v27-model-in-homepge-01.webp" alt="iCAUR V27" loading="eager">
+                <div class="rv-model-overlay" aria-hidden="true"></div>
+                <img src="/assets/images/V27-logo.svg" alt="V27" class="rv-model-logo">
+                <span class="rv-model-dot" aria-hidden="true">
+                  <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor"/></svg>
+                </span>
+              </div>
+            </label>
+
+            <label class="rv-model">
+              <input type="radio" name="rv-model" value="o3t" aria-label="O3T">
+              <div class="rv-model-img-wrap">
+                <img src="/assets/images/ot3-model-in-homepage-01.webp" alt="iCAUR O3T" loading="eager">
+                <div class="rv-model-overlay" aria-hidden="true"></div>
+                <img src="/assets/images/T03-logo.svg" alt="O3T" class="rv-model-logo">
+                <span class="rv-model-dot" aria-hidden="true">
+                  <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor"/></svg>
+                </span>
+              </div>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="rv-divider"></div>
+
+        <!-- Form -->
+        <form id="rvForm" class="rv-form" novalidate>
+
+          <div class="rv-row">
+            <div class="rv-field" id="rvf-first">
+              <label class="rv-label" for="rv-first">First Name</label>
+              <input class="rv-input" id="rv-first" type="text" required autocomplete="given-name">
+            </div>
+            <div class="rv-field" id="rvf-last">
+              <label class="rv-label" for="rv-last">Last Name</label>
+              <input class="rv-input" id="rv-last" type="text" required autocomplete="family-name">
+            </div>
+          </div>
+
+          <div class="rv-field" id="rvf-email">
+            <label class="rv-label" for="rv-email">Email Address</label>
+            <input class="rv-input" id="rv-email" type="email" required autocomplete="email">
+          </div>
+
+          <div class="rv-field" id="rvf-phone">
+            <label class="rv-label" for="rv-phone">Phone Number</label>
+            <input class="rv-input" id="rv-phone" type="tel" autocomplete="tel">
+          </div>
+
+          <!-- Showroom dropdown -->
+          <div class="rv-select-wrap" id="rvf-showroom">
+            <span class="rv-select-label">Choose Showroom</span>
+            <select class="rv-select" id="rv-showroom">
+              <option value="" disabled selected></option>
+              <option value="new-cairo">New Cairo — Qattamya</option>
+              <option value="sheikh-zayed">Sheikh Zayed</option>
+              <option value="maadi">Maadi, Cairo</option>
+              <option value="6th-october">6th of October</option>
+            </select>
+            <span class="rv-select-arrow" aria-hidden="true">
+              <svg width="12" height="7" viewBox="0 0 12 7" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+
+          <button type="submit" class="rv-submit">Submit Your Interest</button>
+          <p class="rv-terms">By submitting you agree to our <a href="/terms">Terms &amp; Conditions</a></p>
+
+        </form>
+
+      </div><!-- /rv-card -->
+    </div><!-- /rv-right -->
+
+  </div><!-- /rv-layout -->
+</section>
+
+</main>

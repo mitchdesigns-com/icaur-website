@@ -1,0 +1,157 @@
+<main id="main">
+
+<!-- ═══════ HERO — reuses the FAQ page-hero pattern (eyebrow + h1 +
+     short tagline, centered, no breadcrumb) so every plain listing
+     page in the site opens the same way ═══════ -->
+<section class="faq-page-hero news-hero" id="hero">
+  <div class="container" style="max-width:720px">
+    <p class="eyebrow reveal reveal--up" data-delay="0" style="justify-content:center">Newsroom</p>
+    <h1 class="reveal reveal--up" data-delay="1">Media Center</h1>
+    <p class="reveal reveal--up" data-delay="2">The latest from iCAUR — news, stories, and updates.</p>
+  </div>
+</section>
+
+<!-- ═══════ FILTERS ═══════ -->
+<section class="section news-filters" id="filters" style="padding:0">
+  <div class="container">
+    <nav class="news-filters__inner" aria-label="Article categories">
+      <button class="filter-btn is-active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="blog">Blog</button>
+      <button class="filter-btn" data-filter="news">News</button>
+      <button class="filter-btn" data-filter="event">Event</button>
+    </nav>
+  </div>
+</section>
+
+<!-- ═══════ FEATURED — now sits under the filters instead of above them ═══════ -->
+<section class="section news-featured-section" id="featured">
+  <div class="container">
+    <div class="news-featured reveal reveal--up" data-delay="1">
+      <a class="news-featured__img" href="/news/electric-wiring" data-cursor-label="Read">
+        <img src="/assets/images/iCAUR INTL_V27 REV_cam025.webp" alt="iCAUR V27 Studio Design Revealed" loading="eager" width="800" height="500">
+      </a>
+      <div class="news-featured__text">
+        <div class="news-featured__meta">
+          <span class="news-featured__tag">News</span>
+          <time datetime="2026-05-28">May 28, 2026</time>
+        </div>
+        <h2 style="margin-bottom:var(--sp-8)">iCAUR V27 Studio Design Revealed</h2>
+        <p style="font-size:16px;line-height:1.75;color:var(--text-mid);margin-bottom:var(--sp-12)">A first look at the design philosophy behind Egypt's most anticipated electric vehicle — how proportions, surfaces, and intent come together into one bold statement.</p>
+        <a href="/news/electric-wiring" class="btn btn--dark btn--arrow btn--magnetic">Read Article <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section news-grid-full" id="articles" style="padding-top:var(--sp-24)">
+  <div class="container">
+    <div class="media-grid">
+      <article class="media-card media-card--tile" data-category="blog">
+        <a href="/news/electric-wiring" class="media-card__img" data-cursor-label="Read">
+          <img src="/assets/images/v27/car-side.webp" alt="Electric Wiring Matrix" loading="lazy" width="400" height="250">
+        </a>
+        <div class="media-card__meta">
+          <span class="media-card__type media-card__type--blog">Blog</span>
+          <time datetime="2026-05-20">May 20, 2026</time>
+        </div>
+        <h4 class="media-card__title">Electric Wiring Matrix Optimized for Egypt</h4>
+      </article>
+
+      <article class="media-card media-card--tile" data-category="event">
+        <a href="/news/electric-wiring" class="media-card__img" data-cursor-label="Read">
+          <img src="/assets/images/ICUAR V27 brochure 03 20.webp" alt="Test Drive: The Wanderer Campaign" loading="lazy" width="400" height="250">
+        </a>
+        <div class="media-card__meta">
+          <span class="media-card__type media-card__type--event">Event</span>
+          <time datetime="2026-05-12">May 12, 2026</time>
+        </div>
+        <h4 class="media-card__title">Test Drive: The Wanderer Campaign</h4>
+      </article>
+
+      <article class="media-card media-card--tile" data-category="blog">
+        <a href="/news/electric-wiring" class="media-card__img" data-cursor-label="Read">
+          <img src="/assets/images/v27/interior-display.webp" alt="AI Cabin Technology" loading="lazy" width="400" height="250">
+        </a>
+        <div class="media-card__meta">
+          <span class="media-card__type media-card__type--blog">Blog</span>
+          <time datetime="2026-04-30">Apr 30, 2026</time>
+        </div>
+        <h4 class="media-card__title">Inside the AI-Powered iCAUR Cabin</h4>
+      </article>
+
+      <article class="media-card media-card--tile" data-category="news">
+        <a href="/news/electric-wiring" class="media-card__img" data-cursor-label="Read">
+          <img src="/assets/images/iCAUR INTL_V27 REV_cam027 copy.webp" alt="Egypt's EV Future" loading="lazy" width="400" height="250">
+        </a>
+        <div class="media-card__meta">
+          <span class="media-card__type">News</span>
+          <time datetime="2026-04-14">Apr 14, 2026</time>
+        </div>
+        <h4 class="media-card__title">Egypt's Electric Future Starts in 2026</h4>
+      </article>
+
+      <article class="media-card media-card--tile" data-category="blog">
+        <a href="/news/electric-wiring" class="media-card__img" data-cursor-label="Read">
+          <img src="/assets/images/v27-23.webp" alt="V23 Design Language" loading="lazy" width="400" height="250">
+        </a>
+        <div class="media-card__meta">
+          <span class="media-card__type media-card__type--blog">Blog</span>
+          <time datetime="2026-03-28">Mar 28, 2026</time>
+        </div>
+        <h4 class="media-card__title">The V23: Designing for the City</h4>
+      </article>
+
+      <article class="media-card media-card--tile" data-category="blog">
+        <a href="/news/electric-wiring" class="media-card__img" data-cursor-label="Read">
+          <img src="/assets/images/v27/interior-01.webp" alt="iCAUR Battery Technology" loading="lazy" width="400" height="250">
+        </a>
+        <div class="media-card__meta">
+          <span class="media-card__type media-card__type--blog">Blog</span>
+          <time datetime="2026-03-10">Mar 10, 2026</time>
+        </div>
+        <h4 class="media-card__title">Built for Egypt's Heat: Our Battery Story</h4>
+      </article>
+
+      <article class="media-card media-card--tile" data-category="news">
+        <a href="/news/battery-tech" class="media-card__img" data-cursor-label="Read">
+          <img src="/assets/images/v27/interior-01.webp" alt="Battery technology" loading="lazy" width="400" height="250">
+        </a>
+        <div class="media-card__meta">
+          <span class="media-card__type">News</span>
+          <time datetime="2026-03-10">Mar 10, 2026</time>
+        </div>
+        <h4 class="media-card__title">Inside the Battery Pack Built for Heat</h4>
+      </article>
+
+      <article class="media-card media-card--tile" data-category="event">
+        <a href="/news/wanderer-campaign" class="media-card__img" data-cursor-label="Read">
+          <img src="/assets/images/ICUAR V27 brochure 03 23.webp" alt="Showroom opening" loading="lazy" width="400" height="250">
+        </a>
+        <div class="media-card__meta">
+          <span class="media-card__type media-card__type--event">Event</span>
+          <time datetime="2026-02-22">Feb 22, 2026</time>
+        </div>
+        <h4 class="media-card__title">New Flagship Showroom Opens in Cairo</h4>
+      </article>
+
+      <article class="media-card media-card--tile" data-category="blog">
+        <a href="/news/egypt-ev-future" class="media-card__img" data-cursor-label="Read">
+          <img src="/assets/images/iCAUR INTL_V27 REV_cam026 copy.webp" alt="Charging network" loading="lazy" width="400" height="250">
+        </a>
+        <div class="media-card__meta">
+          <span class="media-card__type media-card__type--blog">Blog</span>
+          <time datetime="2026-01-30">Jan 30, 2026</time>
+        </div>
+        <h4 class="media-card__title">Mapping Egypt's Fast-Charging Network</h4>
+      </article>
+    </div>
+
+    <!-- Load more -->
+    <div style="text-align:center;margin-top:var(--sp-32)" class="reveal reveal--up">
+      <button class="btn btn--ghost btn--lg btn--magnetic">Load More Articles</button>
+    </div>
+  </div>
+</section>
+
+
+</main>

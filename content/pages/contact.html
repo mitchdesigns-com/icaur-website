@@ -1,0 +1,340 @@
+<main id="main">
+
+<!-- ═══════ CONTACT FORM ═══════ -->
+<section class="rs-section" id="contact">
+  <div class="rs-bg" aria-hidden="true"></div>
+  <div class="rs-card reveal reveal--up">
+
+    <!-- LEFT — headline + contact details -->
+    <div class="rs-left">
+      <p class="eyebrow rs-eyebrow">Get In Touch</p>
+      <h2 class="rs-headline">Let's <em>Talk.</em></h2>
+      <p class="rs-tagline">Whether you're ready to reserve, have questions, or just want to learn more — our team is here for you.</p>
+
+      <div class="rs-contact-links">
+        <a href="tel:17833" class="rs-contact-link">
+          <span class="rs-contact-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.86a16 16 0 0 0 5.98 5.98l.95-.95a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </span>
+          <span class="rs-contact-text">17833</span>
+        </a>
+        <a href="mailto:hello@icauregypt.com" class="rs-contact-link">
+          <span class="rs-contact-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </span>
+          <span class="rs-contact-text">hello@icauregypt.com</span>
+        </a>
+      </div>
+
+      <!-- Fills the space the taller form leaves under the contact details,
+           bleeding to the card's edges rather than floating in the padding -->
+      <figure class="rs-left-media">
+        <img src="/assets/images/contact-us.webp"
+             alt="A customer smiling while holding an EV charging connector"
+             loading="lazy" decoding="async">
+      </figure>
+
+    </div>
+
+    <!-- RIGHT — chips + form -->
+    <div class="rs-right">
+
+      <!-- Request type — swaps the contextual fields below -->
+      <div class="rs-chips" role="tablist" aria-label="Request type">
+        <button type="button" class="rs-chip is-active" role="tab" id="rschip-inquiry"
+                data-panel="inquiry" aria-selected="true" aria-controls="rspanel-inquiry">General Inquiry</button>
+        <button type="button" class="rs-chip" role="tab" id="rschip-testdrive"
+                data-panel="testdrive" aria-selected="false" aria-controls="rspanel-testdrive">Test Drive</button>
+        <button type="button" class="rs-chip" role="tab" id="rschip-maintenance"
+                data-panel="maintenance" aria-selected="false" aria-controls="rspanel-maintenance">Book Maintenance</button>
+      </div>
+
+      <!-- Form — mirrors the Chery EG contact structure -->
+      <form id="rsForm" aria-label="Contact form" novalidate>
+
+        <!-- Salutation -->
+        <div class="rs-group">
+          <p class="rs-group-label">Salutation</p>
+          <div class="rs-radios" role="radiogroup" aria-label="Salutation">
+            <label class="rs-radio">
+              <input type="radio" name="rs-salutation" value="mr">
+              <span class="rs-radio-dot" aria-hidden="true"></span>Mr.
+            </label>
+            <label class="rs-radio">
+              <input type="radio" name="rs-salutation" value="mrs">
+              <span class="rs-radio-dot" aria-hidden="true"></span>Mrs.
+            </label>
+          </div>
+        </div>
+
+        <!-- Full name -->
+        <div class="rs-field-row">
+          <div class="rs-field" id="rsf-first">
+            <label class="rs-label" for="rs-first">First Name</label>
+            <input class="rs-input" id="rs-first" type="text" required autocomplete="given-name">
+          </div>
+          <div class="rs-field" id="rsf-last">
+            <label class="rs-label" for="rs-last">Last Name</label>
+            <input class="rs-input" id="rs-last" type="text" required autocomplete="family-name">
+          </div>
+        </div>
+
+        <!-- Phone + City -->
+        <div class="rs-ctx-row">
+          <div class="rs-field" id="rsf-phone">
+            <label class="rs-label" for="rs-phone">Phone Number</label>
+            <input class="rs-input" id="rs-phone" type="tel" autocomplete="tel">
+          </div>
+          <!-- Second cell swaps with the chip: city for a general inquiry,
+               an actual branch for a test drive or a service booking -->
+          <div class="rs-select-wrap rs-slot" data-panel="inquiry">
+            <span class="rs-select-label">City</span>
+            <select class="rs-select" id="rs-city" aria-label="City">
+              <option value="" disabled selected></option>
+              <option value="cairo">Cairo</option>
+              <option value="giza">Giza</option>
+              <option value="alexandria">Alexandria</option>
+              <option value="new-cairo">New Cairo</option>
+              <option value="6th-october">6th of October</option>
+              <option value="sheikh-zayed">Sheikh Zayed</option>
+              <option value="mansoura">Mansoura</option>
+              <option value="tanta">Tanta</option>
+              <option value="assiut">Assiut</option>
+              <option value="luxor">Luxor</option>
+              <option value="aswan">Aswan</option>
+              <option value="hurghada">Hurghada</option>
+              <option value="port-said">Port Said</option>
+              <option value="suez">Suez</option>
+            </select>
+          </div>
+
+          <!-- Showrooms only (Find Us locations badged "showroom") -->
+          <div class="rs-select-wrap rs-slot" data-panel="testdrive" hidden>
+            <span class="rs-select-label">Showroom</span>
+            <select class="rs-select" id="rs-showroom" aria-label="Showroom">
+              <option value="" disabled selected></option>
+              <option value="qattamya">Qattamya Heights — New Cairo</option>
+              <option value="zayed">Sheikh Zayed — 6th of October</option>
+              <option value="maadi">Maadi Center — Maadi</option>
+            </select>
+          </div>
+
+          <!-- Service centres only (locations badged "service") -->
+          <div class="rs-select-wrap rs-slot" data-panel="maintenance" hidden>
+            <span class="rs-select-label">Service Center</span>
+            <select class="rs-select" id="rs-centre" aria-label="Service center">
+              <option value="" disabled selected></option>
+              <option value="qattamya">Qattamya Heights — New Cairo</option>
+              <option value="newcairo">North Teseen Center — Fifth Settlement</option>
+              <option value="maadi">Maadi Center — Maadi</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="rs-field" id="rsf-email">
+          <label class="rs-label" for="rs-email">Email Address</label>
+          <input class="rs-input" id="rs-email" type="email" required autocomplete="email">
+        </div>
+
+        <!-- ── Panel: General Inquiry ── -->
+        <div class="rs-panel" id="rspanel-inquiry" data-panel="inquiry"
+             role="tabpanel" aria-labelledby="rschip-inquiry">
+          <!-- Request Category + dependent Sub-category -->
+          <div class="rs-ctx-row">
+            <div class="rs-select-wrap">
+              <span class="rs-select-label">Request Category</span>
+              <select class="rs-select" id="rs-category" aria-label="Request category">
+                <option value="" disabled selected></option>
+                <option value="inquiry">Inquiry</option>
+                <option value="complaint">Complaint</option>
+              </select>
+            </div>
+            <div class="rs-select-wrap is-disabled" id="rs-subwrap">
+              <span class="rs-select-label" id="rs-sublabel">Sub-category</span>
+              <select class="rs-select" id="rs-subcategory" disabled aria-label="Sub-category">
+                <option value="" disabled selected></option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Panel: Test Drive ── -->
+        <div class="rs-panel" id="rspanel-testdrive" data-panel="testdrive"
+             role="tabpanel" aria-labelledby="rschip-testdrive" hidden>
+          <div class="rs-ctx-row">
+            <div class="rs-select-wrap">
+              <span class="rs-select-label">Model</span>
+              <select class="rs-select" id="rs-td-model" aria-label="Model">
+                <option value="" disabled selected></option>
+                <option value="v27">iCAUR V27</option>
+                <option value="o3t">iCAUR O3T</option>
+              </select>
+            </div>
+            <!-- the native dd/mm/yyyy skeleton is hidden in CSS; .rs-date-text
+                 shows the picked date and a custom calendar panel opens under
+                 the field (initDatePickers) — same UX as the selects -->
+            <div class="rs-field rs-field--date">
+              <label class="rs-label" for="rs-td-date">Preferred Date</label>
+              <input class="rs-input" id="rs-td-date" type="date">
+              <span class="rs-date-text" aria-hidden="true"></span>
+            </div>
+          </div>
+          <div class="rs-ctx-row">
+            <div class="rs-select-wrap">
+              <span class="rs-select-label">Preferred Time</span>
+              <select class="rs-select" id="rs-td-time" aria-label="Preferred time">
+                <option value="" disabled selected></option>
+                <option value="10-12">10:00 — 12:00</option>
+                <option value="12-14">12:00 — 14:00</option>
+                <option value="14-16">14:00 — 16:00</option>
+                <option value="16-18">16:00 — 18:00</option>
+              </select>
+            </div>
+            <div class="rs-select-wrap">
+              <span class="rs-select-label">Driving License</span>
+              <select class="rs-select" id="rs-td-license" aria-label="Valid driving license">
+                <option value="" disabled selected></option>
+                <option value="yes">I hold a valid license</option>
+                <option value="no">Not yet</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Panel: Book Maintenance ── -->
+        <div class="rs-panel" id="rspanel-maintenance" data-panel="maintenance"
+             role="tabpanel" aria-labelledby="rschip-maintenance" hidden>
+          <div class="rs-ctx-row">
+            <div class="rs-select-wrap">
+              <span class="rs-select-label">Model</span>
+              <select class="rs-select" id="rs-mt-model" aria-label="Model">
+                <option value="" disabled selected></option>
+                <option value="v27">iCAUR V27</option>
+                <option value="o3t">iCAUR O3T</option>
+              </select>
+            </div>
+            <div class="rs-select-wrap">
+              <span class="rs-select-label">Service Type</span>
+              <select class="rs-select" id="rs-mt-type" aria-label="Service type">
+                <option value="" disabled selected></option>
+                <option value="periodic">Periodic Maintenance</option>
+                <option value="repair">Repair</option>
+                <option value="bodywork">Body &amp; Paint</option>
+                <option value="warranty">Warranty Claim</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="rs-ctx-row">
+            <div class="rs-field" id="rsf-mileage">
+              <label class="rs-label" for="rs-mt-mileage">Current Mileage (km)</label>
+              <input class="rs-input" id="rs-mt-mileage" type="number" min="0" step="1" inputmode="numeric">
+            </div>
+            <div class="rs-field rs-field--date">
+              <label class="rs-label" for="rs-mt-date">Preferred Date</label>
+              <input class="rs-input" id="rs-mt-date" type="date">
+              <span class="rs-date-text" aria-hidden="true"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message -->
+        <div class="rs-textarea-wrap">
+          <span class="rs-textarea-label">Message</span>
+          <textarea class="rs-textarea" id="rs-message" placeholder=""></textarea>
+        </div>
+
+        <!-- Preferred communication channels -->
+        <div class="rs-group">
+          <p class="rs-group-label">Please select preferred communication channel</p>
+          <div class="rs-checks">
+            <label class="rs-check">
+              <input type="checkbox" name="rs-channel" value="phone-call" checked>
+              <span class="rs-check-box" aria-hidden="true">
+                <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>Phone Call
+            </label>
+            <label class="rs-check">
+              <input type="checkbox" name="rs-channel" value="email" checked>
+              <span class="rs-check-box" aria-hidden="true">
+                <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>Email
+            </label>
+            <label class="rs-check">
+              <input type="checkbox" name="rs-channel" value="sms" checked>
+              <span class="rs-check-box" aria-hidden="true">
+                <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>SMS
+            </label>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="rs-cta">
+          <button type="submit" class="rs-submit" id="rsSubmitBtn">SUBMIT</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ═══════ BOOK MAINTENANCE APP ═══════ -->
+<section class="svc-book" id="book-app">
+  <div class="svc-book__bg" aria-hidden="true"></div>
+  <div class="svc-book__inner">
+    <div id="svcBookCard">
+      <img class="svc-book__pop" src="/assets/images/Cropped man.webp" alt="" aria-hidden="true">
+      <div class="svc-book__panel-wrap">
+        <div class="svc-book__rl svc-book__rl--1" aria-hidden="true"></div>
+        <div class="svc-book__rl svc-book__rl--2" aria-hidden="true"></div>
+        <div class="svc-book__card">
+          <p class="eyebrow svc-book__eyebrow">Download <span class="brand-name">iCAUR</span> App</p>
+          <h2 class="svc-book__h">Your iCAUR,<br>In <span style="color:var(--amber)">Control</span></h2>
+          <p class="svc-book__body">
+            Everything you need — service bookings, live updates, and more — right in your pocket. Download the iCAUR app and stay connected to your vehicle, wherever you are.
+          </p>
+          <div class="svc-book__badges">
+            <a href="#" class="svc-book__badge btn--magnetic" aria-label="Download on the App Store">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              <div class="svc-book__badge-text">
+                <span class="svc-book__badge-sub">Download on the</span>
+                <span class="svc-book__badge-name">App Store</span>
+              </div>
+            </a>
+            <a href="#" class="svc-book__badge btn--magnetic" aria-label="Get it on Google Play">
+              <svg width="20" height="22" viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.08 0.42C0.72 0.64 0.5 1.04 0.5 1.52V20.48C0.5 20.96 0.72 21.36 1.08 21.58L1.16 21.66L11.62 11.2V11.04L1.16 0.34L1.08 0.42Z" fill="white"/><path d="M15.08 14.68L11.62 11.2V11.04L15.08 7.56L15.18 7.62L19.26 9.94C20.42 10.6 20.42 11.68 19.26 12.34L15.18 14.62L15.08 14.68Z" fill="white" opacity="0.9"/><path d="M15.18 14.62L11.62 11.12L1.08 21.58C1.46 21.98 2.08 22.02 2.78 21.62L15.18 14.62Z" fill="white" opacity="0.7"/><path d="M15.18 7.62L2.78 0.62C2.08 0.22 1.46 0.26 1.08 0.66L11.62 11.12L15.18 7.62Z" fill="white" opacity="0.7"/></svg>
+              <div class="svc-book__badge-text">
+                <span class="svc-book__badge-sub">Get it on</span>
+                <span class="svc-book__badge-name">Google Play</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FIND US — Interactive Map ═══════ -->
+<section id="find-us" class="find-us">
+  <div class="find-us__grid">
+    <div class="find-us__left">
+      <div class="find-us__header" id="findUsHeader">
+        <p class="eyebrow eyebrow--warm">Find Us</p>
+        <h2 class="find-us__h">Where To<br><em>Find Us</em></h2>
+      </div>
+      <div class="find-us__list" id="findUsList"></div>
+    </div>
+    <div class="find-us-map-wrap" id="findUsMapWrap">
+      <div id="findUsMap"></div>
+    </div>
+  </div>
+</section>
+
+
+</main>
