@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { usePathname, useRouter } from "@/i18n/navigation";
+import { getPathname, usePathname } from "@/i18n/navigation";
 
 type Props = {
   id: string;
@@ -21,21 +21,21 @@ export function LanguageSwitcher({
   enLabel = "EN",
 }: Props) {
   const locale = useLocale();
-  const router = useRouter();
   const pathname = usePathname();
   const nextLocale = locale === "ar" ? "en" : "ar";
   const isSwitchingToAr = nextLocale === "ar";
+  const href = getPathname({ href: pathname || "/", locale: nextLocale });
 
   return (
-    <button
-      type="button"
+    <a
       id={id}
+      href={href}
       className={className}
       lang={nextLocale}
+      hrefLang={nextLocale}
       aria-label={isSwitchingToAr ? switchToAr : switchToEn}
-      onClick={() => router.replace(pathname, { locale: nextLocale })}
     >
       {isSwitchingToAr ? arLabel : enLabel}
-    </button>
+    </a>
   );
 }

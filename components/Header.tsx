@@ -283,7 +283,7 @@ async function CompareModal({
   startsFrom: string;
 }) {
   const t = await getTranslations("compare");
-  const fromPrice = compare?.fromPrice || t("fromPrice");
+  const fromPrice = compare?.fromPrice || String(t.raw("fromPrice"));
   const columns =
     models?.length
       ? models.map((model) => ({
