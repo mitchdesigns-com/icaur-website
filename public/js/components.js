@@ -389,9 +389,10 @@ const QUICK_NAV_HTML = `
   }
 
   // Mark the active nav link based on the current path
-  const path = location.pathname.replace(/\/+$/, '') || '/';
+  const stripLocale = (value) => (value || '').replace(/\/+$/, '').replace(/^\/(en|ar)(?=\/|$)/, '') || '/';
+  const path = stripLocale(location.pathname);
   document.querySelectorAll('.nav__links a').forEach(a => {
-    const href = a.getAttribute('href');
+    const href = stripLocale(a.getAttribute('href') || '');
     if (href !== '/' && path.startsWith(href)) a.setAttribute('aria-current', 'page');
   });
 

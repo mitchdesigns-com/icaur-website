@@ -112,7 +112,27 @@
   if (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      form.innerHTML = '<div class="rv-success"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><h3>Request Received</h3><p>Our team will be in touch with you shortly.</p></div>';
+      var submitUrl = window.__ICAUR_CMS && window.__ICAUR_CMS.submitUrl;
+      var payload = {
+        requestType: 'reserve',
+        firstName: (form.querySelector('[name="firstName"], [name="rv-first"]') || {}).value,
+        lastName: (form.querySelector('[name="lastName"], [name="rv-last"]') || {}).value,
+        email: (form.querySelector('[name="email"], [name="rv-email"]') || {}).value,
+        phone: (form.querySelector('[name="phone"], [name="rv-phone"]') || {}).value,
+        model: (form.querySelector('[name="model"]:checked, [name="rv-model"]:checked') || {}).value,
+        showroom: (form.querySelector('[name="showroom"], [name="rv-showroom"]') || {}).value,
+        locale: document.documentElement.lang || 'en',
+        data: Object.fromEntries(new FormData(form)),
+      };
+      var done = function () {
+        form.innerHTML = '<div class="rv-success"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><h3>Request Received</h3><p>Our team will be in touch with you shortly.</p></div>';
+      };
+      if (!submitUrl) { done(); return; }
+      fetch(submitUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: payload }),
+      }).then(done).catch(done);
     });
   }
 })();

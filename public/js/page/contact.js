@@ -458,6 +458,41 @@
   /* ── Form submit ── */
   var rsForm = document.getElementById('rsForm');
   if (rsForm) {
-    rsForm.addEventListener('submit', function (e) { e.preventDefault(); });
+    rsForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var submitUrl = window.__ICAUR_CMS && window.__ICAUR_CMS.submitUrl;
+      if (!submitUrl) return;
+      var data = Object.fromEntries(new FormData(rsForm));
+      fetch(submitUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: {
+            requestType: data['rs-type'] || data.requestType || 'inquiry',
+            salutation: data['rs-salutation'],
+            firstName: data['rs-first'],
+            lastName: data['rs-last'],
+            email: data['rs-email'],
+            phone: data['rs-phone'],
+            city: data['rs-city'],
+            showroom: data['rs-showroom'],
+            centre: data['rs-centre'],
+            category: data['rs-category'],
+            subcategory: data['rs-subcategory'],
+            message: data['rs-message'],
+            tdModel: data['rs-td-model'],
+            tdDate: data['rs-td-date'],
+            tdTime: data['rs-td-time'],
+            tdLicense: data['rs-td-license'],
+            mtModel: data['rs-mt-model'],
+            mtType: data['rs-mt-type'],
+            mtMileage: data['rs-mt-mileage'],
+            mtDate: data['rs-mt-date'],
+            locale: document.documentElement.lang || 'en',
+            data: data,
+          },
+        }),
+      }).catch(function () {});
+    });
   }
 })();

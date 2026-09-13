@@ -212,7 +212,22 @@ function initBookParallax() {
 }
 
 /* ── Find Us — Interactive Leaflet map ────────────── */
-var FIND_US_LOCATIONS = [
+var FIND_US_LOCATIONS = (window.__ICAUR_CMS && window.__ICAUR_CMS.locations && window.__ICAUR_CMS.locations.length)
+  ? window.__ICAUR_CMS.locations.map(function (loc) {
+      return {
+        id: loc.slug,
+        name: loc.name,
+        area: loc.area,
+        address: loc.address,
+        phone: loc.phone,
+        hours: loc.hours,
+        badges: loc.badges || [],
+        lat: loc.lat,
+        lng: loc.lng,
+        mapsUrl: loc.mapsUrl,
+      };
+    })
+  : [
   {
     id: 'qattamya', name: 'Qattamya Heights', area: 'New Cairo',
     address: 'Plot 12, Qattamya Heights, New Cairo, Cairo, Egypt',

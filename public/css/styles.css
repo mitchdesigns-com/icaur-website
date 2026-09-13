@@ -315,6 +315,7 @@ small, .text-sm  { font-size: 14px; }
    ═══════════════════════════════════════════════════════════ */
 .cursor {
   position: fixed; top: 0; left: 0;
+  direction: ltr;
   pointer-events: none; z-index: 10001;
   mix-blend-mode: normal;
   opacity: 0;
@@ -409,6 +410,7 @@ html.pt-entering > body { opacity: 0; }
 /* Links — fluid size, gap and tracking + nowrap, so the tabs scale
    down smoothly but NEVER go two-line before the hamburger takes over */
 .nav__links { display: flex; align-items: center; gap: clamp(7px, calc(3vw - 13px), 32px); }
+.nav__links > li { position: relative; z-index: 1; }
 .nav__link {
   font-family: var(--f-display); font-size: clamp(8.5px, 0.78vw, 11px); font-weight: 700;
   letter-spacing: clamp(0.3px, calc(0.13vw - 0.78px), 1.1px); text-transform: uppercase;
@@ -416,8 +418,12 @@ html.pt-entering > body { opacity: 0; }
   white-space: nowrap;
   transition: color var(--dur-xs);
 }
+.nav__link::before {
+  content: ''; position: absolute;
+  inset-block: -12px; inset-inline: -6px;
+}
 .nav__link::after {
-  content: ''; position: absolute; bottom: -3px; left: 0;
+  content: ''; position: absolute; bottom: -3px; inset-inline-start: 0;
   width: 0; height: 2px; background: var(--amber);
   border-radius: 2px;
   transition: width var(--dur-md) var(--ease-spring);
@@ -476,9 +482,9 @@ html.pt-entering > body { opacity: 0; }
   letter-spacing: -.005em; line-height: 1.2;
   color: var(--black); text-decoration: none; white-space: nowrap;
   padding: 14px 18px; border-radius: 12px;
-  transition: background .2s, color .2s, padding-left .25s var(--ease-out);
+  transition: background .2s, color .2s, padding-inline-start .25s var(--ease-out);
 }
-.nav__svc-link:hover { background: var(--amber); color: var(--white); padding-left: 26px; }
+.nav__svc-link:hover { background: var(--amber); color: var(--white); padding-inline-start: 26px; }
 .nav__svc-media {
   display: block; border-radius: 14px; overflow: hidden;
   min-height: 190px; background: #EDE7DF; position: relative;
@@ -7339,4 +7345,25 @@ body:has(.post-hero) { background: #fff; }
   /* fixed/bottom-anchored chrome clears the home indicator */
   .cta-video__glass { margin-bottom: env(safe-area-inset-bottom, 0px); }
 
+}
+
+html[lang="ar"] {
+  --f-display: 'Noto Kufi Arabic', 'GothamBold', 'GothamMedium', 'Montserrat', 'Futura', sans-serif;
+  --f-body: 'Noto Kufi Arabic', 'GothamBook', 'GothamMedium', 'Montserrat', 'Futura', sans-serif;
+}
+
+html[lang="ar"] .nav__link,
+html[lang="ar"] .nav__compare-label,
+html[lang="ar"] .nav-btn-reserve,
+html[lang="ar"] .footer__nav-row a,
+html[lang="ar"] .mobile-menu__nav a,
+html[lang="ar"] .mobile-menu__tool,
+html[lang="ar"] .qn-item-label {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+html[dir="rtl"] .arrow {
+  display: inline-block;
+  transform: scaleX(-1);
 }

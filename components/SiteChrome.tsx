@@ -6,29 +6,55 @@ import { Header } from "@/components/Header";
 import { LegacyScripts } from "@/components/LegacyScripts";
 import { PageMarkup } from "@/components/PageMarkup";
 import { QuickNav } from "@/components/QuickNav";
+import {
+  cmsRuntime,
+  loadChrome,
+  toSiteScripts,
+  type CmsArticle,
+  type CmsPage,
+} from "@/lib/cms";
 import type { SiteScript } from "@/lib/site";
 
 type Props = {
-  bodyClass: string;
+  locale: string;
+  page?: CmsPage | CmsArticle | null;
   html: string;
-  scripts: SiteScript[];
-  extraStyles?: string[];
+  fallbackBodyClass: string;
+  fallbackScripts: SiteScript[];
+  fallbackStyles?: string[];
 };
 
-export function SiteChrome({ bodyClass, html, scripts, extraStyles = [] }: Props) {
+export async function SiteChrome({
+  locale,
+  page,
+  html,
+  fallbackBodyClass,
+  fallbackScripts,
+  fallbackStyles = [],
+}: Props) {
+  const { global, locations, models } = await loadChrome(locale);
+  const scripts = toSiteScripts(page?.scripts);
+  const styles = page?.extraStyles?.length ? page.extraStyles : fallbackStyles;
+  const runtime = cmsRuntime(locations, models);
+
   return (
     <>
-      {extraStyles.map((href) => (
+      {styles.map((href) => (
         <link key={href} rel="stylesheet" href={href} />
       ))}
-      <BodyClass className={bodyClass} />
+      <BodyClass className={page?.bodyClass || fallbackBodyClass} />
       <GrainFilter />
       <Cursor />
-      <Header />
+      <Header global={global} models={models} />
       <PageMarkup html={html} />
-      <Footer />
-      <QuickNav />
-      <LegacyScripts scripts={scripts} />
+      <Footer global={global} />
+      <QuickNav global={global} />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `window.__ICAUR_CMS=${JSON.stringify(runtime)};`,
+        }}
+      />
+      <LegacyScripts scripts={scripts.length ? scripts : fallbackScripts} />
     </>
   );
 }

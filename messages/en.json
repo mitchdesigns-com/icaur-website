@@ -1,0 +1,175 @@
+{
+  "meta": {
+    "site": {
+      "title": "iCAUR — Built for Every Road",
+      "description": "iCAUR — Egypt's next-generation electric vehicle. Built for every road."
+    },
+    "home": {
+      "title": "iCAUR — Built for Every Road",
+      "description": "iCAUR — Egypt's next-generation electric vehicle. Built for every road."
+    },
+    "about": {
+      "title": "About — iCAUR",
+      "description": "About iCAUR — Egypt's next-generation EV company. Our story, mission, and values."
+    },
+    "contact": {
+      "title": "Contact Us — iCAUR",
+      "description": "Contact iCAUR — Get in touch with our team, find showrooms, or schedule a test drive."
+    },
+    "faq": {
+      "title": "FAQs — iCAUR",
+      "description": "iCAUR FAQs — Answers to your most common questions about iCAUR vehicles, reservations, warranty, and services."
+    },
+    "innovation": {
+      "title": "Innovation — iCAUR",
+      "description": "iCAUR Innovation — The technology, sustainability, and design principles driving Egypt's next-generation EV."
+    },
+    "news": {
+      "title": "News — iCAUR",
+      "description": "iCAUR News — Latest updates, engineering insights, and announcements from Egypt's next-gen EV company."
+    },
+    "reserve": {
+      "title": "Reserve — iCAUR",
+      "description": "Reserve your iCAUR — Secure your V27 or O3T with a fully refundable deposit today."
+    },
+    "services": {
+      "title": "Services — iCAUR",
+      "description": "iCAUR Services — Maintenance, warranty, service centers, and 24/7 support."
+    },
+    "maintenance": {
+      "title": "Maintenance Schedules — iCAUR",
+      "description": "iCAUR Maintenance Schedules — factory-recommended service intervals for V27 and O3T, plus instant booking through the iCAUR app."
+    },
+    "programs": {
+      "title": "Programs — iCAUR",
+      "description": "iCAUR Programs — extended coverage and protection plans that go beyond the standard warranty, built around your driving life."
+    },
+    "warranty": {
+      "title": "Warranty — iCAUR",
+      "description": "iCAUR Warranty — comprehensive coverage from day one for every V27 and O3T. Complete peace of mind, in writing."
+    },
+    "v27": {
+      "title": "iCAUR V27 — Experience the Future",
+      "description": "iCAUR — Egypt's next-generation electric vehicle. Built for every road."
+    },
+    "newsArticles": {
+      "electric-wiring": {
+        "title": "Electric Wiring Matrix Optimized for Egypt — iCAUR",
+        "description": "How iCAUR's engineers rebuilt the EV powertrain for Egypt's unique climate and roads."
+      },
+      "ai-cabin": {
+        "title": "Inside the AI-Powered iCAUR Cabin — iCAUR",
+        "description": "How iCAUR's intelligent cockpit learns your habits, predicts your needs, and makes every drive personal."
+      },
+      "battery-tech": {
+        "title": "Built for Egypt's Heat: Our Battery Story — iCAUR",
+        "description": "How iCAUR's thermal management system was purpose-built to maintain peak performance in 45°C+ summer heat."
+      },
+      "egypt-ev-future": {
+        "title": "Egypt's Electric Future Starts in 2026 — iCAUR",
+        "description": "iCAUR CEO Ahmed Kamal on why now is the right time, the biggest challenges, and what comes next for Egypt's EV future."
+      },
+      "v23-design": {
+        "title": "The V23: Designing for the City — iCAUR",
+        "description": "A deeper look at the design choices behind iCAUR's more urban model — its sleek proportions and bold surfaces."
+      },
+      "v27-breaks-range-records": {
+        "title": "iCAUR V27 Breaks Range Records — Media Center",
+        "description": "The iCAUR V27 sets a new benchmark for electric range in Egypt — 500 km on a single charge."
+      },
+      "wanderer-campaign": {
+        "title": "Test Drive: The Wanderer Campaign — iCAUR",
+        "description": "We drove the iCAUR V27 across three terrains — desert, coastal highway, and city traffic. Here's everything we discovered."
+      }
+    }
+  },
+  "nav": {
+    "homeAria": "iCAUR home",
+    "about": "About",
+    "models": "Models",
+    "modelsAria": "Models",
+    "services": "Services",
+    "servicesAria": "Services",
+    "maintenance": "Maintenance Schedules",
+    "programs": "Programs",
+    "warranty": "Warranty",
+    "allServices": "All services",
+    "innovation": "Innovation",
+    "news": "Media Center",
+    "faq": "FAQs",
+    "contact": "Contact Us",
+    "reserve": "Reserve",
+    "reserveMobile": "Reserve Your",
+    "compare": "Compare",
+    "compareAria": "Compare models",
+    "explore": "Explore",
+    "menu": "Toggle menu",
+    "v27Name": "Bold.",
+    "v27Highlight": "Capable.",
+    "o3tName": "Smart.",
+    "o3tHighlight": "Sleek.",
+    "startsFrom": "Starts from",
+    "v27Price": "1,490,000 EGP",
+    "o3tPrice": "480,000 EGP"
+  },
+  "compare": {
+    "title": "Compare iCAUR Models",
+    "close": "Close",
+    "addModel": "Add Model",
+    "selectTitle": "Select Models & Trims",
+    "selectHint": "Choose up to 5 trims to compare.",
+    "selected": "Selected:",
+    "done": "Done",
+    "v27Name": "Bold.",
+    "v27Highlight": "Capable.",
+    "o3tName": "Smart.",
+    "o3tHighlight": "Sleek.",
+    "standardRange": "Standard Range",
+    "longRange": "Long Range",
+    "performance": "Performance",
+    "core": "Core",
+    "plus": "Plus",
+    "ultra": "Ultra",
+    "fromPrice": "From {price}"
+  },
+  "footer": {
+    "homeAria": "iCAUR home",
+    "models": "Models",
+    "about": "About",
+    "services": "Services",
+    "innovation": "Innovation",
+    "news": "Media Center",
+    "faq": "FAQs",
+    "contact": "Contact us",
+    "reserve": "Reserve Your",
+    "newsletter": "Join Our Newsletter",
+    "emailPlaceholder": "Your email address",
+    "emailAria": "Email address",
+    "subscribe": "Subscribe",
+    "legalPrefix": "By subscribing you agree to our",
+    "privacy": "Privacy Policy",
+    "legalSuffix": "and consent to receive updates from iCAUR.",
+    "social": "Social media",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "twitter": "X / Twitter",
+    "linkedin": "LinkedIn",
+    "youtube": "YouTube",
+    "copyright": "© 2026 iCAUR. All rights reserved.",
+    "terms": "Terms of Service",
+    "credit": "WEBSITE DESIGN & DEVELOPMENT BY MITCHDESIGNS"
+  },
+  "quickNav": {
+    "label": "Quick navigation",
+    "whatsapp": "Chat on WhatsApp",
+    "maintenance": "Book Maintenance",
+    "testDrive": "Request Test Drive",
+    "open": "Open quick navigation"
+  },
+  "lang": {
+    "switchToAr": "التبديل إلى العربية",
+    "switchToEn": "Switch to English",
+    "arLabel": "العربية",
+    "enLabel": "EN"
+  }
+}

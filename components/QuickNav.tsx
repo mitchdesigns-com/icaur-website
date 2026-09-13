@@ -1,15 +1,25 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
+import { cmsHref } from "@/lib/cms";
+import type { CmsGlobal } from "@/lib/cms";
 
-export function QuickNav() {
+type Props = {
+  global?: CmsGlobal | null;
+};
+
+export async function QuickNav({ global }: Props) {
+  const t = await getTranslations("quickNav");
+  const qn = global?.quickNav;
+
   return (
-    <div id="quick-nav" className="qn" aria-label="Quick navigation">
+    <div id="quick-nav" className="qn" aria-label={qn?.label || t("label")}>
       <div className="qn-menu" id="qnMenu" aria-hidden="true">
         <a
-          href="https://wa.me/20221234567"
+          href={qn?.whatsappHref || "https://wa.me/20221234567"}
           className="qn-item qn-item--wa"
           target="_blank"
           rel="noopener"
-          aria-label="Chat on WhatsApp"
+          aria-label={qn?.whatsapp || t("whatsapp")}
         >
           <span className="qn-item-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -17,39 +27,27 @@ export function QuickNav() {
               <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.858L0 24l6.336-1.508A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.793 9.793 0 01-5.001-1.373l-.359-.213-3.722.886.916-3.614-.234-.371A9.787 9.787 0 012.182 12C2.182 6.567 6.567 2.182 12 2.182S21.818 6.567 21.818 12 17.433 21.818 12 21.818z" />
             </svg>
           </span>
-          <span className="qn-item-label">Chat on WhatsApp</span>
+          <span className="qn-item-label">{qn?.whatsapp || t("whatsapp")}</span>
         </a>
-        <Link href="/contact/?tab=maintenance" className="qn-item qn-item--maintenance" aria-label="Book Maintenance">
+        <Link
+          href={cmsHref(qn?.maintenanceHref || "/contact?tab=maintenance") as never}
+          className="qn-item qn-item--maintenance"
+          aria-label={qn?.maintenance || t("maintenance")}
+        >
           <span className="qn-item-icon">
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
             </svg>
           </span>
-          <span className="qn-item-label">Book Maintenance</span>
+          <span className="qn-item-label">{qn?.maintenance || t("maintenance")}</span>
         </Link>
-        <Link href="/contact/?tab=test-drive" className="qn-item qn-item--drive" aria-label="Request Test Drive">
+        <Link
+          href={cmsHref(qn?.testDriveHref || "/contact?tab=test-drive") as never}
+          className="qn-item qn-item--drive"
+          aria-label={qn?.testDrive || t("testDrive")}
+        >
           <span className="qn-item-icon">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="10" />
               <circle cx="12" cy="12" r="3" />
               <line x1="12" y1="9" x2="12" y2="2" />
@@ -57,10 +55,10 @@ export function QuickNav() {
               <line x1="15" y1="11.5" x2="21.5" y2="15" />
             </svg>
           </span>
-          <span className="qn-item-label">Request Test Drive</span>
+          <span className="qn-item-label">{qn?.testDrive || t("testDrive")}</span>
         </Link>
       </div>
-      <button className="qn-toggle" id="qnToggle" aria-label="Open quick navigation" aria-expanded="false">
+      <button className="qn-toggle" id="qnToggle" aria-label={qn?.open || t("open")} aria-expanded="false">
         <span className="qn-bar qn-bar--1" />
         <span className="qn-bar qn-bar--2" />
         <span className="qn-bar qn-bar--3" />

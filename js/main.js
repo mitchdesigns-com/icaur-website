@@ -418,7 +418,7 @@ function splitHeadlineLetters(headline) {
 
   // the menu's العربية / Compare mirror the desktop pill's — same handlers,
   // reached by delegating to the originals so the logic lives in one place
-  $('#mobileLangToggle')?.addEventListener('click', () => { $('#langToggle')?.click(); });
+  // Language buttons are handled by React (next-intl). Do not proxy clicks.
   $('#mobileCompareToggle')?.addEventListener('click', () => { close(); $('#compareToggle')?.click(); });
 
   document.addEventListener('keydown', e => {
@@ -2396,18 +2396,7 @@ document.addEventListener('click', e => {
 // NOTE: text translations are not wired yet; this flips
 // document language/direction as the entry point for i18n.
 // ============================================================
-(function initLangToggle() {
-  const btn = $('#langToggle');
-  if (!btn) return;
-  btn.addEventListener('click', () => {
-    const toAr = document.documentElement.lang !== 'ar';
-    document.documentElement.lang = toAr ? 'ar' : 'en';
-    document.documentElement.dir  = toAr ? 'rtl' : 'ltr';
-    btn.textContent = toAr ? 'EN' : 'ع';
-    btn.setAttribute('data-tooltip', toAr ? 'English' : 'العربية');
-    btn.setAttribute('aria-label', toAr ? 'Switch to English' : 'التبديل إلى العربية');
-  });
-})();
+// Language switching is handled by next-intl (LanguageSwitcher).
 
 
 // ============================================================

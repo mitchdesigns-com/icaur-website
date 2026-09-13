@@ -418,7 +418,7 @@ function splitHeadlineLetters(headline) {
 
   // the menu's العربية / Compare mirror the desktop pill's — same handlers,
   // reached by delegating to the originals so the logic lives in one place
-  $('#mobileLangToggle')?.addEventListener('click', () => { $('#langToggle')?.click(); });
+  // Language buttons are handled by React (next-intl). Do not proxy clicks.
   $('#mobileCompareToggle')?.addEventListener('click', () => { close(); $('#compareToggle')?.click(); });
 
   document.addEventListener('keydown', e => {
@@ -2134,30 +2134,49 @@ document.addEventListener('click', e => {
     'Autopilot Suite', 'Heated Seats', 'Panoramic Roof', '360° Camera'
   ];
 
-  const MODEL_DATA = {
-    v27: {
-      name: 'V27',
-      img:  '/assets/images/v27-model-in-homepge-01.webp',
-      logo: '/assets/images/V27-logo.svg',
-      trimSpecs: {
-        'Standard Range': { range: '450 km', hp: '380 hp', accel: '4.8s' },
-        'Long Range':     { range: '560 km', hp: '380 hp', accel: '4.8s' },
-        'Performance':    { range: '510 km', hp: '520 hp', accel: '3.5s' },
+  const MODEL_DATA = (function () {
+    const fallback = {
+      v27: {
+        name: 'V27',
+        img:  '/assets/images/v27-model-in-homepge-01.webp',
+        logo: '/assets/images/V27-logo.svg',
+        trimSpecs: {
+          'Standard Range': { range: '450 km', hp: '380 hp', accel: '4.8s' },
+          'Long Range':     { range: '560 km', hp: '380 hp', accel: '4.8s' },
+          'Performance':    { range: '510 km', hp: '520 hp', accel: '3.5s' },
+        },
+        features: { 'Fast DC Charging': true, 'All-Wheel Drive': true, 'OTA Updates': true, 'Autopilot Suite': false, 'Heated Seats': true, 'Panoramic Roof': true, '360° Camera': false }
       },
-      features: { 'Fast DC Charging': true, 'All-Wheel Drive': true, 'OTA Updates': true, 'Autopilot Suite': false, 'Heated Seats': true, 'Panoramic Roof': true, '360° Camera': false }
-    },
-    o3t: {
-      name: 'O3T',
-      img:  '/assets/images/ot3-model-in-homepage-01.webp',
-      logo: '/assets/images/T03-logo.svg',
-      trimSpecs: {
-        'Core':  { range: '520 km', hp: '420 hp', accel: '4.2s' },
-        'Plus':  { range: '580 km', hp: '480 hp', accel: '3.8s' },
-        'Ultra': { range: '630 km', hp: '580 hp', accel: '3.1s' },
-      },
-      features: { 'Fast DC Charging': true, 'All-Wheel Drive': false, 'OTA Updates': true, 'Autopilot Suite': true, 'Heated Seats': true, 'Panoramic Roof': false, '360° Camera': true }
-    }
-  };
+      o3t: {
+        name: 'O3T',
+        img:  '/assets/images/ot3-model-in-homepage-01.webp',
+        logo: '/assets/images/T03-logo.svg',
+        trimSpecs: {
+          'Core':  { range: '520 km', hp: '420 hp', accel: '4.2s' },
+          'Plus':  { range: '580 km', hp: '480 hp', accel: '3.8s' },
+          'Ultra': { range: '630 km', hp: '580 hp', accel: '3.1s' },
+        },
+        features: { 'Fast DC Charging': true, 'All-Wheel Drive': false, 'OTA Updates': true, 'Autopilot Suite': true, 'Heated Seats': true, 'Panoramic Roof': false, '360° Camera': true }
+      }
+    };
+    const cmsModels = window.__ICAUR_CMS && window.__ICAUR_CMS.models;
+    if (!cmsModels || !cmsModels.length) return fallback;
+    cmsModels.forEach(function (model) {
+      if (!model || !model.slug) return;
+      const trimSpecs = {};
+      (model.trims || []).forEach(function (trim) {
+        trimSpecs[trim.name] = { range: trim.range, hp: trim.hp, accel: trim.accel };
+      });
+      fallback[model.slug] = {
+        name: model.name || model.slug,
+        img: model.image,
+        logo: model.logo,
+        trimSpecs: Object.keys(trimSpecs).length ? trimSpecs : (fallback[model.slug] && fallback[model.slug].trimSpecs) || {},
+        features: model.features || (fallback[model.slug] && fallback[model.slug].features) || {},
+      };
+    });
+    return fallback;
+  })();
 
   const CHECK_SVG = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.5 9.5l4 4 7-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const CROSS_SVG = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M5 5l8 8M13 5l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
@@ -2396,18 +2415,7 @@ document.addEventListener('click', e => {
 // NOTE: text translations are not wired yet; this flips
 // document language/direction as the entry point for i18n.
 // ============================================================
-(function initLangToggle() {
-  const btn = $('#langToggle');
-  if (!btn) return;
-  btn.addEventListener('click', () => {
-    const toAr = document.documentElement.lang !== 'ar';
-    document.documentElement.lang = toAr ? 'ar' : 'en';
-    document.documentElement.dir  = toAr ? 'rtl' : 'ltr';
-    btn.textContent = toAr ? 'EN' : 'ع';
-    btn.setAttribute('data-tooltip', toAr ? 'English' : 'العربية');
-    btn.setAttribute('aria-label', toAr ? 'Switch to English' : 'التبديل إلى العربية');
-  });
-})();
+// Language switching is handled by next-intl (LanguageSwitcher).
 
 
 // ============================================================
