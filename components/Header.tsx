@@ -17,10 +17,10 @@ export async function Header({ global, models }: Props) {
   const serviceLinks = nav?.serviceLinks?.length
     ? nav.serviceLinks
     : [
-        { label: t("maintenance"), href: "/services/maintenance" },
-        { label: t("programs"), href: "/services/programs" },
-        { label: t("warranty"), href: "/services/warranty" },
-      ];
+      { label: t("maintenance"), href: "/services/maintenance" },
+      { label: t("programs"), href: "/services/programs" },
+      { label: t("warranty"), href: "/services/warranty" },
+    ];
 
   return (
     <>
@@ -39,7 +39,7 @@ export async function Header({ global, models }: Props) {
           <ul className="nav__links" role="list">
             <li>
               <Link href="/about" className="nav__link">
-                {label("about")}
+                {label("about")} alaa
               </Link>
             </li>
             <li className="nav__item--has-drop">
@@ -287,27 +287,27 @@ async function CompareModal({
   const columns =
     models?.length
       ? models.map((model) => ({
-          slug: model.slug || "",
-          name: model.tagline || model.name,
-          highlight: model.highlight,
-          image: model.image,
-          hoverImage: model.hoverImage,
-          logo: model.logo,
-          alt: model.name,
-          specs: model.specs,
-          trims: model.trims || [],
-        }))
+        slug: model.slug || "",
+        name: model.tagline || model.name,
+        highlight: model.highlight,
+        image: model.image,
+        hoverImage: model.hoverImage,
+        logo: model.logo,
+        alt: model.name,
+        specs: model.specs,
+        trims: model.trims || [],
+      }))
       : cards.map((card) => ({
-          slug: card.slug || "",
-          name: card.name,
-          highlight: card.highlight,
-          image: card.image,
-          hoverImage: card.hoverImage,
-          logo: card.logo,
-          alt: card.alt,
-          specs: card.specs,
-          trims: [],
-        }));
+        slug: card.slug || "",
+        name: card.name,
+        highlight: card.highlight,
+        image: card.image,
+        hoverImage: card.hoverImage,
+        logo: card.logo,
+        alt: card.alt,
+        specs: card.specs,
+        trims: [],
+      }));
 
   return (
     <div className="cmp-modal" id="cmpModal" aria-hidden="true">
