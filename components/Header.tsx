@@ -39,7 +39,7 @@ export async function Header({ global, models }: Props) {
           <ul className="nav__links" role="list">
             <li>
               <Link href="/about" className="nav__link">
-                {label("about")} alaa
+                {label("about")}
               </Link>
             </li>
             <li className="nav__item--has-drop">
@@ -203,7 +203,15 @@ function ModelCard({
   );
 }
 
-function defaultModelCards(t: (key: string) => string): CmsNavModel[] {
+type NavMessageKey =
+  | "v27Name"
+  | "v27Highlight"
+  | "v27Price"
+  | "o3tName"
+  | "o3tHighlight"
+  | "o3tPrice";
+
+function defaultModelCards(t: (key: NavMessageKey) => string): CmsNavModel[] {
   return [
     {
       slug: "v27",
@@ -380,7 +388,9 @@ async function CompareModal({
   );
 }
 
-function fallbackTrims(slug: string, t: (key: string, values?: { price: string }) => string) {
+type CompareTrimKey = "core" | "plus" | "ultra" | "standardRange" | "longRange" | "performance";
+
+function fallbackTrims(slug: string, t: (key: CompareTrimKey) => string) {
   if (slug === "o3t") {
     return [
       { name: t("core"), fromPrice: "480,000 EGP", compareLabel: "O3T Core" },
