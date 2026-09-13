@@ -1,20 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SiteChrome } from "@/components/SiteChrome";
-import { getArticles, resolveArticleHtml } from "@/lib/cms";
+import { resolveArticleHtml } from "@/lib/cms";
 import { NEWS_ARTICLES } from "@/lib/newsArticles";
 import { applyRequestLocale, pageMeta } from "@/lib/pageMeta";
 import { CORE_SCRIPTS } from "@/lib/site";
 
+export const runtime = "edge";
+
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };
-
-export async function generateStaticParams() {
-  const articles = await getArticles("en");
-  if (articles?.length) return articles.map((article) => ({ slug: article.slug })).filter((item) => item.slug);
-  return NEWS_ARTICLES.map((article) => ({ slug: article.slug }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;

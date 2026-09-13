@@ -3,6 +3,8 @@ import { resolvePageHtml } from "@/lib/cms";
 import { applyRequestLocale, type LocaleParams, pageMeta } from "@/lib/pageMeta";
 import { CORE_SCRIPTS } from "@/lib/site";
 
+export const runtime = "edge";
+
 export async function generateMetadata({ params }: LocaleParams) {
   const { locale } = await params;
   const fallback = await pageMeta(locale, "news");

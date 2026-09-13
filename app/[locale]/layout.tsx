@@ -3,10 +3,11 @@ import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { routing } from "@/i18n/routing";
 import { getGlobal } from "@/lib/cms";
 import { asLocale } from "@/lib/pageMeta";
 import { FEEDBACK_WIDGET } from "@/lib/site";
+
+export const runtime = "edge";
 
 type Props = {
   children: ReactNode;
@@ -22,10 +23,6 @@ const IMPORT_MAP = {
     ogl: "https://cdn.jsdelivr.net/npm/ogl/dist/ogl.mjs",
   },
 };
-
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
