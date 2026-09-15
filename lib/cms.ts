@@ -240,7 +240,9 @@ export type CmsRuntime = {
   models?: CmsVehicleModel[];
 };
 
-const CMS_URL = (process.env.NEXT_PUBLIC_CMS_URL || "").replace(/\/$/, "");
+const CMS_URL = (
+  process.env.NEXT_PUBLIC_CMS_URL || "https://icaur-cms.cloudhosta.com"
+).replace(/\/$/, "");
 
 export function cmsAsset(src?: string | null): string {
   if (!src) return "";
