@@ -29,7 +29,7 @@ export function CmsLink({ href = "/", className, children, ...rest }: CmsLinkPro
   );
 }
 
-export function CtaVideo({ cta }: { cta?: CmsCta | null }) {
+export function CtaVideo({ cta, reveal = "blur" }: { cta?: CmsCta | null; reveal?: "blur" | "up" }) {
   if (!cta) return null;
   return (
     <section className="cta-video" id="cta">
@@ -45,7 +45,7 @@ export function CtaVideo({ cta }: { cta?: CmsCta | null }) {
         aria-hidden="true"
       />
       <div className="cta-video__overlay" aria-hidden="true" />
-      <div className="cta-video__glass reveal reveal--blur">
+      <div className={`cta-video__glass reveal reveal--${reveal}`}>
         <h2 className="cta-video__h">
           {cta.title} {cta.titleEm ? <em>{cta.titleEm}</em> : null}
         </h2>

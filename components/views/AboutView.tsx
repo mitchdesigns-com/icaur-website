@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import type { CmsPage } from "@/lib/cms";
 import { CmsLink, CtaVideo, list, num, str } from "./shared";
 
@@ -62,25 +63,42 @@ export function AboutView({ page }: { page: CmsPage }) {
                 <p className="svc__sub">{str(story, "sub")}</p>
               </div>
             </div>
-            {panels.map((panel, index) => (
-              <article className={`svc__panel svc__panel--feature${index === 1 ? " svc__panel--flip" : ""}`} key={str(panel, "title")}>
-                <figure className="svc__media svc__media--lg">
-                  <img src={str(panel, "image")} alt={str(panel, "imageAlt")} loading="lazy" data-par="0.10" />
-                </figure>
-                <div className="svc__body">
-                  <span className="svc__num">{str(panel, "num")}</span>
-                  <h3 className="svc__title">
-                    {str(panel, "title")} <em>{str(panel, "titleEm")}</em>
-                  </h3>
-                  <p className="svc__text">{str(panel, "text")}</p>
-                  {str(panel, "ctaLabel") ? (
-                    <CmsLink href={str(panel, "ctaHref")} className="btn btn--dark btn--sm btn--arrow btn--magnetic">
-                      {str(panel, "ctaLabel")} <span className="brand-name">iCAUR</span> <span className="arrow">→</span>
-                    </CmsLink>
+            {panels.map((panel, index) => {
+              const titleEm = str(panel, "titleEm");
+              return (
+                <Fragment key={str(panel, "title") + titleEm}>
+                  <article className={`svc__panel svc__panel--feature${index === 1 ? " svc__panel--flip" : ""}`}>
+                    <figure className="svc__media svc__media--lg">
+                      <img src={str(panel, "image")} alt={str(panel, "imageAlt")} loading="lazy" data-par="0.10" />
+                    </figure>
+                    <div className="svc__body">
+                      <span className="svc__num">{str(panel, "num")}</span>
+                      <h3 className="svc__title">
+                        {str(panel, "title")}{" "}
+                        {titleEm ? <em>{titleEm}</em> : null}
+                        {str(panel, "titleAfter") || (titleEm === "Drama" ? "." : "")}
+                      </h3>
+                      <p className="svc__text">{str(panel, "text")}</p>
+                      {str(panel, "ctaLabel") ? (
+                        <CmsLink href={str(panel, "ctaHref")} className="btn btn--dark btn--sm btn--arrow btn--magnetic">
+                          {str(panel, "ctaLabel")} <span className="brand-name">iCAUR</span> <span className="arrow">→</span>
+                        </CmsLink>
+                      ) : null}
+                    </div>
+                  </article>
+                  {index === 0 ? (
+                    <div className="svc__panel svc__panel--cluster" aria-hidden="true">
+                      <figure className="svc__media svc__media--sm svc__media--sm-a">
+                        <img src="/assets/images/v27/interior-display.webp" alt="" loading="lazy" data-par="0.18" />
+                      </figure>
+                      <figure className="svc__media svc__media--sm svc__media--sm-b">
+                        <img src="/assets/images/ICUAR V27 brochure 03 18.webp" alt="" loading="lazy" data-par="-0.12" />
+                      </figure>
+                    </div>
                   ) : null}
-                </div>
-              </article>
-            ))}
+                </Fragment>
+              );
+            })}
           </div>
         </section>
       </div>
@@ -137,7 +155,7 @@ export function AboutView({ page }: { page: CmsPage }) {
         </div>
       </section>
 
-      <CtaVideo cta={page.cta} />
+      <CtaVideo cta={page.cta} reveal="up" />
     </main>
   );
 }
