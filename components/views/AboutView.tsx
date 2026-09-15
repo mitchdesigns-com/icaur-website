@@ -1,6 +1,25 @@
 import type { CmsPage } from "@/lib/cms";
 import { CmsLink, CtaVideo, list, num, str } from "./shared";
 
+function MvStatement({ parts }: { parts: Record<string, unknown>[] }) {
+  return (
+    <p className="mv__statement" data-mv-split>
+      {parts.map((part, index) => {
+        const image = str(part, "image");
+        if (image) {
+          return (
+            <span className="mv-chip" aria-hidden="true" key={index}>
+              <img src={image} alt="" loading="lazy" />
+            </span>
+          );
+        }
+        const text = str(part, "text");
+        return part.em ? <em key={index}>{text}</em> : text;
+      })}
+    </p>
+  );
+}
+
 export function AboutView({ page }: { page: CmsPage }) {
   const hero = page.hero || {};
   const story = page.story || {};
@@ -88,13 +107,13 @@ export function AboutView({ page }: { page: CmsPage }) {
             <div className="mv__panel mv__panel--vision" id="mvVision">
               <div className="mv__inner">
                 <h2 className="mv__title">{str(vision, "title")} <em>{str(vision, "titleEm")}</em></h2>
-                <p className="mv__statement" data-mv-split>{str(vision, "statement")}</p>
+                <MvStatement parts={list(vision, "parts")} />
               </div>
             </div>
             <div className="mv__panel mv__panel--mission" id="mvMission">
               <div className="mv__inner">
                 <h2 className="mv__title">{str(mission, "title")} <em>{str(mission, "titleEm")}</em></h2>
-                <p className="mv__statement" data-mv-split>{str(mission, "statement")}</p>
+                <MvStatement parts={list(mission, "parts")} />
               </div>
             </div>
           </div>
