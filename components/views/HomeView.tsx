@@ -47,6 +47,7 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
   const paragraphs = texts(overview.paragraphs);
   const stats = list(overview, "stats");
   const serviceItems = list(services, "items");
+  const deck = texts(services.deck);
   const featured = homeMediaStories(articles);
   const homeFaqs = faqs
     .filter((item) => item.showOnHome)
@@ -221,7 +222,7 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
                 </article>
                 {index === 0 ? (
                   <ServiceCluster
-                    first="/assets/images/v27/interior-01.webp"
+                    first={deck[7] || "/assets/images/v27/interior-01.webp"}
                     second="/assets/images/v27-18.webp"
                     firstClass="svc__media--sm-a"
                     secondClass="svc__media--sm-b"
@@ -231,8 +232,8 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
                 ) : null}
                 {index === 1 ? (
                   <ServiceCluster
-                    first="/assets/images/ICUAR V27 brochure 03 18.webp"
-                    second="/assets/images/v27/interior-display.webp"
+                    first={deck[5] || "/assets/images/v27-18.webp"}
+                    second={deck[4] || "/assets/images/v27/interior-display.webp"}
                     firstClass="svc__media--sm-c"
                     secondClass="svc__media--sm-d"
                     firstPar="0.16"
@@ -336,11 +337,15 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
 
 function homeMediaStories(articles: CmsArticle[]): HomeStory[] {
   const bySlug = new Map(articles.map((item) => [item.slug, item]));
-  return HOME_MEDIA.map((story) => {
+  const studioCover = articles.find((item) => (item.coverImage || "").includes("cam025"))?.coverImage;
+  return HOME_MEDIA.map((story, index) => {
     const cms = bySlug.get(story.slug);
     return {
       ...story,
       slug: cms?.slug || story.slug,
+      category: cms?.category || story.category,
+      publishedOn: cms?.publishedOn || story.publishedOn,
+      coverImage: (index === 0 && studioCover) || cms?.coverImage || story.coverImage,
     };
   });
 }
