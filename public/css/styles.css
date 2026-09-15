@@ -3021,6 +3021,28 @@ html.pt-entering > body { opacity: 0; }
    nothing flashes in flat before the first paint */
 @media (min-width: 861px) and (prefers-reduced-motion: no-preference) {
   .media-card--tile { opacity: 0; }
+  #articles .media-card--tile.media-card--enter {
+    animation: newsTileEnter 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  #articles .media-card--tile.media-card--enter:nth-child(3n+1) {
+    transform-origin: left bottom;
+  }
+  #articles .media-card--tile.media-card--enter:nth-child(3n+2) {
+    transform-origin: center bottom;
+  }
+  #articles .media-card--tile.media-card--enter:nth-child(3n) {
+    transform-origin: right bottom;
+  }
+}
+@keyframes newsTileEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 70px, -260px) rotateX(24deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
+  }
 }
 /* Alternating tall / short. Across three columns, odd-and-even by index
    lands exactly as: tall, short, tall — then short, tall, short — and

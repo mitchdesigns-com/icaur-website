@@ -1,10 +1,39 @@
+"use client";
+
+import { useLayoutEffect, useMemo, useState } from "react";
 import type { CmsArticle, CmsPage } from "@/lib/cms";
 import { categoryLabel, CmsLink, formatDate, str } from "./shared";
 
-export function NewsView({ page, articles, locale }: { page: CmsPage; articles: CmsArticle[]; locale: string }) {
+const PAGE_SIZE = 6;
+const FILTERS = ["all", "blog", "news", "event"] as const;
+
+type FilterKey = (typeof FILTERS)[number];
+
+type Props = {
+  page: CmsPage;
+  articles: CmsArticle[];
+  locale: string;
+};
+
+export function NewsView({ page, articles, locale }: Props) {
   const hero = page.hero || {};
   const filters = page.filters || {};
-  const [featured, ...rest] = articles;
+  const [featured, ...gridArticles] = articles;
+  const [filter, setFilter] = useState<FilterKey>("all");
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const filtered = useMemo(
+    () => gridArticles.filter((article) => filter === "all" || article.category === filter),
+    [filter, gridArticles]
+  );
+  const visible = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
+
+  useLayoutEffect(() => {
+    window.dispatchEvent(new Event("resize"));
+  }, [visible.length, filter]);
+
+  const showFeatured = Boolean(featured) && (filter === "all" || featured.category === filter);
 
   return (
     <main id="main">
@@ -19,16 +48,25 @@ export function NewsView({ page, articles, locale }: { page: CmsPage; articles: 
       <section className="section news-filters" id="filters" style={{ padding: 0 }}>
         <div className="container">
           <nav className="news-filters__inner" aria-label="Article categories">
-            <button className="filter-btn is-active" data-filter="all">{filters.all || "All"}</button>
-            <button className="filter-btn" data-filter="blog">{filters.blog || "Blog"}</button>
-            <button className="filter-btn" data-filter="news">{filters.news || "News"}</button>
-            <button className="filter-btn" data-filter="event">{filters.event || "Event"}</button>
+            {FILTERS.map((key) => (
+              <button
+                key={key}
+                type="button"
+                className={`filter-btn${filter === key ? " is-active" : ""}`}
+                onClick={() => {
+                  setFilter(key);
+                  setVisibleCount(PAGE_SIZE);
+                }}
+              >
+                {filters[key] || (key === "all" ? "All" : categoryLabel(key))}
+              </button>
+            ))}
           </nav>
         </div>
       </section>
 
-      {featured ? (
-        <section className="section news-featured-section" id="featured">
+      {showFeatured && featured ? (
+        <section className="section news-featured-section" id="featured" key={`${filter}-${featured.slug}`}>
           <div className="container">
             <div className="news-featured reveal reveal--up" data-delay="1">
               <CmsLink className="news-featured__img" href={`/news/${featured.slug}`} data-cursor-label="Read">
@@ -53,8 +91,21 @@ export function NewsView({ page, articles, locale }: { page: CmsPage; articles: 
       <section className="section news-grid-full" id="articles" style={{ paddingTop: "var(--sp-24)" }}>
         <div className="container">
           <div className="media-grid">
-            {rest.map((article) => (
-              <article className="media-card media-card--tile" data-category={article.category} key={article.slug}>
+            {visible.map((article, index) => (
+              <article
+                className="media-card media-card--tile media-card--enter"
+                data-category={article.category}
+                key={`${filter}-${article.slug || article.title}`}
+                style={{ animationDelay: `${index * 80}ms` }}
+                onAnimationEnd={(event) => {
+                  if (event.currentTarget === event.target) {
+                    event.currentTarget.classList.remove("media-card--enter");
+                    event.currentTarget.style.opacity = "1";
+                    event.currentTarget.style.transform = "";
+                    window.dispatchEvent(new Event("resize"));
+                  }
+                }}
+              >
                 <CmsLink href={`/news/${article.slug}`} className="media-card__img" data-cursor-label="Read">
                   <img src={article.coverImage} alt={article.title || ""} loading="lazy" width={400} height={250} />
                 </CmsLink>
@@ -68,9 +119,17 @@ export function NewsView({ page, articles, locale }: { page: CmsPage; articles: 
               </article>
             ))}
           </div>
-          <div style={{ textAlign: "center", marginTop: "var(--sp-32)" }} className="reveal reveal--up">
-            <button className="btn btn--ghost btn--lg btn--magnetic">{page.loadMore || "Load More Articles"}</button>
-          </div>
+          {hasMore ? (
+            <div style={{ textAlign: "center", marginTop: "var(--sp-32)" }}>
+              <button
+                type="button"
+                className="btn btn--ghost btn--lg"
+                onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+              >
+                {page.loadMore || "Load More Articles"}
+              </button>
+            </div>
+          ) : null}
         </div>
       </section>
     </main>

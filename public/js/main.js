@@ -545,6 +545,19 @@ function splitHeadlineLetters(headline) {
 
   $$('.reveal:not(.hero .reveal)').forEach(el => obs.observe(el));
 
+  const observeAdded = (node) => {
+    if (!(node instanceof Element)) return;
+    const nodes = node.classList.contains('reveal') ? [node] : [];
+    node.querySelectorAll?.('.reveal').forEach((el) => nodes.push(el));
+    nodes.forEach((el) => {
+      if (!el.closest('.hero')) obs.observe(el);
+    });
+  };
+
+  new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => mutation.addedNodes.forEach(observeAdded));
+  }).observe(document.body, { childList: true, subtree: true });
+
   // Word-mask reveals for non-hero words (section headings etc.)
   const wordObs = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -1733,18 +1746,22 @@ initSvcScroll({
 // so a row opens like a hand of cards rather than one flat plane.
 // ============================================================
 (function initMediaTilt() {
-  const tiles = Array.from(document.querySelectorAll('.media-card--tile'));
-  if (!tiles.length) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const clamp01 = v => Math.min(1, Math.max(0, v));
   const easeOut = t => 1 - Math.pow(1 - t, 3);
 
   function paint() {
+    const tiles = Array.from(document.querySelectorAll('.media-card--tile'));
+    if (!tiles.length) return;
     const vh = window.innerHeight;
     tiles.forEach((el, i) => {
+      if (el.classList.contains("media-card--enter")) return;
       const r = el.getBoundingClientRect();
-      if (r.bottom < -200 || r.top > vh + 400) return;      // far off-screen
+      if (r.bottom < -200 || r.top > vh + 400) {
+        el.style.opacity = "1";
+        return;
+      }
       // 0 as the tile's top touches the bottom of the viewport,
       // 1 once it has travelled a third of the screen upward
       const p = easeOut(clamp01((vh - r.top) / (vh * 0.34)));
