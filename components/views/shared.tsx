@@ -45,7 +45,7 @@ export function CtaVideo({ cta }: { cta?: CmsCta | null }) {
         aria-hidden="true"
       />
       <div className="cta-video__overlay" aria-hidden="true" />
-      <div className="cta-video__glass reveal reveal--up">
+      <div className="cta-video__glass reveal reveal--blur">
         <h2 className="cta-video__h">
           {cta.title} {cta.titleEm ? <em>{cta.titleEm}</em> : null}
         </h2>
@@ -65,6 +65,18 @@ export function CtaVideo({ cta }: { cta?: CmsCta | null }) {
 
 export function BrandName({ children }: { children?: ReactNode }) {
   return <span className="brand-name">{children || "iCAUR"}</span>;
+}
+
+export function withBrand(text: string) {
+  return text.split(/(iCAUR)/g).map((chunk, index) =>
+    chunk === "iCAUR" ? (
+      <span className="brand-name" key={index}>
+        iCAUR
+      </span>
+    ) : (
+      chunk
+    )
+  );
 }
 
 export function str(obj: Record<string, unknown> | undefined | null, key: string, fallback = "") {
@@ -97,7 +109,7 @@ export function formatDate(value?: string | null, locale = "en") {
   if (!value) return "";
   const date = new Date(`${value}T00:00:00`);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", {
+  return date.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",

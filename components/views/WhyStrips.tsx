@@ -1,4 +1,4 @@
-import { str } from "./shared";
+import { str, withBrand } from "./shared";
 
 type Props = {
   items: Record<string, unknown>[];
@@ -14,7 +14,7 @@ export function WhyStrips({ items }: Props) {
           <article className={`why-strip why-strip--${variant}`} data-side={side} key={str(item, "word") + str(item, "wordEm")}>
             <div className="why-strip__inner">
               {str(item, "eyebrow") ? (
-                <p className="eyebrow why-strip__eyebrow">{str(item, "eyebrow")}</p>
+                <p className="eyebrow why-strip__eyebrow">{withBrand(str(item, "eyebrow"))}</p>
               ) : null}
               <WhyGraphic index={index} />
               <h3 className="why-strip__word">

@@ -1,6 +1,6 @@
 import { SiteChrome } from "@/components/SiteChrome";
 import { HomeView } from "@/components/views/HomeView";
-import { getArticles, getFaqs, getPage, getVehicleModels, seoMetadata } from "@/lib/cms";
+import { getArticles, getFaqs, getGlobal, getPage, getVehicleModels, seoMetadata } from "@/lib/cms";
 import { applyRequestLocale, type LocaleParams, pageMeta } from "@/lib/pageMeta";
 import { PAGE_CHROME } from "@/lib/site";
 import { notFound } from "next/navigation";
@@ -17,17 +17,25 @@ export async function generateMetadata({ params }: LocaleParams) {
 export default async function HomePage({ params }: LocaleParams) {
   const { locale } = await params;
   applyRequestLocale(locale);
-  const [page, models, articles, faqs] = await Promise.all([
+  const [page, models, articles, faqs, global] = await Promise.all([
     getPage("home", locale),
     getVehicleModels(locale),
     getArticles(locale),
     getFaqs(locale),
+    getGlobal(locale),
   ]);
   if (!page) notFound();
   const chrome = PAGE_CHROME.home;
   return (
     <SiteChrome locale={locale} bodyClass={chrome.bodyClass} scripts={chrome.scripts}>
-      <HomeView page={page} models={models || []} articles={articles || []} faqs={faqs || []} locale={locale} />
+      <HomeView
+        page={page}
+        models={models || []}
+        articles={articles || []}
+        faqs={faqs || []}
+        locale={locale}
+        startsFrom={global?.nav?.startsFrom}
+      />
     </SiteChrome>
   );
 }

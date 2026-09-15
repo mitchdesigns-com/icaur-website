@@ -1,5 +1,6 @@
+import { Fragment } from "react";
 import type { CmsArticle, CmsFaqItem, CmsPage, CmsVehicleModel } from "@/lib/cms";
-import { CmsLink, CtaVideo, formatDate, list, num, str, texts } from "./shared";
+import { categoryLabel, CmsLink, CtaVideo, formatDate, list, num, str, texts, withBrand } from "./shared";
 import { WhyStrips } from "./WhyStrips";
 
 type Props = {
@@ -8,9 +9,35 @@ type Props = {
   articles: CmsArticle[];
   faqs: CmsFaqItem[];
   locale: string;
+  startsFrom?: string;
 };
 
-export function HomeView({ page, models, articles, faqs, locale }: Props) {
+type HomeStory = {
+  slug: string;
+  title: string;
+  category: string;
+  publishedOn: string;
+  coverImage: string;
+};
+
+const HOME_MEDIA: HomeStory[] = [
+  {
+    slug: "v23-design",
+    title: "iCAUR V27 Studio Design Revealed",
+    category: "news",
+    publishedOn: "2026-05-28",
+    coverImage: "/assets/images/iCAUR INTL_V27 REV_cam025.webp",
+  },
+  {
+    slug: "electric-wiring",
+    title: "Electric Wiring Matrix Optimized for Egypt",
+    category: "blog",
+    publishedOn: "2026-05-20",
+    coverImage: "/assets/images/v27/car-side.webp",
+  },
+];
+
+export function HomeView({ page, models, articles, faqs, locale, startsFrom = "Starts from" }: Props) {
   const hero = page.hero || {};
   const modelsCopy = page.models || {};
   const overview = page.overview || {};
@@ -20,8 +47,12 @@ export function HomeView({ page, models, articles, faqs, locale }: Props) {
   const paragraphs = texts(overview.paragraphs);
   const stats = list(overview, "stats");
   const serviceItems = list(services, "items");
-  const featured = articles.slice(0, 2);
-  const homeFaqs = faqs.filter((item) => item.showOnHome).slice(0, 5);
+  const featured = homeMediaStories(articles);
+  const homeFaqs = faqs
+    .filter((item) => item.showOnHome)
+    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+    .slice(0, 5);
+  const modelCards = [...models].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
   return (
     <main id="main">
@@ -51,7 +82,9 @@ export function HomeView({ page, models, articles, faqs, locale }: Props) {
               </span>
             </h1>
             <div className="hero__footer">
-              <p className="hero__sub reveal reveal--up" data-delay="5">{str(hero, "subtitle")}</p>
+              <p className="hero__sub reveal reveal--up" data-delay="5">
+                <HeroSubtitle text={str(hero, "subtitle")} />
+              </p>
               <div className="hero__ctas reveal reveal--up" data-delay="6">
                 <CmsLink href={str(hero, "ctaHref", "/reserve")} className="btn btn--filled btn--lg btn--magnetic">
                   {str(hero, "ctaLabel")} →
@@ -65,7 +98,7 @@ export function HomeView({ page, models, articles, faqs, locale }: Props) {
       <section className="section models" id="models">
         <div className="container">
           <header className="section-head models__head reveal reveal--up" data-stagger="parent">
-            <p className="eyebrow">{str(modelsCopy, "eyebrow")}</p>
+            <p className="eyebrow">{withBrand(str(modelsCopy, "eyebrow"))}</p>
             <h2 className="section-title">
               {str(modelsCopy, "title")}
               <br />
@@ -73,7 +106,7 @@ export function HomeView({ page, models, articles, faqs, locale }: Props) {
             </h2>
           </header>
           <div className="models-grid models-grid--feature">
-            {models.map((model, index) => (
+            {modelCards.map((model, index) => (
               <article className="mfc reveal reveal--up" data-delay={index} key={model.slug || model.name}>
                 <CmsLink href={model.href || "/models/v27"} className="mfc__inner" data-cursor-label="Explore">
                   <span className="mfc__glow" aria-hidden="true" />
@@ -90,7 +123,7 @@ export function HomeView({ page, models, articles, faqs, locale }: Props) {
                       ))}
                     </div>
                     <div className="mfc__price">
-                      <span className="mfc__price-label">Starts from</span>
+                      <span className="mfc__price-label">{startsFrom}</span>
                       <span className="mfc__price-value">{model.startingPrice}</span>
                     </div>
                   </div>
@@ -148,7 +181,7 @@ export function HomeView({ page, models, articles, faqs, locale }: Props) {
             <div className="svc__panel svc__panel--intro">
               <div className="svc__intro-inner">
                 <div className="svc__headgroup" id="svcHeadGroup">
-                  <p className="eyebrow svc__eyebrow">{str(services, "eyebrow")}</p>
+                  <p className="eyebrow svc__eyebrow">{withBrand(str(services, "eyebrow"))}</p>
                   <h2 className="svc__headline" id="svcHeadline">
                     {str(services, "headline")}
                     <br />
@@ -170,21 +203,43 @@ export function HomeView({ page, models, articles, faqs, locale }: Props) {
               </div>
             </div>
             {serviceItems.map((item, index) => (
-              <article className={`svc__panel svc__panel--feature${index === 1 ? " svc__panel--flip" : ""}`} key={str(item, "href") || index}>
-                <figure className="svc__media svc__media--lg">
-                  <img src={str(item, "image")} alt={str(item, "imageAlt")} loading="lazy" data-par="0.10" />
-                </figure>
-                <div className="svc__body">
-                  <span className="svc__num">{str(item, "num")}</span>
-                  <h3 className="svc__title">
-                    {str(item, "title")} {str(item, "titleEm") ? <em>{str(item, "titleEm")}</em> : null}
-                  </h3>
-                  <p className="svc__text">{str(item, "text")}</p>
-                  <CmsLink href={str(item, "href")} className="btn btn--dark btn--sm btn--arrow btn--magnetic">
-                    {str(item, "ctaLabel")} <span className="arrow">→</span>
-                  </CmsLink>
-                </div>
-              </article>
+              <Fragment key={str(item, "href") || index}>
+                <article className={`svc__panel svc__panel--feature${index === 1 ? " svc__panel--flip" : ""}`}>
+                  <figure className="svc__media svc__media--lg">
+                    <img src={str(item, "image")} alt={str(item, "imageAlt")} loading="lazy" data-par="0.10" />
+                  </figure>
+                  <div className="svc__body">
+                    <span className="svc__num">{str(item, "num")}</span>
+                    <h3 className="svc__title">
+                      {str(item, "title")} {str(item, "titleEm") ? <em>{str(item, "titleEm")}</em> : null}
+                    </h3>
+                    <p className="svc__text">{str(item, "text")}</p>
+                    <CmsLink href={str(item, "href")} className="btn btn--dark btn--sm btn--arrow btn--magnetic">
+                      {str(item, "ctaLabel")} <span className="arrow">→</span>
+                    </CmsLink>
+                  </div>
+                </article>
+                {index === 0 ? (
+                  <ServiceCluster
+                    first="/assets/images/v27/interior-01.webp"
+                    second="/assets/images/v27-18.webp"
+                    firstClass="svc__media--sm-a"
+                    secondClass="svc__media--sm-b"
+                    firstPar="0.18"
+                    secondPar="-0.12"
+                  />
+                ) : null}
+                {index === 1 ? (
+                  <ServiceCluster
+                    first="/assets/images/ICUAR V27 brochure 03 18.webp"
+                    second="/assets/images/v27/interior-display.webp"
+                    firstClass="svc__media--sm-c"
+                    secondClass="svc__media--sm-d"
+                    firstPar="0.16"
+                    secondPar="-0.10"
+                  />
+                ) : null}
+              </Fragment>
             ))}
           </div>
         </section>
@@ -210,11 +265,13 @@ export function HomeView({ page, models, articles, faqs, locale }: Props) {
               </div>
               {featured[0] ? (
                 <article className="media-card media-card--lead" id="mediaLead">
-                  <CmsLink href={`/news/${featured[0].slug}`} className="media-card__img" data-cursor-label="Read">
-                    <img src={featured[0].coverImage} alt={featured[0].title || ""} loading="lazy" />
+                  <CmsLink href={`/news/${featured[0].slug}`} className="media-card__img" id="mediaLeadImg" data-cursor-label="Read">
+                    <img src={featured[0].coverImage} alt={featured[0].title} loading="lazy" />
                   </CmsLink>
                   <div className="media-card__meta">
-                    <span className="media-card__type">{featured[0].category}</span>
+                    <span className={`media-card__type${featured[0].category === "blog" ? " media-card__type--blog" : ""}`}>
+                      {categoryLabel(featured[0].category)}
+                    </span>
                     <time dateTime={featured[0].publishedOn}>{formatDate(featured[0].publishedOn, locale)}</time>
                   </div>
                   <h4 className="media-card__title">{featured[0].title}</h4>
@@ -223,10 +280,12 @@ export function HomeView({ page, models, articles, faqs, locale }: Props) {
               {featured[1] ? (
                 <article className="media-card media-card--big" id="mediaBig">
                   <CmsLink href={`/news/${featured[1].slug}`} className="media-card__img" data-cursor-label="Read">
-                    <img src={featured[1].coverImage} alt={featured[1].title || ""} loading="lazy" />
+                    <img src={featured[1].coverImage} alt={featured[1].title} loading="lazy" />
                   </CmsLink>
                   <div className="media-card__meta">
-                    <span className={`media-card__type${featured[1].category === "blog" ? " media-card__type--blog" : ""}`}>{featured[1].category}</span>
+                    <span className={`media-card__type${featured[1].category === "blog" ? " media-card__type--blog" : ""}`}>
+                      {categoryLabel(featured[1].category)}
+                    </span>
                     <time dateTime={featured[1].publishedOn}>{formatDate(featured[1].publishedOn, locale)}</time>
                   </div>
                   <h4 className="media-card__title">{featured[1].title}</h4>
@@ -272,5 +331,57 @@ export function HomeView({ page, models, articles, faqs, locale }: Props) {
 
       <CtaVideo cta={page.cta} />
     </main>
+  );
+}
+
+function homeMediaStories(articles: CmsArticle[]): HomeStory[] {
+  const bySlug = new Map(articles.map((item) => [item.slug, item]));
+  return HOME_MEDIA.map((story) => {
+    const cms = bySlug.get(story.slug);
+    return {
+      ...story,
+      slug: cms?.slug || story.slug,
+    };
+  });
+}
+
+function HeroSubtitle({ text }: { text: string }) {
+  const marker = "real life,";
+  const at = text.toLowerCase().indexOf(marker);
+  if (at === -1) return <>{text}</>;
+  const splitAt = at + marker.length;
+  return (
+    <>
+      {text.slice(0, splitAt)}
+      <br />
+      {text.slice(splitAt).trimStart()}
+    </>
+  );
+}
+
+function ServiceCluster({
+  first,
+  second,
+  firstClass,
+  secondClass,
+  firstPar,
+  secondPar,
+}: {
+  first: string;
+  second: string;
+  firstClass: string;
+  secondClass: string;
+  firstPar: string;
+  secondPar: string;
+}) {
+  return (
+    <div className="svc__panel svc__panel--cluster" aria-hidden="true">
+      <figure className={`svc__media svc__media--sm ${firstClass}`}>
+        <img src={first} alt="" loading="lazy" data-par={firstPar} />
+      </figure>
+      <figure className={`svc__media svc__media--sm ${secondClass}`}>
+        <img src={second} alt="" loading="lazy" data-par={secondPar} />
+      </figure>
+    </div>
   );
 }
