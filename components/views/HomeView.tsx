@@ -53,7 +53,7 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
     .filter((item) => item.showOnHome)
     .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
     .slice(0, 5);
-  const modelCards = [...models].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  const modelCards = homeModelCards(page, models);
 
   return (
     <main id="main">
@@ -335,13 +335,25 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
   );
 }
 
-function asArticle(value: unknown): CmsArticle | null {
+function asRelated<T extends { slug?: string }>(value: unknown, key: string): T | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const row = value as Record<string, unknown>;
-  const nested = row.article;
+  const nested = row[key];
   const source = Array.isArray(nested) ? nested[0] : nested;
-  const article = (source && typeof source === "object" ? source : row) as CmsArticle;
-  return article.slug ? article : null;
+  const related = (source && typeof source === "object" ? source : row) as T;
+  return related.slug ? related : null;
+}
+
+function asArticle(value: unknown): CmsArticle | null {
+  return asRelated<CmsArticle>(value, "article");
+}
+
+function homeModelCards(page: CmsPage, models: CmsVehicleModel[]): CmsVehicleModel[] {
+  const related = list(page.models, "vehicles")
+    .map((item) => asRelated<CmsVehicleModel>(item, "model"))
+    .filter((item): item is CmsVehicleModel => Boolean(item));
+  if (related.length) return related;
+  return [...models].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 }
 
 function homeMediaStories(page: CmsPage, articles: CmsArticle[]): HomeStory[] {
