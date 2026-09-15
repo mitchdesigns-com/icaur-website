@@ -1,6 +1,11 @@
 import { Fragment } from "react";
 import type { CmsPage } from "@/lib/cms";
-import { CmsLink, CtaVideo, list, num, str } from "./shared";
+import { CmsLink, CtaVideo, list, num, str, texts } from "./shared";
+
+const ABOUT_STORY_CLUSTER = [
+  "https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev/cms/interior_display_4c3657864e.webp",
+  "https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev/cms/ICUAR_V27_brochure_03_18_bc9df0f1f9.webp",
+];
 
 function MvStatement({ parts }: { parts: Record<string, unknown>[] }) {
   return (
@@ -25,6 +30,8 @@ export function AboutView({ page }: { page: CmsPage }) {
   const hero = page.hero || {};
   const story = page.story || {};
   const panels = list(story, "panels");
+  const cmsCluster = texts(story.cluster);
+  const cluster = cmsCluster.length >= 2 ? cmsCluster : ABOUT_STORY_CLUSTER;
   const figures = list(page.figures, "items");
   const vision = page.vision || {};
   const mission = page.mission || {};
@@ -89,10 +96,10 @@ export function AboutView({ page }: { page: CmsPage }) {
                   {index === 0 ? (
                     <div className="svc__panel svc__panel--cluster" aria-hidden="true">
                       <figure className="svc__media svc__media--sm svc__media--sm-a">
-                        <img src="/assets/images/v27/interior-display.webp" alt="" loading="lazy" data-par="0.18" />
+                        <img src={cluster[0]} alt="" loading="lazy" data-par="0.18" />
                       </figure>
                       <figure className="svc__media svc__media--sm svc__media--sm-b">
-                        <img src="/assets/images/ICUAR V27 brochure 03 18.webp" alt="" loading="lazy" data-par="-0.12" />
+                        <img src={cluster[1]} alt="" loading="lazy" data-par="-0.12" />
                       </figure>
                     </div>
                   ) : null}
