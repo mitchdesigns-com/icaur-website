@@ -48,7 +48,7 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
   const stats = list(overview, "stats");
   const serviceItems = list(services, "items");
   const deck = texts(services.deck);
-  const featured = homeMediaStories(articles);
+  const featured = homeMediaStories(page, articles);
   const homeFaqs = faqs
     .filter((item) => item.showOnHome)
     .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
@@ -335,7 +335,29 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
   );
 }
 
-function homeMediaStories(articles: CmsArticle[]): HomeStory[] {
+function asArticle(value: unknown): CmsArticle | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const row = value as Record<string, unknown>;
+  const nested = row.article;
+  const source = Array.isArray(nested) ? nested[0] : nested;
+  const article = (source && typeof source === "object" ? source : row) as CmsArticle;
+  return article.slug ? article : null;
+}
+
+function homeMediaStories(page: CmsPage, articles: CmsArticle[]): HomeStory[] {
+  const related = list(page.media, "stories")
+    .map(asArticle)
+    .filter((item): item is CmsArticle => Boolean(item))
+    .map((item) => ({
+      slug: item.slug || "",
+      title: item.title || "",
+      category: item.category || "news",
+      publishedOn: item.publishedOn || "",
+      coverImage: item.coverImage || "",
+    }))
+    .filter((item) => item.slug);
+  if (related.length) return related.slice(0, 2);
+
   const bySlug = new Map(articles.map((item) => [item.slug, item]));
   const studioCover = articles.find((item) => (item.coverImage || "").includes("cam025"))?.coverImage;
   return HOME_MEDIA.map((story, index) => {
@@ -343,7 +365,7 @@ function homeMediaStories(articles: CmsArticle[]): HomeStory[] {
     return {
       ...story,
       slug: cms?.slug || story.slug,
-      coverImage: (index === 0 && studioCover) || story.coverImage,
+      coverImage: (index === 0 && studioCover) || cms?.coverImage || story.coverImage,
     };
   });
 }
