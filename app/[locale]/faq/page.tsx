@@ -1,28 +1,28 @@
 import { SiteChrome } from "@/components/SiteChrome";
-import { resolvePageHtml } from "@/lib/cms";
+import { FaqView } from "@/components/views/FaqView";
+import { getFaqs, getPage, seoMetadata } from "@/lib/cms";
 import { applyRequestLocale, type LocaleParams, pageMeta } from "@/lib/pageMeta";
-import { CORE_SCRIPTS } from "@/lib/site";
+import { PAGE_CHROME } from "@/lib/site";
+import { notFound } from "next/navigation";
 
 export const runtime = "edge";
 
 export async function generateMetadata({ params }: LocaleParams) {
   const { locale } = await params;
   const fallback = await pageMeta(locale, "faq");
-  const { page } = await resolvePageHtml("faq", locale, "faq");
-  return page?.seo?.title ? { title: page.seo.title, description: page.seo.description } : fallback;
+  const page = await getPage("faq", locale);
+  return seoMetadata(page?.seo, fallback);
 }
 
 export default async function FaqPage({ params }: LocaleParams) {
   const { locale } = await params;
   applyRequestLocale(locale);
-  const { page, html } = await resolvePageHtml("faq", locale, "faq");
+  const [page, faqs] = await Promise.all([getPage("faq", locale), getFaqs(locale)]);
+  if (!page) notFound();
+  const chrome = PAGE_CHROME.faq;
   return (
-    <SiteChrome
-      locale={locale}
-      page={page}
-      html={html}
-      fallbackBodyClass="is-loading"
-      fallbackScripts={[...CORE_SCRIPTS, { src: "/js/page/faq.js" }]}
-    />
+    <SiteChrome locale={locale} bodyClass={chrome.bodyClass} scripts={chrome.scripts}>
+      <FaqView page={page} faqs={(faqs || []).filter((item) => item.category !== "home")} />
+    </SiteChrome>
   );
 }

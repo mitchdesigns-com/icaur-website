@@ -1,6 +1,4 @@
-import { NEWS_ARTICLES } from "@/lib/newsArticles";
-import { readPageHtml } from "@/lib/readPageHtml";
-import type { SiteScript } from "@/lib/site";
+import type { Metadata } from "next";
 
 export type CmsLink = {
   label?: string;
@@ -43,16 +41,41 @@ export type CmsNavModel = {
 export type CmsSeo = {
   title?: string;
   description?: string;
+  keywords?: string;
+  ogImage?: string;
 };
 
-export type CmsScript = {
-  src?: string;
-  type?: "default" | "module";
+export type CmsCta = {
+  title?: string;
+  titleEm?: string;
+  body?: string;
+  primaryLabel?: string;
+  primaryHref?: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
+  videoSrc?: string;
+  posterSrc?: string;
 };
 
-export type CmsSection = {
-  key?: string;
-  html?: string;
+export type CmsFeatureFlag = {
+  label?: string;
+  included?: boolean;
+};
+
+export type CmsArticleBlock = {
+  heading?: string;
+  body?: string;
+  quote?: string;
+  image?: string;
+  imageAlt?: string;
+};
+
+export type CmsFaqItem = {
+  question?: string;
+  answer?: string;
+  category?: "sales" | "warranty" | "services" | "spare-parts" | "home" | string;
+  sortOrder?: number;
+  showOnHome?: boolean;
 };
 
 export type CmsGlobal = {
@@ -139,22 +162,45 @@ export type CmsGlobal = {
 };
 
 export type CmsPage = {
+  seo?: CmsSeo;
+  hero?: Record<string, unknown>;
+  models?: Record<string, unknown>;
+  overview?: Record<string, unknown>;
+  services?: Record<string, unknown>;
+  why?: { items?: Record<string, unknown>[] };
+  media?: Record<string, unknown>;
+  faq?: Record<string, unknown>;
+  cta?: CmsCta;
+  story?: Record<string, unknown>;
+  figures?: { items?: Record<string, unknown>[] };
+  vision?: Record<string, unknown>;
+  mission?: Record<string, unknown>;
+  values?: Record<string, unknown>;
+  intro?: Record<string, unknown>;
+  form?: Record<string, unknown>;
+  app?: Record<string, unknown>;
+  findUs?: Record<string, unknown>;
+  technology?: Record<string, unknown>;
+  pillars?: Record<string, unknown>[];
+  filters?: Record<string, string>;
+  featuredCta?: string;
+  loadMore?: string;
+  hub?: { cards?: Record<string, unknown>[] };
+  book?: Record<string, unknown>;
+  downloads?: Record<string, unknown>;
+  coverage?: Record<string, unknown>;
+};
+
+export type CmsArticle = {
   slug?: string;
   title?: string;
   seo?: CmsSeo;
-  bodyClass?: string;
-  extraStyles?: string[];
-  scripts?: CmsScript[];
-  sections?: CmsSection[];
-  html?: string;
-};
-
-export type CmsArticle = CmsPage & {
   description?: string;
   category?: string;
   publishedOn?: string;
   readTime?: string;
   coverImage?: string;
+  blocks?: CmsArticleBlock[];
   related?: CmsArticle[];
 };
 
@@ -184,8 +230,7 @@ export type CmsVehicleModel = {
   startingPrice?: string;
   specs?: CmsSpec[];
   trims?: CmsTrim[];
-  features?: Record<string, boolean>;
-  experience?: Record<string, unknown>;
+  features?: CmsFeatureFlag[] | Record<string, boolean>;
   sortOrder?: number;
 };
 
@@ -197,6 +242,51 @@ export type CmsRuntime = {
 
 const CMS_URL = (process.env.NEXT_PUBLIC_CMS_URL || "").replace(/\/$/, "");
 
+export function cmsAsset(src?: string | null): string {
+  if (!src) return "";
+  if (/^https?:\/\//i.test(src) || src.startsWith("//") || src.startsWith("data:")) return src;
+  if (src.startsWith("/uploads") && CMS_URL) return `${CMS_URL}${src}`;
+  return src;
+}
+
+function withCmsAssets<T>(value: T): T {
+  if (typeof value === "string") return cmsAsset(value) as T;
+  if (Array.isArray(value)) return value.map((item) => withCmsAssets(item)) as T;
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, withCmsAssets(item)])) as T;
+  }
+  return value;
+}
+
+export function seoMetadata(
+  seo?: CmsSeo | null,
+  fallback: { title?: string; description?: string } = {}
+): Metadata {
+  const title = seo?.title || fallback.title;
+  const description = seo?.description || fallback.description;
+  const keywords = (seo?.keywords || "")
+    .split(/[,،]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const image = cmsAsset(seo?.ogImage);
+  return {
+    title,
+    description,
+    keywords: keywords.length ? keywords : undefined,
+    openGraph: {
+      title,
+      description,
+      ...(image ? { images: [{ url: image }] } : {}),
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
+    },
+  };
+}
+
 async function cmsGet<T>(path: string): Promise<T | null> {
   if (!CMS_URL) return null;
   try {
@@ -205,7 +295,7 @@ async function cmsGet<T>(path: string): Promise<T | null> {
     });
     if (!response.ok) return null;
     const json = (await response.json()) as { data?: T };
-    return json.data ?? null;
+    return withCmsAssets((json.data ?? null) as T);
   } catch {
     return null;
   }
@@ -220,11 +310,12 @@ export function cmsHref(href: string): string | { pathname: string; query: Recor
   return Object.keys(query).length ? { pathname, query } : pathname;
 }
 
-export function toSiteScripts(scripts?: CmsScript[] | null): SiteScript[] {
-  if (!scripts?.length) return [];
-  return scripts
-    .filter((script): script is CmsScript & { src: string } => Boolean(script.src))
-    .map((script) => (script.type === "module" ? { src: script.src, type: "module" as const } : { src: script.src }));
+export function featureMap(features?: CmsFeatureFlag[] | Record<string, boolean> | null): Record<string, boolean> {
+  if (!features) return {};
+  if (Array.isArray(features)) {
+    return Object.fromEntries(features.map((item) => [item.label || "", Boolean(item.included)]));
+  }
+  return features;
 }
 
 export async function getGlobal(locale: string): Promise<CmsGlobal | null> {
@@ -260,6 +351,10 @@ export async function getArticles(locale: string): Promise<CmsArticle[] | null> 
   return cmsGet<CmsArticle[]>(`/api/articles?locale=${locale}`);
 }
 
+export async function getFaqs(locale: string): Promise<CmsFaqItem[] | null> {
+  return cmsGet<CmsFaqItem[]>(`/api/faq-items?locale=${locale}`);
+}
+
 export async function getLocations(locale: string): Promise<CmsLocation[] | null> {
   return cmsGet<CmsLocation[]>(`/api/locations?locale=${locale}`);
 }
@@ -279,38 +374,21 @@ export async function loadChrome(locale: string) {
 
 export async function cmsPageMeta(slug: string, locale: string, fallback: { title?: string; description?: string }) {
   const page = await getPage(slug, locale);
-  if (page?.seo?.title) {
-    return { title: page.seo.title, description: page.seo.description };
-  }
-  return fallback;
+  return seoMetadata(page?.seo, fallback);
 }
 
 export async function cmsArticleMeta(slug: string, locale: string, fallback: { title?: string; description?: string }) {
   const article = await getArticle(slug, locale);
-  if (article?.seo?.title) {
-    return { title: article.seo.title, description: article.seo.description };
-  }
-  return fallback;
-}
-
-export async function resolvePageHtml(slug: string, locale: string, fallbackId: string) {
-  const page = await getPage(slug, locale);
-  if (page?.html) return { page, html: page.html };
-  return { page, html: await readPageHtml(fallbackId) };
-}
-
-export async function resolveArticleHtml(slug: string, locale: string) {
-  const article = await getArticle(slug, locale);
-  if (article?.html) return { article, html: article.html };
-  const local = NEWS_ARTICLES.find((item) => item.slug === slug);
-  if (!local) return { article, html: null };
-  return { article, html: await readPageHtml(local.contentId) };
+  return seoMetadata(article?.seo, fallback);
 }
 
 export function cmsRuntime(locations?: CmsLocation[] | null, models?: CmsVehicleModel[] | null): CmsRuntime {
   return {
     submitUrl: CMS_URL ? `${CMS_URL}/api/reserve-submissions` : undefined,
     locations: locations ?? undefined,
-    models: models ?? undefined,
+    models: (models || []).map((model) => ({
+      ...model,
+      features: featureMap(model.features),
+    })),
   };
 }

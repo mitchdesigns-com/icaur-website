@@ -1,28 +1,28 @@
 import { SiteChrome } from "@/components/SiteChrome";
-import { resolvePageHtml } from "@/lib/cms";
+import { NewsView } from "@/components/views/NewsView";
+import { getArticles, getPage, seoMetadata } from "@/lib/cms";
 import { applyRequestLocale, type LocaleParams, pageMeta } from "@/lib/pageMeta";
-import { CORE_SCRIPTS } from "@/lib/site";
+import { PAGE_CHROME } from "@/lib/site";
+import { notFound } from "next/navigation";
 
 export const runtime = "edge";
 
 export async function generateMetadata({ params }: LocaleParams) {
   const { locale } = await params;
   const fallback = await pageMeta(locale, "news");
-  const { page } = await resolvePageHtml("news", locale, "news");
-  return page?.seo?.title ? { title: page.seo.title, description: page.seo.description } : fallback;
+  const page = await getPage("news", locale);
+  return seoMetadata(page?.seo, fallback);
 }
 
 export default async function NewsPage({ params }: LocaleParams) {
   const { locale } = await params;
   applyRequestLocale(locale);
-  const { page, html } = await resolvePageHtml("news", locale, "news");
+  const [page, articles] = await Promise.all([getPage("news", locale), getArticles(locale)]);
+  if (!page) notFound();
+  const chrome = PAGE_CHROME.news;
   return (
-    <SiteChrome
-      locale={locale}
-      page={page}
-      html={html}
-      fallbackBodyClass="is-loading"
-      fallbackScripts={[...CORE_SCRIPTS, { src: "/js/page/news.js" }]}
-    />
+    <SiteChrome locale={locale} bodyClass={chrome.bodyClass} scripts={chrome.scripts}>
+      <NewsView page={page} articles={articles || []} locale={locale} />
+    </SiteChrome>
   );
 }

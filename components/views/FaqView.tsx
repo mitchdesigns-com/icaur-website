@@ -1,0 +1,87 @@
+import type { CmsFaqItem, CmsPage } from "@/lib/cms";
+import { CmsLink, CtaVideo, str, texts } from "./shared";
+
+const GROUPS = [
+  { id: "sales", label: "Sales" },
+  { id: "warranty", label: "Warranty" },
+  { id: "services", label: "Services" },
+  { id: "spare-parts", label: "Spare Parts" },
+] as const;
+
+export function FaqView({ page, faqs }: { page: CmsPage; faqs: CmsFaqItem[] }) {
+  const hero = page.hero || {};
+  const pills = texts(hero.pills);
+  const shots = texts(hero.shots);
+  const shotClass = ["faq-hero-shot--tall", "faq-hero-shot--sq", "faq-hero-shot--wide", "faq-hero-shot--tall"];
+
+  return (
+    <main id="main">
+      <section className="faq-page-hero">
+        <div className="faq-hero-shots" aria-hidden="true">
+          {shots.map((src, index) => (
+            <div className={`faq-hero-shot ${shotClass[index % shotClass.length]} reveal reveal--up`} data-delay={index + 2} key={src}>
+              <img src={src} alt="" loading="lazy" />
+            </div>
+          ))}
+        </div>
+        <div className="faq-asks" aria-hidden="true">
+          {pills.map((pill, index) => (
+            <div className={`faq-ask faq-ask--${index + 1} reveal reveal--up`} data-delay={index + 3} key={pill}>
+              <span className={`faq-ask__pill ${index % 2 === 0 ? "faq-ask__pill--amber" : "faq-ask__pill--ink"}`}>
+                <span className="faq-ask__t">{pill}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="container" style={{ maxWidth: 720 }}>
+          <nav className="breadcrumb reveal reveal--up" data-delay="0" aria-label="Breadcrumb">
+            <CmsLink href="/">{str(hero, "homeLabel", "Home")}</CmsLink>
+            <span>›</span>
+            <span aria-current="page">{str(hero, "pageLabel", "FAQs")}</span>
+          </nav>
+          <p className="eyebrow reveal reveal--up" data-delay="1">{str(hero, "eyebrow")}</p>
+          <h1 className="reveal reveal--up" data-delay="2">
+            {str(hero, "title")}
+            <br />
+            <em style={{ fontStyle: "normal", color: "var(--amber)" }}>{str(hero, "titleEm")}</em>
+          </h1>
+          <p className="reveal reveal--up" data-delay="3">{str(hero, "intro")}</p>
+        </div>
+        <div className="faq-cat-filters">
+          <button className="faq-cat-btn is-active" data-cat="all">{str(hero, "allLabel", "All FAQs")}</button>
+          {GROUPS.map((group) => (
+            <button className="faq-cat-btn" data-cat={group.id} key={group.id}>{group.label}</button>
+          ))}
+        </div>
+      </section>
+
+      <div className="faq-page-body">
+        <div className="container" style={{ maxWidth: 800 }}>
+          {GROUPS.map((group) => {
+            const items = faqs.filter((item) => item.category === group.id);
+            if (!items.length) return null;
+            return (
+              <div className="faq-group" data-group={group.id} key={group.id}>
+                {items.map((item) => (
+                  <div className="faq-item reveal reveal--up" role="listitem" key={item.question}>
+                    <button type="button" className="faq-item__q" aria-expanded="false">
+                      {item.question}
+                      <span className="faq-item__plus" aria-hidden="true">+</span>
+                    </button>
+                    <div className="faq-item__a" aria-hidden="true">
+                      <div>
+                        <p>{item.answer}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <CtaVideo cta={page.cta} />
+    </main>
+  );
+}

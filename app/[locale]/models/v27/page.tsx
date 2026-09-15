@@ -1,34 +1,28 @@
 import { SiteChrome } from "@/components/SiteChrome";
-import { resolvePageHtml } from "@/lib/cms";
+import { V27View } from "@/components/views/V27View";
+import { getPage, seoMetadata } from "@/lib/cms";
 import { applyRequestLocale, type LocaleParams, pageMeta } from "@/lib/pageMeta";
-import { CORE_SCRIPTS, GSAP_V27 } from "@/lib/site";
+import { PAGE_CHROME } from "@/lib/site";
+import { notFound } from "next/navigation";
 
 export const runtime = "edge";
 
 export async function generateMetadata({ params }: LocaleParams) {
   const { locale } = await params;
   const fallback = await pageMeta(locale, "v27");
-  const { page } = await resolvePageHtml("models-v27", locale, "models-v27");
-  return page?.seo?.title ? { title: page.seo.title, description: page.seo.description } : fallback;
+  const page = await getPage("models-v27", locale);
+  return seoMetadata(page?.seo, fallback);
 }
 
 export default async function V27Page({ params }: LocaleParams) {
   const { locale } = await params;
   applyRequestLocale(locale);
-  const { page, html } = await resolvePageHtml("models-v27", locale, "models-v27");
+  const page = await getPage("models-v27", locale);
+  if (!page) notFound();
+  const chrome = PAGE_CHROME["models-v27"];
   return (
-    <SiteChrome
-      locale={locale}
-      page={page}
-      html={html}
-      fallbackBodyClass="v27-page"
-      fallbackStyles={["/css/v27.css"]}
-      fallbackScripts={[
-        ...GSAP_V27,
-        ...CORE_SCRIPTS,
-        { src: "/js/page/models-v27.js" },
-        { src: "/js/v27.js?v=67", type: "module" },
-      ]}
-    />
+    <SiteChrome locale={locale} bodyClass={chrome.bodyClass} scripts={chrome.scripts} styles={chrome.styles}>
+      <V27View page={page} />
+    </SiteChrome>
   );
 }

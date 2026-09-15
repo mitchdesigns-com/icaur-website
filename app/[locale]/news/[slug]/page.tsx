@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SiteChrome } from "@/components/SiteChrome";
-import { resolveArticleHtml } from "@/lib/cms";
+import { ArticleView } from "@/components/views/ArticleView";
+import { getArticle, seoMetadata } from "@/lib/cms";
 import { NEWS_ARTICLES } from "@/lib/newsArticles";
 import { applyRequestLocale, pageMeta } from "@/lib/pageMeta";
-import { CORE_SCRIPTS } from "@/lib/site";
+import { PAGE_CHROME } from "@/lib/site";
 
 export const runtime = "edge";
 
@@ -14,27 +15,21 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
-  const { article } = await resolveArticleHtml(slug, locale);
-  if (article?.seo?.title) {
-    return { title: article.seo.title, description: article.seo.description };
-  }
+  const article = await getArticle(slug, locale);
   const local = NEWS_ARTICLES.find((item) => item.slug === slug);
-  if (!local) return {};
-  return pageMeta(locale, `newsArticles.${slug}`);
+  const fallback = local ? await pageMeta(locale, `newsArticles.${slug}`) : {};
+  return seoMetadata(article?.seo, fallback);
 }
 
 export default async function NewsArticlePage({ params }: Props) {
   const { locale, slug } = await params;
   applyRequestLocale(locale);
-  const { article, html } = await resolveArticleHtml(slug, locale);
-  if (!html) notFound();
+  const article = await getArticle(slug, locale);
+  if (!article) notFound();
+  const chrome = PAGE_CHROME.article;
   return (
-    <SiteChrome
-      locale={locale}
-      page={article}
-      html={html}
-      fallbackBodyClass="is-loading"
-      fallbackScripts={CORE_SCRIPTS}
-    />
+    <SiteChrome locale={locale} bodyClass={chrome.bodyClass} scripts={chrome.scripts}>
+      <ArticleView article={article} locale={locale} />
+    </SiteChrome>
   );
 }

@@ -34,3 +34,55 @@ export const FEEDBACK_WIDGET = {
 export const DEFAULT_TITLE = "iCAUR — Built for Every Road";
 export const DEFAULT_DESCRIPTION =
   "iCAUR — Egypt's next-generation electric vehicle. Built for every road.";
+
+export const PAGE_CHROME: Record<string, { bodyClass: string; scripts: SiteScript[]; styles?: string[] }> = {
+  home: { bodyClass: "is-loading dark-hero-page", scripts: [...CORE_SCRIPTS, { src: "/js/dot-field.js" }] },
+  about: {
+    bodyClass: "is-loading",
+    scripts: [
+      ...CORE_SCRIPTS,
+      { src: "/js/about-car.js" },
+      { src: "/js/dot-field.js" },
+      { src: "/js/doodles.js" },
+      { src: "/js/about-thread.js" },
+      { src: "/js/page/about.js" },
+      { src: "/js/about-mv.js", type: "module" },
+    ],
+  },
+  contact: {
+    bodyClass: "is-loading",
+    styles: ["https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"],
+    scripts: [...CORE_SCRIPTS, ...LEAFLET, { src: "/js/services.js" }, { src: "/js/page/contact.js" }],
+  },
+  faq: { bodyClass: "is-loading", scripts: [...CORE_SCRIPTS, { src: "/js/page/faq.js" }] },
+  innovation: {
+    bodyClass: "is-loading dark-hero-page",
+    styles: ["/css/v27.css"],
+    scripts: [...CORE_SCRIPTS, ...GSAP_INNOV, { src: "/js/page/innovation.js" }],
+  },
+  news: { bodyClass: "is-loading", scripts: [...CORE_SCRIPTS, { src: "/js/page/news.js" }] },
+  reserve: { bodyClass: "is-loading dark-hero-page", scripts: [...CORE_SCRIPTS, { src: "/js/page/reserve.js" }] },
+  services: {
+    bodyClass: "is-loading dark-hero-page",
+    styles: ["https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"],
+    scripts: [...CORE_SCRIPTS, { src: "/js/doodles.js" }, ...LEAFLET, { src: "/js/services.js" }],
+  },
+  "services-maintenance": {
+    bodyClass: "is-loading dark-hero-page",
+    scripts: [...CORE_SCRIPTS, { src: "/js/doodles.js" }, { src: "/js/services.js" }],
+  },
+  "services-programs": {
+    bodyClass: "is-loading dark-hero-page",
+    scripts: [...CORE_SCRIPTS, { src: "/js/doodles.js" }],
+  },
+  "services-warranty": {
+    bodyClass: "is-loading dark-hero-page",
+    scripts: [...CORE_SCRIPTS, { src: "/js/doodles.js" }],
+  },
+  "models-v27": {
+    bodyClass: "v27-page",
+    styles: ["/css/v27.css"],
+    scripts: [...GSAP_V27, ...CORE_SCRIPTS, { src: "/js/page/models-v27.js" }, { src: "/js/v27.js?v=67", type: "module" }],
+  },
+  article: { bodyClass: "is-loading", scripts: CORE_SCRIPTS },
+};

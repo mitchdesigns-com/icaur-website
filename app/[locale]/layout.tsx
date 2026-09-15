@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { getGlobal } from "@/lib/cms";
+import { cmsAsset, getGlobal, seoMetadata } from "@/lib/cms";
 import { asLocale } from "@/lib/pageMeta";
 import { FEEDBACK_WIDGET } from "@/lib/site";
 
@@ -28,14 +28,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale: asLocale(locale), namespace: "meta.site" });
   const global = await getGlobal(asLocale(locale));
+  const seo = seoMetadata(global?.seo, { title: t("title"), description: t("description") });
   return {
     title: {
-      default: global?.seo?.title || t("title"),
+      default: String(seo.title || t("title")),
       template: "%s",
     },
-    description: global?.seo?.description || t("description"),
+    description: seo.description,
+    keywords: seo.keywords,
+    openGraph: seo.openGraph,
+    twitter: seo.twitter,
     icons: {
-      icon: [{ url: global?.favicon || "/assets/images/Favicon.svg", type: "image/svg+xml" }],
+      icon: [{ url: cmsAsset(global?.favicon) || "/assets/images/Favicon.svg", type: "image/svg+xml" }],
     },
   };
 }
