@@ -343,9 +343,7 @@ function homeMediaStories(articles: CmsArticle[]): HomeStory[] {
     return {
       ...story,
       slug: cms?.slug || story.slug,
-      category: cms?.category || story.category,
-      publishedOn: cms?.publishedOn || story.publishedOn,
-      coverImage: (index === 0 && studioCover) || cms?.coverImage || story.coverImage,
+      coverImage: (index === 0 && studioCover) || story.coverImage,
     };
   });
 }
