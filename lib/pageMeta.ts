@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { type Locale, routing } from "@/i18n/routing";
 
@@ -36,7 +35,10 @@ type MetaKey =
   | "v27"
   | `newsArticles.${string}`;
 
-export async function pageMeta(locale: string, key: MetaKey): Promise<Metadata> {
+export async function pageMeta(
+  locale: string,
+  key: MetaKey
+): Promise<{ title: string; description: string }> {
   const t = await getTranslations({
     locale: asLocale(locale),
     namespace: `meta.${key}` as "meta.home",

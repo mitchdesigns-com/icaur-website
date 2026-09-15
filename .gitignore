@@ -2,6 +2,7 @@
 .next/
 out/
 node_modules/
+.pnpm-store/
 
 # OS / editor
 .DS_Store
