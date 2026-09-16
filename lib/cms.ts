@@ -306,14 +306,19 @@ export function seoMetadata(
 
 async function cmsGet<T>(path: string): Promise<T | null> {
   if (!CMS_URL) return null;
+  const url = `${CMS_URL}${path}`;
   try {
-    const response = await fetch(`${CMS_URL}${path}`, {
+    const response = await fetch(url, {
       cache: "no-store",
     });
-    if (!response.ok) return null;
+    if (!response.ok) {
+      console.warn(`[cms] ${response.status} ${url}`);
+      return null;
+    }
     const json = (await response.json()) as { data?: T };
     return withCmsAssets((json.data ?? null) as T);
-  } catch {
+  } catch (error) {
+    console.warn(`[cms] failed ${url}`, error);
     return null;
   }
 }
