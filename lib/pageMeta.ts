@@ -33,6 +33,7 @@ type MetaKey =
   | "programs"
   | "warranty"
   | "v27"
+  | "o3t"
   | `newsArticles.${string}`;
 
 export async function pageMeta(

@@ -971,6 +971,11 @@ function initMarquee() {
 /* ══════════════════════════════════════════════════════════
    8.  INTERIOR CAROUSEL
 ══════════════════════════════════════════════════════════ */
+function cmsSrc(src) {
+  const assets = (typeof window !== 'undefined' && window.__ICAUR_CMS && window.__ICAUR_CMS.assets) || {};
+  return assets[src] || src;
+}
+
 const SLIDES = [
   { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam025.webp', label: 'Overview',
     hotspots: [
@@ -990,7 +995,11 @@ const SLIDES = [
   { src: '/assets/images/v27/interior-sunroof.webp', label: 'Panoramic Roof' },
   { src: '/assets/images/v27/interior-console.webp', label: 'Wireless Charging' },
   { src: '/assets/images/v27/interior-01.webp', label: 'Cabin Ambience' },
-];
+].map((slide) => ({
+  ...slide,
+  src: cmsSrc(slide.src),
+  hotspots: (slide.hotspots || []).map((spot) => ({ ...spot, img: cmsSrc(spot.img) })),
+}));
 
 const PEEK = 72;
 const GAP  = 10;

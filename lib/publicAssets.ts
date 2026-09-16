@@ -1,4 +1,5 @@
 const CMS_MEDIA = "https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev/cms";
+const PAGES_ORIGIN = "https://icaur-website.pages.dev";
 
 export const PUBLIC_ASSET_ALIASES: Record<string, string> = {
   "/assets/images/overview background.webp": `${CMS_MEDIA}/overview_background_e951a8b89c.webp`,
@@ -10,7 +11,11 @@ export const PUBLIC_ASSET_ALIASES: Record<string, string> = {
   "/assets/images/v27/iCAUR INTL_V27 REV_cam026 copy.webp": `${CMS_MEDIA}/i_CAUR_INTL_V27_REV_cam026_copy_7ca1e4bf5b.webp`,
   "/assets/images/iCAUR INTL_V27 REV_cam027 copy.webp": `${CMS_MEDIA}/i_CAUR_INTL_V27_REV_cam027_copy_55d48e610a.webp`,
   "/assets/images/v27/iCAUR INTL_V27 REV_cam027 copy.webp": `${CMS_MEDIA}/i_CAUR_INTL_V27_REV_cam027_copy_55d48e610a.webp`,
+  "/assets/images/v27/iCAUR INTL_V27 REV_cam028 copy.webp": `${PAGES_ORIGIN}/assets/images/v27/iCAUR%20INTL_V27%20REV_cam028%20copy.webp`,
+  "/assets/images/v27/iCAUR INTL_V27 REV_cam033 copy.webp": `${PAGES_ORIGIN}/assets/images/v27/iCAUR%20INTL_V27%20REV_cam033%20copy.webp`,
+  "/assets/images/v27/iCAUR INTL_V27 REV_cam0301 copy.webp": `${PAGES_ORIGIN}/assets/images/v27/iCAUR%20INTL_V27%20REV_cam0301%20copy.webp`,
   "/assets/images/v27/interior-display.webp": `${CMS_MEDIA}/interior_display_4c3657864e.webp`,
+  "/assets/images/v27/interior-01.webp": `${PAGES_ORIGIN}/assets/images/v27/interior-01.webp`,
 };
 
 export const MODEL_INTERIOR_PATHS: Record<string, string[]> = {

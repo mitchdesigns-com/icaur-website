@@ -82,7 +82,12 @@ export const PAGE_CHROME: Record<string, { bodyClass: string; scripts: SiteScrip
   "models-v27": {
     bodyClass: "v27-page",
     styles: ["/css/v27.css"],
-    scripts: [...GSAP_V27, ...CORE_SCRIPTS, { src: "/js/page/models-v27.js" }, { src: "/js/v27.js?v=67", type: "module" }],
+    scripts: [...GSAP_V27, ...CORE_SCRIPTS, { src: "/js/page/models-v27.js" }, { src: "/js/v27.js?v=68", type: "module" }],
+  },
+  "models-o3t": {
+    bodyClass: "v27-page",
+    styles: ["/css/v27.css"],
+    scripts: [...GSAP_V27, ...CORE_SCRIPTS, { src: "/js/v27.js?v=68", type: "module" }],
   },
   article: { bodyClass: "is-loading", scripts: CORE_SCRIPTS },
 };

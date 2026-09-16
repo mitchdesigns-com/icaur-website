@@ -231,7 +231,7 @@ function defaultModelCards(t: (key: NavMessageKey) => string): CmsNavModel[] {
     },
     {
       slug: "o3t",
-      href: "/models/v27",
+      href: "/models/o3t",
       name: t("o3tName"),
       highlight: t("o3tHighlight"),
       price: t("o3tPrice"),
