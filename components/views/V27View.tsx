@@ -22,9 +22,23 @@ function PriceValue({ price, unit }: { price: string; unit: string }) {
   return <>{price}</>;
 }
 
+function brandExperience(html: string, mark: string) {
+  if (mark === "V27") return html;
+  return html
+    .replaceAll("Download V27 Brochure", `Download ${mark} Brochure`)
+    .replaceAll("Download V27 Warranty", `Download ${mark} Warranty`)
+    .replaceAll("V27 Resources", `${mark} Resources`)
+    .replaceAll("V27 Brochure", `${mark} Brochure`)
+    .replaceAll("V27 Warranty", `${mark} Warranty`)
+    .replaceAll('<span class="brand-name">iCAUR</span> V27', `<span class="brand-name">iCAUR</span> ${mark}`)
+    .replaceAll("</span><span>V27</span>", `</span><span>${mark}</span>`)
+    .replaceAll('Safety <span class="eyebrow-dot"></span> V27', `Safety <span class="eyebrow-dot"></span> ${mark}`)
+    .replaceAll("The V27's", `The ${mark}'s`);
+}
+
 export async function ModelView({
   page,
-  htmlId,
+  htmlId = "models-v27",
   mark = "V27",
 }: {
   page: CmsPage;
@@ -37,13 +51,11 @@ export async function ModelView({
   const logo = str(hero, "logo");
   const brochureLabel = str(overview, "brochureLabel");
   const brochureHref = str(overview, "brochureHref", "/assets/docs/iCAUR-V27-Brochure.pdf");
-  let experience = "";
-  if (htmlId) {
-    const html = await readPageHtml(htmlId);
-    const start = html.indexOf('<section id="v27-exterior">');
-    const end = html.indexOf('<section class="cta-video"');
-    experience = start >= 0 && end > start ? rewriteHtmlAssets(html.slice(start, end)) : "";
-  }
+  const html = await readPageHtml(htmlId);
+  const start = html.indexOf('<section id="v27-exterior">');
+  const end = html.indexOf('<section class="cta-video"');
+  const experience =
+    start >= 0 && end > start ? brandExperience(rewriteHtmlAssets(html.slice(start, end)), mark) : "";
 
   return (
     <>
