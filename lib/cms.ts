@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { modelAssetMap, publicAsset } from "@/lib/publicAssets";
 
 export type CmsLink = {
   label?: string;
@@ -218,6 +219,11 @@ export type CmsLocation = {
   sortOrder?: number;
 };
 
+export type CmsGallerySlide = {
+  src?: string;
+  label?: string;
+};
+
 export type CmsVehicleModel = {
   slug?: string;
   name?: string;
@@ -228,6 +234,12 @@ export type CmsVehicleModel = {
   image?: string;
   hoverImage?: string;
   startingPrice?: string;
+  priceUnit?: string;
+  brochureLabel?: string;
+  brochureHref?: string;
+  safetyImage?: string;
+  interiorSlides?: CmsGallerySlide[];
+  exteriorSlides?: CmsGallerySlide[];
   specs?: CmsSpec[];
   trims?: CmsTrim[];
   features?: CmsFeatureFlag[] | Record<string, boolean>;
@@ -238,6 +250,7 @@ export type CmsRuntime = {
   submitUrl?: string;
   locations?: CmsLocation[];
   models?: CmsVehicleModel[];
+  assets?: Record<string, string>;
 };
 
 const CMS_URL = (
@@ -246,6 +259,8 @@ const CMS_URL = (
 
 export function cmsAsset(src?: string | null): string {
   if (!src) return "";
+  const mapped = publicAsset(src);
+  if (mapped !== src) return mapped;
   if (/^https?:\/\//i.test(src) || src.startsWith("//") || src.startsWith("data:")) return src;
   if (src.startsWith("/uploads") && CMS_URL) return `${CMS_URL}${src}`;
   return src;
@@ -337,6 +352,7 @@ const PAGE_API: Record<string, string> = {
   "services-programs": "/api/programs-page",
   "services-warranty": "/api/warranty-page",
   "models-v27": "/api/v27-page",
+  "models-o3t": "/api/o3t-page",
 };
 
 export async function getPage(slug: string, locale: string): Promise<CmsPage | null> {
@@ -385,12 +401,14 @@ export async function cmsArticleMeta(slug: string, locale: string, fallback: { t
 }
 
 export function cmsRuntime(locations?: CmsLocation[] | null, models?: CmsVehicleModel[] | null): CmsRuntime {
+  const list = models || [];
   return {
     submitUrl: CMS_URL ? `${CMS_URL}/api/reserve-submissions` : undefined,
     locations: locations ?? undefined,
-    models: (models || []).map((model) => ({
+    models: list.map((model) => ({
       ...model,
       features: featureMap(model.features),
     })),
+    assets: modelAssetMap(list),
   };
 }
