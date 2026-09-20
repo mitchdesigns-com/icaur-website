@@ -1,5 +1,6 @@
 import type { CmsPage } from "@/lib/cms";
-import { CmsLink, CtaVideo, list, str } from "./shared";
+import { DownloadFile } from "./DownloadFile";
+import { CmsLink, CtaVideo, StoreBadges, cmsFile, downloadName, list, str } from "./shared";
 
 function SpotHero({ hero }: { hero: Record<string, unknown> }) {
   const image = str(hero, "image");
@@ -43,9 +44,20 @@ export function MaintenanceView({ page }: { page: CmsPage }) {
                 <h2 className="svc-book__h">
                   {str(book, "title")}
                   <br />
-                  By <span style={{ color: "var(--amber)" }}>{str(book, "titleEm")}</span>
+                  {str(book, "byLabel", "By")} {str(book, "titleEm") ? <span style={{ color: "var(--amber)" }}>{str(book, "titleEm")}</span> : null}
                 </h2>
-                <p className="svc-book__body">{str(book, "body")}</p>
+                <p className="svc-book__body">
+                  {str(book, "body")}{" "}
+                  {str(book, "contactLabel") ? (
+                    <CmsLink href={str(book, "contactHref", "/contact")}>{str(book, "contactLabel")}</CmsLink>
+                  ) : null}
+                </p>
+                <StoreBadges
+                  appStoreLabel={str(book, "appStoreLabel")}
+                  appStoreHref={str(book, "appStoreHref")}
+                  playLabel={str(book, "playLabel")}
+                  playHref={str(book, "playHref")}
+                />
               </div>
             </div>
           </div>
@@ -137,13 +149,32 @@ function DownloadBand({
         </h2>
         <p className="warranty-card__body reveal reveal--up" data-delay="2">{body}</p>
         <div className="white-hover-cards dl-cards reveal reveal--up" data-delay="3">
-          {items.map((item) => (
-            <a href={str(item, "href") || "#"} className="white-hover-card" aria-label={str(item, "title")} key={str(item, "title")}>
-              <h3 className="white-hover-card__h">{str(item, "title")}</h3>
-              <p className="white-hover-card__p">{str(item, "meta")}</p>
-              <span className="white-hover-card__link">{str(item, "ctaLabel")} <span className="arrow">→</span></span>
-            </a>
-          ))}
+          {items.map((item) => {
+            const href = cmsFile(item);
+            const title = str(item, "title");
+            return (
+              <DownloadFile
+                href={href}
+                filename={downloadName(title, href)}
+                className="white-hover-card"
+                aria-label={`${str(item, "ctaLabel", "Download")} ${title}`}
+                key={title}
+              >
+                <span className="white-hover-card__icon">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <path d="M14 2v6h6" />
+                    <path d="M9 13h6" />
+                    <path d="M9 17h6" />
+                    <path d="M9 9h1" />
+                  </svg>
+                </span>
+                <h3 className="white-hover-card__h">{title}</h3>
+                <p className="white-hover-card__p">{str(item, "meta")}</p>
+                <span className="white-hover-card__link">{str(item, "ctaLabel")} <span className="arrow">→</span></span>
+              </DownloadFile>
+            );
+          })}
         </div>
       </div>
     </section>

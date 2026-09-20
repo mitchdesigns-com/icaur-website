@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { chargeAtPercent, chargingConfig, type CmsPage, type CmsVehicleModel } from "@/lib/cms";
-import { CmsLink, CtaVideo, list, num, str } from "./shared";
+import { DownloadFile } from "./DownloadFile";
+import { CmsLink, CtaVideo, cmsFile, downloadName, list, num, str } from "./shared";
 
 function PriceValue({ price, unit }: { price: string; unit: string }) {
   if (unit) {
@@ -85,7 +86,7 @@ export function ModelView({
   const videoSrc = str(hero, "videoSrc");
   const logo = str(hero, "logo") || str(record, "logo");
   const brochureLabel = str(overview, "brochureLabel") || str(record, "brochureLabel");
-  const brochureHref = str(overview, "brochureHref") || str(record, "brochureHref");
+  const brochureHref = cmsFile(overview, ["brochureFile", "brochureHref", "file"]) || cmsFile(record, ["brochureFile", "brochureHref"]);
   const colors = list(exterior, "colors");
   const resourceItems = list(resources, "items");
   const techItems = list(tech, "items");
@@ -148,13 +149,13 @@ export function ModelView({
                 </span>
               </div>
               {brochureLabel && brochureHref ? (
-                <a href={brochureHref} download className="v27-cta-btn v27-cta-btn--dark ovx-cta">
+                <DownloadFile href={brochureHref} filename={downloadName(brochureLabel, brochureHref)} className="v27-cta-btn v27-cta-btn--dark ovx-cta">
                   <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 3v13M7 11l5 5 5-5" />
                     <path d="M4 20h16" />
                   </svg>
                   {brochureLabel}
-                </a>
+                </DownloadFile>
               ) : null}
             </div>
           </div>
@@ -255,22 +256,26 @@ export function ModelView({
         <p className="eyebrow v27-res-eyebrow">{str(resources, "eyebrow")}</p>
         <h2 className="v27-res-h2">{str(resources, "title")}</h2>
         <div className="white-hover-cards dl-cards v27-dl-cards reveal reveal--up" data-delay="2">
-          {resourceItems.map((item) => (
-            <a
-              className="white-hover-card"
-              href={str(item, "href")}
-              download
-              aria-label={`${str(item, "ctaLabel")} ${str(item, "title")}`}
-              key={str(item, "title")}
-            >
-              <span className="white-hover-card__icon">
-                <ResourceIcon icon={str(item, "icon", "file")} />
-              </span>
-              <h3 className="white-hover-card__h">{str(item, "title")}</h3>
-              <p className="white-hover-card__p">{str(item, "meta")}</p>
-              <span className="white-hover-card__link">{str(item, "ctaLabel")} <span className="arrow">&rarr;</span></span>
-            </a>
-          ))}
+          {resourceItems.map((item) => {
+            const href = cmsFile(item);
+            const title = str(item, "title");
+            return (
+              <DownloadFile
+                className="white-hover-card"
+                href={href}
+                filename={downloadName(title, href)}
+                aria-label={`${str(item, "ctaLabel")} ${title}`}
+                key={title}
+              >
+                <span className="white-hover-card__icon">
+                  <ResourceIcon icon={str(item, "icon", "file")} />
+                </span>
+                <h3 className="white-hover-card__h">{title}</h3>
+                <p className="white-hover-card__p">{str(item, "meta")}</p>
+                <span className="white-hover-card__link">{str(item, "ctaLabel")} <span className="arrow">&rarr;</span></span>
+              </DownloadFile>
+            );
+          })}
         </div>
       </section>
 

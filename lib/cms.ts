@@ -261,6 +261,7 @@ export type CmsVehicleModel = {
   priceUnit?: string;
   brochureLabel?: string;
   brochureHref?: string;
+  brochureFile?: string;
   safetyImage?: string;
   interiorSlides?: CmsGallerySlide[];
   exteriorSlides?: CmsGallerySlide[];

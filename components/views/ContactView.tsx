@@ -1,5 +1,5 @@
 import type { CmsLocation, CmsPage, CmsVehicleModel } from "@/lib/cms";
-import { CtaVideo, str } from "./shared";
+import { CtaVideo, StoreBadges, str } from "./shared";
 
 type Props = {
   page: CmsPage;
@@ -217,6 +217,12 @@ export function ContactView({ page, locations, models }: Props) {
               <div className="svc-book__card">
                 <h2 className="svc-book__h">{str(app, "title")}<br /><span style={{ color: "var(--amber)" }}>{str(app, "titleEm")}</span></h2>
                 <p className="svc-book__body">{str(app, "body")}</p>
+                <StoreBadges
+                  appStoreLabel={str(app, "appStoreLabel")}
+                  appStoreHref={str(app, "appStoreHref")}
+                  playLabel={str(app, "playLabel")}
+                  playHref={str(app, "playHref")}
+                />
               </div>
             </div>
           </div>
