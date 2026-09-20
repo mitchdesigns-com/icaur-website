@@ -35,7 +35,7 @@ export const DEFAULT_TITLE = "iCAUR — Built for Every Road";
 export const DEFAULT_DESCRIPTION =
   "iCAUR — Egypt's next-generation electric vehicle. Built for every road.";
 
-export const MODEL_CHROME = {
+export const MODEL_CHROME: { bodyClass: string; scripts: SiteScript[]; styles: string[] } = {
   bodyClass: "v27-page",
   styles: ["/css/v27.css"],
   scripts: [...GSAP_V27, ...CORE_SCRIPTS, { src: "/js/page/models-v27.js" }, { src: "/js/v27.js?v=73", type: "module" }],
