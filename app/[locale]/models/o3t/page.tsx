@@ -21,7 +21,7 @@ export default async function O3TPage({ params }: LocaleParams) {
   if (!page) notFound();
   const chrome = PAGE_CHROME["models-o3t"];
   return (
-    <SiteChrome locale={locale} bodyClass={chrome.bodyClass} scripts={chrome.scripts} styles={chrome.styles}>
+    <SiteChrome locale={locale} bodyClass={chrome.bodyClass} scripts={chrome.scripts} styles={chrome.styles} page={page}>
       <ModelView page={page} mark="O3T" />
     </SiteChrome>
   );

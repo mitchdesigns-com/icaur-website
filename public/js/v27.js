@@ -47,7 +47,7 @@ let modelYaw = 0;
 
 /* ─── Car colors — one GLB per paint (same sources as the landing page) ── */
 const R2 = 'https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev';
-const CAR_COLORS = {
+const DEFAULT_CAR_COLORS = {
   'camel':          '/assets/images/car-v27.glb',
   'carbon-black':   `${R2}/car-v27-carbon-black.glb`,
   'gold-sand':      `${R2}/car-v27-gold-sand.glb`,
@@ -57,10 +57,30 @@ const CAR_COLORS = {
   'tactical-green': `${R2}/car-v27-tactical-green.glb`,
 };
 
+function cmsModel() {
+  return (typeof window !== 'undefined' && window.__ICAUR_CMS && window.__ICAUR_CMS.model) || {};
+}
+
+function cmsSrc(src) {
+  const assets = (typeof window !== 'undefined' && window.__ICAUR_CMS && window.__ICAUR_CMS.assets) || {};
+  return assets[src] || src;
+}
+
+const CAR_COLORS = (() => {
+  const map = {};
+  (cmsModel().colors || []).forEach((color) => {
+    if (color && color.key && color.model) map[color.key] = color.model;
+  });
+  return Object.keys(map).length ? map : DEFAULT_CAR_COLORS;
+})();
+
 let car = null;          /* pose group — poses/rotation applied here */
 let carBody = null;      /* current color GLB scene inside the group */
 let refBox = null;       /* first-loaded bbox — variants are normalized to it */
-let activeColor = 'carbon-black';
+let activeColor = (() => {
+  const active = (cmsModel().colors || []).find((color) => color && color.active && color.key);
+  return (active && active.key) || 'carbon-black';
+})();
 const glbCache = new Map();   /* url → Promise<THREE.Group> */
 const glbReady = new Set();   /* urls whose model is decoded & ready (instant swap) */
 let isDragging  = false;
@@ -492,7 +512,7 @@ function initExterior() {
 /* ══════════════════════════════════════════════════════════
    4.  EXTERIOR DESIGN — photo carousel
 ══════════════════════════════════════════════════════════ */
-const EXT_SLIDES = [
+const DEFAULT_EXT_SLIDES = [
   { src: '/assets/images/v27/v27-01.webp',  label: 'Front View' },
   { src: '/assets/images/v27/v27-02.webp',  label: 'Profile' },
   { src: '/assets/images/v27/v27-03.webp',  label: 'Exterior' },
@@ -500,6 +520,12 @@ const EXT_SLIDES = [
   { src: '/assets/images/v27/v27-17.webp',  label: 'Side' },
   { src: '/assets/images/v27/v27-20.webp',  label: 'Dynamic' },
 ];
+const EXT_SLIDES = (() => {
+  const slides = (cmsModel().exteriorSlides || [])
+    .filter((slide) => slide && slide.src)
+    .map((slide) => ({ src: cmsSrc(slide.src), label: slide.label || '' }));
+  return slides.length ? slides : DEFAULT_EXT_SLIDES.map((slide) => ({ ...slide, src: cmsSrc(slide.src) }));
+})();
 
 /* ─── Lightbox state ─────────────────────────────────── */
 let lbItems  = [];
@@ -971,12 +997,7 @@ function initMarquee() {
 /* ══════════════════════════════════════════════════════════
    8.  INTERIOR CAROUSEL
 ══════════════════════════════════════════════════════════ */
-function cmsSrc(src) {
-  const assets = (typeof window !== 'undefined' && window.__ICAUR_CMS && window.__ICAUR_CMS.assets) || {};
-  return assets[src] || src;
-}
-
-const SLIDES = [
+const DEFAULT_SLIDES = [
   { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam025.webp', label: 'Overview',
     hotspots: [
       { x: '38%', y: '22%', title: 'Panoramic Sunroof', desc: 'Tinted electrochromic glass dims on demand.', img: '/assets/images/v27/interior-sunroof.webp' },
@@ -995,11 +1016,17 @@ const SLIDES = [
   { src: '/assets/images/v27/interior-sunroof.webp', label: 'Panoramic Roof' },
   { src: '/assets/images/v27/interior-console.webp', label: 'Wireless Charging' },
   { src: '/assets/images/v27/interior-01.webp', label: 'Cabin Ambience' },
-].map((slide) => ({
-  ...slide,
-  src: cmsSrc(slide.src),
-  hotspots: (slide.hotspots || []).map((spot) => ({ ...spot, img: cmsSrc(spot.img) })),
-}));
+];
+
+const SLIDES = (() => {
+  const fromCms = (cmsModel().interiorSlides || []).filter((slide) => slide && slide.src);
+  const source = fromCms.length ? fromCms : DEFAULT_SLIDES;
+  return source.map((slide) => ({
+    ...slide,
+    src: cmsSrc(slide.src),
+    hotspots: (slide.hotspots || []).map((spot) => ({ ...spot, img: cmsSrc(spot.img) })),
+  }));
+})();
 
 const PEEK = 72;
 const GAP  = 10;

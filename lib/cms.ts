@@ -167,6 +167,13 @@ export type CmsPage = {
   hero?: Record<string, unknown>;
   models?: Record<string, unknown>;
   overview?: Record<string, unknown>;
+  exterior?: Record<string, unknown>;
+  gallery?: Record<string, unknown>;
+  interior?: Record<string, unknown>;
+  resources?: Record<string, unknown>;
+  tech?: Record<string, unknown>;
+  safety?: Record<string, unknown>;
+  charging?: Record<string, unknown>;
   services?: Record<string, unknown>;
   why?: { items?: Record<string, unknown>[] };
   media?: Record<string, unknown>;
@@ -219,9 +226,26 @@ export type CmsLocation = {
   sortOrder?: number;
 };
 
+export type CmsModelHotspot = {
+  x?: string;
+  y?: string;
+  title?: string;
+  desc?: string;
+  img?: string;
+};
+
 export type CmsGallerySlide = {
   src?: string;
   label?: string;
+  hotspots?: CmsModelHotspot[];
+};
+
+export type CmsModelColor = {
+  key?: string;
+  name?: string;
+  image?: string;
+  model?: string;
+  active?: boolean;
 };
 
 export type CmsVehicleModel = {
@@ -251,6 +275,11 @@ export type CmsRuntime = {
   locations?: CmsLocation[];
   models?: CmsVehicleModel[];
   assets?: Record<string, string>;
+  model?: {
+    colors?: CmsModelColor[];
+    exteriorSlides?: CmsGallerySlide[];
+    interiorSlides?: CmsGallerySlide[];
+  };
 };
 
 const CMS_URL = (
@@ -405,7 +434,46 @@ export async function cmsArticleMeta(slug: string, locale: string, fallback: { t
   return seoMetadata(article?.seo, fallback);
 }
 
-export function cmsRuntime(locations?: CmsLocation[] | null, models?: CmsVehicleModel[] | null): CmsRuntime {
+function asRecordList(value: unknown): Record<string, unknown>[] {
+  return Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
+}
+
+export function modelPageRuntime(page?: CmsPage | null): CmsRuntime["model"] {
+  if (!page) return undefined;
+  const colors = asRecordList(page.exterior?.colors)
+    .map((color) => ({
+      key: String(color.key || ""),
+      name: String(color.name || ""),
+      image: String(color.image || ""),
+      model: String(color.model || ""),
+      active: Boolean(color.active),
+    }))
+    .filter((color) => color.key);
+  const exteriorSlides = asRecordList(page.gallery?.slides)
+    .map((slide) => ({ src: String(slide.src || ""), label: String(slide.label || "") }))
+    .filter((slide) => slide.src);
+  const interiorSlides = asRecordList(page.interior?.slides)
+    .map((slide) => ({
+      src: String(slide.src || ""),
+      label: String(slide.label || ""),
+      hotspots: asRecordList(slide.hotspots).map((spot) => ({
+        x: String(spot.x || ""),
+        y: String(spot.y || ""),
+        title: String(spot.title || ""),
+        desc: String(spot.desc || ""),
+        img: String(spot.img || ""),
+      })),
+    }))
+    .filter((slide) => slide.src);
+  if (!colors.length && !exteriorSlides.length && !interiorSlides.length) return undefined;
+  return { colors, exteriorSlides, interiorSlides };
+}
+
+export function cmsRuntime(
+  locations?: CmsLocation[] | null,
+  models?: CmsVehicleModel[] | null,
+  page?: CmsPage | null
+): CmsRuntime {
   const list = models || [];
   return {
     submitUrl: CMS_URL ? `${CMS_URL}/api/reserve-submissions` : undefined,
@@ -415,5 +483,6 @@ export function cmsRuntime(locations?: CmsLocation[] | null, models?: CmsVehicle
       features: featureMap(model.features),
     })),
     assets: modelAssetMap(list),
+    model: modelPageRuntime(page),
   };
 }

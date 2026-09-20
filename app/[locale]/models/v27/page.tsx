@@ -21,7 +21,7 @@ export default async function V27Page({ params }: LocaleParams) {
   if (!page) notFound();
   const chrome = PAGE_CHROME["models-v27"];
   return (
-    <SiteChrome locale={locale} bodyClass={chrome.bodyClass} scripts={chrome.scripts} styles={chrome.styles}>
+    <SiteChrome locale={locale} bodyClass={chrome.bodyClass} scripts={chrome.scripts} styles={chrome.styles} page={page}>
       <V27View page={page} />
     </SiteChrome>
   );

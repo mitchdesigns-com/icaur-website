@@ -5,7 +5,7 @@ import { GrainFilter } from "@/components/GrainFilter";
 import { Header } from "@/components/Header";
 import { LegacyScripts } from "@/components/LegacyScripts";
 import { QuickNav } from "@/components/QuickNav";
-import { cmsRuntime, loadChrome } from "@/lib/cms";
+import { cmsRuntime, loadChrome, type CmsPage } from "@/lib/cms";
 import type { SiteScript } from "@/lib/site";
 import type { ReactNode } from "react";
 
@@ -15,11 +15,12 @@ type Props = {
   bodyClass: string;
   scripts: SiteScript[];
   styles?: string[];
+  page?: CmsPage | null;
 };
 
-export async function SiteChrome({ locale, children, bodyClass, scripts, styles = [] }: Props) {
+export async function SiteChrome({ locale, children, bodyClass, scripts, styles = [], page }: Props) {
   const { global, locations, models } = await loadChrome(locale);
-  const runtime = cmsRuntime(locations, models);
+  const runtime = cmsRuntime(locations, models, page);
 
   return (
     <>

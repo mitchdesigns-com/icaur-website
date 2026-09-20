@@ -1,7 +1,6 @@
+import { Fragment } from "react";
 import type { CmsPage } from "@/lib/cms";
-import { rewriteHtmlAssets } from "@/lib/publicAssets";
-import { CmsLink, CtaVideo, str } from "./shared";
-import { readPageHtml } from "@/lib/readPageHtml";
+import { CmsLink, CtaVideo, list, num, str } from "./shared";
 
 function PriceValue({ price, unit }: { price: string; unit: string }) {
   if (unit) {
@@ -22,40 +21,75 @@ function PriceValue({ price, unit }: { price: string; unit: string }) {
   return <>{price}</>;
 }
 
-function brandExperience(html: string, mark: string) {
-  if (mark === "V27") return html;
-  return html
-    .replaceAll("Download V27 Brochure", `Download ${mark} Brochure`)
-    .replaceAll("Download V27 Warranty", `Download ${mark} Warranty`)
-    .replaceAll("V27 Resources", `${mark} Resources`)
-    .replaceAll("V27 Brochure", `${mark} Brochure`)
-    .replaceAll("V27 Warranty", `${mark} Warranty`)
-    .replaceAll('<span class="brand-name">iCAUR</span> V27', `<span class="brand-name">iCAUR</span> ${mark}`)
-    .replaceAll("</span><span>V27</span>", `</span><span>${mark}</span>`)
-    .replaceAll('Safety <span class="eyebrow-dot"></span> V27', `Safety <span class="eyebrow-dot"></span> ${mark}`)
-    .replaceAll("The V27's", `The ${mark}'s`);
+function Lines({ text }: { text: string }) {
+  return text.split("\n").map((line, index) => (
+    <Fragment key={index}>
+      {index > 0 ? <br /> : null}
+      {line}
+    </Fragment>
+  ));
 }
 
-export async function ModelView({
+function ResourceIcon({ icon }: { icon: string }) {
+  if (icon === "calendar") {
+    return (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M8 2v4" />
+        <path d="M16 2v4" />
+        <rect x="3" y="4" width="18" height="18" rx="2" />
+        <path d="M3 10h18" />
+        <path d="M8 14h3" />
+        <path d="M8 18h6" />
+      </svg>
+    );
+  }
+  if (icon === "shield") {
+    return (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <polyline points="9 12 11 14 15 10" />
+      </svg>
+    );
+  }
+  return (
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6" />
+      <path d="M9 13h6" />
+      <path d="M9 17h6" />
+      <path d="M9 9h1" />
+    </svg>
+  );
+}
+
+export function ModelView({
   page,
-  htmlId = "models-v27",
   mark = "V27",
 }: {
   page: CmsPage;
-  htmlId?: string;
   mark?: string;
 }) {
   const hero = page.hero || {};
   const overview = page.overview || {};
+  const exterior = page.exterior || {};
+  const gallery = page.gallery || {};
+  const interior = page.interior || {};
+  const resources = page.resources || {};
+  const tech = page.tech || {};
+  const safety = page.safety || {};
+  const charging = page.charging || {};
   const videoSrc = str(hero, "videoSrc");
   const logo = str(hero, "logo");
   const brochureLabel = str(overview, "brochureLabel");
   const brochureHref = str(overview, "brochureHref", "/assets/docs/iCAUR-V27-Brochure.pdf");
-  const html = await readPageHtml(htmlId);
-  const start = html.indexOf('<section id="v27-exterior">');
-  const end = html.indexOf('<section class="cta-video"');
-  const experience =
-    start >= 0 && end > start ? brandExperience(rewriteHtmlAssets(html.slice(start, end)), mark) : "";
+  const colors = list(exterior, "colors");
+  const resourceItems = list(resources, "items");
+  const techItems = list(tech, "items");
+  const safetyItems = list(safety, "items");
+  const safetyImage = str(safety, "image");
+  const techMark = str(tech, "mark", mark);
+  const safetyMark = str(safety, "mark", mark);
+  const galleryMark = str(gallery, "eyebrowMark", mark);
 
   return (
     <>
@@ -121,12 +155,236 @@ export async function ModelView({
           </div>
         </div>
       </section>
-      {experience ? <div dangerouslySetInnerHTML={{ __html: experience }} /> : null}
+
+      <section id="v27-exterior">
+        <div className="v27-ext-sticky">
+          <div className="v27-ext-header">
+            <div>
+              <div className="eyebrow" id="v27-ext-eyebrow">{str(exterior, "eyebrow", "360 Experience")}</div>
+              <h2 className="v27-ext-h2" id="v27-ext-h2">
+                {str(exterior, "title", "Designed To")} {str(exterior, "titleEm") ? <em>{str(exterior, "titleEm")}</em> : null}
+              </h2>
+            </div>
+          </div>
+          <div className="v27-ext-window" />
+          <div className="v27-swatches-wrap">
+            <div className="v27-swatches" id="v27-swatches">
+              {colors.map((color) => {
+                const key = str(color, "key");
+                const name = str(color, "name");
+                return (
+                  <button
+                    className={`v27-swatch${color.active ? " active" : ""}`}
+                    data-color={key}
+                    aria-label={name}
+                    key={key}
+                  >
+                    <img src={str(color, "image")} alt={name} draggable={false} />
+                    <span className="v27-swatch-name">{name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="exterior-gallery">
+        <div className="eg-header">
+          <p className="eyebrow eg-eyebrow">
+            <span>{str(gallery, "eyebrow", "Exterior")}</span>
+            <span className="eg-eyebrow-dot" aria-hidden="true" />
+            <span>{galleryMark}</span>
+          </p>
+          <h2 className="eg-h2" id="eg-h2">{str(gallery, "title", "DESIGNED TO BE SEEN.")}</h2>
+        </div>
+        <div id="v27-eg-grid" className="v27-eg-grid" />
+      </section>
+
+      <div className="v27-marquee-wrap v27-marquee-wrap--ext" aria-hidden="true">
+        <div className="v27-marquee-ribbon v27-marquee-ribbon--a">
+          <div className="v27-marquee-track" id="v27-mq-c" />
+        </div>
+        <div className="v27-marquee-ribbon v27-marquee-ribbon--b">
+          <div className="v27-marquee-track" id="v27-mq-d" />
+        </div>
+      </div>
+
+      <div className="v27-lightbox" id="v27-lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+        <div className="v27-lb-stage" id="v27-lb-stage">
+          <div className="v27-lb-frame">
+            <img id="v27-lightbox-img" src="" alt="" />
+          </div>
+          <p className="v27-lb-caption" id="v27-lb-caption" />
+        </div>
+        <button className="v27-lb-btn v27-lb-btn--prev" id="v27-lb-prev" aria-label="Previous image">
+          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" /></svg>
+        </button>
+        <button className="v27-lb-btn v27-lb-btn--next" id="v27-lb-next" aria-label="Next image">
+          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" /></svg>
+        </button>
+        <button className="v27-lb-close" id="v27-lightbox-close" aria-label="Close lightbox">
+          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <section id="v27-interior">
+        <div className="v27-interior-head" id="v27-interior-head">
+          <div className="eyebrow">{str(interior, "eyebrow", "Interior")}</div>
+          <h2 className="v27-interior-h2">
+            {str(interior, "title", "Where Design")} {str(interior, "titleEm") ? <em>{str(interior, "titleEm")}</em> : null}
+          </h2>
+        </div>
+        <div className="v27-carousel-outer" id="v27-carousel-outer">
+          <button className="v27-carousel-arrow v27-carousel-arrow--prev" id="v27-arrow-prev" aria-label="Previous">
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" /></svg>
+          </button>
+          <button className="v27-carousel-arrow v27-carousel-arrow--next" id="v27-arrow-next" aria-label="Next">
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" /></svg>
+          </button>
+          <div className="v27-carousel-track" id="v27-carousel-track" />
+        </div>
+      </section>
+
+      <section id="v27-resources">
+        <p className="eyebrow v27-res-eyebrow">{str(resources, "eyebrow", `${mark} Resources`)}</p>
+        <h2 className="v27-res-h2">{str(resources, "title", "Everything You Need.")}</h2>
+        <div className="white-hover-cards dl-cards v27-dl-cards reveal reveal--up" data-delay="2">
+          {resourceItems.map((item) => (
+            <a
+              className="white-hover-card"
+              href={str(item, "href", "#")}
+              download
+              aria-label={`${str(item, "ctaLabel", "Download")} ${str(item, "title")}`}
+              key={str(item, "title")}
+            >
+              <span className="white-hover-card__icon">
+                <ResourceIcon icon={str(item, "icon", "file")} />
+              </span>
+              <h3 className="white-hover-card__h">{str(item, "title")}</h3>
+              <p className="white-hover-card__p">{str(item, "meta")}</p>
+              <span className="white-hover-card__link">{str(item, "ctaLabel", "Download")} <span className="arrow">&rarr;</span></span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section id="v27-tech">
+        <div className="v27-ct-sticky">
+          <div className="v27-ct-liquid-bg" id="v27-ct-liquid-bg" aria-hidden="true" />
+          <div className="v27-ct-vignette" aria-hidden="true" />
+          <div className="v27-ct-head" id="v27-ct-head">
+            <p className="v27-ct-eyebrow" id="v27-ct-eyebrow">
+              {str(tech, "eyebrow", "Technology")} <span className="eyebrow-dot" /> <span className="brand-name">{str(tech, "brand", "iCAUR")}</span> {techMark}
+            </p>
+            <div className="v27-ct-line-wrap">
+              <div className="v27-ct-line1" id="v27-ct-line1">{str(tech, "line1")}</div>
+              <div className="v27-ct-mask" id="v27-ct-mask1" />
+            </div>
+            <div className="v27-ct-line-wrap" style={{ marginBottom: 24 }}>
+              <div className="v27-ct-line2" id="v27-ct-line2">{str(tech, "line2")}</div>
+              <div className="v27-ct-mask" id="v27-ct-mask2" />
+            </div>
+            <p className="v27-ct-sub" id="v27-ct-sub">{str(tech, "sub")}</p>
+          </div>
+        </div>
+        {techItems.map((item) => (
+          <div className="v27-ct-item" data-rotate={String(num(item, "rotate"))} key={str(item, "label")}>
+            <div className="v27-ct-item-inner">
+              <div className="v27-ct-left">
+                <h3 className="v27-ct-title">
+                  <Lines text={str(item, "title")} />
+                </h3>
+              </div>
+              <div className="v27-ct-center">
+                <img className="v27-ct-img" src={str(item, "image")} alt={str(item, "title")} />
+              </div>
+              <div className="v27-ct-right">
+                <p className="v27-ct-label">{str(item, "label")}</p>
+                <p className="v27-ct-desc">{str(item, "desc")}</p>
+                <div className="v27-ct-deco" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section id="v27-safety">
+        <div className="v27-sf-card">
+          <div className="v27-sf-header">
+            <div>
+              <p className="v27-sf-eyebrow">
+                {str(safety, "eyebrow", "Safety")} <span className="eyebrow-dot" /> {safetyMark}
+              </p>
+              <h2 className="v27-safety-h2" id="v27-sf-h2">
+                <span className="line-clip"><span className="line-inner">{str(safety, "title")}</span></span>
+                <span className="line-clip"><span className="line-inner" style={{ color: "#F37021" }}>{str(safety, "titleEm")}</span></span>
+              </h2>
+            </div>
+            <p className="v27-sf-intro">{str(safety, "intro")}</p>
+          </div>
+          <div className="v27-sf-main" id="v27-sf-main">
+            <div className="v27-sf-img-wrap" id="v27-sf-img-wrap" aria-hidden="true">
+              {safetyImage ? <img className="v27-sf-img v27-sf-img--default" id="v27-sf-default-img" src={safetyImage} alt="" /> : null}
+              {safetyItems.map((item, index) => (
+                <img className="v27-sf-img v27-sf-feat-img" data-idx={index} src={str(item, "image")} alt="" key={str(item, "title")} />
+              ))}
+            </div>
+            <div className="v27-sf-list" id="v27-sf-list">
+              {safetyItems.map((item, index) => (
+                <div className="v27-sf-row-wrap" key={str(item, "title")}>
+                  <div aria-hidden="true" />
+                  <div className="v27-sf-row sf-row" data-idx={index}>
+                    <div className="v27-sf-row-body">
+                      <h3 className="sf-title">{str(item, "title")}</h3>
+                      <div className="sf-disc-wrap"><div><p className="sf-disc">{str(item, "disc")}</p></div></div>
+                    </div>
+                    <span className="sf-num">{str(item, "num")}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="v27-charging">
+        <div className="v27-charging-eyebrow"><span className="eyebrow-dot" />{str(charging, "eyebrow", "Power & Range")}</div>
+        <div className="v27-charging-top">
+          <h2 className="v27-charging-h2" id="v27-charging-h2">
+            {str(charging, "title", "Charge")} {str(charging, "titleEm") ? <em>{str(charging, "titleEm")}</em> : null}
+            <br />
+            {str(charging, "titleAfter")}
+          </h2>
+          <p className="v27-charging-intro">{str(charging, "intro")}</p>
+        </div>
+        <div className="v27-charge-track-wrap">
+          <div className="v27-charge-tooltip" id="v27-charge-tooltip" style={{ left: "20%" }}>20%</div>
+          <div className="v27-charge-track" id="v27-charge-track">
+            <div className="v27-charge-fill" id="v27-charge-fill" style={{ width: "20%" }} />
+            <div className="v27-charge-thumb" id="v27-charge-thumb" style={{ left: "20%" }}>
+              <svg width="28" height="28" fill="#fff" viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H11L10 22l9.5-11.5H13L14 2z" opacity=".9" /></svg>
+            </div>
+          </div>
+        </div>
+        <div className="v27-charge-stats">
+          <div className="v27-charge-stat">
+            <div className="v27-charge-stat-val" id="v27-charge-time">8<span className="v27-charge-stat-unit">min</span></div>
+            <div className="v27-charge-stat-label">{str(charging, "timeLabel")}</div>
+          </div>
+          <div className="v27-charge-divider" />
+          <div className="v27-charge-stat">
+            <div className="v27-charge-stat-val" id="v27-charge-range">90<span className="v27-charge-stat-unit">km</span></div>
+            <div className="v27-charge-stat-label">{str(charging, "rangeLabel")}</div>
+          </div>
+        </div>
+      </section>
+
       <CtaVideo cta={page.cta} />
     </>
   );
 }
 
 export function V27View({ page }: { page: CmsPage }) {
-  return <ModelView page={page} htmlId="models-v27" mark="V27" />;
+  return <ModelView page={page} mark="V27" />;
 }
