@@ -69,6 +69,7 @@ export function ModelView({
   page: CmsPage | CmsVehicleModel;
   mark?: string;
 }) {
+  const vehicle = page as CmsVehicleModel;
   const hero = page.hero || {};
   const overview = page.overview || {};
   const exterior = page.exterior || {};
@@ -78,17 +79,18 @@ export function ModelView({
   const tech = page.tech || {};
   const safety = page.safety || {};
   const charging = page.charging || {};
-  const charge = chargingConfig(charging);
+  const charge = chargingConfig(charging, vehicle.specs);
   const initialCharge = chargeAtPercent(charge.defaultPercent, charge);
+  const record = page as Record<string, unknown>;
   const videoSrc = str(hero, "videoSrc");
-  const logo = str(hero, "logo");
-  const brochureLabel = str(overview, "brochureLabel");
-  const brochureHref = str(overview, "brochureHref");
+  const logo = str(hero, "logo") || str(record, "logo");
+  const brochureLabel = str(overview, "brochureLabel") || str(record, "brochureLabel");
+  const brochureHref = str(overview, "brochureHref") || str(record, "brochureHref");
   const colors = list(exterior, "colors");
   const resourceItems = list(resources, "items");
   const techItems = list(tech, "items");
   const safetyItems = list(safety, "items");
-  const safetyImage = str(safety, "image");
+  const safetyImage = str(safety, "image") || str(record, "safetyImage");
   const techMark = str(tech, "mark", mark);
   const techBrand = str(tech, "brand");
   const safetyMark = str(safety, "mark", mark);
@@ -291,8 +293,8 @@ export function ModelView({
             <p className="v27-ct-sub" id="v27-ct-sub">{str(tech, "sub")}</p>
           </div>
         </div>
-        {techItems.map((item) => (
-          <div className="v27-ct-item" data-rotate={String(num(item, "rotate"))} key={str(item, "label")}>
+        {techItems.map((item, index) => (
+          <div className="v27-ct-item" data-rotate={String(num(item, "rotate") || (index % 2 ? 14 : -14))} key={str(item, "label") || str(item, "title") || String(index)}>
             <div className="v27-ct-item-inner">
               <div className="v27-ct-left">
                 <h3 className="v27-ct-title">

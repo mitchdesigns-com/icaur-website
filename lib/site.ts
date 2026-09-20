@@ -38,7 +38,7 @@ export const DEFAULT_DESCRIPTION =
 export const MODEL_CHROME = {
   bodyClass: "v27-page",
   styles: ["/css/v27.css"],
-  scripts: [...GSAP_V27, ...CORE_SCRIPTS, { src: "/js/page/models-v27.js" }, { src: "/js/v27.js?v=71", type: "module" }],
+  scripts: [...GSAP_V27, ...CORE_SCRIPTS, { src: "/js/page/models-v27.js" }, { src: "/js/v27.js?v=73", type: "module" }],
 };
 
 export const PAGE_CHROME: Record<string, { bodyClass: string; scripts: SiteScript[]; styles?: string[] }> = {

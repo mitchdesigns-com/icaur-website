@@ -436,7 +436,13 @@ export async function getVehicleModels(locale: string): Promise<CmsVehicleModel[
 }
 
 export async function getVehicleModel(slug: string, locale: string): Promise<CmsVehicleModel | null> {
-  return cmsGet<CmsVehicleModel>(`/api/vehicle-models?slug=${encodeURIComponent(slug)}&locale=${locale}`);
+  const data = await cmsGet<CmsVehicleModel | CmsVehicleModel[]>(
+    `/api/vehicle-models?slug=${encodeURIComponent(slug)}&locale=${locale}`
+  );
+  const match = Array.isArray(data) ? data.find((item) => item.slug === slug) || data[0] : data;
+  if (match?.slug) return match;
+  const list = await getVehicleModels(locale);
+  return (list || []).find((item) => item.slug === slug) || null;
 }
 
 export async function loadChrome(locale: string) {
@@ -473,15 +479,27 @@ function cmsText(obj: Record<string, unknown> | undefined | null, key: string, f
   return typeof value === "string" && value ? value : fallback;
 }
 
-export function chargingConfig(charging?: Record<string, unknown> | null): CmsChargingConfig {
+function specRange(specs?: CmsSpec[] | null) {
+  const row = (specs || []).find((item) => /range/i.test(item.label || ""));
+  const match = String(row?.value || "").match(/([\d,.]+)\s*([A-Za-z\u0600-\u06FF]+)?/);
+  if (!match) return { value: 0, unit: "" };
+  const value = Number(match[1].replace(/,/g, ""));
+  return { value: Number.isFinite(value) ? value : 0, unit: match[2] || "" };
+}
+
+export function chargingConfig(
+  charging?: Record<string, unknown> | null,
+  specs?: CmsSpec[] | null
+): CmsChargingConfig {
+  const range = specRange(specs);
   return {
     defaultPercent: cmsNumber(charging, "defaultPercent", 20),
     animateToPercent: cmsNumber(charging, "animateToPercent", 80),
     timeCapPercent: cmsNumber(charging, "timeCapPercent", 80),
     maxTime: cmsNumber(charging, "maxTime", 30),
-    fullRange: cmsNumber(charging, "fullRange", 450),
+    fullRange: cmsNumber(charging, "fullRange", range.value || 450),
     timeUnit: cmsText(charging, "timeUnit", "min"),
-    rangeUnit: cmsText(charging, "rangeUnit", "km"),
+    rangeUnit: cmsText(charging, "rangeUnit", range.unit || "km"),
   };
 }
 
@@ -493,9 +511,16 @@ export function chargeAtPercent(pct: number, config: CmsChargingConfig) {
   return { pct: value, time, range };
 }
 
-export function modelPageRuntime(page?: CmsPage | CmsVehicleModel | null): CmsRuntime["model"] {
-  if (!page) return undefined;
-  const colors = asRecordList(page.exterior?.colors)
+function asVehicle(page?: CmsPage | CmsVehicleModel | null): CmsVehicleModel | null {
+  if (!page || typeof page !== "object") return null;
+  if ("slug" in page || "specs" in page || "exteriorSlides" in page || "interiorSlides" in page) {
+    return page as CmsVehicleModel;
+  }
+  return null;
+}
+
+function mapColors(value: unknown) {
+  return asRecordList(value)
     .map((color) => ({
       key: String(color.key || ""),
       name: String(color.name || ""),
@@ -504,10 +529,16 @@ export function modelPageRuntime(page?: CmsPage | CmsVehicleModel | null): CmsRu
       active: Boolean(color.active),
     }))
     .filter((color) => color.key);
-  const exteriorSlides = asRecordList(page.gallery?.slides)
+}
+
+function mapExteriorSlides(value: unknown) {
+  return asRecordList(value)
     .map((slide) => ({ src: String(slide.src || ""), label: String(slide.label || "") }))
     .filter((slide) => slide.src);
-  const interiorSlides = asRecordList(page.interior?.slides)
+}
+
+function mapInteriorSlides(value: unknown) {
+  return asRecordList(value)
     .map((slide) => ({
       src: String(slide.src || ""),
       label: String(slide.label || ""),
@@ -520,9 +551,26 @@ export function modelPageRuntime(page?: CmsPage | CmsVehicleModel | null): CmsRu
       })),
     }))
     .filter((slide) => slide.src);
-  const charging = chargingConfig(page.charging);
-  if (!colors.length && !exteriorSlides.length && !interiorSlides.length && !page.charging) return undefined;
+}
+
+export function modelPageRuntime(page?: CmsPage | CmsVehicleModel | null): CmsRuntime["model"] {
+  if (!page) return undefined;
+  const vehicle = asVehicle(page);
+  const colors = mapColors(page.exterior?.colors);
+  const fromGallery = mapExteriorSlides(page.gallery?.slides);
+  const exteriorSlides = fromGallery.length ? fromGallery : mapExteriorSlides(vehicle?.exteriorSlides);
+  const fromInterior = mapInteriorSlides(page.interior?.slides);
+  const interiorSlides = fromInterior.length ? fromInterior : mapInteriorSlides(vehicle?.interiorSlides);
+  const charging = chargingConfig(page.charging, vehicle?.specs);
+  if (!colors.length && !exteriorSlides.length && !interiorSlides.length && !page.charging && !vehicle?.specs?.length) {
+    return undefined;
+  }
   return { colors, exteriorSlides, interiorSlides, charging };
+}
+
+function vehicleBySlug(models: CmsVehicleModel[], slug?: string) {
+  if (!slug) return undefined;
+  return models.find((item) => item.slug === slug);
 }
 
 export function cmsRuntime(
@@ -531,6 +579,8 @@ export function cmsRuntime(
   page?: CmsPage | CmsVehicleModel | null
 ): CmsRuntime {
   const list = models || [];
+  const slug = asVehicle(page)?.slug;
+  const source = vehicleBySlug(list, slug) || page;
   return {
     submitUrl: CMS_URL ? `${CMS_URL}/api/reserve-submissions` : undefined,
     locations: locations ?? undefined,
@@ -539,6 +589,6 @@ export function cmsRuntime(
       features: featureMap(model.features),
     })),
     assets: modelAssetMap(list),
-    model: modelPageRuntime(page),
+    model: modelPageRuntime(source),
   };
 }

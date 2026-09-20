@@ -82,7 +82,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body suppressHydrationWarning>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var p=location.pathname.replace(/\\/+$/,'')||'/';p=p.replace(/^\\/(en|ar)(?=\\/|$)/,'')||'/';var c=[];if(p==='/models/v27'){c.push('v27-page')}else{c.push('is-loading');if(p==='/'||p==='/reserve'||p==='/services'||p.indexOf('/services/')===0||p==='/innovation')c.push('dark-hero-page')}document.body.className=c.join(' ')})();`,
+            __html: `(function(){var p=location.pathname.replace(/\\/+$/,'')||'/';p=p.replace(/^\\/(en|ar)(?=\\/|$)/,'')||'/';var c=[];if(p.indexOf('/models/')===0){c.push('v27-page')}else{c.push('is-loading');if(p==='/'||p==='/reserve'||p==='/services'||p.indexOf('/services/')===0||p==='/innovation')c.push('dark-hero-page')}document.body.className=c.join(' ')})();`,
           }}
         />
         <NextIntlClientProvider>{children}</NextIntlClientProvider>

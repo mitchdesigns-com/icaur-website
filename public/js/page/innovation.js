@@ -29,18 +29,26 @@
       gsap.set(['#v27-ct-line1', '#v27-ct-line2', '#v27-ct-sub'], { opacity: 0 });
       gsap.set('#v27-ct-mask1', { x: '-101%', background: '#0D0B09' });
       gsap.set('#v27-ct-mask2', { x: '101%', background: '#555859' });
+      var revealed = false;
+      var revealHead = function() {
+        if (revealed) return;
+        revealed = true;
+        var tl = gsap.timeline();
+        tl.from('#v27-ct-eyebrow', { opacity: 0, y: 10, duration: .3, ease: 'power2.out' })
+          .to('#v27-ct-mask1', { x: '0%', duration: .28, ease: 'power2.in' }, '-=0.05')
+          .set('#v27-ct-line1', { opacity: 1 })
+          .to('#v27-ct-mask1', { x: '101%', duration: .28, ease: 'power2.out' })
+          .to('#v27-ct-mask2', { x: '0%', duration: .28, ease: 'power2.in' }, '-=0.18')
+          .set('#v27-ct-line2', { opacity: 1 })
+          .to('#v27-ct-mask2', { x: '-101%', duration: .28, ease: 'power2.out' })
+          .to('#v27-ct-sub', { opacity: 1, y: 0, duration: .35, ease: 'power2.out' }, '-=0.1');
+      };
       ST.create({
         trigger: headEl, start: 'top 80%', once: true,
-        onEnter: function() {
-          var tl = gsap.timeline();
-          tl.from('#v27-ct-eyebrow', { opacity: 0, y: 10, duration: .3, ease: 'power2.out' })
-            .to('#v27-ct-mask1', { x: '0%', duration: .28, ease: 'power2.in' }, '-=0.05')
-            .set('#v27-ct-line1', { opacity: 1 })
-            .to('#v27-ct-mask1', { x: '101%', duration: .28, ease: 'power2.out' })
-            .to('#v27-ct-mask2', { x: '0%', duration: .28, ease: 'power2.in' }, '-=0.18')
-            .set('#v27-ct-line2', { opacity: 1 })
-            .to('#v27-ct-mask2', { x: '-101%', duration: .28, ease: 'power2.out' })
-            .to('#v27-ct-sub', { opacity: 1, y: 0, duration: .35, ease: 'power2.out' }, '-=0.1');
+        onEnter: revealHead,
+        onRefresh: function() {
+          var rect = headEl.getBoundingClientRect();
+          if (rect.top < window.innerHeight * 0.8 && rect.bottom > 0) revealHead();
         }
       });
     }

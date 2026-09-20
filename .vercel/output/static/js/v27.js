@@ -46,8 +46,20 @@ const CAM = { fov: 50, x: 0.2, y: 3.8, z: 9.2 };
 let modelYaw = 0;
 
 /* ─── Car colors — one GLB per paint, from Strapi ── */
+function cmsSlug() {
+  const path = (typeof location !== 'undefined' ? location.pathname : '').replace(/\/+$/, '');
+  return path.split('/').pop() || '';
+}
+
 function cmsModel() {
-  return (typeof window !== 'undefined' && window.__ICAUR_CMS && window.__ICAUR_CMS.model) || {};
+  const cms = (typeof window !== 'undefined' && window.__ICAUR_CMS) || {};
+  if (cms.model && ((cms.model.colors || []).length || cms.model.charging)) return cms.model;
+  const vehicle = (cms.models || []).find((item) => item && item.slug === cmsSlug());
+  if (!vehicle) return cms.model || {};
+  const colors = ((vehicle.exterior && vehicle.exterior.colors) || []).filter((color) => color && color.key);
+  const exteriorSlides = ((vehicle.gallery && vehicle.gallery.slides) || vehicle.exteriorSlides || []).filter((slide) => slide && slide.src);
+  const interiorSlides = ((vehicle.interior && vehicle.interior.slides) || vehicle.interiorSlides || []).filter((slide) => slide && slide.src);
+  return { colors, exteriorSlides, interiorSlides, charging: vehicle.charging || {} };
 }
 
 function cmsSrc(src) {
@@ -1310,33 +1322,47 @@ function initTech() {
     gsap.set('#v27-ct-mask1', { x: '-101%', background: '#0D0B09' });
     gsap.set('#v27-ct-mask2', { x: '101%',  background: '#555859' });
 
+    let revealed = false;
+    const revealHead = () => {
+      if (revealed) return;
+      revealed = true;
+      const tl = gsap.timeline();
+      tl.from('#v27-ct-eyebrow', { opacity: 0, y: 10, duration: .3, ease: 'power2.out' })
+        .to('#v27-ct-mask1',  { x: '0%',    duration: .28, ease: 'power2.in' }, '-=0.05')
+        .set('#v27-ct-line1', { opacity: 1 })
+        .to('#v27-ct-mask1',  { x: '101%',  duration: .28, ease: 'power2.out' })
+        .to('#v27-ct-mask2',  { x: '0%',    duration: .28, ease: 'power2.in' }, '-=0.18')
+        .set('#v27-ct-line2', { opacity: 1 })
+        .to('#v27-ct-mask2',  { x: '-101%', duration: .28, ease: 'power2.out' })
+        .to('#v27-ct-sub',    { opacity: 1, y: 0, duration: .35, ease: 'power2.out' }, '-=0.1');
+    };
+
     ScrollTrigger.create({
-      trigger: headEl, start: 'top 80%', once: true,
-      onEnter() {
-        const tl = gsap.timeline();
-        tl.from('#v27-ct-eyebrow', { opacity: 0, y: 10, duration: .3, ease: 'power2.out' })
-          .to('#v27-ct-mask1',  { x: '0%',    duration: .28, ease: 'power2.in' }, '-=0.05')
-          .set('#v27-ct-line1', { opacity: 1 })
-          .to('#v27-ct-mask1',  { x: '101%',  duration: .28, ease: 'power2.out' })
-          .to('#v27-ct-mask2',  { x: '0%',    duration: .28, ease: 'power2.in' }, '-=0.18')
-          .set('#v27-ct-line2', { opacity: 1 })
-          .to('#v27-ct-mask2',  { x: '-101%', duration: .28, ease: 'power2.out' })
-          .to('#v27-ct-sub',    { opacity: 1, y: 0, duration: .35, ease: 'power2.out' }, '-=0.1');
-      }
+      trigger: headEl,
+      start: 'top 80%',
+      once: true,
+      onEnter: revealHead,
+      onRefresh() {
+        const rect = headEl.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.8 && rect.bottom > 0) revealHead();
+      },
     });
   }
 
   /* ── Per-item scroll animations ── */
-  $$('.v27-ct-item').forEach((item) => {
+  const DEFAULT_ROTATES = [-14, 14, -12, 12, -10];
+  $$('#v27-tech .v27-ct-item').forEach((item, index) => {
     const img   = item.querySelector('.v27-ct-img');
     const left  = item.querySelector('.v27-ct-left');
     const right = item.querySelector('.v27-ct-right');
-    const rotate = parseFloat(item.dataset.rotate) || 0;
+    const parsed = parseFloat(item.dataset.rotate);
+    const rotate = Number.isFinite(parsed) && parsed !== 0 ? parsed : DEFAULT_ROTATES[index % DEFAULT_ROTATES.length];
     if (!img) return;
 
     /* Image: rotate + parallax across full scroll span */
     ScrollTrigger.create({
       trigger: item, start: 'top bottom', end: 'bottom top', scrub: 1.2,
+      invalidateOnRefresh: true,
       onUpdate({ progress: p }) {
         const ep = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
         const rot = rotate * (1 - ep * 2);
@@ -1351,6 +1377,7 @@ function initTech() {
       gsap.timeline({
         scrollTrigger: {
           trigger: item, start: 'top 70%', end: 'center 40%', scrub: 0.9,
+          invalidateOnRefresh: true,
         }
       }).fromTo([left, right],
         { opacity: 0, y: 32 },
@@ -1358,6 +1385,17 @@ function initTech() {
       );
     }
   });
+
+  /* ScrollTrigger measures start/end at creation, but web fonts, CMS
+     images and the async fluid background reflow the layout afterward —
+     which left item start/end at stale offsets so images never rotated. */
+  const refresh = () => { try { ScrollTrigger.refresh(); } catch (_) {} };
+  $$('#v27-tech .v27-ct-img').forEach((img) => {
+    if (!img.complete) img.addEventListener('load', refresh, { once: true });
+  });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(refresh);
+  window.addEventListener('load', refresh);
+  setTimeout(refresh, 800);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1788,19 +1826,26 @@ function initOverviewScene() {
    INIT
 ══════════════════════════════════════════════════════════ */
 function init() {
-  initScene();
-  initHeroEntrance();
-  initOverviewScene();
-  initExterior();
-  initLightbox();
-  initBrand();
-  initAbout();
-  initGallery();
-  initMarquee();
-  initCarousel();
-  initTech();
-  initSafety();
-  initCharging();
+  [
+    initScene,
+    initHeroEntrance,
+    initOverviewScene,
+    initExterior,
+    initLightbox,
+    initBrand,
+    initAbout,
+    initGallery,
+    initMarquee,
+    initCarousel,
+    initTech,
+    initSafety,
+    initCharging,
+  ].forEach((fn) => {
+    try { fn(); } catch (err) { console.warn('[v27]', fn.name, err); }
+  });
+  const refresh = () => { try { ScrollTrigger.refresh(); } catch (_) {} };
+  window.addEventListener('load', refresh);
+  setTimeout(refresh, 400);
 }
 
 if (document.readyState === 'loading') {
