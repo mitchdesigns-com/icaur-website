@@ -268,6 +268,27 @@ export type CmsVehicleModel = {
   trims?: CmsTrim[];
   features?: CmsFeatureFlag[] | Record<string, boolean>;
   sortOrder?: number;
+  seo?: CmsSeo;
+  hero?: Record<string, unknown>;
+  overview?: Record<string, unknown>;
+  exterior?: Record<string, unknown>;
+  gallery?: Record<string, unknown>;
+  interior?: Record<string, unknown>;
+  resources?: Record<string, unknown>;
+  tech?: Record<string, unknown>;
+  safety?: Record<string, unknown>;
+  charging?: Record<string, unknown>;
+  cta?: CmsCta;
+};
+
+export type CmsChargingConfig = {
+  defaultPercent: number;
+  animateToPercent: number;
+  timeCapPercent: number;
+  maxTime: number;
+  fullRange: number;
+  timeUnit: string;
+  rangeUnit: string;
 };
 
 export type CmsRuntime = {
@@ -279,6 +300,7 @@ export type CmsRuntime = {
     colors?: CmsModelColor[];
     exteriorSlides?: CmsGallerySlide[];
     interiorSlides?: CmsGallerySlide[];
+    charging?: CmsChargingConfig;
   };
 };
 
@@ -385,8 +407,6 @@ const PAGE_API: Record<string, string> = {
   "services-maintenance": "/api/maintenance-page",
   "services-programs": "/api/programs-page",
   "services-warranty": "/api/warranty-page",
-  "models-v27": "/api/v27-page",
-  "models-o3t": "/api/o3t-page",
 };
 
 export async function getPage(slug: string, locale: string): Promise<CmsPage | null> {
@@ -415,6 +435,10 @@ export async function getVehicleModels(locale: string): Promise<CmsVehicleModel[
   return cmsGet<CmsVehicleModel[]>(`/api/vehicle-models?locale=${locale}`);
 }
 
+export async function getVehicleModel(slug: string, locale: string): Promise<CmsVehicleModel | null> {
+  return cmsGet<CmsVehicleModel>(`/api/vehicle-models?slug=${encodeURIComponent(slug)}&locale=${locale}`);
+}
+
 export async function loadChrome(locale: string) {
   const [global, locations, models] = await Promise.all([
     getGlobal(locale),
@@ -438,7 +462,38 @@ function asRecordList(value: unknown): Record<string, unknown>[] {
   return Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
 }
 
-export function modelPageRuntime(page?: CmsPage | null): CmsRuntime["model"] {
+function cmsNumber(obj: Record<string, unknown> | undefined | null, key: string, fallback: number) {
+  const value = obj?.[key];
+  const parsed = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function cmsText(obj: Record<string, unknown> | undefined | null, key: string, fallback: string) {
+  const value = obj?.[key];
+  return typeof value === "string" && value ? value : fallback;
+}
+
+export function chargingConfig(charging?: Record<string, unknown> | null): CmsChargingConfig {
+  return {
+    defaultPercent: cmsNumber(charging, "defaultPercent", 20),
+    animateToPercent: cmsNumber(charging, "animateToPercent", 80),
+    timeCapPercent: cmsNumber(charging, "timeCapPercent", 80),
+    maxTime: cmsNumber(charging, "maxTime", 30),
+    fullRange: cmsNumber(charging, "fullRange", 450),
+    timeUnit: cmsText(charging, "timeUnit", "min"),
+    rangeUnit: cmsText(charging, "rangeUnit", "km"),
+  };
+}
+
+export function chargeAtPercent(pct: number, config: CmsChargingConfig) {
+  const value = Math.max(1, Math.min(100, pct));
+  const cap = Math.max(1, config.timeCapPercent);
+  const time = value <= cap ? Math.round((value / cap) * config.maxTime) : config.maxTime;
+  const range = Math.round(value * (config.fullRange / 100));
+  return { pct: value, time, range };
+}
+
+export function modelPageRuntime(page?: CmsPage | CmsVehicleModel | null): CmsRuntime["model"] {
   if (!page) return undefined;
   const colors = asRecordList(page.exterior?.colors)
     .map((color) => ({
@@ -465,14 +520,15 @@ export function modelPageRuntime(page?: CmsPage | null): CmsRuntime["model"] {
       })),
     }))
     .filter((slide) => slide.src);
-  if (!colors.length && !exteriorSlides.length && !interiorSlides.length) return undefined;
-  return { colors, exteriorSlides, interiorSlides };
+  const charging = chargingConfig(page.charging);
+  if (!colors.length && !exteriorSlides.length && !interiorSlides.length && !page.charging) return undefined;
+  return { colors, exteriorSlides, interiorSlides, charging };
 }
 
 export function cmsRuntime(
   locations?: CmsLocation[] | null,
   models?: CmsVehicleModel[] | null,
-  page?: CmsPage | null
+  page?: CmsPage | CmsVehicleModel | null
 ): CmsRuntime {
   const list = models || [];
   return {

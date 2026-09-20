@@ -45,18 +45,7 @@ const CAM = { fov: 50, x: 0.2, y: 3.8, z: 9.2 };
    group's own rotation is 0). Measured off the wheel hubs in prepModel. */
 let modelYaw = 0;
 
-/* ─── Car colors — one GLB per paint (same sources as the landing page) ── */
-const R2 = 'https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev';
-const DEFAULT_CAR_COLORS = {
-  'camel':          '/assets/images/car-v27.glb',
-  'carbon-black':   `${R2}/car-v27-carbon-black.glb`,
-  'gold-sand':      `${R2}/car-v27-gold-sand.glb`,
-  'khaki-white':    `${R2}/car-v27-khaki-white.glb`,
-  'porcelain-gray': `${R2}/car-v27-porcelain-gray.glb`,
-  'star-silver':    `${R2}/car-v27-star-silver.glb`,
-  'tactical-green': `${R2}/car-v27-tactical-green.glb`,
-};
-
+/* ─── Car colors — one GLB per paint, from Strapi ── */
 function cmsModel() {
   return (typeof window !== 'undefined' && window.__ICAUR_CMS && window.__ICAUR_CMS.model) || {};
 }
@@ -71,15 +60,17 @@ const CAR_COLORS = (() => {
   (cmsModel().colors || []).forEach((color) => {
     if (color && color.key && color.model) map[color.key] = color.model;
   });
-  return Object.keys(map).length ? map : DEFAULT_CAR_COLORS;
+  return map;
 })();
 
 let car = null;          /* pose group — poses/rotation applied here */
 let carBody = null;      /* current color GLB scene inside the group */
 let refBox = null;       /* first-loaded bbox — variants are normalized to it */
 let activeColor = (() => {
-  const active = (cmsModel().colors || []).find((color) => color && color.active && color.key);
-  return (active && active.key) || 'carbon-black';
+  const colors = cmsModel().colors || [];
+  const active = colors.find((color) => color && color.active && color.key && CAR_COLORS[color.key]);
+  if (active) return active.key;
+  return Object.keys(CAR_COLORS)[0] || '';
 })();
 const glbCache = new Map();   /* url → Promise<THREE.Group> */
 const glbReady = new Set();   /* urls whose model is decoded & ready (instant swap) */
@@ -160,7 +151,7 @@ function prepModel(scene) {
 
 function initScene() {
   const canvas = $('#v27-canvas');
-  if (!canvas) return;
+  if (!canvas || !CAR_COLORS[activeColor]) return;
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
@@ -512,20 +503,9 @@ function initExterior() {
 /* ══════════════════════════════════════════════════════════
    4.  EXTERIOR DESIGN — photo carousel
 ══════════════════════════════════════════════════════════ */
-const DEFAULT_EXT_SLIDES = [
-  { src: '/assets/images/v27/v27-01.webp',  label: 'Front View' },
-  { src: '/assets/images/v27/v27-02.webp',  label: 'Profile' },
-  { src: '/assets/images/v27/v27-03.webp',  label: 'Exterior' },
-  { src: '/assets/images/v27/v27-12.webp',  label: 'Detail' },
-  { src: '/assets/images/v27/v27-17.webp',  label: 'Side' },
-  { src: '/assets/images/v27/v27-20.webp',  label: 'Dynamic' },
-];
-const EXT_SLIDES = (() => {
-  const slides = (cmsModel().exteriorSlides || [])
-    .filter((slide) => slide && slide.src)
-    .map((slide) => ({ src: cmsSrc(slide.src), label: slide.label || '' }));
-  return slides.length ? slides : DEFAULT_EXT_SLIDES.map((slide) => ({ ...slide, src: cmsSrc(slide.src) }));
-})();
+const EXT_SLIDES = (cmsModel().exteriorSlides || [])
+  .filter((slide) => slide && slide.src)
+  .map((slide) => ({ src: cmsSrc(slide.src), label: slide.label || '' }));
 
 /* ─── Lightbox state ─────────────────────────────────── */
 let lbItems  = [];
@@ -997,36 +977,13 @@ function initMarquee() {
 /* ══════════════════════════════════════════════════════════
    8.  INTERIOR CAROUSEL
 ══════════════════════════════════════════════════════════ */
-const DEFAULT_SLIDES = [
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam025.webp', label: 'Overview',
-    hotspots: [
-      { x: '38%', y: '22%', title: 'Panoramic Sunroof', desc: 'Tinted electrochromic glass dims on demand.', img: '/assets/images/v27/interior-sunroof.webp' },
-      { x: '52%', y: '44%', title: 'Central Display',  desc: '34" curved AMOLED, 2880×1080 resolution.',  img: '/assets/images/v27/interior-display.webp' },
-      { x: '30%', y: '62%', title: 'Centre Console',   desc: 'Floating console with wireless charging.',    img: '/assets/images/v27/interior-console.webp' },
-      { x: '18%', y: '54%', title: 'Nappa Leather',    desc: 'Perforated semi-aniline hide with massage.', img: '/assets/images/v27/interior-leather.webp' },
-    ]
-  },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam026 copy.webp', label: 'Front Cabin' },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam027 copy.webp', label: 'Rear Seats' },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam028 copy.webp', label: 'Console' },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam033 copy.webp', label: 'Rear Cabin' },
-  { src: '/assets/images/v27/iCAUR INTL_V27 REV_cam0301 copy.webp', label: 'Detailing' },
-  { src: '/assets/images/v27/interior-display.webp', label: 'Central Display' },
-  { src: '/assets/images/v27/interior-leather.webp', label: 'Nappa Leather' },
-  { src: '/assets/images/v27/interior-sunroof.webp', label: 'Panoramic Roof' },
-  { src: '/assets/images/v27/interior-console.webp', label: 'Wireless Charging' },
-  { src: '/assets/images/v27/interior-01.webp', label: 'Cabin Ambience' },
-];
-
-const SLIDES = (() => {
-  const fromCms = (cmsModel().interiorSlides || []).filter((slide) => slide && slide.src);
-  const source = fromCms.length ? fromCms : DEFAULT_SLIDES;
-  return source.map((slide) => ({
+const SLIDES = (cmsModel().interiorSlides || [])
+  .filter((slide) => slide && slide.src)
+  .map((slide) => ({
     ...slide,
     src: cmsSrc(slide.src),
     hotspots: (slide.hotspots || []).map((spot) => ({ ...spot, img: cmsSrc(spot.img) })),
   }));
-})();
 
 const PEEK = 72;
 const GAP  = 10;
@@ -1533,6 +1490,25 @@ function initSafety() {
 /* ══════════════════════════════════════════════════════════
    11. CHARGING SLIDER
 ══════════════════════════════════════════════════════════ */
+function chargingStats(section) {
+  const cms = cmsModel().charging || {};
+  const ds = (section && section.dataset) || {};
+  const n = (a, b, fallback) => {
+    const value = Number(a ?? b);
+    return Number.isFinite(value) ? value : fallback;
+  };
+  const s = (a, b, fallback) => a || b || fallback;
+  return {
+    defaultPercent: n(cms.defaultPercent, ds.defaultPercent, 20),
+    animateToPercent: n(cms.animateToPercent, ds.animateTo, 80),
+    timeCapPercent: n(cms.timeCapPercent, ds.timeCap, 80),
+    maxTime: n(cms.maxTime, ds.maxTime, 30),
+    fullRange: n(cms.fullRange, ds.fullRange, 450),
+    timeUnit: s(cms.timeUnit, ds.timeUnit, 'min'),
+    rangeUnit: s(cms.rangeUnit, ds.rangeUnit, 'km'),
+  };
+}
+
 function initCharging() {
   const track   = $('#v27-charge-track');
   const fill    = $('#v27-charge-fill');
@@ -1543,7 +1519,8 @@ function initCharging() {
   const section = $('#v27-charging');
   if (!track) return;
 
-  let pct = 20;
+  const stats = chargingStats(section);
+  let pct = stats.defaultPercent;
   let dragging = false;
 
   /* Background: white immediately on entry, complete by 80% scroll progress */
@@ -1584,10 +1561,11 @@ function initCharging() {
     tooltip.style.left = pct + '%';
     tooltip.textContent = Math.round(pct) + '%';
 
-    const time  = pct <= 80 ? Math.round((pct / 80) * 30) : 30;
-    const range = Math.round(pct * 4.5);
-    timeEl.innerHTML  = time  + '<span class="v27-charge-stat-unit">min</span>';
-    rangeEl.innerHTML = range + '<span class="v27-charge-stat-unit">km</span>';
+    const cap = Math.max(1, stats.timeCapPercent);
+    const time  = pct <= cap ? Math.round((pct / cap) * stats.maxTime) : stats.maxTime;
+    const range = Math.round(pct * (stats.fullRange / 100));
+    timeEl.innerHTML  = time  + '<span class="v27-charge-stat-unit">' + stats.timeUnit + '</span>';
+    rangeEl.innerHTML = range + '<span class="v27-charge-stat-unit">' + stats.rangeUnit + '</span>';
   }
 
   function getPct(e) {
@@ -1603,17 +1581,17 @@ function initCharging() {
   window.addEventListener('mouseup',   () => { dragging = false; });
   window.addEventListener('touchend',  () => { dragging = false; });
 
-  updateSlider(20);
+  updateSlider(stats.defaultPercent);
 
-  /* Animate to 80% when section enters viewport */
+  /* Animate toward the CMS target when the section enters the viewport */
   ScrollTrigger.create({
     trigger: section,
     start: 'top 75%',
     once: true,
     onEnter() {
-      const proxy = { val: 20 };
+      const proxy = { val: stats.defaultPercent };
       gsap.to(proxy, {
-        val: 80,
+        val: stats.animateToPercent,
         duration: 1.8,
         ease: 'power2.out',
         delay: 0.2,

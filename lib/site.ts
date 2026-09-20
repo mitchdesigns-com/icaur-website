@@ -35,6 +35,12 @@ export const DEFAULT_TITLE = "iCAUR — Built for Every Road";
 export const DEFAULT_DESCRIPTION =
   "iCAUR — Egypt's next-generation electric vehicle. Built for every road.";
 
+export const MODEL_CHROME = {
+  bodyClass: "v27-page",
+  styles: ["/css/v27.css"],
+  scripts: [...GSAP_V27, ...CORE_SCRIPTS, { src: "/js/page/models-v27.js" }, { src: "/js/v27.js?v=71", type: "module" }],
+};
+
 export const PAGE_CHROME: Record<string, { bodyClass: string; scripts: SiteScript[]; styles?: string[] }> = {
   home: { bodyClass: "is-loading dark-hero-page", scripts: [...CORE_SCRIPTS, { src: "/js/dot-field.js" }] },
   about: {
@@ -79,15 +85,7 @@ export const PAGE_CHROME: Record<string, { bodyClass: string; scripts: SiteScrip
     bodyClass: "is-loading dark-hero-page",
     scripts: [...CORE_SCRIPTS, { src: "/js/doodles.js" }],
   },
-  "models-v27": {
-    bodyClass: "v27-page",
-    styles: ["/css/v27.css"],
-    scripts: [...GSAP_V27, ...CORE_SCRIPTS, { src: "/js/page/models-v27.js" }, { src: "/js/v27.js?v=69", type: "module" }],
-  },
-  "models-o3t": {
-    bodyClass: "v27-page",
-    styles: ["/css/v27.css"],
-    scripts: [...GSAP_V27, ...CORE_SCRIPTS, { src: "/js/page/models-v27.js" }, { src: "/js/v27.js?v=69", type: "module" }],
-  },
+  "models-v27": MODEL_CHROME,
+  "models-o3t": MODEL_CHROME,
   article: { bodyClass: "is-loading", scripts: CORE_SCRIPTS },
 };

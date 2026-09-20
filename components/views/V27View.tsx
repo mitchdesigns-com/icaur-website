@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import type { CmsPage } from "@/lib/cms";
+import { chargeAtPercent, chargingConfig, type CmsPage, type CmsVehicleModel } from "@/lib/cms";
 import { CmsLink, CtaVideo, list, num, str } from "./shared";
 
 function PriceValue({ price, unit }: { price: string; unit: string }) {
@@ -66,7 +66,7 @@ export function ModelView({
   page,
   mark = "V27",
 }: {
-  page: CmsPage;
+  page: CmsPage | CmsVehicleModel;
   mark?: string;
 }) {
   const hero = page.hero || {};
@@ -78,16 +78,19 @@ export function ModelView({
   const tech = page.tech || {};
   const safety = page.safety || {};
   const charging = page.charging || {};
+  const charge = chargingConfig(charging);
+  const initialCharge = chargeAtPercent(charge.defaultPercent, charge);
   const videoSrc = str(hero, "videoSrc");
   const logo = str(hero, "logo");
   const brochureLabel = str(overview, "brochureLabel");
-  const brochureHref = str(overview, "brochureHref", "/assets/docs/iCAUR-V27-Brochure.pdf");
+  const brochureHref = str(overview, "brochureHref");
   const colors = list(exterior, "colors");
   const resourceItems = list(resources, "items");
   const techItems = list(tech, "items");
   const safetyItems = list(safety, "items");
   const safetyImage = str(safety, "image");
   const techMark = str(tech, "mark", mark);
+  const techBrand = str(tech, "brand");
   const safetyMark = str(safety, "mark", mark);
   const galleryMark = str(gallery, "eyebrowMark", mark);
 
@@ -112,7 +115,7 @@ export function ModelView({
             <p className="v27-hero-sub" id="v27-hero-sub">{str(hero, "subtitle")}</p>
           </div>
           <div className="v27-hero-bottom" id="v27-hero-bottom">
-            <CmsLink href={str(hero, "ctaHref", "/reserve")} className="v27-cta-btn v27-cta-btn--dark v27-hero-reserve-btn" id="v27-hero-cta">
+            <CmsLink href={str(hero, "ctaHref")} className="v27-cta-btn v27-cta-btn--dark v27-hero-reserve-btn" id="v27-hero-cta">
               {str(hero, "ctaLabel")}
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M5 12h14M12 5l7 7-7 7" />
@@ -142,7 +145,7 @@ export function ModelView({
                   <PriceValue price={str(overview, "price")} unit={str(overview, "priceUnit")} />
                 </span>
               </div>
-              {brochureLabel ? (
+              {brochureLabel && brochureHref ? (
                 <a href={brochureHref} download className="v27-cta-btn v27-cta-btn--dark ovx-cta">
                   <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 3v13M7 11l5 5 5-5" />
@@ -160,9 +163,9 @@ export function ModelView({
         <div className="v27-ext-sticky">
           <div className="v27-ext-header">
             <div>
-              <div className="eyebrow" id="v27-ext-eyebrow">{str(exterior, "eyebrow", "360 Experience")}</div>
+              <div className="eyebrow" id="v27-ext-eyebrow">{str(exterior, "eyebrow")}</div>
               <h2 className="v27-ext-h2" id="v27-ext-h2">
-                {str(exterior, "title", "Designed To")} {str(exterior, "titleEm") ? <em>{str(exterior, "titleEm")}</em> : null}
+                {str(exterior, "title")} {str(exterior, "titleEm") ? <em>{str(exterior, "titleEm")}</em> : null}
               </h2>
             </div>
           </div>
@@ -192,11 +195,11 @@ export function ModelView({
       <section id="exterior-gallery">
         <div className="eg-header">
           <p className="eyebrow eg-eyebrow">
-            <span>{str(gallery, "eyebrow", "Exterior")}</span>
+            <span>{str(gallery, "eyebrow")}</span>
             <span className="eg-eyebrow-dot" aria-hidden="true" />
             <span>{galleryMark}</span>
           </p>
-          <h2 className="eg-h2" id="eg-h2">{str(gallery, "title", "DESIGNED TO BE SEEN.")}</h2>
+          <h2 className="eg-h2" id="eg-h2">{str(gallery, "title")}</h2>
         </div>
         <div id="v27-eg-grid" className="v27-eg-grid" />
       </section>
@@ -230,9 +233,9 @@ export function ModelView({
 
       <section id="v27-interior">
         <div className="v27-interior-head" id="v27-interior-head">
-          <div className="eyebrow">{str(interior, "eyebrow", "Interior")}</div>
+          <div className="eyebrow">{str(interior, "eyebrow")}</div>
           <h2 className="v27-interior-h2">
-            {str(interior, "title", "Where Design")} {str(interior, "titleEm") ? <em>{str(interior, "titleEm")}</em> : null}
+            {str(interior, "title")} {str(interior, "titleEm") ? <em>{str(interior, "titleEm")}</em> : null}
           </h2>
         </div>
         <div className="v27-carousel-outer" id="v27-carousel-outer">
@@ -247,15 +250,15 @@ export function ModelView({
       </section>
 
       <section id="v27-resources">
-        <p className="eyebrow v27-res-eyebrow">{str(resources, "eyebrow", `${mark} Resources`)}</p>
-        <h2 className="v27-res-h2">{str(resources, "title", "Everything You Need.")}</h2>
+        <p className="eyebrow v27-res-eyebrow">{str(resources, "eyebrow")}</p>
+        <h2 className="v27-res-h2">{str(resources, "title")}</h2>
         <div className="white-hover-cards dl-cards v27-dl-cards reveal reveal--up" data-delay="2">
           {resourceItems.map((item) => (
             <a
               className="white-hover-card"
-              href={str(item, "href", "#")}
+              href={str(item, "href")}
               download
-              aria-label={`${str(item, "ctaLabel", "Download")} ${str(item, "title")}`}
+              aria-label={`${str(item, "ctaLabel")} ${str(item, "title")}`}
               key={str(item, "title")}
             >
               <span className="white-hover-card__icon">
@@ -263,7 +266,7 @@ export function ModelView({
               </span>
               <h3 className="white-hover-card__h">{str(item, "title")}</h3>
               <p className="white-hover-card__p">{str(item, "meta")}</p>
-              <span className="white-hover-card__link">{str(item, "ctaLabel", "Download")} <span className="arrow">&rarr;</span></span>
+              <span className="white-hover-card__link">{str(item, "ctaLabel")} <span className="arrow">&rarr;</span></span>
             </a>
           ))}
         </div>
@@ -275,7 +278,7 @@ export function ModelView({
           <div className="v27-ct-vignette" aria-hidden="true" />
           <div className="v27-ct-head" id="v27-ct-head">
             <p className="v27-ct-eyebrow" id="v27-ct-eyebrow">
-              {str(tech, "eyebrow", "Technology")} <span className="eyebrow-dot" /> <span className="brand-name">{str(tech, "brand", "iCAUR")}</span> {techMark}
+              {str(tech, "eyebrow")} {techBrand || techMark ? <span className="eyebrow-dot" /> : null} {techBrand ? <span className="brand-name">{techBrand}</span> : null} {techMark}
             </p>
             <div className="v27-ct-line-wrap">
               <div className="v27-ct-line1" id="v27-ct-line1">{str(tech, "line1")}</div>
@@ -314,7 +317,7 @@ export function ModelView({
           <div className="v27-sf-header">
             <div>
               <p className="v27-sf-eyebrow">
-                {str(safety, "eyebrow", "Safety")} <span className="eyebrow-dot" /> {safetyMark}
+                {str(safety, "eyebrow")} {safetyMark ? <><span className="eyebrow-dot" /> {safetyMark}</> : null}
               </p>
               <h2 className="v27-safety-h2" id="v27-sf-h2">
                 <span className="line-clip"><span className="line-inner">{str(safety, "title")}</span></span>
@@ -348,33 +351,42 @@ export function ModelView({
         </div>
       </section>
 
-      <section id="v27-charging">
-        <div className="v27-charging-eyebrow"><span className="eyebrow-dot" />{str(charging, "eyebrow", "Power & Range")}</div>
+      <section
+        id="v27-charging"
+        data-default-percent={charge.defaultPercent}
+        data-animate-to={charge.animateToPercent}
+        data-time-cap={charge.timeCapPercent}
+        data-max-time={charge.maxTime}
+        data-full-range={charge.fullRange}
+        data-time-unit={charge.timeUnit}
+        data-range-unit={charge.rangeUnit}
+      >
+        <div className="v27-charging-eyebrow"><span className="eyebrow-dot" />{str(charging, "eyebrow")}</div>
         <div className="v27-charging-top">
           <h2 className="v27-charging-h2" id="v27-charging-h2">
-            {str(charging, "title", "Charge")} {str(charging, "titleEm") ? <em>{str(charging, "titleEm")}</em> : null}
+            {str(charging, "title")} {str(charging, "titleEm") ? <em>{str(charging, "titleEm")}</em> : null}
             <br />
             {str(charging, "titleAfter")}
           </h2>
           <p className="v27-charging-intro">{str(charging, "intro")}</p>
         </div>
         <div className="v27-charge-track-wrap">
-          <div className="v27-charge-tooltip" id="v27-charge-tooltip" style={{ left: "20%" }}>20%</div>
+          <div className="v27-charge-tooltip" id="v27-charge-tooltip" style={{ left: `${charge.defaultPercent}%` }}>{charge.defaultPercent}%</div>
           <div className="v27-charge-track" id="v27-charge-track">
-            <div className="v27-charge-fill" id="v27-charge-fill" style={{ width: "20%" }} />
-            <div className="v27-charge-thumb" id="v27-charge-thumb" style={{ left: "20%" }}>
+            <div className="v27-charge-fill" id="v27-charge-fill" style={{ width: `${charge.defaultPercent}%` }} />
+            <div className="v27-charge-thumb" id="v27-charge-thumb" style={{ left: `${charge.defaultPercent}%` }}>
               <svg width="28" height="28" fill="#fff" viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H11L10 22l9.5-11.5H13L14 2z" opacity=".9" /></svg>
             </div>
           </div>
         </div>
         <div className="v27-charge-stats">
           <div className="v27-charge-stat">
-            <div className="v27-charge-stat-val" id="v27-charge-time">8<span className="v27-charge-stat-unit">min</span></div>
+            <div className="v27-charge-stat-val" id="v27-charge-time">{initialCharge.time}<span className="v27-charge-stat-unit">{charge.timeUnit}</span></div>
             <div className="v27-charge-stat-label">{str(charging, "timeLabel")}</div>
           </div>
           <div className="v27-charge-divider" />
           <div className="v27-charge-stat">
-            <div className="v27-charge-stat-val" id="v27-charge-range">90<span className="v27-charge-stat-unit">km</span></div>
+            <div className="v27-charge-stat-val" id="v27-charge-range">{initialCharge.range}<span className="v27-charge-stat-unit">{charge.rangeUnit}</span></div>
             <div className="v27-charge-stat-label">{str(charging, "rangeLabel")}</div>
           </div>
         </div>
@@ -385,6 +397,6 @@ export function ModelView({
   );
 }
 
-export function V27View({ page }: { page: CmsPage }) {
+export function V27View({ page }: { page: CmsPage | CmsVehicleModel }) {
   return <ModelView page={page} mark="V27" />;
 }
