@@ -424,6 +424,17 @@ export async function getArticles(locale: string): Promise<CmsArticle[] | null> 
   return cmsGet<CmsArticle[]>(`/api/articles?locale=${locale}`);
 }
 
+export function pickReadAlso(articles: CmsArticle[] | null | undefined, currentSlug: string, count = 2): CmsArticle[] {
+  const pool = (articles || []).filter((item) => item.slug && item.slug !== currentSlug);
+  for (let i = pool.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const swap = pool[i];
+    pool[i] = pool[j];
+    pool[j] = swap;
+  }
+  return pool.slice(0, count);
+}
+
 export async function getFaqs(locale: string): Promise<CmsFaqItem[] | null> {
   return cmsGet<CmsFaqItem[]>(`/api/faq-items?locale=${locale}`);
 }

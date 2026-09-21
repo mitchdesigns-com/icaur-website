@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ArticleView } from "@/components/views/ArticleView";
-import { getArticle, seoMetadata } from "@/lib/cms";
+import { getArticle, getArticles, pickReadAlso, seoMetadata } from "@/lib/cms";
 import { NEWS_ARTICLES } from "@/lib/newsArticles";
 import { applyRequestLocale, pageMeta } from "@/lib/pageMeta";
 import { PAGE_CHROME } from "@/lib/site";
@@ -24,12 +24,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function NewsArticlePage({ params }: Props) {
   const { locale, slug } = await params;
   applyRequestLocale(locale);
-  const article = await getArticle(slug, locale);
+  const [article, articles] = await Promise.all([getArticle(slug, locale), getArticles(locale)]);
   if (!article) notFound();
   const chrome = PAGE_CHROME.article;
   return (
     <SiteChrome locale={locale} bodyClass={chrome.bodyClass} scripts={chrome.scripts}>
-      <ArticleView article={article} locale={locale} />
+      <ArticleView article={{ ...article, related: pickReadAlso(articles, slug) }} locale={locale} />
     </SiteChrome>
   );
 }
