@@ -362,38 +362,9 @@
   })();
 
   /* ── Stabilize panel height ────────────────────────────────────
-     Inquiry has one contextual row; Test Drive and Book Maintenance
-     have two — swapping chips visibly jumped the whole card's height
-     (and, via .rs-left-media's flex:1, the photo's height with it).
-     Measure every panel's natural height once and floor them all at
-     the tallest, so only one panel is ever visible but the space it
-     holds never changes when you switch. */
-  (function stabilizePanelHeight() {
-    var panels = document.querySelectorAll('.rs-panel');
-    if (!panels.length) return;
-
-    function measure() {
-      panels.forEach(function (p) { p.style.minHeight = ''; });
-      var max = 0;
-      panels.forEach(function (p) {
-        var wasHidden = p.hidden;
-        p.hidden = false;              // synchronous — no paint happens mid-script
-        max = Math.max(max, p.offsetHeight);
-        p.hidden = wasHidden;
-      });
-      panels.forEach(function (p) { p.style.minHeight = max + 'px'; });
-    }
-
-    measure();
-    // custom font swapping in can change text metrics after first paint
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
-
-    var resizeT;
-    window.addEventListener('resize', function () {
-      clearTimeout(resizeT);
-      resizeT = setTimeout(measure, 150);
-    }, { passive: true });
-  })();
+  /* Panel heights vary (Inquiry = 1 row, Test Drive / Maintenance = 2).
+     We let them size naturally so field rhythm stays even; a small card
+     height change on chip switch is preferable to empty dead space. */
 
   /* ── Floating labels (textarea) ── */
   document.querySelectorAll('.rs-textarea-wrap').forEach(function (wrap) {

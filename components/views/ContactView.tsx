@@ -15,6 +15,52 @@ export function ContactView({ page, locations, models }: Props) {
   const findUs = page.findUs || {};
   const showrooms = locations.filter((item) => (item.badges || []).includes("showroom"));
   const services = locations.filter((item) => (item.badges || []).includes("service"));
+  type LocOption = { slug: string; name?: string; area?: string };
+  type ModelOption = { slug: string; name: string };
+  const cityOptions: LocOption[] = locations.length
+    ? locations.map((location) => ({
+        slug: location.slug || "",
+        name: location.name,
+        area: location.area,
+      }))
+    : [
+        { slug: "cairo", name: "Cairo", area: "Cairo" },
+        { slug: "giza", name: "Giza", area: "Giza" },
+        { slug: "alexandria", name: "Alexandria", area: "Alexandria" },
+        { slug: "new-cairo", name: "New Cairo", area: "New Cairo" },
+        { slug: "6th-october", name: "6th of October", area: "6th of October" },
+        { slug: "sheikh-zayed", name: "Sheikh Zayed", area: "Sheikh Zayed" },
+        { slug: "mansoura", name: "Mansoura", area: "Mansoura" },
+        { slug: "tanta", name: "Tanta", area: "Tanta" },
+        { slug: "assiut", name: "Assiut", area: "Assiut" },
+        { slug: "luxor", name: "Luxor", area: "Luxor" },
+        { slug: "aswan", name: "Aswan", area: "Aswan" },
+        { slug: "hurghada", name: "Hurghada", area: "Hurghada" },
+        { slug: "port-said", name: "Port Said", area: "Port Said" },
+        { slug: "suez", name: "Suez", area: "Suez" },
+      ];
+  const showroomOptions: LocOption[] = showrooms.length
+    ? showrooms.map((location) => ({ slug: location.slug || "", name: location.name }))
+    : [
+        { slug: "qattamya-heights", name: "Qattamya Heights — New Cairo" },
+        { slug: "sheikh-zayed", name: "Sheikh Zayed — 6th of October" },
+        { slug: "maadi-center", name: "Maadi Center — Maadi" },
+      ];
+  const serviceOptions: LocOption[] = services.length
+    ? services.map((location) => ({ slug: location.slug || "", name: location.name }))
+    : [
+        { slug: "qattamya-heights", name: "Qattamya Heights — New Cairo" },
+        { slug: "north-teseen", name: "North Teseen Center — Fifth Settlement" },
+        { slug: "maadi-center", name: "Maadi Center — Maadi" },
+      ];
+  const modelOptions: ModelOption[] = models.length
+    ? models
+        .filter((model) => !!model.slug)
+        .map((model) => ({ slug: model.slug as string, name: model.name || (model.slug as string) }))
+    : [
+        { slug: "v27", name: "iCAUR V27" },
+        { slug: "o3t", name: "iCAUR O3T" },
+      ];
 
   return (
     <main id="main">
@@ -71,7 +117,7 @@ export function ContactView({ page, locations, models }: Props) {
                   <span className="rs-select-label">{str(form, "city")}</span>
                   <select className="rs-select" id="rs-city" name="rs-city" aria-label={str(form, "city")} defaultValue="">
                     <option value="" disabled />
-                    {locations.map((location) => (
+                    {cityOptions.map((location) => (
                       <option value={location.slug} key={location.slug}>{location.area || location.name}</option>
                     ))}
                   </select>
@@ -80,7 +126,7 @@ export function ContactView({ page, locations, models }: Props) {
                   <span className="rs-select-label">{str(form, "showroom")}</span>
                   <select className="rs-select" id="rs-showroom" name="rs-showroom" aria-label={str(form, "showroom")} defaultValue="">
                     <option value="" disabled />
-                    {showrooms.map((location) => (
+                    {showroomOptions.map((location) => (
                       <option value={location.slug} key={location.slug}>{location.name}</option>
                     ))}
                   </select>
@@ -89,7 +135,7 @@ export function ContactView({ page, locations, models }: Props) {
                   <span className="rs-select-label">{str(form, "serviceCenter")}</span>
                   <select className="rs-select" id="rs-centre" name="rs-centre" aria-label={str(form, "serviceCenter")} defaultValue="">
                     <option value="" disabled />
-                    {services.map((location) => (
+                    {serviceOptions.map((location) => (
                       <option value={location.slug} key={location.slug}>{location.name}</option>
                     ))}
                   </select>
@@ -123,7 +169,7 @@ export function ContactView({ page, locations, models }: Props) {
                     <span className="rs-select-label">{str(form, "model")}</span>
                     <select className="rs-select" id="rs-td-model" name="rs-td-model" aria-label={str(form, "model")} defaultValue="">
                       <option value="" disabled />
-                      {models.map((model) => (
+                      {modelOptions.map((model) => (
                         <option value={model.slug} key={model.slug}>{model.name}</option>
                       ))}
                     </select>
@@ -161,7 +207,7 @@ export function ContactView({ page, locations, models }: Props) {
                     <span className="rs-select-label">{str(form, "model")}</span>
                     <select className="rs-select" id="rs-mt-model" name="rs-mt-model" aria-label={str(form, "model")} defaultValue="">
                       <option value="" disabled />
-                      {models.map((model) => (
+                      {modelOptions.map((model) => (
                         <option value={model.slug} key={`mt-${model.slug}`}>{model.name}</option>
                       ))}
                     </select>
@@ -197,9 +243,9 @@ export function ContactView({ page, locations, models }: Props) {
               <div className="rs-group">
                 <p className="rs-group-label">{str(form, "channelLabel")}</p>
                 <div className="rs-checks">
-                  <label className="rs-check"><input type="checkbox" name="rs-channel" value="phone-call" defaultChecked /><span className="rs-check-box" aria-hidden="true" />Phone Call</label>
-                  <label className="rs-check"><input type="checkbox" name="rs-channel" value="email" defaultChecked /><span className="rs-check-box" aria-hidden="true" />Email</label>
-                  <label className="rs-check"><input type="checkbox" name="rs-channel" value="sms" defaultChecked /><span className="rs-check-box" aria-hidden="true" />SMS</label>
+                  <label className="rs-check"><input type="checkbox" name="rs-channel" value="phone-call" defaultChecked /><span className="rs-check-box" aria-hidden="true" />{str(form, "channelPhone", "Phone Call")}</label>
+                  <label className="rs-check"><input type="checkbox" name="rs-channel" value="email" defaultChecked /><span className="rs-check-box" aria-hidden="true" />{str(form, "channelEmail", "Email")}</label>
+                  <label className="rs-check"><input type="checkbox" name="rs-channel" value="sms" defaultChecked /><span className="rs-check-box" aria-hidden="true" />{str(form, "channelSms", "SMS")}</label>
                 </div>
               </div>
               <div className="rs-cta">

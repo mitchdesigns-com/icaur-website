@@ -4904,11 +4904,24 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
 .rs-info-item a:hover { color: var(--amber); }
 .rs-right { padding: clamp(32px,4vw,56px); }
 
+#rsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+#rsForm .rs-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+#rsForm .rs-panel[hidden] { display: none; }
+#rsForm .rs-cta { margin-top: 0; }
+
 /* ── Request-type chips — pick the kind of request; the active one
       swaps the contextual fields (.rs-panel / .rs-slot) below ── */
 .rs-chips {
   display: flex; flex-wrap: wrap; gap: 8px;
-  margin-bottom: clamp(18px, 2.4vw, 28px);
+  margin-bottom: clamp(22px, 2.8vw, 32px);
 }
 .rs-chip {
   font-family: var(--f-display);
@@ -4942,10 +4955,14 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
 .rs-field {
   position: relative;
   border-bottom: 1px solid rgba(35,24,21,.1);
-  padding-top: 1.05rem; padding-bottom: 7px;
+  padding-top: 1.15rem; padding-bottom: 10px;
   transition: border-color .3s;
+  min-height: 3.1rem;
+  width: 100%;
+  align-self: end;
 }
-.rs-field + .rs-field { margin-top: 12px; }
+/* Stacked fields only — never apply inside a 2-col row (misaligns Last Name) */
+.rs-field + .rs-field { margin-top: 0; }
 .rs-field.is-active { border-color: rgba(35,24,21,.5); }
 .rs-label {
   position: absolute; left: 0; top: 0; pointer-events: none;
@@ -5044,19 +5061,22 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
 .rs-date-day.is-selected {
   background: var(--amber); color: var(--white); font-weight: 700;
 }
-.rs-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.rs-field-row + .rs-field { margin-top: 12px; }
+.rs-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: end; }
+.rs-field-row + .rs-field { margin-top: 0; }
 
 /* Contextual panel fields (select / textarea) */
-.rs-ctx-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-/* consistent rhythm between every form block (matches .rs-field + .rs-field) */
+.rs-ctx-row { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: end; }
+/* Form rhythm comes from #rsForm gap — don't double-space with margins */
 .rs-ctx-row + .rs-field, .rs-field + .rs-ctx-row,
-.rs-field-row + .rs-ctx-row, .rs-ctx-row + .rs-ctx-row { margin-top: 12px; }
+.rs-field-row + .rs-ctx-row, .rs-ctx-row + .rs-ctx-row { margin-top: 0; }
 .rs-select-wrap {
   border-bottom: 1px solid rgba(35,24,21,.1);
   /* same metrics as .rs-field so selects and inputs align in a row */
-  padding-top: 1.05rem; padding-bottom: 7px; position: relative;
+  padding-top: 1.15rem; padding-bottom: 10px; position: relative;
   transition: border-color .3s;
+  min-height: 3.1rem;
+  width: 100%;
+  align-self: end;
 }
 .rs-select-wrap.is-active { border-color: rgba(35,24,21,.5); }
 .rs-select-label {
@@ -5138,8 +5158,8 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
 }
 .rs-textarea-wrap {
   border-bottom: 1px solid rgba(35,24,21,.1);
-  padding-top: 1.05rem; padding-bottom: 7px; position: relative;
-  margin-top: 12px; transition: border-color .3s;
+  padding-top: 1.15rem; padding-bottom: 10px; position: relative;
+  margin-top: 0; transition: border-color .3s;
 }
 .rs-textarea-wrap.is-active { border-color: rgba(35,24,21,.5); }
 .rs-textarea-label {
@@ -5173,13 +5193,13 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
 
 /* ── Chery-style contact controls: salutation radios, channel
       checkboxes, group labels, disabled sub-category ── */
-.rs-group { margin: 14px 0 8px; }
+.rs-group { margin: 0; }
 /* same style as the floated field labels, so every label matches */
 .rs-group-label {
   font-family: var(--f-display);
   font-size: .72rem; font-weight: 700;
   letter-spacing: .18em; text-transform: uppercase;
-  color: #231815; margin: 0 0 12px;
+  color: #231815; margin: 0 0 14px;
 }
 .rs-radios { display: flex; gap: 26px; }
 .rs-radio, .rs-check {
@@ -5253,7 +5273,7 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
   .rs-left { border-right: none; border-bottom: 1px solid rgba(35,24,21,.07); }
 }
 @media (max-width: 520px) {
-  .rs-field-row, .rs-ctx-row { grid-template-columns: 1fr; gap: 0; }
+  .rs-field-row, .rs-ctx-row { grid-template-columns: 1fr; gap: 32px; }
 }
 
 /* Locations */
