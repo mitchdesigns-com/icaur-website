@@ -1,4 +1,5 @@
 import type { CmsPage, CmsVehicleModel, CmsLocation } from "@/lib/cms";
+import { cmsAsset } from "@/lib/cms";
 import { CmsImg } from "./CmsMedia";
 import { CmsLink, str } from "./shared";
 
@@ -8,13 +9,21 @@ type Props = {
   locations: CmsLocation[];
 };
 
+const RESERVE_BG_FALLBACK = "/assets/images/ICUAR V27 brochure 03 20.webp";
+
 export function ReserveView({ page, models, locations }: Props) {
   const hero = page.hero || {};
   const form = page.form || {};
+  const bgSrc = cmsAsset(str(hero, "image", RESERVE_BG_FALLBACK) || RESERVE_BG_FALLBACK);
   return (
     <main id="main">
       <section className="rv-section" id="reserve">
-        <div className="rv-bg" aria-hidden="true" id="rvBg" />
+        <div
+          className="rv-bg"
+          aria-hidden="true"
+          id="rvBg"
+          style={bgSrc ? { backgroundImage: `url("${bgSrc}")` } : undefined}
+        />
         <div className="rv-overlay" aria-hidden="true" />
         <div className="rv-layout">
           <div className="rv-left reveal reveal--up">
