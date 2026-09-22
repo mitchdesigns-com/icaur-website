@@ -22,7 +22,6 @@ export async function Header({ global, models }: Props) {
       { label: t("programs"), href: "/services/programs" },
       { label: t("warranty"), href: "/services/warranty" },
     ];
-
   return (
     <>
       <nav className="nav" id="nav" role="navigation" aria-label="Main">
