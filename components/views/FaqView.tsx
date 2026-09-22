@@ -1,4 +1,6 @@
 import type { CmsFaqItem, CmsPage } from "@/lib/cms";
+import { mediaList } from "@/lib/media";
+import { CmsImg } from "./CmsMedia";
 import { CmsLink, CtaVideo, str, texts } from "./shared";
 
 const GROUPS = [
@@ -11,7 +13,7 @@ const GROUPS = [
 export function FaqView({ page, faqs }: { page: CmsPage; faqs: CmsFaqItem[] }) {
   const hero = page.hero || {};
   const pills = texts(hero.pills);
-  const shots = texts(hero.shots);
+  const shots = mediaList(hero.shots);
   const shotClass = ["faq-hero-shot--tall", "faq-hero-shot--sq", "faq-hero-shot--wide", "faq-hero-shot--tall"];
 
   return (
@@ -20,7 +22,7 @@ export function FaqView({ page, faqs }: { page: CmsPage; faqs: CmsFaqItem[] }) {
         <div className="faq-hero-shots" aria-hidden="true">
           {shots.map((src, index) => (
             <div className={`faq-hero-shot ${shotClass[index % shotClass.length]} reveal reveal--up`} data-delay={index + 2} key={src}>
-              <img src={src} alt="" loading="lazy" />
+              <CmsImg src={src} alt="" loading="lazy" variant="thumb" />
             </div>
           ))}
         </div>

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { CmsGlobal } from "@/lib/cms";
+import { CmsImg } from "@/components/views/CmsMedia";
 
 type Props = {
   global?: CmsGlobal | null;
@@ -42,7 +43,7 @@ export async function Footer({ global }: Props) {
       <footer className="footer" id="footer">
         <div className="footer__logo-wrap">
           <Link href="/" aria-label={footer?.homeAria || t("homeAria")} className="footer__wordmark reveal reveal--logo" data-delay="0">
-            <img src={footer?.logo || "/assets/images/icaur-logo.svg"} alt="iCAUR" aria-hidden="true" />
+            <CmsImg src={footer?.logo || "/assets/images/icaur-logo.svg"} alt="iCAUR" aria-hidden="true" variant="logo" />
           </Link>
         </div>
 
@@ -101,10 +102,11 @@ export async function Footer({ global }: Props) {
               </div>
 
               <div className="footer__partner">
-                <img
+                <CmsImg
                   src={footer?.partnerLogo || "/assets/images/GBauto.webp"}
                   alt={footer?.partnerAlt || "Ghabour Auto"}
                   className="footer__ghabour-logo"
+                  variant="logo"
                 />
               </div>
 

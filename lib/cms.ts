@@ -309,13 +309,14 @@ const CMS_URL = (
   process.env.NEXT_PUBLIC_CMS_URL || "https://icaur-cms.cloudhosta.com"
 ).replace(/\/$/, "");
 
-export function cmsAsset(src?: string | null): string {
-  if (!src) return "";
-  const mapped = publicAsset(src);
-  if (mapped !== src) return mapped;
-  if (/^https?:\/\//i.test(src) || src.startsWith("//") || src.startsWith("data:")) return src;
-  if (src.startsWith("/uploads") && CMS_URL) return `${CMS_URL}${src}`;
-  return src;
+export function cmsAsset(src?: string | { url?: string } | null): string {
+  const raw = typeof src === "string" ? src : src && typeof src === "object" ? String(src.url || "") : "";
+  if (!raw) return "";
+  const mapped = publicAsset(raw);
+  if (mapped !== raw) return mapped;
+  if (/^https?:\/\//i.test(raw) || raw.startsWith("//") || raw.startsWith("data:")) return raw;
+  if (raw.startsWith("/uploads") && CMS_URL) return `${CMS_URL}${raw}`;
+  return raw;
 }
 
 function withCmsAssets<T>(value: T): T {

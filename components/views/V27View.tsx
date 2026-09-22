@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { chargeAtPercent, chargingConfig, type CmsPage, type CmsVehicleModel } from "@/lib/cms";
 import { DownloadFile } from "./DownloadFile";
+import { CmsImg, CmsVideo } from "./CmsMedia";
 import { CmsLink, CtaVideo, cmsFile, downloadName, list, num, str } from "./shared";
 
 function PriceValue({ price, unit }: { price: string; unit: string }) {
@@ -106,14 +107,14 @@ export function ModelView({
       <section id="v27-hero">
         <div className="v27-hero-sticky">
           {videoSrc ? (
-            <video className="v27-hero-video" id="v27HeroVideo" src={videoSrc} autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
+            <CmsVideo className="v27-hero-video" id="v27HeroVideo" src={videoSrc} mode="hero" aria-hidden="true" />
           ) : (
-            <img className="v27-hero-video" src={str(overview, "image")} alt="" />
+            <CmsImg className="v27-hero-video" src={overview.image} alt="" variant="full" />
           )}
           <div className="v27-hero-scrim" aria-hidden="true" />
           <div className="v27-hero-top" id="v27-hero-top">
             <h1 className="v27-hero-h1" id="v27-hero-h1">
-              {str(hero, "title")} {logo ? <img src={logo} alt={mark} className="v27-model-logo-inline" aria-hidden="true" /> : mark}
+              {str(hero, "title")} {logo ? <CmsImg src={logo} alt={mark} className="v27-model-logo-inline" aria-hidden="true" variant="logo" /> : mark}
             </h1>
             <p className="v27-hero-sub" id="v27-hero-sub">{str(hero, "subtitle")}</p>
           </div>
@@ -131,7 +132,7 @@ export function ModelView({
         <div className="ovx-sticky">
           <div className="ovx-frame" id="ovxFrame">
             <div className="ovx-bg" aria-hidden="true">
-              <img id="ovxBgImg" src={str(overview, "image")} alt="" />
+              <CmsImg id="ovxBgImg" src={overview.image} alt="" variant="full" />
             </div>
             <div className="ovx-shade" aria-hidden="true" />
             <div className="ovx-copy ovx-copy--lead" id="ovxLead">
@@ -185,7 +186,7 @@ export function ModelView({
                     aria-label={name}
                     key={key}
                   >
-                    <img src={str(color, "image")} alt={name} draggable={false} />
+                    <CmsImg src={color.image} alt={name} draggable={false} variant="card" />
                     <span className="v27-swatch-name">{name}</span>
                   </button>
                 );
@@ -307,7 +308,7 @@ export function ModelView({
                 </h3>
               </div>
               <div className="v27-ct-center">
-                <img className="v27-ct-img" src={str(item, "image")} alt={str(item, "title")} />
+                <CmsImg className="v27-ct-img" src={item.image} alt={str(item, "title")} variant="card" />
               </div>
               <div className="v27-ct-right">
                 <p className="v27-ct-label">{str(item, "label")}</p>
@@ -335,9 +336,9 @@ export function ModelView({
           </div>
           <div className="v27-sf-main" id="v27-sf-main">
             <div className="v27-sf-img-wrap" id="v27-sf-img-wrap" aria-hidden="true">
-              {safetyImage ? <img className="v27-sf-img v27-sf-img--default" id="v27-sf-default-img" src={safetyImage} alt="" /> : null}
+              {safetyImage ? <CmsImg className="v27-sf-img v27-sf-img--default" id="v27-sf-default-img" src={safetyImage} alt="" variant="full" /> : null}
               {safetyItems.map((item, index) => (
-                <img className="v27-sf-img v27-sf-feat-img" data-idx={index} src={str(item, "image")} alt="" key={str(item, "title")} />
+                <CmsImg className="v27-sf-img v27-sf-feat-img" data-idx={index} src={item.image} alt="" key={str(item, "title")} variant="card" />
               ))}
             </div>
             <div className="v27-sf-list" id="v27-sf-list">

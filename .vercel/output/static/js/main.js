@@ -20,8 +20,10 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
     document.body.classList.remove('is-loading');
     setTimeout(triggerHeroWords, 100);
   };
-  if (document.readyState === 'complete') setTimeout(ready, 50);
-  else window.addEventListener('load', () => setTimeout(ready, 50), { once: true });
+  // Don't wait for window.load — homepage videos are tens of MB and would
+  // keep the intro (and every .reveal image) stuck at opacity 0.
+  if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(ready, 50);
+  else document.addEventListener('DOMContentLoaded', () => setTimeout(ready, 50), { once: true });
 })();
 
 
@@ -1576,7 +1578,7 @@ initSvcScroll({
 // VIDEO PLAY — autoplay hero video if present
 // ============================================================
 (function initHeroVideo() {
-  const video = $('video.hero__video');
+  const video = $('video.hero__video, video.hero__bg-img');
   if (!video) return;
 
   video.muted  = true;

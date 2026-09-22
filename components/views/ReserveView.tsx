@@ -1,4 +1,5 @@
 import type { CmsPage, CmsVehicleModel, CmsLocation } from "@/lib/cms";
+import { CmsImg } from "./CmsMedia";
 import { CmsLink, str } from "./shared";
 
 type Props = {
@@ -34,9 +35,9 @@ export function ReserveView({ page, models, locations }: Props) {
                     <label className="rv-model" key={model.slug}>
                       <input type="radio" name="rv-model" value={model.slug} defaultChecked={index === 0} aria-label={model.name} />
                       <div className="rv-model-img-wrap">
-                        <img src={model.image} alt={model.name || ""} loading="eager" />
+                        <CmsImg src={model.image} alt={model.name || ""} loading="eager" variant="card" />
                         <div className="rv-model-overlay" aria-hidden="true" />
-                        <img src={model.logo} alt={model.name || ""} className="rv-model-logo" />
+                        <CmsImg src={model.logo} alt={model.name || ""} className="rv-model-logo" variant="logo" />
                         <span className="rv-model-dot" aria-hidden="true">
                           <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor" /></svg>
                         </span>

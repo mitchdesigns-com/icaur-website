@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Link } from "@/i18n/navigation";
 import type { CmsGlobal, CmsNavModel, CmsVehicleModel } from "@/lib/cms";
+import { CmsImg } from "@/components/views/CmsMedia";
 
 type Props = {
   global?: CmsGlobal | null;
@@ -27,12 +28,13 @@ export async function Header({ global, models }: Props) {
       <nav className="nav" id="nav" role="navigation" aria-label="Main">
         <div className="nav__inner">
           <Link href="/" className="nav__logo" aria-label={label("homeAria")}>
-            <img
+            <CmsImg
               src={nav?.logo || "/assets/images/icaur-logo.svg"}
               alt="iCAUR"
               width={113}
               height={22}
               aria-hidden="true"
+              variant="logo"
             />
           </Link>
 
@@ -87,10 +89,11 @@ export async function Header({ global, models }: Props) {
                   data-cursor-label={label("explore")}
                   aria-label={label("allServices")}
                 >
-                  <img
+                  <CmsImg
                     src={nav?.servicesImage || "/assets/images/Maintainance.webp"}
                     alt={nav?.servicesImageAlt || "iCAUR service & maintenance"}
                     loading="lazy"
+                    variant="card"
                   />
                 </Link>
               </div>
@@ -181,10 +184,10 @@ function ModelCard({
     <article className="mfc">
       <Link href={(card.href || "/models/v27") as never} className="mfc__inner" data-cursor-label={explore}>
         <span className="mfc__glow" aria-hidden="true" />
-        <img src={card.image} alt="" className="mfc__img mfc__img--default" loading="lazy" />
-        <img src={card.hoverImage} alt={card.alt || ""} className="mfc__img mfc__img--hover" loading="lazy" />
+        <CmsImg src={card.image} alt="" className="mfc__img mfc__img--default" loading="lazy" variant="card" />
+        <CmsImg src={card.hoverImage} alt={card.alt || ""} className="mfc__img mfc__img--hover" loading="lazy" variant="card" />
         <div className="mfc__bottom">
-          <img src={card.logo} alt={card.alt || ""} className="mfc__logo" />
+          <CmsImg src={card.logo} alt={card.alt || ""} className="mfc__logo" variant="logo" />
           <h3 className="mfc__name">
             {card.name} <span className="mfc__hl">{card.highlight}</span>
           </h3>
@@ -339,9 +342,9 @@ async function CompareModal({
           {columns.map((column) => (
             <div className="cmp-model-col" key={column.slug || column.name}>
               <div className="cmp-mfc">
-                <img src={column.image} alt={column.alt || ""} className="cmp-mfc__img cmp-mfc__img--default" />
-                <img src={column.hoverImage} alt={column.alt || ""} className="cmp-mfc__img cmp-mfc__img--hover" />
-                <img src={column.logo} alt="" className="cmp-mfc__logo" aria-hidden="true" />
+                <CmsImg src={column.image} alt={column.alt || ""} className="cmp-mfc__img cmp-mfc__img--default" variant="card" />
+                <CmsImg src={column.hoverImage} alt={column.alt || ""} className="cmp-mfc__img cmp-mfc__img--hover" variant="card" />
+                <CmsImg src={column.logo} alt="" className="cmp-mfc__logo" aria-hidden="true" variant="logo" />
                 <div className="cmp-mfc__bottom">
                   <span className="cmp-mfc__name">
                     {column.name} <em>{column.highlight}</em>

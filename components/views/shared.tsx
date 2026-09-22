@@ -1,6 +1,8 @@
 import type { ReactNode, CSSProperties } from "react";
 import { Link } from "@/i18n/navigation";
 import { cmsHref, type CmsCta } from "@/lib/cms";
+import { mediaUrl } from "@/lib/media";
+import { CmsVideo } from "./CmsMedia";
 
 type CmsLinkProps = {
   href?: string;
@@ -33,15 +35,11 @@ export function CtaVideo({ cta, reveal = "blur" }: { cta?: CmsCta | null; reveal
   if (!cta) return null;
   return (
     <section className="cta-video" id="cta">
-      <video
+      <CmsVideo
         className="cta-video__bg"
         src={cta.videoSrc || "/assets/images/CTA-bg.webm"}
         poster={cta.posterSrc || "/assets/images/CTA.webp"}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
+        mode="lazy"
         aria-hidden="true"
       />
       <div className="cta-video__overlay" aria-hidden="true" />
@@ -130,7 +128,10 @@ export function withBrand(text: string) {
 
 export function str(obj: Record<string, unknown> | undefined | null, key: string, fallback = "") {
   const value = obj?.[key];
-  return typeof value === "string" ? value : value == null ? fallback : String(value);
+  if (typeof value === "string") return value;
+  const fromMedia = mediaUrl(value);
+  if (fromMedia) return fromMedia;
+  return value == null ? fallback : String(value);
 }
 
 export function cmsFile(obj: Record<string, unknown> | undefined | null, keys: string[] = ["file", "href"]) {

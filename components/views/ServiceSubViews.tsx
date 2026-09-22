@@ -1,5 +1,6 @@
 import type { CmsPage } from "@/lib/cms";
 import { DownloadFile } from "./DownloadFile";
+import { CmsImg } from "./CmsMedia";
 import { CmsLink, CtaVideo, StoreBadges, cmsFile, downloadName, list, str } from "./shared";
 
 function SpotHero({ hero }: { hero: Record<string, unknown> }) {
@@ -37,7 +38,7 @@ export function MaintenanceView({ page }: { page: CmsPage }) {
         <div className="svc-book__bg" aria-hidden="true" />
         <div className="svc-book__inner">
           <div id="svcBookCard">
-            <img className="svc-book__pop" src={str(book, "image")} alt="" aria-hidden="true" />
+            {str(book, "image") ? <CmsImg className="svc-book__pop" src={book.image} alt="" aria-hidden="true" variant="thumb" /> : null}
             <div className="svc-book__panel-wrap">
               <div className="svc-book__card">
                 <p className="eyebrow svc-book__eyebrow">{str(book, "eyebrow")}</p>

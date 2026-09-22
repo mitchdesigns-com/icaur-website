@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useMemo, useState } from "react";
 import type { CmsArticle, CmsPage } from "@/lib/cms";
+import { CmsImg } from "./CmsMedia";
 import { categoryLabel, CmsLink, formatDate, str } from "./shared";
 
 const PAGE_SIZE = 6;
@@ -70,7 +71,7 @@ export function NewsView({ page, articles, locale }: Props) {
           <div className="container">
             <div className="news-featured reveal reveal--up" data-delay="1">
               <CmsLink className="news-featured__img" href={`/news/${featured.slug}`} data-cursor-label="Read">
-                <img src={featured.coverImage} alt={featured.title || ""} loading="eager" width={800} height={500} />
+                <CmsImg src={featured.coverImage} alt={featured.title || ""} loading="eager" width={800} height={500} variant="card" />
               </CmsLink>
               <div className="news-featured__text">
                 <div className="news-featured__meta">
@@ -107,7 +108,7 @@ export function NewsView({ page, articles, locale }: Props) {
                 }}
               >
                 <CmsLink href={`/news/${article.slug}`} className="media-card__img" data-cursor-label="Read">
-                  <img src={article.coverImage} alt={article.title || ""} loading="lazy" width={400} height={250} />
+                  <CmsImg src={article.coverImage} alt={article.title || ""} loading="lazy" width={400} height={250} variant="thumb" />
                 </CmsLink>
                 <div className="media-card__meta">
                   <span className={`media-card__type${article.category && article.category !== "news" ? ` media-card__type--${article.category}` : ""}`}>

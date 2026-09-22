@@ -1,4 +1,5 @@
 import type { CmsLocation, CmsPage, CmsVehicleModel } from "@/lib/cms";
+import { CmsImg } from "./CmsMedia";
 import { CtaVideo, StoreBadges, str } from "./shared";
 
 type Props = {
@@ -33,7 +34,7 @@ export function ContactView({ page, locations, models }: Props) {
               </a>
             </div>
             <figure className="rs-left-media">
-              <img src={str(intro, "image")} alt={str(intro, "imageAlt")} loading="lazy" decoding="async" />
+              <CmsImg src={intro.image} alt={str(intro, "imageAlt")} loading="lazy" variant="card" />
             </figure>
           </div>
           <div className="rs-right">
@@ -212,7 +213,7 @@ export function ContactView({ page, locations, models }: Props) {
         <div className="svc-book__bg" aria-hidden="true" />
         <div className="svc-book__inner">
           <div id="svcBookCard">
-            {str(app, "image") ? <img className="svc-book__pop" src={str(app, "image")} alt="" aria-hidden="true" /> : null}
+            {str(app, "image") ? <CmsImg className="svc-book__pop" src={app.image} alt="" aria-hidden="true" variant="thumb" /> : null}
             <div className="svc-book__panel-wrap">
               <div className="svc-book__card">
                 <h2 className="svc-book__h">{str(app, "title")}<br /><span style={{ color: "var(--amber)" }}>{str(app, "titleEm")}</span></h2>

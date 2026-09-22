@@ -1,4 +1,5 @@
 import type { CmsArticle } from "@/lib/cms";
+import { CmsImg } from "./CmsMedia";
 import { categoryLabel, CmsLink, formatDate } from "./shared";
 
 type Props = {
@@ -32,7 +33,7 @@ export function ArticleView({ article, locale }: Props) {
 
       {article.coverImage ? (
         <div className="post-cover reveal reveal--up">
-          <img src={article.coverImage} alt={article.title || ""} loading="eager" />
+          <CmsImg src={article.coverImage} alt={article.title || ""} loading="eager" variant="full" />
         </div>
       ) : null}
 
@@ -44,7 +45,7 @@ export function ArticleView({ article, locale }: Props) {
             {block.quote ? <div className="post-pullquote">{block.quote}</div> : null}
             {block.image ? (
               <div className="post-img">
-                <img src={block.image} alt={block.imageAlt || ""} loading="lazy" />
+                <CmsImg src={block.image} alt={block.imageAlt || ""} loading="lazy" variant="full" />
               </div>
             ) : null}
           </div>
@@ -68,7 +69,7 @@ export function ArticleView({ article, locale }: Props) {
                     <h4>{item.title}</h4>
                   </div>
                   <CmsLink href={`/news/${item.slug}`} className="news-card__img" data-cursor-label="Read">
-                    <img src={item.coverImage} alt={item.title || ""} loading="lazy" width={400} height={250} />
+                    <CmsImg src={item.coverImage} alt={item.title || ""} loading="lazy" width={400} height={250} variant="thumb" />
                   </CmsLink>
                   <div className="news-card__body">
                     <p>{item.description}</p>
