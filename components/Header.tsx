@@ -7,9 +7,10 @@ import { CmsImg } from "@/components/views/CmsMedia";
 type Props = {
   global?: CmsGlobal | null;
   models?: CmsVehicleModel[] | null;
+  compareModels?: CmsVehicleModel[] | null;
 };
 
-export async function Header({ global, models }: Props) {
+export async function Header({ global, models, compareModels }: Props) {
   const t = await getTranslations("nav");
   const nav = global?.nav;
   const label = (key: keyof NonNullable<CmsGlobal["nav"]>, fallback?: string) =>
@@ -22,6 +23,7 @@ export async function Header({ global, models }: Props) {
       { label: t("programs"), href: "/services/programs" },
       { label: t("warranty"), href: "/services/warranty" },
     ];
+  const compareList = compareModels?.length ? compareModels : models;
   return (
     <>
       <nav className="nav" id="nav" role="navigation" aria-label="Main">
@@ -156,7 +158,7 @@ export async function Header({ global, models }: Props) {
       </nav>
 
       <CompareDrawer compare={global?.compare} />
-      <CompareModal compare={global?.compare} models={models} cards={cards} startsFrom={label("startsFrom")} />
+      <CompareModal compare={global?.compare} models={compareList} startsFrom={label("startsFrom")} />
       <MobileMenu global={global} cards={cards} serviceLinks={serviceLinks} />
     </>
   );
@@ -284,40 +286,27 @@ async function CompareDrawer({ compare }: { compare?: CmsGlobal["compare"] }) {
 async function CompareModal({
   compare,
   models,
-  cards,
   startsFrom,
 }: {
   compare?: CmsGlobal["compare"];
   models?: CmsVehicleModel[] | null;
-  cards: CmsNavModel[];
   startsFrom: string;
 }) {
   const t = await getTranslations("compare");
   const fromPrice = compare?.fromPrice || String(t.raw("fromPrice"));
-  const columns =
-    models?.length
-      ? models.map((model) => ({
-        slug: model.slug || "",
-        name: model.tagline || model.name,
-        highlight: model.highlight,
-        image: model.image,
-        hoverImage: model.hoverImage,
-        logo: model.logo,
-        alt: model.name,
-        specs: model.specs,
-        trims: model.trims || [],
-      }))
-      : cards.map((card) => ({
-        slug: card.slug || "",
-        name: card.name,
-        highlight: card.highlight,
-        image: card.image,
-        hoverImage: card.hoverImage,
-        logo: card.logo,
-        alt: card.alt,
-        specs: card.specs,
-        trims: [],
-      }));
+  const columns = (models || [])
+    .filter((model) => model.slug && (model.trims || []).length > 0)
+    .map((model) => ({
+      slug: model.slug || "",
+      name: model.tagline || model.name,
+      highlight: model.highlight,
+      image: model.image,
+      hoverImage: model.hoverImage,
+      logo: model.logo,
+      alt: model.name,
+      specs: model.specs,
+      trims: model.trims || [],
+    }));
 
   return (
     <div className="cmp-modal" id="cmpModal" aria-hidden="true">
@@ -356,10 +345,7 @@ async function CompareModal({
                 </div>
               </div>
               <div className="cmp-trims">
-                {(column.trims.length
-                  ? column.trims
-                  : fallbackTrims(column.slug, t)
-                ).map((trim) => (
+                {column.trims.map((trim) => (
                   <label className="cmp-trim" key={trim.name}>
                     <input
                       type="checkbox"
@@ -388,23 +374,6 @@ async function CompareModal({
       </div>
     </div>
   );
-}
-
-type CompareTrimKey = "core" | "plus" | "ultra" | "standardRange" | "longRange" | "performance";
-
-function fallbackTrims(slug: string, t: (key: CompareTrimKey) => string) {
-  if (slug === "o3t") {
-    return [
-      { name: t("core"), fromPrice: "480,000 EGP", compareLabel: "O3T Core" },
-      { name: t("plus"), fromPrice: "560,000 EGP", compareLabel: "O3T Plus" },
-      { name: t("ultra"), fromPrice: "640,000 EGP", compareLabel: "O3T Ultra" },
-    ];
-  }
-  return [
-    { name: t("standardRange"), fromPrice: "450,000 EGP", compareLabel: "V27 Standard Range" },
-    { name: t("longRange"), fromPrice: "520,000 EGP", compareLabel: "V27 Long Range" },
-    { name: t("performance"), fromPrice: "610,000 EGP", compareLabel: "V27 Performance" },
-  ];
 }
 
 async function MobileMenu({

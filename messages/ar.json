@@ -128,6 +128,8 @@
     "title": "قارن طرازات آي كور",
     "close": "إغلاق",
     "addModel": "أضف طرازاً",
+    "add": "أضف",
+    "remove": "إزالة",
     "selectTitle": "اختر الطرازات والفئات",
     "selectHint": "اختر حتى 5 فئات للمقارنة.",
     "selected": "المحدد:",
@@ -142,7 +144,10 @@
     "core": "كور",
     "plus": "بلس",
     "ultra": "ألترا",
-    "fromPrice": "من {price}"
+    "fromPrice": "من {price}",
+    "rangeLabel": "المدى",
+    "powerLabel": "القوة",
+    "accelLabel": "التسارع"
   },
   "footer": {
     "homeAria": "الصفحة الرئيسية لآي كور",

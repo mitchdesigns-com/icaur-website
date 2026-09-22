@@ -19,8 +19,8 @@ type Props = {
 };
 
 export async function SiteChrome({ locale, children, bodyClass, scripts, styles = [], page }: Props) {
-  const { global, locations, models } = await loadChrome(locale);
-  const runtime = cmsRuntime(locations, models, page);
+  const { global, locations, models, compareRows, compareModels } = await loadChrome(locale);
+  const runtime = cmsRuntime(locations, models, page, global, compareRows, compareModels);
 
   return (
     <>
@@ -30,7 +30,7 @@ export async function SiteChrome({ locale, children, bodyClass, scripts, styles 
       <BodyClass className={bodyClass} />
       <GrainFilter />
       <Cursor />
-      <Header global={global} models={models} />
+      <Header global={global} models={models} compareModels={compareModels} />
       {children}
       <Footer global={global} />
       <QuickNav global={global} />

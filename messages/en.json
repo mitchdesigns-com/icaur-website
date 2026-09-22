@@ -128,6 +128,8 @@
     "title": "Compare iCAUR Models",
     "close": "Close",
     "addModel": "Add Model",
+    "add": "Add",
+    "remove": "Remove",
     "selectTitle": "Select Models & Trims",
     "selectHint": "Choose up to 5 trims to compare.",
     "selected": "Selected:",
@@ -142,7 +144,10 @@
     "core": "Core",
     "plus": "Plus",
     "ultra": "Ultra",
-    "fromPrice": "From {price}"
+    "fromPrice": "From {price}",
+    "rangeLabel": "Range",
+    "powerLabel": "Power",
+    "accelLabel": "Acceleration"
   },
   "footer": {
     "homeAria": "iCAUR home",

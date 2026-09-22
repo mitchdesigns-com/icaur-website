@@ -2142,60 +2142,41 @@ document.addEventListener('click', e => {
   const MAX = 5;
   let selections = []; // { model, trim, label }
 
-  const SPECS = [
-    { label: 'Range',        key: 'range' },
-    { label: 'Power',        key: 'hp' },
-    { label: 'Acceleration', key: 'accel' },
-  ];
+  const cms = (typeof window !== 'undefined' && window.__ICAUR_CMS) || {};
+  const compareLabels = cms.compare || {};
+  const cmsModels = Array.isArray(cms.compareModels) && cms.compareModels.length
+    ? cms.compareModels
+    : (Array.isArray(cms.models) ? cms.models : []);
+  const compareRows = Array.isArray(cms.compareRows) ? cms.compareRows.slice() : [];
+  compareRows.sort(function (a, b) { return (a.sortOrder || 0) - (b.sortOrder || 0); });
 
-  const FEATURES = [
-    'Fast DC Charging', 'All-Wheel Drive', 'OTA Updates',
-    'Autopilot Suite', 'Heated Seats', 'Panoramic Roof', '360° Camera'
-  ];
+  const SPECS = compareRows
+    .filter(function (row) { return row && row.rowType === 'spec' && row.trimField; })
+    .map(function (row) { return { label: row.label || '', key: row.trimField }; });
 
-  const MODEL_DATA = (function () {
-    const fallback = {
-      v27: {
-        name: 'V27',
-        img:  '/assets/images/v27-model-in-homepge-01.webp',
-        logo: '/assets/images/V27-logo.svg',
-        trimSpecs: {
-          'Standard Range': { range: '450 km', hp: '380 hp', accel: '4.8s' },
-          'Long Range':     { range: '560 km', hp: '380 hp', accel: '4.8s' },
-          'Performance':    { range: '510 km', hp: '520 hp', accel: '3.5s' },
-        },
-        features: { 'Fast DC Charging': true, 'All-Wheel Drive': true, 'OTA Updates': true, 'Autopilot Suite': false, 'Heated Seats': true, 'Panoramic Roof': true, '360° Camera': false }
-      },
-      o3t: {
-        name: 'O3T',
-        img:  '/assets/images/ot3-model-in-homepage-01.webp',
-        logo: '/assets/images/T03-logo.svg',
-        trimSpecs: {
-          'Core':  { range: '520 km', hp: '420 hp', accel: '4.2s' },
-          'Plus':  { range: '580 km', hp: '480 hp', accel: '3.8s' },
-          'Ultra': { range: '630 km', hp: '580 hp', accel: '3.1s' },
-        },
-        features: { 'Fast DC Charging': true, 'All-Wheel Drive': false, 'OTA Updates': true, 'Autopilot Suite': true, 'Heated Seats': true, 'Panoramic Roof': false, '360° Camera': true }
-      }
-    };
-    const cmsModels = window.__ICAUR_CMS && window.__ICAUR_CMS.models;
-    if (!cmsModels || !cmsModels.length) return fallback;
-    cmsModels.forEach(function (model) {
-      if (!model || !model.slug) return;
-      const trimSpecs = {};
-      (model.trims || []).forEach(function (trim) {
-        trimSpecs[trim.name] = { range: trim.range, hp: trim.hp, accel: trim.accel };
-      });
-      fallback[model.slug] = {
-        name: model.name || model.slug,
-        img: model.image,
-        logo: model.logo,
-        trimSpecs: Object.keys(trimSpecs).length ? trimSpecs : (fallback[model.slug] && fallback[model.slug].trimSpecs) || {},
-        features: model.features || (fallback[model.slug] && fallback[model.slug].features) || {},
-      };
+  const FEATURE_ROWS = compareRows
+    .filter(function (row) { return row && row.rowType === 'feature' && (row.key || row.label); })
+    .map(function (row) { return { key: row.key || row.label, label: row.label || row.key || '' }; });
+
+  const MODEL_DATA = {};
+  cmsModels.forEach(function (model) {
+    if (!model || !model.slug) return;
+    const trimSpecs = {};
+    (model.trims || []).forEach(function (trim) {
+      if (!trim || !trim.name) return;
+      trimSpecs[trim.name] = { range: trim.range || '', hp: trim.hp || '', accel: trim.accel || '' };
     });
-    return fallback;
-  })();
+    const features = model.features && typeof model.features === 'object' && !Array.isArray(model.features)
+      ? model.features
+      : {};
+    MODEL_DATA[model.slug] = {
+      name: model.name || model.slug,
+      img: model.image || '',
+      logo: model.logo || '',
+      trimSpecs: trimSpecs,
+      features: features,
+    };
+  });
 
   const CHECK_SVG = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.5 9.5l4 4 7-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const CROSS_SVG = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M5 5l8 8M13 5l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
@@ -2222,7 +2203,6 @@ document.addEventListener('click', e => {
 
   function syncCount() {
     const n = selections.length;
-    // every badge — the nav pill's AND the mobile menu's mirror
     document.querySelectorAll('#compareCount, .nav__compare-count').forEach(b => {
       b.textContent = n;
       b.dataset.count = n;
@@ -2245,61 +2225,63 @@ document.addEventListener('click', e => {
 
   function renderDrawer() {
     drawerBody.innerHTML = '';
-    // Plus col visible whenever we're under the 5-selection limit
     const hasPlus = selections.length < MAX;
+    const addModelLabel = compareLabels.addModel || '';
+    const addLabel = compareLabels.add || addModelLabel;
+    const removeLabel = compareLabels.remove || '';
 
     if (selections.length === 0) {
-
       const empty = document.createElement('div');
       empty.className = 'cmp-empty';
       empty.innerHTML = `<button class="cmp-add-btn">
         <span class="cmp-add-btn__icon">
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v14M4 11h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-        </span><span>Add Model</span></button>`;
+        </span><span></span></button>`;
+      const addText = empty.querySelector('.cmp-add-btn span:last-child');
+      if (addText) addText.textContent = addModelLabel;
       empty.querySelector('.cmp-add-btn').addEventListener('click', openModal);
       drawerBody.appendChild(empty);
       return;
     }
 
-
-    // Fixed 155px per selection column; feat-name col 140px; plus col 80px
     const gridCols = `140px ${selections.map(() => '155px').join(' ')}${hasPlus ? ' 80px' : ''}`;
 
     const table = document.createElement('div');
     table.className = 'cmp-table';
     table.style.gridTemplateColumns = gridCols;
 
-    // ── Header row ──────────────────────────────────────────
     const spacer = document.createElement('div');
     spacer.className = 'cmp-feat-spacer';
     table.appendChild(spacer);
 
-    // One column per trim selection
     selections.forEach(sel => {
-      const data = MODEL_DATA[sel.model];
+      const data = MODEL_DATA[sel.model] || { name: sel.model, img: '', logo: '', trimSpecs: {}, features: {} };
       const hcol = document.createElement('div');
       hcol.className = 'cmp-model-hcol';
       hcol.innerHTML = `
-        <button class="cmp-model-hcol__remove" aria-label="Remove ${sel.trim}">✕</button>
+        <button class="cmp-model-hcol__remove" aria-label=""></button>
         <div class="cmp-model-hcol__img-wrap">
           <img src="${data.img}" alt="${data.name}" class="cmp-model-hcol__img">
           <img src="${data.logo}" alt="${data.name}" class="cmp-model-hcol__logo">
         </div>
         <p class="cmp-model-hcol__title">${data.name} · ${sel.trim}</p>`;
-      hcol.querySelector('.cmp-model-hcol__remove').addEventListener('click', () => removeSel(sel.model, sel.trim));
+      const removeBtn = hcol.querySelector('.cmp-model-hcol__remove');
+      removeBtn.textContent = '✕';
+      removeBtn.setAttribute('aria-label', (removeLabel + ' ' + sel.trim).trim());
+      removeBtn.addEventListener('click', () => removeSel(sel.model, sel.trim));
       table.appendChild(hcol);
     });
 
-    // Plus column: always shown while under max
     if (hasPlus) {
       const plusBtn = document.createElement('button');
       plusBtn.className = 'cmp-plus-hcol';
-      plusBtn.innerHTML = `<span class="cmp-plus-hcol__icon">+</span><span>Add</span>`;
+      plusBtn.innerHTML = `<span class="cmp-plus-hcol__icon">+</span><span></span>`;
+      const plusText = plusBtn.querySelector('span:last-child');
+      if (plusText) plusText.textContent = addLabel;
       plusBtn.addEventListener('click', openModal);
       table.appendChild(plusBtn);
     }
 
-    // ── Spec rows (text values) ───────────────────────────────
     let rowIdx = 0;
     SPECS.forEach(spec => {
       const bg = rowIdx % 2 === 1 ? 'rgba(0,0,0,.025)' : '';
@@ -2310,7 +2292,8 @@ document.addEventListener('click', e => {
       table.appendChild(nameCell);
 
       selections.forEach(sel => {
-        const trimSpecs = MODEL_DATA[sel.model].trimSpecs[sel.trim] || {};
+        const data = MODEL_DATA[sel.model] || { trimSpecs: {} };
+        const trimSpecs = data.trimSpecs[sel.trim] || {};
         const cell = document.createElement('div');
         cell.className = 'cmp-feat-cell cmp-feat-cell--text';
         cell.style.background = bg;
@@ -2327,17 +2310,17 @@ document.addEventListener('click', e => {
       rowIdx++;
     });
 
-    // ── Feature rows (✓/✗) ───────────────────────────────────
-    FEATURES.forEach(feat => {
+    FEATURE_ROWS.forEach(feat => {
       const bg = rowIdx % 2 === 1 ? 'rgba(0,0,0,.025)' : '';
       const nameCell = document.createElement('div');
       nameCell.className = 'cmp-feat-name';
       nameCell.style.background = bg;
-      nameCell.textContent = feat;
+      nameCell.textContent = feat.label;
       table.appendChild(nameCell);
 
       selections.forEach(sel => {
-        const has  = MODEL_DATA[sel.model].features[feat];
+        const data = MODEL_DATA[sel.model] || { features: {} };
+        const has  = !!(data.features[feat.key] || data.features[feat.label]);
         const cell = document.createElement('div');
         cell.className = `cmp-feat-cell cmp-feat-cell--${has ? 'yes' : 'no'}`;
         cell.style.background = bg;

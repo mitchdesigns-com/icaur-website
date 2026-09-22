@@ -59,8 +59,22 @@ export type CmsCta = {
 };
 
 export type CmsFeatureFlag = {
+  key?: string;
   label?: string;
   included?: boolean;
+};
+
+export type CmsCompareModel = {
+  sortOrder?: number;
+  vehicle?: CmsVehicleModel | null;
+};
+
+export type CmsCompareRow = {
+  key?: string;
+  label?: string;
+  rowType?: "spec" | "feature" | string;
+  trimField?: "range" | "hp" | "accel" | string;
+  sortOrder?: number;
 };
 
 export type CmsArticleBlock = {
@@ -148,11 +162,16 @@ export type CmsGlobal = {
     title?: string;
     close?: string;
     addModel?: string;
+    add?: string;
+    remove?: string;
     selectTitle?: string;
     selectHint?: string;
     selected?: string;
     done?: string;
     fromPrice?: string;
+    rangeLabel?: string;
+    powerLabel?: string;
+    accelLabel?: string;
   };
   lang?: {
     switchToAr?: string;
@@ -296,6 +315,9 @@ export type CmsChargingConfig = {
 export type CmsRuntime = {
   submitUrl?: string;
   contactSubmitUrl?: string;
+  compare?: CmsGlobal["compare"];
+  compareRows?: CmsCompareRow[];
+  compareModels?: CmsVehicleModel[];
   locations?: CmsLocation[];
   models?: CmsVehicleModel[];
   assets?: Record<string, string>;
@@ -390,7 +412,12 @@ export function cmsHref(href: string): string | { pathname: string; query: Recor
 export function featureMap(features?: CmsFeatureFlag[] | Record<string, boolean> | null): Record<string, boolean> {
   if (!features) return {};
   if (Array.isArray(features)) {
-    return Object.fromEntries(features.map((item) => [item.label || "", Boolean(item.included)]));
+    return Object.fromEntries(
+      features.map((item) => {
+        const key = item.key || item.label || "";
+        return [key, Boolean(item.included)];
+      })
+    );
   }
   return features;
 }
@@ -448,6 +475,20 @@ export async function getLocations(locale: string): Promise<CmsLocation[] | null
   return cmsGet<CmsLocation[]>(`/api/locations?locale=${locale}`);
 }
 
+export async function getCompareFeatures(locale: string): Promise<CmsCompareRow[] | null> {
+  return cmsGet<CmsCompareRow[]>(`/api/compare-features?locale=${locale}`);
+}
+
+export async function getCompareModels(locale: string): Promise<CmsVehicleModel[] | null> {
+  const rows = await cmsGet<CmsCompareModel[]>(`/api/compare-models?locale=${locale}`);
+  if (!rows?.length) return null;
+  return rows
+    .slice()
+    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+    .map((row) => row.vehicle)
+    .filter((vehicle): vehicle is CmsVehicleModel => !!vehicle?.slug);
+}
+
 export async function getVehicleModels(locale: string): Promise<CmsVehicleModel[] | null> {
   return cmsGet<CmsVehicleModel[]>(`/api/vehicle-models?locale=${locale}`);
 }
@@ -463,12 +504,14 @@ export async function getVehicleModel(slug: string, locale: string): Promise<Cms
 }
 
 export async function loadChrome(locale: string) {
-  const [global, locations, models] = await Promise.all([
+  const [global, locations, models, compareRows, compareModels] = await Promise.all([
     getGlobal(locale),
     getLocations(locale),
     getVehicleModels(locale),
+    getCompareFeatures(locale),
+    getCompareModels(locale),
   ]);
-  return { global, locations, models };
+  return { global, locations, models, compareRows, compareModels };
 }
 
 export async function cmsPageMeta(slug: string, locale: string, fallback: { title?: string; description?: string }) {
@@ -593,14 +636,26 @@ function vehicleBySlug(models: CmsVehicleModel[], slug?: string) {
 export function cmsRuntime(
   locations?: CmsLocation[] | null,
   models?: CmsVehicleModel[] | null,
-  page?: CmsPage | CmsVehicleModel | null
+  page?: CmsPage | CmsVehicleModel | null,
+  global?: CmsGlobal | null,
+  compareRows?: CmsCompareRow[] | null,
+  compareModels?: CmsVehicleModel[] | null
 ): CmsRuntime {
   const list = models || [];
+  const compareList = compareModels?.length ? compareModels : list;
   const slug = asVehicle(page)?.slug;
   const source = vehicleBySlug(list, slug) || page;
   return {
     submitUrl: CMS_URL ? `${CMS_URL}/api/reserve-submissions` : undefined,
     contactSubmitUrl: CMS_URL ? `${CMS_URL}/api/contact-submissions` : undefined,
+    compare: global?.compare,
+    compareRows: (compareRows || [])
+      .slice()
+      .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
+    compareModels: compareList.map((model) => ({
+      ...model,
+      features: featureMap(model.features),
+    })),
     locations: locations ?? undefined,
     models: list.map((model) => ({
       ...model,
