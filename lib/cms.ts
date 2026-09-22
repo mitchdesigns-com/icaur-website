@@ -197,6 +197,7 @@ export type CmsPage = {
   book?: Record<string, unknown>;
   downloads?: Record<string, unknown>;
   coverage?: Record<string, unknown>;
+  sections?: { heading?: string; body?: string }[];
 };
 
 export type CmsArticle = {
@@ -410,6 +411,8 @@ const PAGE_API: Record<string, string> = {
   "services-maintenance": "/api/maintenance-page",
   "services-programs": "/api/programs-page",
   "services-warranty": "/api/warranty-page",
+  terms: "/api/terms-page",
+  privacy: "/api/privacy-page",
 };
 
 export async function getPage(slug: string, locale: string): Promise<CmsPage | null> {

@@ -86,7 +86,7 @@ export async function Footer({ global }: Props) {
               </form>
               <p className="footer__nl-legal">
                 {footer?.legalPrefix || t("legalPrefix")}{" "}
-                <Link href={(footer?.privacyHref || "/privacy") as never}>{footer?.privacy || t("privacy")}</Link>{" "}
+                <Link href={(footer?.privacyHref || "/privacy-policy") as never}>{footer?.privacy || t("privacy")}</Link>{" "}
                 {footer?.legalSuffix || t("legalSuffix")}
               </p>
 
@@ -127,8 +127,8 @@ export async function Footer({ global }: Props) {
           <div className="footer__bottom">
             <p className="footer__legal">
               {footer?.copyright || t("copyright")} &nbsp;·&nbsp;{" "}
-              <Link href={(footer?.privacyHref || "/privacy") as never}>{footer?.privacy || t("privacy")}</Link> &nbsp;·&nbsp;{" "}
-              <Link href={(footer?.termsHref || "/terms") as never}>{footer?.terms || t("terms")}</Link>
+              <Link href={(footer?.privacyHref || "/privacy-policy") as never}>{footer?.privacy || t("privacy")}</Link> &nbsp;·&nbsp;{" "}
+              <Link href={(footer?.termsHref || "/terms-and-conditions") as never}>{footer?.terms || t("terms")}</Link>
             </p>
             <p className="footer__credit">{footer?.credit || t("credit")}</p>
           </div>

@@ -295,7 +295,7 @@ const SITE_FOOTER = `
           <input type="email" name="email" placeholder="Your email address" required aria-label="Email address">
           <button type="submit">Subscribe</button>
         </form>
-        <p class="footer__nl-legal">By subscribing you agree to our <a href="/privacy">Privacy Policy</a> and consent to receive updates from iCAUR.</p>
+        <p class="footer__nl-legal">By subscribing you agree to our <a href="/privacy-policy">Privacy Policy</a> and consent to receive updates from iCAUR.</p>
 
         <div class="footer__contact">
           <a href="tel:17833" class="footer__contact-item">
@@ -338,7 +338,7 @@ const SITE_FOOTER = `
 <div class="footer__outro">
   <div class="footer__inner">
     <div class="footer__bottom">
-      <p class="footer__legal">© 2026 iCAUR. All rights reserved. &nbsp;·&nbsp; <a href="/privacy">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms">Terms of Service</a></p>
+      <p class="footer__legal">© 2026 iCAUR. All rights reserved. &nbsp;·&nbsp; <a href="/privacy-policy">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms-and-conditions">Terms of Service</a></p>
       <p class="footer__credit">WEBSITE DESIGN &amp; DEVELOPMENT BY MITCHDESIGNS</p>
     </div>
   </div>

@@ -32,6 +32,8 @@ type MetaKey =
   | "maintenance"
   | "programs"
   | "warranty"
+  | "terms"
+  | "privacy"
   | "v27"
   | "o3t"
   | `newsArticles.${string}`;

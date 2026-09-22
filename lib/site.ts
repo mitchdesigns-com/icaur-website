@@ -88,4 +88,5 @@ export const PAGE_CHROME: Record<string, { bodyClass: string; scripts: SiteScrip
   "models-v27": MODEL_CHROME,
   "models-o3t": MODEL_CHROME,
   article: { bodyClass: "is-loading", scripts: CORE_SCRIPTS },
+  legal: { bodyClass: "is-loading", scripts: CORE_SCRIPTS },
 };

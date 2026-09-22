@@ -81,7 +81,7 @@ export function ReserveView({ page, models, locations }: Props) {
                 <button type="submit" className="rv-submit">{str(form, "submit")}</button>
                 <p className="rv-terms">
                   {str(form, "termsPrefix")}{" "}
-                  <CmsLink href={str(form, "termsHref", "/terms")}>{str(form, "termsLabel")}</CmsLink>
+                  <CmsLink href={str(form, "termsHref", "/terms-and-conditions")}>{str(form, "termsLabel")}</CmsLink>
                 </p>
               </form>
             </div>
