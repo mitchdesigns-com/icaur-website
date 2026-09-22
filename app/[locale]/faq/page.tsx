@@ -22,7 +22,7 @@ export default async function FaqPage({ params }: LocaleParams) {
   const chrome = PAGE_CHROME.faq;
   return (
     <SiteChrome locale={locale} bodyClass={chrome.bodyClass} scripts={chrome.scripts}>
-      <FaqView page={page} faqs={(faqs || []).filter((item) => item.category !== "home")} />
+      <FaqView page={page} locale={locale} faqs={(faqs || []).filter((item) => item.category !== "home")} />
     </SiteChrome>
   );
 }

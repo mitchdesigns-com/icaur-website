@@ -4,17 +4,28 @@ import { CmsImg } from "./CmsMedia";
 import { CmsLink, CtaVideo, str, texts } from "./shared";
 
 const GROUPS = [
-  { id: "sales", label: "Sales" },
-  { id: "warranty", label: "Warranty" },
-  { id: "services", label: "Services" },
-  { id: "spare-parts", label: "Spare Parts" },
+  { id: "sales", labelKey: "salesLabel", en: "Sales", ar: "المبيعات" },
+  { id: "warranty", labelKey: "warrantyLabel", en: "Warranty", ar: "الضمان" },
+  { id: "services", labelKey: "servicesLabel", en: "Services", ar: "الخدمات" },
+  { id: "spare-parts", labelKey: "sparePartsLabel", en: "Spare Parts", ar: "قطع الغيار" },
 ] as const;
 
-export function FaqView({ page, faqs }: { page: CmsPage; faqs: CmsFaqItem[] }) {
+type Props = {
+  page: CmsPage;
+  faqs: CmsFaqItem[];
+  locale?: string;
+};
+
+export function FaqView({ page, faqs, locale = "en" }: Props) {
   const hero = page.hero || {};
   const pills = texts(hero.pills);
   const shots = mediaList(hero.shots);
   const shotClass = ["faq-hero-shot--tall", "faq-hero-shot--sq", "faq-hero-shot--wide", "faq-hero-shot--tall"];
+  const isAr = locale === "ar";
+  const groups = GROUPS.map((group) => ({
+    ...group,
+    label: str(hero, group.labelKey, isAr ? group.ar : group.en),
+  }));
 
   return (
     <main id="main">
@@ -51,7 +62,7 @@ export function FaqView({ page, faqs }: { page: CmsPage; faqs: CmsFaqItem[] }) {
         </div>
         <div className="faq-cat-filters">
           <button className="faq-cat-btn is-active" data-cat="all">{str(hero, "allLabel", "All FAQs")}</button>
-          {GROUPS.map((group) => (
+          {groups.map((group) => (
             <button className="faq-cat-btn" data-cat={group.id} key={group.id}>{group.label}</button>
           ))}
         </div>
@@ -59,7 +70,7 @@ export function FaqView({ page, faqs }: { page: CmsPage; faqs: CmsFaqItem[] }) {
 
       <div className="faq-page-body">
         <div className="container" style={{ maxWidth: 800 }}>
-          {GROUPS.map((group) => {
+          {groups.map((group) => {
             const items = faqs.filter((item) => item.category === group.id);
             if (!items.length) return null;
             return (
