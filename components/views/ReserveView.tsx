@@ -28,47 +28,47 @@ export function ReserveView({ page, models, locations }: Props) {
           <div className="rv-right reveal reveal--up" data-delay="1">
             <div className="rv-card">
               <p className="eyebrow rv-eyebrow rv-card-eyebrow">{str(form, "eyebrow")}</p>
-              <div className="rv-block">
-                <p className="rv-block-label">{str(form, "chooseModel")}</p>
-                <div className="rv-models" role="radiogroup" aria-label={str(form, "chooseModel")}>
-                  {models.map((model, index) => (
-                    <label className="rv-model" key={model.slug}>
-                      <input type="radio" name="rv-model" value={model.slug} defaultChecked={index === 0} aria-label={model.name} />
-                      <div className="rv-model-img-wrap">
-                        <CmsImg src={model.image} alt={model.name || ""} loading="eager" variant="card" />
-                        <div className="rv-model-overlay" aria-hidden="true" />
-                        <CmsImg src={model.logo} alt={model.name || ""} className="rv-model-logo" variant="logo" />
-                        <span className="rv-model-dot" aria-hidden="true">
-                          <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor" /></svg>
-                        </span>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <div className="rv-divider" />
               <form id="rvForm" className="rv-form" noValidate>
+                <div className="rv-block">
+                  <p className="rv-block-label">{str(form, "chooseModel")}</p>
+                  <div className="rv-models" role="radiogroup" aria-label={str(form, "chooseModel")}>
+                    {models.map((model, index) => (
+                      <label className="rv-model" key={model.slug}>
+                        <input type="radio" name="rv-model" value={model.slug} defaultChecked={index === 0} aria-label={model.name} />
+                        <div className="rv-model-img-wrap">
+                          <CmsImg src={model.image} alt={model.name || ""} loading="eager" variant="card" />
+                          <div className="rv-model-overlay" aria-hidden="true" />
+                          <CmsImg src={model.logo} alt={model.name || ""} className="rv-model-logo" variant="logo" />
+                          <span className="rv-model-dot" aria-hidden="true">
+                            <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor" /></svg>
+                          </span>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div className="rv-divider" />
                 <div className="rv-row">
                   <div className="rv-field" id="rvf-first">
                     <label className="rv-label" htmlFor="rv-first">{str(form, "firstName")}</label>
-                    <input className="rv-input" id="rv-first" type="text" required autoComplete="given-name" />
+                    <input className="rv-input" id="rv-first" name="rv-first" type="text" required autoComplete="given-name" />
                   </div>
                   <div className="rv-field" id="rvf-last">
                     <label className="rv-label" htmlFor="rv-last">{str(form, "lastName")}</label>
-                    <input className="rv-input" id="rv-last" type="text" required autoComplete="family-name" />
+                    <input className="rv-input" id="rv-last" name="rv-last" type="text" required autoComplete="family-name" />
                   </div>
                 </div>
                 <div className="rv-field" id="rvf-email">
                   <label className="rv-label" htmlFor="rv-email">{str(form, "emailAddress")}</label>
-                  <input className="rv-input" id="rv-email" type="email" required autoComplete="email" />
+                  <input className="rv-input" id="rv-email" name="rv-email" type="email" required autoComplete="email" />
                 </div>
                 <div className="rv-field" id="rvf-phone">
                   <label className="rv-label" htmlFor="rv-phone">{str(form, "phoneNumber")}</label>
-                  <input className="rv-input" id="rv-phone" type="tel" autoComplete="tel" />
+                  <input className="rv-input" id="rv-phone" name="rv-phone" type="tel" autoComplete="tel" />
                 </div>
                 <div className="rv-select-wrap" id="rvf-showroom">
                   <span className="rv-select-label">{str(form, "chooseShowroom")}</span>
-                  <select className="rv-select" id="rv-showroom" defaultValue="">
+                  <select className="rv-select" id="rv-showroom" name="rv-showroom" defaultValue="">
                     <option value="" disabled />
                     {locations.map((location) => (
                       <option value={location.slug} key={location.slug}>{location.name}</option>
