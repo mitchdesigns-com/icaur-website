@@ -1,4 +1,5 @@
 import type { CmsPage } from "@/lib/cms";
+import { CmsImg, CmsVideo } from "./CmsMedia";
 import { CmsLink, CtaVideo, list, str, texts } from "./shared";
 
 export function InnovationView({ page }: { page: CmsPage }) {
@@ -12,7 +13,7 @@ export function InnovationView({ page }: { page: CmsPage }) {
     <main id="main">
       <section className="innov-page-hero" id="hero">
         <div className="innov-page-hero__bg" aria-hidden="true">
-          <video className="innov-page-hero__video" src={str(hero, "videoSrc")} poster={str(hero, "posterSrc")} autoPlay muted loop playsInline preload="auto" />
+          <CmsVideo className="innov-page-hero__video" src={hero.videoSrc} poster={hero.posterSrc} mode="hero" />
         </div>
         <div className="innov-page-hero__overlay" aria-hidden="true" />
         <div className="innov-page-hero__inner">
@@ -52,7 +53,7 @@ export function InnovationView({ page }: { page: CmsPage }) {
                 <h3 className="v27-ct-title">{str(item, "title")}</h3>
               </div>
               <div className="v27-ct-center">
-                <img className="v27-ct-img" src={str(item, "image")} alt={str(item, "imageAlt")} loading="lazy" />
+                <CmsImg className="v27-ct-img" src={item.image} alt={str(item, "imageAlt")} loading="lazy" variant="card" />
               </div>
               <div className="v27-ct-right">
                 <p className="v27-ct-label">{str(item, "label")}</p>
@@ -67,7 +68,7 @@ export function InnovationView({ page }: { page: CmsPage }) {
       {pillars.map((pillar, index) => (
         <div className={`innov-pillar${index === 0 ? " innov-pillar--reverse innov-pillar--cream" : " innov-pillar--dark"}`} key={str(pillar, "tag")}>
           <div className="innov-pillar__img reveal reveal--up">
-            <img src={str(pillar, "image")} alt={str(pillar, "imageAlt")} loading="lazy" />
+            <CmsImg src={pillar.image} alt={str(pillar, "imageAlt")} loading="lazy" variant="full" />
           </div>
           <div className="innov-pillar__text">
             <p className="innov-pillar__num">{str(pillar, "num")}</p>

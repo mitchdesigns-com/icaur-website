@@ -1,6 +1,8 @@
 import { Fragment } from "react";
 import type { CmsPage } from "@/lib/cms";
-import { CmsLink, CtaVideo, list, num, str, texts } from "./shared";
+import { mediaList } from "@/lib/media";
+import { CmsImg, CmsVideo } from "./CmsMedia";
+import { CmsLink, CtaVideo, list, num, str } from "./shared";
 
 const ABOUT_STORY_CLUSTER = [
   "https://pub-835dbefa2ea84f599cef0519f76de888.r2.dev/cms/interior_display_4c3657864e.webp",
@@ -15,7 +17,7 @@ function MvStatement({ parts }: { parts: Record<string, unknown>[] }) {
         if (image) {
           return (
             <span className="mv-chip" aria-hidden="true" key={index}>
-              <img src={image} alt="" loading="lazy" />
+              <CmsImg src={image} alt="" loading="lazy" variant="thumb" />
             </span>
           );
         }
@@ -30,7 +32,7 @@ export function AboutView({ page }: { page: CmsPage }) {
   const hero = page.hero || {};
   const story = page.story || {};
   const panels = list(story, "panels");
-  const cmsCluster = texts(story.cluster);
+  const cmsCluster = mediaList(story.cluster);
   const cluster = cmsCluster.length >= 2 ? cmsCluster : ABOUT_STORY_CLUSTER;
   const figures = list(page.figures, "items");
   const vision = page.vision || {};
@@ -41,7 +43,7 @@ export function AboutView({ page }: { page: CmsPage }) {
   return (
     <main id="main">
       <section className="spot-hero spot-hero--video" id="hero">
-        <video className="spot-hero__video" id="aboutHeroVideo" src={str(hero, "videoSrc")} poster={str(hero, "posterSrc")} autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
+        <CmsVideo className="spot-hero__video" id="aboutHeroVideo" src={hero.videoSrc} poster={hero.posterSrc} mode="hero" aria-hidden="true" />
         <div className="spot-hero__reveal" aria-hidden="true" />
         <div className="spot-hero__shade" aria-hidden="true" />
         <div className="spot-hero__head">
@@ -76,7 +78,7 @@ export function AboutView({ page }: { page: CmsPage }) {
                 <Fragment key={str(panel, "title") + titleEm}>
                   <article className={`svc__panel svc__panel--feature${index === 1 ? " svc__panel--flip" : ""}`}>
                     <figure className="svc__media svc__media--lg">
-                      <img src={str(panel, "image")} alt={str(panel, "imageAlt")} loading="lazy" data-par="0.10" />
+                      <CmsImg src={panel.image} alt={str(panel, "imageAlt")} loading="lazy" data-par="0.10" variant="card" />
                     </figure>
                     <div className="svc__body">
                       <span className="svc__num">{str(panel, "num")}</span>
@@ -96,10 +98,10 @@ export function AboutView({ page }: { page: CmsPage }) {
                   {index === 0 ? (
                     <div className="svc__panel svc__panel--cluster" aria-hidden="true">
                       <figure className="svc__media svc__media--sm svc__media--sm-a">
-                        <img src={cluster[0]} alt="" loading="lazy" data-par="0.18" />
+                        <CmsImg src={cluster[0]} alt="" loading="lazy" data-par="0.18" variant="thumb" />
                       </figure>
                       <figure className="svc__media svc__media--sm svc__media--sm-b">
-                        <img src={cluster[1]} alt="" loading="lazy" data-par="-0.12" />
+                        <CmsImg src={cluster[1]} alt="" loading="lazy" data-par="-0.12" variant="thumb" />
                       </figure>
                     </div>
                   ) : null}
@@ -157,7 +159,7 @@ export function AboutView({ page }: { page: CmsPage }) {
             ))}
           </div>
           <div className="usp-preview" id="uspPreview" aria-hidden="true">
-            <img src={str(valueItems[0], "image")} alt="" loading="lazy" />
+            <CmsImg src={valueItems[0]?.image} alt="" loading="lazy" variant="card" />
           </div>
         </div>
       </section>

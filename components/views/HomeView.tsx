@@ -1,5 +1,7 @@
 import { Fragment } from "react";
 import type { CmsArticle, CmsFaqItem, CmsPage, CmsVehicleModel } from "@/lib/cms";
+import { mediaList } from "@/lib/media";
+import { CmsImg, CmsVideo } from "./CmsMedia";
 import { categoryLabel, CmsLink, CtaVideo, formatDate, list, num, str, texts, withBrand } from "./shared";
 import { WhyStrips } from "./WhyStrips";
 
@@ -47,7 +49,7 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
   const paragraphs = texts(overview.paragraphs);
   const stats = list(overview, "stats");
   const serviceItems = list(services, "items");
-  const deck = texts(services.deck);
+  const deck = mediaList(services.deck);
   const featured = homeMediaStories(page, articles);
   const homeFaqs = faqs
     .filter((item) => item.showOnHome)
@@ -60,7 +62,12 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
       <div className="hero-scroll-driver" id="heroScrollDriver">
         <section className="hero" id="hero">
           <div className="hero__bg" aria-hidden="true">
-            <video className="hero__bg-img" src={str(hero, "videoSrc")} autoPlay loop muted playsInline preload="metadata" />
+            <CmsVideo
+              className="hero__bg-img"
+              src={hero.videoSrc}
+              poster={hero.posterSrc || "/assets/images/homepage-hero-poster.webp"}
+              mode="hero"
+            />
           </div>
           <div className="hero__overlay" id="heroOverlay" aria-hidden="true" />
           <div className="hero__mask-reveal" id="heroMaskReveal" aria-hidden="true">
@@ -111,9 +118,9 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
               <article className="mfc reveal reveal--up" data-delay={index} key={model.slug || model.name}>
                 <CmsLink href={model.href || "/models/v27"} className="mfc__inner" data-cursor-label="Explore">
                   <span className="mfc__glow" aria-hidden="true" />
-                  <img src={model.image} alt="" className="mfc__img mfc__img--default" loading="lazy" />
-                  <img src={model.logo} alt={model.name || ""} className="mfc__logo" />
-                  <img src={model.hoverImage} alt={model.name || ""} className="mfc__img mfc__img--hover" loading="lazy" />
+                  <CmsImg src={model.image} alt="" className="mfc__img mfc__img--default" loading="lazy" variant="card" />
+                  <CmsImg src={model.logo} alt={model.name || ""} className="mfc__logo" variant="logo" />
+                  <CmsImg src={model.hoverImage} alt={model.name || ""} className="mfc__img mfc__img--hover" loading="lazy" variant="card" />
                   <div className="mfc__bottom">
                     <h3 className="mfc__name">
                       {model.tagline} <span className="mfc__hl">{model.highlight}</span>
@@ -139,7 +146,7 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
         <section className="overview" id="overview">
           <div className="overview__bg" aria-hidden="true">
             <div className="overview__bg-inner" id="overviewBgInner">
-              <video className="overview__video" src={str(overview, "videoSrc")} muted playsInline preload="auto" />
+              <CmsVideo className="overview__video" src={overview.videoSrc} mode="scrub" />
               <div className="overview__overlay" aria-hidden="true" />
               <span className="overview__grain" aria-hidden="true" />
             </div>
@@ -197,8 +204,8 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
               </svg>
               <div className="svc__deck" id="svcDeck" aria-hidden="true">
                 <div className="svc__deck-inner">
-                  {texts(services.deck).map((src) => (
-                    <img key={src} src={src} alt="" loading="lazy" />
+                  {deck.map((src) => (
+                    <CmsImg key={src} src={src} alt="" loading="lazy" variant="thumb" />
                   ))}
                 </div>
               </div>
@@ -207,7 +214,7 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
               <Fragment key={str(item, "href") || index}>
                 <article className={`svc__panel svc__panel--feature${index === 1 ? " svc__panel--flip" : ""}`}>
                   <figure className="svc__media svc__media--lg">
-                    <img src={str(item, "image")} alt={str(item, "imageAlt")} loading="lazy" data-par="0.10" />
+                    <CmsImg src={item.image} alt={str(item, "imageAlt")} loading="lazy" data-par="0.10" variant="card" />
                   </figure>
                   <div className="svc__body">
                     <span className="svc__num">{str(item, "num")}</span>
@@ -267,7 +274,7 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
               {featured[0] ? (
                 <article className="media-card media-card--lead" id="mediaLead">
                   <CmsLink href={`/news/${featured[0].slug}`} className="media-card__img" id="mediaLeadImg" data-cursor-label="Read">
-                    <img src={featured[0].coverImage} alt={featured[0].title} loading="lazy" />
+                    <CmsImg src={featured[0].coverImage} alt={featured[0].title} loading="lazy" variant="card" />
                   </CmsLink>
                   <div className="media-card__meta">
                     <span className={`media-card__type${featured[0].category === "blog" ? " media-card__type--blog" : ""}`}>
@@ -281,7 +288,7 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
               {featured[1] ? (
                 <article className="media-card media-card--big" id="mediaBig">
                   <CmsLink href={`/news/${featured[1].slug}`} className="media-card__img" data-cursor-label="Read">
-                    <img src={featured[1].coverImage} alt={featured[1].title} loading="lazy" />
+                    <CmsImg src={featured[1].coverImage} alt={featured[1].title} loading="lazy" variant="card" />
                   </CmsLink>
                   <div className="media-card__meta">
                     <span className={`media-card__type${featured[1].category === "blog" ? " media-card__type--blog" : ""}`}>
@@ -414,10 +421,10 @@ function ServiceCluster({
   return (
     <div className="svc__panel svc__panel--cluster" aria-hidden="true">
       <figure className={`svc__media svc__media--sm ${firstClass}`}>
-        <img src={first} alt="" loading="lazy" data-par={firstPar} />
+        <CmsImg src={first} alt="" loading="lazy" data-par={firstPar} variant="thumb" />
       </figure>
       <figure className={`svc__media svc__media--sm ${secondClass}`}>
-        <img src={second} alt="" loading="lazy" data-par={secondPar} />
+        <CmsImg src={second} alt="" loading="lazy" data-par={secondPar} variant="thumb" />
       </figure>
     </div>
   );
