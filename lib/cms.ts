@@ -294,6 +294,7 @@ export type CmsChargingConfig = {
 
 export type CmsRuntime = {
   submitUrl?: string;
+  contactSubmitUrl?: string;
   locations?: CmsLocation[];
   models?: CmsVehicleModel[];
   assets?: Record<string, string>;
@@ -596,6 +597,7 @@ export function cmsRuntime(
   const source = vehicleBySlug(list, slug) || page;
   return {
     submitUrl: CMS_URL ? `${CMS_URL}/api/reserve-submissions` : undefined,
+    contactSubmitUrl: CMS_URL ? `${CMS_URL}/api/contact-submissions` : undefined,
     locations: locations ?? undefined,
     models: list.map((model) => ({
       ...model,

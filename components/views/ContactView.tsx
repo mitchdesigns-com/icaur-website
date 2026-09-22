@@ -44,6 +44,7 @@ export function ContactView({ page, locations, models }: Props) {
               <button type="button" className="rs-chip" role="tab" id="rschip-maintenance" data-panel="maintenance" aria-selected="false" aria-controls="rspanel-maintenance">{str(form, "maintenanceChip")}</button>
             </div>
             <form id="rsForm" aria-label="Contact form" noValidate>
+              <input type="hidden" name="rs-type" id="rs-type" value="inquiry" />
               <div className="rs-group">
                 <p className="rs-group-label">{str(form, "salutation")}</p>
                 <div className="rs-radios" role="radiogroup" aria-label={str(form, "salutation")}>
@@ -54,21 +55,21 @@ export function ContactView({ page, locations, models }: Props) {
               <div className="rs-field-row">
                 <div className="rs-field" id="rsf-first">
                   <label className="rs-label" htmlFor="rs-first">{str(form, "firstName")}</label>
-                  <input className="rs-input" id="rs-first" type="text" required autoComplete="given-name" />
+                  <input className="rs-input" id="rs-first" name="rs-first" type="text" required autoComplete="given-name" />
                 </div>
                 <div className="rs-field" id="rsf-last">
                   <label className="rs-label" htmlFor="rs-last">{str(form, "lastName")}</label>
-                  <input className="rs-input" id="rs-last" type="text" required autoComplete="family-name" />
+                  <input className="rs-input" id="rs-last" name="rs-last" type="text" required autoComplete="family-name" />
                 </div>
               </div>
               <div className="rs-ctx-row">
                 <div className="rs-field" id="rsf-phone">
                   <label className="rs-label" htmlFor="rs-phone">{str(form, "phoneNumber")}</label>
-                  <input className="rs-input" id="rs-phone" type="tel" autoComplete="tel" />
+                  <input className="rs-input" id="rs-phone" name="rs-phone" type="tel" autoComplete="tel" />
                 </div>
                 <div className="rs-select-wrap rs-slot" data-panel="inquiry">
                   <span className="rs-select-label">{str(form, "city")}</span>
-                  <select className="rs-select" id="rs-city" aria-label={str(form, "city")} defaultValue="">
+                  <select className="rs-select" id="rs-city" name="rs-city" aria-label={str(form, "city")} defaultValue="">
                     <option value="" disabled />
                     {locations.map((location) => (
                       <option value={location.slug} key={location.slug}>{location.area || location.name}</option>
@@ -77,7 +78,7 @@ export function ContactView({ page, locations, models }: Props) {
                 </div>
                 <div className="rs-select-wrap rs-slot" data-panel="testdrive" hidden>
                   <span className="rs-select-label">{str(form, "showroom")}</span>
-                  <select className="rs-select" id="rs-showroom" aria-label={str(form, "showroom")} defaultValue="">
+                  <select className="rs-select" id="rs-showroom" name="rs-showroom" aria-label={str(form, "showroom")} defaultValue="">
                     <option value="" disabled />
                     {showrooms.map((location) => (
                       <option value={location.slug} key={location.slug}>{location.name}</option>
@@ -86,7 +87,7 @@ export function ContactView({ page, locations, models }: Props) {
                 </div>
                 <div className="rs-select-wrap rs-slot" data-panel="maintenance" hidden>
                   <span className="rs-select-label">{str(form, "serviceCenter")}</span>
-                  <select className="rs-select" id="rs-centre" aria-label={str(form, "serviceCenter")} defaultValue="">
+                  <select className="rs-select" id="rs-centre" name="rs-centre" aria-label={str(form, "serviceCenter")} defaultValue="">
                     <option value="" disabled />
                     {services.map((location) => (
                       <option value={location.slug} key={location.slug}>{location.name}</option>
@@ -96,13 +97,13 @@ export function ContactView({ page, locations, models }: Props) {
               </div>
               <div className="rs-field" id="rsf-email">
                 <label className="rs-label" htmlFor="rs-email">{str(form, "emailAddress")}</label>
-                <input className="rs-input" id="rs-email" type="email" required autoComplete="email" />
+                <input className="rs-input" id="rs-email" name="rs-email" type="email" required autoComplete="email" />
               </div>
               <div className="rs-panel" id="rspanel-inquiry" data-panel="inquiry" role="tabpanel" aria-labelledby="rschip-inquiry">
                 <div className="rs-ctx-row">
                   <div className="rs-select-wrap">
                     <span className="rs-select-label">{str(form, "requestCategory")}</span>
-                    <select className="rs-select" id="rs-category" aria-label={str(form, "requestCategory")} defaultValue="">
+                    <select className="rs-select" id="rs-category" name="rs-category" aria-label={str(form, "requestCategory")} defaultValue="">
                       <option value="" disabled />
                       <option value="inquiry">Inquiry</option>
                       <option value="complaint">Complaint</option>
@@ -110,7 +111,7 @@ export function ContactView({ page, locations, models }: Props) {
                   </div>
                   <div className="rs-select-wrap is-disabled" id="rs-subwrap">
                     <span className="rs-select-label" id="rs-sublabel">{str(form, "subCategory")}</span>
-                    <select className="rs-select" id="rs-subcategory" disabled aria-label={str(form, "subCategory")} defaultValue="">
+                    <select className="rs-select" id="rs-subcategory" name="rs-subcategory" disabled aria-label={str(form, "subCategory")} defaultValue="">
                       <option value="" disabled />
                     </select>
                   </div>
@@ -120,7 +121,7 @@ export function ContactView({ page, locations, models }: Props) {
                 <div className="rs-ctx-row">
                   <div className="rs-select-wrap">
                     <span className="rs-select-label">{str(form, "model")}</span>
-                    <select className="rs-select" id="rs-td-model" aria-label={str(form, "model")} defaultValue="">
+                    <select className="rs-select" id="rs-td-model" name="rs-td-model" aria-label={str(form, "model")} defaultValue="">
                       <option value="" disabled />
                       {models.map((model) => (
                         <option value={model.slug} key={model.slug}>{model.name}</option>
@@ -129,14 +130,14 @@ export function ContactView({ page, locations, models }: Props) {
                   </div>
                   <div className="rs-field rs-field--date">
                     <label className="rs-label" htmlFor="rs-td-date">{str(form, "preferredDate")}</label>
-                    <input className="rs-input" id="rs-td-date" type="date" />
+                    <input className="rs-input" id="rs-td-date" name="rs-td-date" type="date" />
                     <span className="rs-date-text" aria-hidden="true" />
                   </div>
                 </div>
                 <div className="rs-ctx-row">
                   <div className="rs-select-wrap">
                     <span className="rs-select-label">{str(form, "preferredTime")}</span>
-                    <select className="rs-select" id="rs-td-time" aria-label={str(form, "preferredTime")} defaultValue="">
+                    <select className="rs-select" id="rs-td-time" name="rs-td-time" aria-label={str(form, "preferredTime")} defaultValue="">
                       <option value="" disabled />
                       <option value="10-12">10:00 — 12:00</option>
                       <option value="12-14">12:00 — 14:00</option>
@@ -146,7 +147,7 @@ export function ContactView({ page, locations, models }: Props) {
                   </div>
                   <div className="rs-select-wrap">
                     <span className="rs-select-label">{str(form, "drivingLicense")}</span>
-                    <select className="rs-select" id="rs-td-license" aria-label={str(form, "drivingLicense")} defaultValue="">
+                    <select className="rs-select" id="rs-td-license" name="rs-td-license" aria-label={str(form, "drivingLicense")} defaultValue="">
                       <option value="" disabled />
                       <option value="yes">{str(form, "licenseYes")}</option>
                       <option value="no">{str(form, "licenseNo")}</option>
@@ -158,7 +159,7 @@ export function ContactView({ page, locations, models }: Props) {
                 <div className="rs-ctx-row">
                   <div className="rs-select-wrap">
                     <span className="rs-select-label">{str(form, "model")}</span>
-                    <select className="rs-select" id="rs-mt-model" aria-label={str(form, "model")} defaultValue="">
+                    <select className="rs-select" id="rs-mt-model" name="rs-mt-model" aria-label={str(form, "model")} defaultValue="">
                       <option value="" disabled />
                       {models.map((model) => (
                         <option value={model.slug} key={`mt-${model.slug}`}>{model.name}</option>
@@ -167,7 +168,7 @@ export function ContactView({ page, locations, models }: Props) {
                   </div>
                   <div className="rs-select-wrap">
                     <span className="rs-select-label">{str(form, "serviceType")}</span>
-                    <select className="rs-select" id="rs-mt-type" aria-label={str(form, "serviceType")} defaultValue="">
+                    <select className="rs-select" id="rs-mt-type" name="rs-mt-type" aria-label={str(form, "serviceType")} defaultValue="">
                       <option value="" disabled />
                       <option value="periodic">Periodic Maintenance</option>
                       <option value="repair">Repair</option>
@@ -180,18 +181,18 @@ export function ContactView({ page, locations, models }: Props) {
                 <div className="rs-ctx-row">
                   <div className="rs-field" id="rsf-mileage">
                     <label className="rs-label" htmlFor="rs-mt-mileage">{str(form, "mileage")}</label>
-                    <input className="rs-input" id="rs-mt-mileage" type="number" min={0} step={1} inputMode="numeric" />
+                    <input className="rs-input" id="rs-mt-mileage" name="rs-mt-mileage" type="number" min={0} step={1} inputMode="numeric" />
                   </div>
                   <div className="rs-field rs-field--date">
                     <label className="rs-label" htmlFor="rs-mt-date">{str(form, "preferredDate")}</label>
-                    <input className="rs-input" id="rs-mt-date" type="date" />
+                    <input className="rs-input" id="rs-mt-date" name="rs-mt-date" type="date" />
                     <span className="rs-date-text" aria-hidden="true" />
                   </div>
                 </div>
               </div>
               <div className="rs-textarea-wrap">
                 <span className="rs-textarea-label">{str(form, "message")}</span>
-                <textarea className="rs-textarea" id="rs-message" />
+                <textarea className="rs-textarea" id="rs-message" name="rs-message" />
               </div>
               <div className="rs-group">
                 <p className="rs-group-label">{str(form, "channelLabel")}</p>
