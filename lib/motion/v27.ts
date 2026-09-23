@@ -7,7 +7,7 @@ import {
 
 const V27_PAGE: MotionScript[] = [
   { id: "models-v27", src: "/js/page/models-v27.js" },
-  { id: "v27", src: "/js/v27.js?v=75", type: "module" },
+  { id: "v27", src: "/js/v27.js?v=77", type: "module" },
 ];
 
 /**

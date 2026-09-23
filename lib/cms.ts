@@ -593,24 +593,27 @@ function mapColors(value: unknown) {
 
 function mapExteriorSlides(value: unknown) {
   return asRecordList(value)
-    .map((slide) => ({ src: String(slide.src || ""), label: String(slide.label || "") }))
-    .filter((slide) => slide.src);
+    .map((slide) => ({
+      src: cmsAsset(slide.src as string | { url?: string } | null),
+      label: String(slide.label || ""),
+    }))
+    .filter((slide) => slide.src && slide.src !== "[object Object]");
 }
 
 function mapInteriorSlides(value: unknown) {
   return asRecordList(value)
     .map((slide) => ({
-      src: String(slide.src || ""),
+      src: cmsAsset(slide.src as string | { url?: string } | null),
       label: String(slide.label || ""),
       hotspots: asRecordList(slide.hotspots).map((spot) => ({
         x: String(spot.x || ""),
         y: String(spot.y || ""),
         title: String(spot.title || ""),
         desc: String(spot.desc || ""),
-        img: String(spot.img || ""),
+        img: cmsAsset(spot.img as string | { url?: string } | null),
       })),
     }))
-    .filter((slide) => slide.src);
+    .filter((slide) => slide.src && slide.src !== "[object Object]");
 }
 
 export function modelPageRuntime(page?: CmsPage | CmsVehicleModel | null): CmsRuntime["model"] {

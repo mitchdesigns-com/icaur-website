@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { chargeAtPercent, chargingConfig, type CmsPage, type CmsVehicleModel } from "@/lib/cms";
+import { chargeAtPercent, chargingConfig, modelPageRuntime, type CmsPage, type CmsVehicleModel } from "@/lib/cms";
 import { DownloadFile } from "./DownloadFile";
 import { CmsImg, CmsVideo } from "./CmsMedia";
 import { CmsLink, CtaVideo, cmsFile, downloadName, list, num, str } from "./shared";
@@ -97,6 +97,8 @@ export function ModelView({
   const techBrand = str(tech, "brand");
   const safetyMark = str(safety, "mark", mark);
   const galleryMark = str(gallery, "eyebrowMark", mark);
+  const exteriorSlides = modelPageRuntime(page)?.exteriorSlides || [];
+  const hasExteriorGallery = exteriorSlides.length > 0;
 
   return (
     <>
@@ -196,6 +198,7 @@ export function ModelView({
         </div>
       </section>
 
+      {hasExteriorGallery ? (
       <section id="exterior-gallery">
         <div className="eg-header">
           <p className="eyebrow eg-eyebrow">
@@ -207,6 +210,7 @@ export function ModelView({
         </div>
         <div id="v27-eg-grid" className="v27-eg-grid" />
       </section>
+      ) : null}
 
       <div className="v27-marquee-wrap v27-marquee-wrap--ext" aria-hidden="true">
         <div className="v27-marquee-ribbon v27-marquee-ribbon--a">

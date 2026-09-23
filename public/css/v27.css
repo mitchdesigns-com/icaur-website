@@ -726,9 +726,9 @@
   font-size: clamp(2rem,4vw,3.5rem); font-weight: 500; line-height: 1.08; color: #1F0F08;
 }
 .v27-interior-h2 em { font-style: normal; color: var(--orange); }
-.v27-carousel-outer { position: relative; padding: 14px 0 22px; overflow: hidden; }
+.v27-carousel-outer { position: relative; padding: 14px 0 22px; overflow: hidden; direction: ltr; }
 .v27-carousel-track {
-  display: flex; gap: 10px; will-change: transform;
+  display: flex; gap: 10px; will-change: transform; direction: ltr;
 }
 .v27-carousel-slide {
   flex-shrink: 0; border-radius: 16px; overflow: hidden;
@@ -763,6 +763,25 @@
 .v27-carousel-arrow:hover { background: rgba(35,24,21,.8); }
 .v27-carousel-arrow--prev { left: 100px; }
 .v27-carousel-arrow--next { right: 100px; }
+/* Arabic: place "next" on the start side (right) and flip chevrons so
+   they still point outward — track stays LTR for GSAP x math. */
+html[lang="ar"] .v27-carousel-arrow--prev {
+  left: auto;
+  right: 100px;
+}
+html[lang="ar"] .v27-carousel-arrow--next {
+  right: auto;
+  left: 100px;
+}
+html[lang="ar"] .v27-carousel-arrow svg {
+  transform: scaleX(-1);
+}
+html[lang="ar"] .v27-carousel-slide-label {
+  left: auto;
+  right: 16px;
+  letter-spacing: 0;
+  text-transform: none;
+}
 /* Hotspot */
 .v27-hotspot {
   position: absolute; transform: translate(-50%,-50%); z-index: 4;

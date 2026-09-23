@@ -516,8 +516,12 @@ function initExterior() {
    4.  EXTERIOR DESIGN — photo carousel
 ══════════════════════════════════════════════════════════ */
 const EXT_SLIDES = (cmsModel().exteriorSlides || [])
-  .filter((slide) => slide && slide.src)
-  .map((slide) => ({ src: cmsSrc(slide.src), label: slide.label || '' }));
+  .map((slide) => {
+    const raw = slide && slide.src;
+    const src = typeof raw === 'string' ? raw : (raw && raw.url) || '';
+    return { src: cmsSrc(src), label: (slide && slide.label) || '' };
+  })
+  .filter((slide) => slide.src && slide.src !== '[object Object]');
 
 /* ─── Lightbox state ─────────────────────────────────── */
 let lbItems  = [];
@@ -831,10 +835,18 @@ function initDotGrid(wrap) {
 
 function initBrand() {
   const grid = $('#v27-eg-grid');
+  const section = $('#exterior-gallery');
   if (!grid) return;
 
-  const items = EXT_SLIDES.map(s => ({ image: s.src, text: s.label }));
+  const items = EXT_SLIDES
+    .map(s => ({ image: s.src, text: s.label }))
+    .filter((it) => it.image);
   lbItems = items;
+
+  if (!items.length) {
+    section?.remove();
+    return;
+  }
 
   ScrollTrigger.create({
     trigger: '#exterior-gallery', start: 'top 85%', once: true,
@@ -857,6 +869,11 @@ function initBrand() {
     img.src = it.image;
     img.alt = it.text;
     img.draggable = false;
+    img.addEventListener('error', () => {
+      card.remove();
+      lbItems = lbItems.filter((item) => item.image !== it.image);
+      if (!grid.children.length) section?.remove();
+    });
     card.appendChild(img);
 
     const tag = document.createElement('span');
@@ -872,8 +889,8 @@ function initBrand() {
       scrollTrigger: { trigger: card, start: 'top 85%', once: true },
     });
     tl.fromTo(card,
-      { xPercent: fromLeft ? -46 : 46, rotation: fromLeft ? -7 : 7, opacity: 0, transformOrigin: '50% 50%' },
-      { xPercent: 0, rotation: 0, opacity: 1, duration: 1.3, ease: 'power3.out' },
+      { xPercent: fromLeft ? -46 : 46, rotate: fromLeft ? -7 : 7, opacity: 0, transformOrigin: '50% 50%' },
+      { xPercent: 0, rotate: 0, opacity: 1, duration: 1.3, ease: 'power3.out' },
       0
     );
     tl.fromTo(img,
@@ -990,12 +1007,20 @@ function initMarquee() {
    8.  INTERIOR CAROUSEL
 ══════════════════════════════════════════════════════════ */
 const SLIDES = (cmsModel().interiorSlides || [])
-  .filter((slide) => slide && slide.src)
-  .map((slide) => ({
-    ...slide,
-    src: cmsSrc(slide.src),
-    hotspots: (slide.hotspots || []).map((spot) => ({ ...spot, img: cmsSrc(spot.img) })),
-  }));
+  .map((slide) => {
+    const raw = slide && slide.src;
+    const src = typeof raw === 'string' ? raw : (raw && raw.url) || '';
+    return {
+      ...slide,
+      src: cmsSrc(src),
+      hotspots: (slide.hotspots || []).map((spot) => {
+        const imgRaw = spot && spot.img;
+        const img = typeof imgRaw === 'string' ? imgRaw : (imgRaw && imgRaw.url) || '';
+        return { ...spot, img: cmsSrc(img) };
+      }),
+    };
+  })
+  .filter((slide) => slide.src && slide.src !== '[object Object]');
 
 const PEEK = 72;
 const GAP  = 10;
@@ -1091,8 +1116,20 @@ function initCarousel() {
   setSlideWidths();
   goTo(0, false);
 
-  $('#v27-arrow-prev').addEventListener('click', () => goTo(carouselCur - 1));
-  $('#v27-arrow-next').addEventListener('click', () => goTo(carouselCur + 1));
+  const carouselRtl = document.documentElement.getAttribute('dir') === 'rtl'
+    || document.documentElement.lang === 'ar';
+  const prevBtn = $('#v27-arrow-prev');
+  const nextBtn = $('#v27-arrow-next');
+  if (prevBtn) {
+    /* Visually on the right in AR (CSS); still steps backward on the LTR track */
+    prevBtn.setAttribute('aria-label', carouselRtl ? 'السابق' : 'Previous');
+    prevBtn.addEventListener('click', () => goTo(carouselCur - 1));
+  }
+  if (nextBtn) {
+    /* Visually on the left in AR (CSS); still steps forward on the LTR track */
+    nextBtn.setAttribute('aria-label', carouselRtl ? 'التالي' : 'Next');
+    nextBtn.addEventListener('click', () => goTo(carouselCur + 1));
+  }
 
   window.addEventListener('resize', setSlideWidths);
 
