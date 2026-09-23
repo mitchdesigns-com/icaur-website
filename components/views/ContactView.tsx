@@ -1,6 +1,7 @@
 import type { CmsLocation, CmsPage, CmsVehicleModel } from "@/lib/cms";
 import { ContactFormClient } from "@/components/motion/ContactFormClient";
 import { CmsImg } from "./CmsMedia";
+import { FindUsSection } from "./FindUsSection";
 import { CtaVideo, StoreBadges, str } from "./shared";
 
 type Props = {
@@ -279,20 +280,12 @@ export function ContactView({ page, locations, models }: Props) {
         </div>
       </section>
 
-      <section id="find-us" className="find-us">
-        <div className="find-us__grid">
-          <div className="find-us__left">
-            <div className="find-us__header" id="findUsHeader">
-              <p className="eyebrow eyebrow--warm">{str(findUs, "eyebrow")}</p>
-              <h2 className="find-us__h">{str(findUs, "title")}<br /><em>{str(findUs, "titleEm")}</em></h2>
-            </div>
-            <div className="find-us__list" id="findUsList" />
-          </div>
-          <div className="find-us-map-wrap" id="findUsMapWrap">
-            <div id="findUsMap" />
-          </div>
-        </div>
-      </section>
+      <FindUsSection
+        eyebrow={str(findUs, "eyebrow")}
+        title={str(findUs, "title")}
+        titleEm={str(findUs, "titleEm")}
+        locations={locations}
+      />
 
       <CtaVideo cta={page.cta} />
     </main>

@@ -315,6 +315,9 @@ function fuPopupHTML(loc) {
 }
 
 function initFindUs() {
+  /* Find-us map is React/mapcn (`FindUsSection`). Skip legacy Leaflet boot. */
+  if (document.querySelector('#find-us[data-mapcn]')) return;
+
   var section  = document.getElementById('find-us');
   var header   = document.getElementById('findUsHeader');
   var listEl   = document.getElementById('findUsList');
@@ -348,9 +351,15 @@ function initFindUs() {
     center: [30.02, 31.22], zoom: 10,
     zoomControl: true, scrollWheelZoom: false,
   });
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>',
-    subdomains: 'abcd', maxZoom: 19,
+  /* Free light basemap (no API key). CARTO CDN now watermarks unsigned requests. */
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles © <a href="https://www.esri.com/">Esri</a>',
+    maxZoom: 16,
+  }).addTo(map);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '',
+    maxZoom: 16,
+    opacity: 0.9,
   }).addTo(map);
 
   FIND_US_LOCATIONS.forEach(function(loc) {

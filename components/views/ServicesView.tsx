@@ -1,7 +1,8 @@
-import type { CmsPage } from "@/lib/cms";
+import type { CmsLocation, CmsPage } from "@/lib/cms";
 import { CmsLink, CtaVideo, list, str } from "./shared";
+import { FindUsSection } from "./FindUsSection";
 
-export function ServicesView({ page }: { page: CmsPage }) {
+export function ServicesView({ page, locations = [] }: { page: CmsPage; locations?: CmsLocation[] }) {
   const hero = page.hero || {};
   const cards = list(page.hub, "cards");
   const findUs = page.findUs || {};
@@ -36,20 +37,12 @@ export function ServicesView({ page }: { page: CmsPage }) {
         </div>
       </section>
 
-      <section id="find-us" className="find-us">
-        <div className="find-us__grid">
-          <div className="find-us__left">
-            <div className="find-us__header" id="findUsHeader">
-              <p className="eyebrow eyebrow--warm">{str(findUs, "eyebrow")}</p>
-              <h2 className="find-us__h">{str(findUs, "title")}<br /><em>{str(findUs, "titleEm")}</em></h2>
-            </div>
-            <div className="find-us__list" id="findUsList" />
-          </div>
-          <div className="find-us-map-wrap" id="findUsMapWrap">
-            <div id="findUsMap" />
-          </div>
-        </div>
-      </section>
+      <FindUsSection
+        eyebrow={str(findUs, "eyebrow")}
+        title={str(findUs, "title")}
+        titleEm={str(findUs, "titleEm")}
+        locations={locations}
+      />
 
       <CtaVideo cta={page.cta} />
     </main>

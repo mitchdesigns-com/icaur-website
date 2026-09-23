@@ -56,8 +56,8 @@ export const PAGE_CHROME: Record<string, { bodyClass: string; scripts: SiteScrip
   },
   contact: {
     bodyClass: "is-loading",
-    styles: ["https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"],
-    scripts: [...CORE_SCRIPTS, ...LEAFLET, { src: "/js/services.js?v=2" }],
+    styles: [],
+    scripts: [...CORE_SCRIPTS, { src: "/js/services.js?v=4" }],
   },
   faq: { bodyClass: "is-loading", scripts: CORE_SCRIPTS },
   innovation: {
@@ -69,12 +69,12 @@ export const PAGE_CHROME: Record<string, { bodyClass: string; scripts: SiteScrip
   reserve: { bodyClass: "is-loading dark-hero-page", scripts: CORE_SCRIPTS },
   services: {
     bodyClass: "is-loading dark-hero-page",
-    styles: ["https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"],
-    scripts: [...CORE_SCRIPTS, { src: "/js/doodles.js" }, ...LEAFLET, { src: "/js/services.js?v=2" }],
+    styles: [],
+    scripts: [...CORE_SCRIPTS, { src: "/js/doodles.js" }, { src: "/js/services.js?v=4" }],
   },
   "services-maintenance": {
     bodyClass: "is-loading dark-hero-page",
-    scripts: [...CORE_SCRIPTS, { src: "/js/doodles.js" }, { src: "/js/services.js?v=2" }],
+    scripts: [...CORE_SCRIPTS, { src: "/js/doodles.js" }, { src: "/js/services.js?v=4" }],
   },
   "services-programs": {
     bodyClass: "is-loading dark-hero-page",

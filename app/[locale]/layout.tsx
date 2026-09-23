@@ -66,7 +66,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap"
           rel="stylesheet"
         />
-        <link rel="stylesheet" href="/css/styles.css?v=84" />
+        <link rel="stylesheet" href="/css/styles.css?v=91" />
         <script
           type="importmap"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(IMPORT_MAP) }}

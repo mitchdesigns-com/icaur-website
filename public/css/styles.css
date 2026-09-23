@@ -2154,16 +2154,22 @@ body:has(.mobile-menu.is-open) .nav {
   background: #F5EFE5;
   padding: clamp(80px,10vh,120px) var(--px,60px);
   position: relative; z-index: 5;
+  overflow: clip;
 }
 .find-us__grid {
   display: grid;
-  grid-template-columns: 1fr 1.6fr;
+  grid-template-columns: minmax(240px, 0.95fr) minmax(0, 1.55fr);
   gap: clamp(16px,2vw,28px);
   align-items: stretch;
 }
-.find-us__left { display: flex; flex-direction: column; gap: clamp(20px,2.5vh,28px); }
+.find-us__left {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px,2vh,24px);
+  min-width: 0;
+}
 
-.find-us__header { opacity: 0; transform: translateY(32px); transition: opacity .7s ease, transform .7s ease; }
+.find-us__header { opacity: 0; transform: translateY(32px); transition: opacity .7s ease, transform .7s ease; flex-shrink: 0; }
 .find-us__header.is-visible { opacity: 1; transform: none; }
 
 .find-us__h {
@@ -2177,13 +2183,14 @@ body:has(.mobile-menu.is-open) .nav {
 }
 .find-us__h em { font-style: normal; color: var(--amber); }
 
-/* List panel */
+/* List panel — show all locations, no inner scroll */
 .find-us__list {
   background: #EDE7DF;
   border-radius: 20px;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
+  flex: 0 0 auto;
   opacity: 0; transform: translateX(-24px);
   transition: opacity .65s ease .1s, transform .65s ease .1s;
 }
@@ -2193,8 +2200,9 @@ body:has(.mobile-menu.is-open) .nav {
   display: flex; flex-direction: column; gap: 6px;
   padding: clamp(18px,2.2vh,24px) clamp(18px,2vw,26px);
   background: transparent;
-  border: none; border-left: 3px solid transparent;
-  cursor: pointer; text-align: left; outline: none;
+  border: none;
+  border-inline-start: 3px solid transparent;
+  cursor: pointer; text-align: start; outline: none;
   flex-shrink: 0;
   transition: background .22s ease, border-color .22s ease, box-shadow .22s ease;
 }
@@ -2202,7 +2210,7 @@ body:has(.mobile-menu.is-open) .nav {
 .find-us__row:hover { background: rgba(255,255,255,.62); }
 .find-us__row.is-active {
   background: #fff;
-  border-left-color: #231815;
+  border-inline-start-color: #231815;
   box-shadow: 0 2px 16px rgba(35,24,21,.08);
 }
 
@@ -2225,19 +2233,35 @@ body:has(.mobile-menu.is-open) .nav {
   transition: color .22s ease;
 }
 .find-us__row.is-active .find-us__name { color: #1F0F08; }
-.find-us__area { font-size: .74rem; font-weight: 500; color: #888; line-height: 1; transition: color .22s ease; }
+.find-us__area { font-size: .74rem; font-weight: 500; color: #888; line-height: 1.35; transition: color .22s ease; }
 .find-us__row.is-active .find-us__area { color: #666; }
 
-/* Map wrap */
+/* Map wrap — contained so popups/cards never break the page */
 .find-us-map-wrap {
-  border-radius: 20px; overflow: hidden; position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
   box-shadow: 0 24px 72px rgba(20,10,6,.11), 0 4px 16px rgba(35,24,21,.07);
-  min-height: 520px;
+  min-height: 420px;
+  height: auto;
+  min-width: 0;
+  align-self: stretch;
   opacity: 0; transform: scale(.97);
   transition: opacity .8s ease .18s, transform .8s ease .18s;
+  z-index: 1;
+  background: #E5E0D8;
+  isolation: isolate;
+  contain: layout paint;
 }
 .find-us-map-wrap.is-visible { opacity: 1; transform: none; }
-#findUsMap { position: absolute; inset: 0; width: 100%; height: 100%; }
+#findUsMap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+}
 
 /* Leaflet overrides */
 .find-us-map-wrap .leaflet-container { background: #E5E0D8 !important; }
@@ -2267,11 +2291,17 @@ body:has(.mobile-menu.is-open) .nav {
 /* Find-us popup card */
 .fu-popup {
   padding: 22px 24px 20px;
-  padding-inline-end: 36px;
+  padding-inline-end: 40px;
   font-family: var(--f-body, Gotham, sans-serif);
   min-width: 300px;
+  max-width: 340px;
   box-sizing: border-box;
   text-align: start;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(20,10,6,.18), 0 4px 16px rgba(35,24,21,.1);
+  border: 1px solid rgba(35,24,21,.07);
+  position: relative;
 }
 .fu-popup__badges {
   display: flex;
@@ -2283,7 +2313,8 @@ body:has(.mobile-menu.is-open) .nav {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px 4px 8px;
+  padding-block: 4px;
+  padding-inline: 8px 10px;
   border-radius: 5px;
   font-size: 0.6rem;
   font-weight: 700;
@@ -2359,9 +2390,131 @@ body:has(.mobile-menu.is-open) .nav {
 }
 .find-us-marker { background: transparent !important; border: none !important; }
 
+/* mapcn / MapLibre find-us map */
+.fu-mapcn,
+.fu-mapcn__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+}
+.fu-mapcn .maplibregl-map,
+.fu-mapcn .maplibregl-canvas-container,
+.fu-mapcn .maplibregl-marker {
+  max-width: 100%;
+}
+.fu-mapcn .maplibregl-map {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  overflow: hidden !important;
+  position: absolute !important;
+  inset: 0;
+}
+.fu-mapcn .maplibregl-canvas-container {
+  overflow: hidden !important;
+}
+.fu-mapcn .maplibregl-canvas-container canvas {
+  border-radius: 20px;
+}
+.fu-mapcn .maplibregl-marker {
+  z-index: 2;
+}
+.fu-mapcn .maplibregl-ctrl-attrib {
+  background: rgba(255,255,255,.78) !important;
+  color: rgba(35,24,21,.45) !important;
+  font-size: 9px !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.fu-map-dot {
+  display: block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #F37021;
+  box-shadow: 0 0 0 3px rgba(243,112,33,0.18);
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.fu-map-dot.is-active {
+  width: 20px;
+  height: 20px;
+  box-shadow: 0 0 0 4px rgba(243,112,33,0.22), 0 0 16px rgba(243,112,33,0.55);
+  animation: fuGlow 2s ease-in-out infinite;
+}
+.fu-mapcn button[aria-label="Zoom in"],
+.fu-mapcn button[aria-label="Zoom out"] {
+  background: #fff;
+  color: #231815;
+  border: 1px solid rgba(35,24,21,.09);
+}
+
+/* In-map location card — anchored under the active marker */
+.fu-map-card {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  top: 0;
+  width: min(320px, calc(100% - 20px));
+  max-width: min(320px, calc(100% - 20px));
+  max-height: min(280px, calc(100% - 20px));
+  margin: 0;
+  padding: 14px 16px 12px;
+  padding-inline-end: 40px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid rgba(35,24,21,.07);
+  box-shadow: 0 18px 48px rgba(20,10,6,.18), 0 4px 14px rgba(35,24,21,.08);
+  text-align: start;
+  pointer-events: auto;
+  will-change: transform;
+  animation: fuMapCardIn .28s cubic-bezier(.22,1,.36,1) both;
+}
+.fu-map-card .fu-popup__name {
+  font-size: .9rem;
+  margin-bottom: 10px;
+}
+.fu-map-card .fu-popup__rows {
+  gap: 7px;
+  padding-bottom: 10px;
+}
+.fu-map-card .fu-popup__maps {
+  margin-top: 10px;
+}
+.fu-map-card__close {
+  position: absolute;
+  top: 8px;
+  inset-inline-end: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(35,24,21,.06);
+  color: #231815;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1;
+}
+.fu-map-card__close:hover {
+  background: rgba(35,24,21,.12);
+}
+
 @keyframes fuPopup {
   from { opacity: 0; transform: scale(.86) translateY(8px); }
   to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes fuMapCardIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 @keyframes fuBloom {
   0%   { transform: scale(1); opacity: .75; }
@@ -2373,8 +2526,21 @@ body:has(.mobile-menu.is-open) .nav {
 }
 
 @media (max-width: 900px) {
-  .find-us__grid { grid-template-columns: 1fr; }
-  .find-us-map-wrap { min-height: 360px; }
+  .find-us__grid {
+    grid-template-columns: 1fr;
+  }
+  .find-us-map-wrap {
+    min-height: 340px;
+    height: 360px;
+  }
+  .find-us__list {
+    overflow: visible;
+    max-height: none;
+  }
+  .fu-map-card {
+    width: min(300px, calc(100% - 20px));
+    max-width: min(300px, calc(100% - 20px));
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -7748,7 +7914,30 @@ html[lang="ar"] .innov-stat__label {
   text-transform: none;
 }
 
-/* Find-us map popup — Arabic type + RTL close */
+/* Find-us — Arabic type + RTL list */
+html[lang="ar"] .find-us__h {
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+html[lang="ar"] .find-us__list {
+  transform: translateX(24px);
+}
+html[lang="ar"] .find-us__list.is-visible {
+  transform: none;
+}
+html[lang="ar"] .find-us__badge {
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 0.68rem;
+}
+html[lang="ar"] .find-us__name {
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+html[lang="ar"] .find-us__area {
+  letter-spacing: 0;
+  line-height: 1.5;
+}
 html[lang="ar"] .fu-popup__badge {
   letter-spacing: 0;
   text-transform: none;
@@ -7765,9 +7954,12 @@ html[lang="ar"] .fu-popup__row {
 html[lang="ar"] .fu-popup__maps {
   letter-spacing: 0;
 }
-html[lang="ar"] .find-us__badge {
-  letter-spacing: 0;
-  text-transform: none;
+html[lang="ar"] .fu-map-card {
+  font-family: var(--f-body, Gotham, sans-serif);
+}
+html[lang="ar"] .fu-map-card__close {
+  inset-inline-end: 8px;
+  inset-inline-start: auto;
 }
 html[dir="rtl"] .find-us-map-wrap .leaflet-popup-close-button {
   right: auto !important;
