@@ -1,6 +1,6 @@
 import type { ReactNode, CSSProperties } from "react";
 import { Link } from "@/i18n/navigation";
-import { cmsHref, type CmsCta } from "@/lib/cms";
+import { cmsAsset, cmsHref, type CmsCta } from "@/lib/cms";
 import { mediaUrl } from "@/lib/media";
 import { CmsVideo } from "./CmsMedia";
 
@@ -142,7 +142,7 @@ export function cmsFile(obj: Record<string, unknown> | undefined | null, keys: s
     else if (value && typeof value === "object" && "url" in value) {
       url = String((value as { url?: string }).url || "");
     }
-    if (url && url !== "#") return url;
+    if (url && url !== "#" && url !== "[object Object]") return cmsAsset(url);
   }
   return "";
 }

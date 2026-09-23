@@ -57,6 +57,9 @@
     if (!href || href.startsWith('#') || href.startsWith('http') ||
         href.startsWith('mailto:') || href.startsWith('tel:')) return;
     if (a.target === '_blank') return;
+    if (a.hasAttribute('download')) return;          /* file downloads — never soft-nav */
+    if (href.startsWith('/api/')) return;            /* same-origin download proxy */
+    if (a.dataset.noTransition != null) return;
     if (a.classList.contains('nav__drop-trigger')) return;
 
     e.preventDefault();

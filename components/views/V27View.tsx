@@ -89,7 +89,8 @@ export function ModelView({
   const brochureLabel = str(overview, "brochureLabel") || str(record, "brochureLabel");
   const brochureHref = cmsFile(overview, ["brochureFile", "brochureHref", "file"]) || cmsFile(record, ["brochureFile", "brochureHref"]);
   const colors = list(exterior, "colors");
-  const resourceItems = list(resources, "items");
+  const resourceItems = list(resources, "items").filter((item) => Boolean(cmsFile(item)));
+  const hasResources = resourceItems.length > 0;
   const techItems = list(tech, "items");
   const safetyItems = list(safety, "items");
   const safetyImage = str(safety, "image") || str(record, "safetyImage");
@@ -257,6 +258,7 @@ export function ModelView({
         </div>
       </section>
 
+      {hasResources ? (
       <section id="v27-resources">
         <p className="eyebrow v27-res-eyebrow">{str(resources, "eyebrow")}</p>
         <h2 className="v27-res-h2">{str(resources, "title")}</h2>
@@ -283,6 +285,7 @@ export function ModelView({
           })}
         </div>
       </section>
+      ) : null}
 
       <section id="v27-tech">
         <div className="v27-ct-sticky">

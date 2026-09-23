@@ -6,7 +6,7 @@ export type SiteScript = {
 export const CORE_SCRIPTS: SiteScript[] = [
   { src: "/js/components.js" },
   { src: "/js/main.js?v=77" },
-  { src: "/js/transitions.js" },
+  { src: "/js/transitions.js?v=2" },
   { src: "/js/game.js" },
 ];
 
