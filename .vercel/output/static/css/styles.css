@@ -1244,7 +1244,12 @@ html.pt-entering > body { opacity: 0; }
   color: var(--white);   /* dark background */
   margin-bottom: var(--sp-12);
 }
-.hero__line { display: block; }
+.hero__line {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.28em;
+  row-gap: 0;
+}
 
 /* Per-letter elastic pop + brand color cycle (ported from landing-page SplitText) */
 .hero__headline {
@@ -4907,12 +4912,12 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
 #rsForm {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 32px;
 }
 #rsForm .rs-panel {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 32px;
 }
 #rsForm .rs-panel[hidden] { display: none; }
 #rsForm .rs-cta { margin-top: 0; }
@@ -5062,6 +5067,9 @@ svg.viz-spin { transform-box: fill-box; transform-origin: center; }
   background: var(--amber); color: var(--white); font-weight: 700;
 }
 .rs-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: end; }
+.rs-field-row > .rs-field,
+.rs-ctx-row > .rs-field,
+.rs-ctx-row > .rs-select-wrap { margin-top: 0; }
 .rs-field-row + .rs-field { margin-top: 0; }
 
 /* Contextual panel fields (select / textarea) */

@@ -81,12 +81,12 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
             </div>
             <h1 className="hero__headline" aria-label={`${str(hero, "titleA")} ${str(hero, "titleB")} ${str(hero, "titleC")} ${str(hero, "titleAccent")}`}>
               <span className="hero__line" aria-hidden="true">
-                <span className="hero__word">{str(hero, "titleA")}</span>
-                <span className="hero__word">{str(hero, "titleB")}</span>
+                <span className="hero__word">{str(hero, "titleA", "Built")}</span>
+                <span className="hero__word">{str(hero, "titleB", "For")}</span>
               </span>
               <span className="hero__line" aria-hidden="true">
-                <span className="hero__word">{str(hero, "titleC")}</span>
-                <span className="hero__word hero__word--accent">{str(hero, "titleAccent")}</span>
+                <span className="hero__word">{str(hero, "titleC", "Every")}</span>
+                <span className="hero__word hero__word--accent">{str(hero, "titleAccent", "Road")}</span>
               </span>
             </h1>
             <div className="hero__footer">
