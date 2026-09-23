@@ -1158,9 +1158,10 @@ function buildAnnotCard(hs, dotWrap, dotBtn, slideIndex) {
   card.style.pointerEvents = 'none';
 
   /* Position: alongside the hotspot — right of it unless near the right
-     edge. `top` is the hotspot's own y and yPercent:-50 (kept on every
-     tween below) centres the card on the dot, so it sits beside the dot
-     rather than hanging below it. */
+     edge. Physical left/right (not logical) — hotspot coords are painted
+     on the photo, which does not mirror in RTL. `top` is the hotspot's
+     own y and yPercent:-50 (kept on every tween below) centres the card
+     on the dot, so it sits beside the dot rather than hanging below it. */
   const pctX = parseFloat(hs.x);
   const GAP_PCT = 1.5;                 /* horizontal breathing room, % of slide */
   card.style.top = hs.y;
@@ -1171,10 +1172,14 @@ function buildAnnotCard(hs, dotWrap, dotBtn, slideIndex) {
   }
   gsap.set(card, { opacity: 0, scale: .6, yPercent: -50 });
 
-  const img = document.createElement('img');
-  img.src = hs.img || '';
-  img.alt = hs.title;
-  card.appendChild(img);
+  const imgSrc = (hs.img || '').trim();
+  if (imgSrc) {
+    const img = document.createElement('img');
+    img.src = imgSrc;
+    img.alt = hs.title || '';
+    img.addEventListener('error', () => { img.remove(); });
+    card.appendChild(img);
+  }
 
   const body = document.createElement('div');
   body.className = 'v27-annot-body';
@@ -1183,6 +1188,8 @@ function buildAnnotCard(hs, dotWrap, dotBtn, slideIndex) {
 
   const closeBtn = document.createElement('button');
   closeBtn.className = 'v27-annot-close';
+  closeBtn.type = 'button';
+  closeBtn.setAttribute('aria-label', document.documentElement.lang === 'ar' ? 'إغلاق' : 'Close');
   closeBtn.innerHTML = '&#x2715;';
   card.appendChild(closeBtn);
 

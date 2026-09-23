@@ -805,10 +805,23 @@
 .v27-annot-title { font-size: .76rem; font-weight: 600; color: #1F0F08; margin-bottom: 4px; }
 .v27-annot-desc { font-size: .66rem; line-height: 1.55; color: rgba(35,24,21,.6); }
 .v27-annot-close {
-  position: absolute; top: 8px; right: 8px; width: 26px; height: 26px;
+  position: absolute; top: 8px; inset-inline-end: 8px; width: 26px; height: 26px;
   border-radius: 50%; background: rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.2);
   color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer;
-  z-index: 2; outline: none;
+  z-index: 2; outline: none; padding: 0; line-height: 1;
+}
+/* No photo strip — keep the close clear of the title */
+.v27-annot-card:not(:has(img)) .v27-annot-body {
+  padding-inline-end: 38px;
+}
+html[lang="ar"] .v27-annot-title,
+html[lang="ar"] .v27-annot-desc {
+  letter-spacing: 0;
+  text-align: start;
+  text-transform: none;
+}
+html[lang="ar"] .v27-annot-desc {
+  line-height: 1.7;
 }
 @keyframes v27HsPing {
   0%   { transform: scale(1);   opacity: .75; }
@@ -980,10 +993,10 @@
   position: relative; padding-bottom: clamp(48px,6vh,72px);
 }
 
-/* Floating crossfade image — fills left column */
+/* Floating crossfade image — fills the start column (left in LTR, right in RTL) */
 .v27-sf-img-wrap {
   position: absolute;
-  left: var(--px); top: 0;
+  inset-inline-start: var(--px); top: 0;
   width: calc(50% - var(--px) - clamp(12px,2vw,32px));
   aspect-ratio: 16/10;
   border-radius: 16px; overflow: hidden;
@@ -1050,7 +1063,7 @@
 .sf-num {
   font-size: .58rem; font-weight: 700; letter-spacing: .18em;
   flex-shrink: 0; color: rgba(35,24,21,.20);
-  transition: color .28s ease; margin-left: auto; padding-left: 24px;
+  transition: color .28s ease; margin-inline-start: auto; padding-inline-start: 24px;
 }
 .v27-sf-row.is-on .sf-num { color: #015699; }
 
@@ -1088,7 +1101,7 @@
   /* full-width row of its own, under the headline */
   .v27-sf-row-body .sf-disc-wrap { grid-row: 2; grid-column: 1 / -1; }
   .v27-sf-row.is-scroll-on .v27-sf-row-body::before {
-    width: clamp(64px, 19vw, 88px); margin-right: 12px; opacity: 1;
+    width: clamp(64px, 19vw, 88px); margin-inline-end: 12px; opacity: 1;
   }
   /* the open row: same treatment the desktop hover gives */
   .v27-sf-row.is-scroll-on .sf-title { color: #1F0F08; }
@@ -1364,4 +1377,84 @@
 .v27-res-eyebrow {
   font-family: 'GothamMedium', 'Montserrat', 'Futura', sans-serif;
   font-weight: 600;
+}
+
+/* ── Arabic leading (V27 + Innovation pages) ── */
+html[lang="ar"] :is(
+  .eg-h2,
+  .v27-hero-title,
+  .v27-ov-title,
+  .v27-ext-title,
+  .v27-about-title,
+  .v27-gallery-title,
+  .v27-interior-title,
+  .v27-ct-title,
+  .v27-sf-title,
+  .v27-charging-title,
+  .v27-trims-title,
+  .v27-res-title,
+  .v27-hero-sub,
+  .v27-ov-copy,
+  .v27-ext-copy,
+  .v27-ov-eyebrow,
+  .v27-ext-eyebrow,
+  .v27-about-copy,
+  .v27-interior-copy,
+  .v27-ct-copy,
+  .v27-sf-copy,
+  .v27-charging-copy,
+  .v27-trims-copy,
+  .v27-res-copy,
+  .v27-gallery-copy,
+  [class^="v27-"][class$="-title"],
+  [class^="v27-"][class$="-copy"],
+  [class^="v27-"][class$="-sub"]
+) {
+  line-height: 1.35 !important;
+  letter-spacing: 0 !important;
+}
+html[lang="ar"] :is(
+  .v27-ov-copy,
+  .v27-ext-copy,
+  .v27-hero-sub,
+  .v27-about-copy,
+  .v27-interior-copy,
+  .v27-ct-copy,
+  .v27-sf-copy,
+  .v27-charging-copy,
+  .v27-trims-copy,
+  .v27-res-copy,
+  .v27-gallery-copy,
+  [class^="v27-"][class$="-copy"],
+  [class^="v27-"][class$="-sub"]
+) {
+  line-height: 1.8 !important;
+}
+
+/* Safety section — mirror image/list columns + Arabic type */
+html[lang="ar"] .v27-sf-eyebrow {
+  letter-spacing: 0;
+  text-transform: none;
+}
+html[lang="ar"] .v27-safety-h2 {
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+html[lang="ar"] .v27-sf-intro {
+  line-height: 1.85;
+  letter-spacing: 0;
+  text-align: start;
+}
+html[lang="ar"] .sf-title {
+  letter-spacing: 0;
+  line-height: 1.35;
+  white-space: normal;
+}
+html[lang="ar"] .sf-disc {
+  letter-spacing: 0;
+  line-height: 1.65;
+  white-space: normal;
+}
+html[lang="ar"] .sf-num {
+  letter-spacing: 0.06em;
 }
