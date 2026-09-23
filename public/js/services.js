@@ -262,7 +262,19 @@ var FIND_US_LOCATIONS = (window.__ICAUR_CMS && window.__ICAUR_CMS.locations && w
   },
 ];
 
-var BADGE_LABELS = { showroom: 'Showroom', service: 'Service Center' };
+function fuIsAr() {
+  return (document.documentElement.lang || '').toLowerCase().indexOf('ar') === 0;
+}
+
+function fuBadgeLabels() {
+  return fuIsAr()
+    ? { showroom: 'صالة العرض', service: 'مركز الخدمة' }
+    : { showroom: 'Showroom', service: 'Service Center' };
+}
+
+function fuMapsLabel() {
+  return fuIsAr() ? 'افتح في الخرائط' : 'Open in Maps';
+}
 
 function fuMakeIcon(active) {
   var S = 60, H = 30, DOT = active ? 20 : 13, off = H - DOT / 2;
@@ -283,24 +295,22 @@ function fuMakeIcon(active) {
 }
 
 function fuPopupHTML(loc) {
-  var icoPin   = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#231815" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
-  var icoPhone = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#231815" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.4 2 2 0 0 1 3.59 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.86-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.91z"/></svg>';
-  var icoClock = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#231815" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
-  var BADGE_POP = { showroom: { bg:'#FDF4EF', color:'#7A3D2C', dot:'#8C5A48', r:'50%' }, service: { bg:'#EFF4F2', color:'#2C5040', dot:'#5A7060', r:'2px' } };
-  var badges = loc.badges.map(function(b) {
-    var s = BADGE_POP[b];
-    var dot = '<span style="display:inline-block;width:5px;height:5px;border-radius:' + s.r + ';background:' + s.dot + ';margin-right:6px;flex-shrink:0;"></span>';
-    return '<span style="display:inline-flex;align-items:center;padding:4px 10px 4px 8px;border-radius:5px;background:' + s.bg + ';color:' + s.color + ';font-size:0.6rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;">' + dot + BADGE_LABELS[b] + '</span>';
+  var labels = fuBadgeLabels();
+  var icoPin   = '<svg class="fu-popup__ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+  var icoPhone = '<svg class="fu-popup__ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.6 3.4 2 2 0 0 1 3.59 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.86-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.91z"/></svg>';
+  var icoClock = '<svg class="fu-popup__ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+  var badges = (loc.badges || []).map(function(b) {
+    return '<span class="fu-popup__badge fu-popup__badge--' + b + '"><span class="fu-popup__badge-dot" aria-hidden="true"></span>' + (labels[b] || b) + '</span>';
   }).join('');
-  return '<div style="padding:22px 24px 20px;font-family:Gotham,sans-serif;min-width:300px;box-sizing:border-box;">' +
-    '<div style="display:flex;gap:5px;margin-bottom:11px;flex-wrap:wrap;">' + badges + '</div>' +
-    '<div style="font-weight:700;font-size:.96rem;color:#1F0F08;margin-bottom:16px;letter-spacing:-.015em;line-height:1.18;">' + loc.name + '</div>' +
-    '<div style="display:flex;flex-direction:column;gap:9px;padding-bottom:15px;border-bottom:1px solid rgba(35,24,21,.08);">' +
-      '<div style="display:flex;gap:9px;align-items:flex-start;">' + icoPin   + '<span style="font-size:.75rem;color:#666;line-height:1.45;">' + loc.address + '</span></div>' +
-      '<div style="display:flex;gap:9px;align-items:center;">'      + icoPhone + '<span style="font-size:.75rem;color:#666;">' + loc.phone + '</span></div>' +
-      '<div style="display:flex;gap:9px;align-items:center;">'      + icoClock + '<span style="font-size:.75rem;color:#666;">' + loc.hours + '</span></div>' +
+  return '<div class="fu-popup">' +
+    '<div class="fu-popup__badges">' + badges + '</div>' +
+    '<div class="fu-popup__name">' + loc.name + '</div>' +
+    '<div class="fu-popup__rows">' +
+      '<div class="fu-popup__row">' + icoPin   + '<span>' + loc.address + '</span></div>' +
+      '<div class="fu-popup__row fu-popup__row--phone">' + icoPhone + '<span dir="ltr">' + loc.phone + '</span></div>' +
+      '<div class="fu-popup__row">' + icoClock + '<span>' + loc.hours + '</span></div>' +
     '</div>' +
-    '<a href="' + loc.mapsUrl + '" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;margin-top:14px;font-size:.74rem;font-weight:500;color:#231815;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(35,24,21,.28);">Open in Maps</a>' +
+    '<a class="fu-popup__maps" href="' + loc.mapsUrl + '" target="_blank" rel="noopener noreferrer">' + fuMapsLabel() + '</a>' +
   '</div>';
 }
 
@@ -315,6 +325,7 @@ function initFindUs() {
   var map, markers = {}, activeId = null;
 
   /* ── Build list rows ── */
+  var listLabels = fuBadgeLabels();
   FIND_US_LOCATIONS.forEach(function(loc) {
     var btn = document.createElement('button');
     btn.className = 'find-us__row';
@@ -322,7 +333,7 @@ function initFindUs() {
     btn.innerHTML =
       '<div class="find-us__badges">' +
         loc.badges.map(function(b) {
-          return '<span class="find-us__badge find-us__badge--' + b + '">' + BADGE_LABELS[b] + '</span>';
+          return '<span class="find-us__badge find-us__badge--' + b + '">' + (listLabels[b] || b) + '</span>';
         }).join('') +
       '</div>' +
       '<div class="find-us__name">' + loc.name + '</div>' +

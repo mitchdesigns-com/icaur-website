@@ -86,8 +86,11 @@ export function ProgramsView({ page }: { page: CmsPage }) {
           </h2>
           <p className="warranty-card__body reveal reveal--up" data-delay="2" style={{ maxWidth: 680 }}>{str(coverage, "body")}</p>
           <div className="white-hover-cards perk-cards reveal reveal--up" data-delay="3">
-            {items.map((item) => (
+            {items.map((item, index) => (
               <div className="white-hover-card" data-tilt key={str(item, "title")}>
+                <span className="white-hover-card__icon">
+                  <PerkIcon icon={str(item, "icon") || PERK_ICON_FALLBACK[index] || "shield"} />
+                </span>
                 <h3 className="white-hover-card__h">{str(item, "title")}</h3>
                 <p className="white-hover-card__p">{str(item, "text")}</p>
               </div>
@@ -100,6 +103,45 @@ export function ProgramsView({ page }: { page: CmsPage }) {
       </section>
       <CtaVideo cta={page.cta} />
     </main>
+  );
+}
+
+/** Order matches the original static programs page (shield → calendar → headset). */
+const PERK_ICON_FALLBACK = ["shield", "calendar", "headset"] as const;
+
+function PerkIcon({ icon }: { icon: string }) {
+  const common = {
+    width: 24,
+    height: 24,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true as const,
+  };
+  if (icon === "calendar") {
+    return (
+      <svg {...common}>
+        <rect x="3" y="4" width="18" height="18" rx="2" />
+        <path d="M16 2v4M8 2v4M3 10h18" />
+      </svg>
+    );
+  }
+  if (icon === "headset" || icon === "support" || icon === "headphones") {
+    return (
+      <svg {...common}>
+        <path d="M3 11h3a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-6a9 9 0 0 1 18 0v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1h3" />
+        <path d="M21 16v2a4 4 0 0 1-4 4h-5" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...common}>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
   );
 }
 

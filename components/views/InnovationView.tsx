@@ -76,12 +76,15 @@ export function InnovationView({ page }: { page: CmsPage }) {
             <h2 className="innov-pillar__h">
               {str(pillar, "title")}
               <br />
-              {str(pillar, "titleEm")}
+              <em>{str(pillar, "titleEm")}</em>
             </h2>
             <p className="innov-pillar__body">{str(pillar, "body")}</p>
             <div className="innov-pillar__bullets">
               {texts(pillar.bullets).map((bullet) => (
                 <div className="innov-pillar__bullet" key={bullet}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
                   <span>{bullet}</span>
                 </div>
               ))}
