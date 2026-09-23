@@ -7453,6 +7453,45 @@ html[lang="ar"] .qn-item-label {
   text-transform: none;
 }
 
+/* Buttons: EN uses uppercase + tracking; both break Arabic joining. */
+html[lang="ar"] .btn {
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.45;
+}
+
+/* Arabic: keep connected shaping; EN letter-split + tight tracking break joins. */
+html[lang="ar"] .hero__headline,
+html[lang="ar"] .diff__headline,
+html[lang="ar"] .why-strip__word {
+  letter-spacing: 0;
+}
+html[lang="ar"] .hero__headline {
+  line-height: 1.2;
+}
+html[lang="ar"] .hero__line {
+  row-gap: 0.12em;
+}
+html[lang="ar"] .hero__word--accent {
+  color: var(--brown);
+}
+html[lang="ar"] .why-strip__word {
+  line-height: 1.25;
+}
+html[lang="ar"] .diff__headline {
+  line-height: 1.2;
+}
+
+/* Hero mask (BORN / TO PLAY) — Arabic needs more leading between the two lines. */
+html[lang="ar"] .hero__mask-reveal {
+  line-height: 1.18;
+  letter-spacing: 0;
+  text-transform: none;
+}
+html[lang="ar"] .hero__mask-line {
+  word-spacing: normal;
+}
+
 html[dir="rtl"] .arrow {
   display: inline-block;
   transform: scaleX(-1);

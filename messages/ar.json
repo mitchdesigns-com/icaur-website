@@ -188,5 +188,8 @@
     "switchToEn": "Switch to English",
     "arLabel": "العربية",
     "enLabel": "EN"
+  },
+  "cta": {
+    "reserveYours": "احجز سيارتك"
   }
 }

@@ -1,8 +1,9 @@
 import { Fragment } from "react";
+import { getTranslations } from "next-intl/server";
 import type { CmsArticle, CmsFaqItem, CmsPage, CmsVehicleModel } from "@/lib/cms";
 import { mediaList } from "@/lib/media";
 import { CmsImg, CmsVideo } from "./CmsMedia";
-import { categoryLabel, CmsLink, CtaVideo, formatDate, list, num, str, texts, withBrand } from "./shared";
+import { categoryLabel, CmsLink, CtaVideo, formatDate, list, num, resolveReserveYoursLabel, str, texts, withBrand } from "./shared";
 import { WhyStrips } from "./WhyStrips";
 
 type Props = {
@@ -39,7 +40,8 @@ const HOME_MEDIA: HomeStory[] = [
   },
 ];
 
-export function HomeView({ page, models, articles, faqs, locale, startsFrom = "Starts from" }: Props) {
+export async function HomeView({ page, models, articles, faqs, locale, startsFrom = "Starts from" }: Props) {
+  const t = await getTranslations("cta");
   const hero = page.hero || {};
   const modelsCopy = page.models || {};
   const overview = page.overview || {};
@@ -56,6 +58,7 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
     .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
     .slice(0, 5);
   const modelCards = homeModelCards(page, models);
+  const heroCtaLabel = resolveReserveYoursLabel(str(hero, "ctaLabel"), locale, t("reserveYours"));
 
   return (
     <main id="main" className="font-body antialiased">
@@ -97,7 +100,7 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
               </p>
               <div className="hero__ctas reveal reveal--up" data-delay="6">
                 <CmsLink href={str(hero, "ctaHref", "/reserve")} className="btn btn--filled btn--lg btn--magnetic">
-                  {str(hero, "ctaLabel")} →
+                  {heroCtaLabel} <span className="arrow">→</span>
                 </CmsLink>
               </div>
             </div>

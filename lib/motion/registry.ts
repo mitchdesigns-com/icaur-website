@@ -12,7 +12,7 @@ export type MotionScript = {
 
 export const CORE_MOTION: MotionScript[] = [
   { id: "components", src: "/js/components.js" },
-  { id: "main", src: "/js/main.js?v=75" },
+  { id: "main", src: "/js/main.js?v=77" },
   { id: "transitions", src: "/js/transitions.js" },
   { id: "game", src: "/js/game.js" },
 ];

@@ -10,6 +10,10 @@
 // ─── Helpers ──────────────────────────────────────────────
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+/** Arabic must stay joined — per-letter <span> splits break cursive shaping. */
+const isArabicDoc = () =>
+  document.documentElement.lang === 'ar' ||
+  document.documentElement.dir === 'rtl';
 
 
 // ============================================================
@@ -32,22 +36,25 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 // ============================================================
 function triggerHeroWords() {
   // Per-letter elastic pop + color cycle (matches landing-page SplitText)
+  // Skip glyph splits on Arabic — isolated forms + letter-spacing break words.
   const headline = $('.hero__headline');
   if (headline && !headline.dataset.split) {
     headline.dataset.split = '1';
-    let idx = 0;
-    $$('.hero__word', headline).forEach(word => {
-      const text = word.textContent;
-      word.textContent = '';
-      [...text].forEach(ch => {
-        const span = document.createElement('span');
-        span.className = 'lettre';
-        span.textContent = ch;
-        span.style.setProperty('--ld', (idx * 0.045).toFixed(3) + 's');
-        word.appendChild(span);
-        idx++;
+    if (!isArabicDoc()) {
+      let idx = 0;
+      $$('.hero__word', headline).forEach(word => {
+        const text = word.textContent;
+        word.textContent = '';
+        [...text].forEach(ch => {
+          const span = document.createElement('span');
+          span.className = 'lettre';
+          span.textContent = ch;
+          span.style.setProperty('--ld', (idx * 0.045).toFixed(3) + 's');
+          word.appendChild(span);
+          idx++;
+        });
       });
-    });
+    }
     requestAnimationFrame(() => headline.classList.add('letters-in'));
   }
 
@@ -63,6 +70,7 @@ function triggerHeroWords() {
 function splitHeadlineLetters(headline) {
   if (!headline || headline.dataset.split) return;
   headline.dataset.split = '1';
+  if (isArabicDoc()) return;
   const counter = { i: 0 };
   const walk = (root) => {
     [...root.childNodes].forEach(node => {
@@ -268,9 +276,11 @@ function splitHeadlineLetters(headline) {
       'visibility:hidden', 'pointer-events:none',
       'white-space:nowrap',
       `font-family:${getComputedStyle(mask).fontFamily}`,
-      'font-weight:900', 'letter-spacing:-0.04em', 'word-spacing:-0.12em',
+      'font-weight:900',
+      `letter-spacing:${isArabicDoc() ? '0' : '-0.04em'}`,
+      `word-spacing:${isArabicDoc() ? 'normal' : '-0.12em'}`,
       'font-size:200px',              // large reference size
-      'text-transform:uppercase',
+      `text-transform:${isArabicDoc() ? 'none' : 'uppercase'}`,
     ].join(';');
 
     const b = document.createElement('span');
@@ -299,7 +309,7 @@ function splitHeadlineLetters(headline) {
     // stacked lines never exceed the viewport — keeps the same scale
     // and centred position from laptops up to large wide screens.
     const vh = window.innerHeight;
-    const lineHeight = 0.88;
+    const lineHeight = isArabicDoc() ? 1.18 : 0.88;
     const maxBornFsByHeight = (vh * 0.86) / ((1 + ratio) * lineHeight);
     bornFs = Math.min(bornFs, maxBornFsByHeight);
 
@@ -1646,6 +1656,11 @@ initSvcScroll({
   // opportunity, which split words mid-word on narrow viewports.
   function splitLetters(word) {
     if (!word || word.dataset.split) return [];
+    // Keep Arabic words as single shaping runs (no per-glyph spans).
+    if (isArabicDoc()) {
+      word.dataset.split = '1';
+      return [];
+    }
     const out = [];
     let n = 0;
     const walk = node => {

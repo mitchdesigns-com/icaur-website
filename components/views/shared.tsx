@@ -190,3 +190,14 @@ export function categoryLabel(category?: string) {
   if (!category) return "News";
   return category.charAt(0).toUpperCase() + category.slice(1);
 }
+
+/**
+ * Hero "Reserve Yours" label — CMS Arabic currently ships a broken "احجزs".
+ * Prefer a correct AR string when the CMS value is empty, mixed Latin, or the known typo.
+ */
+export function resolveReserveYoursLabel(cmsLabel: string | undefined, locale: string, fallback: string) {
+  const label = (cmsLabel || "").trim();
+  if (locale !== "ar") return label || fallback;
+  if (!label || /احجزs/i.test(label) || /[A-Za-z]/.test(label)) return fallback;
+  return label;
+}
