@@ -1,0 +1,358 @@
+/*
+  iCAUR Tailwind entry — PRIMARY styling system going forward.
+
+  Preflight is intentionally omitted so existing public/css/styles.css
+  resets, custom cursor rules, and JS-hook selectors keep working while
+  sections are converted page-by-page.
+
+  Design tokens mirror :root in public/css/styles.css exactly.
+  Complex keyframes / multiply masks / V27 rules stay in legacy CSS
+  until each block is verified equivalent under Tailwind.
+*/
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* Scan App Router + components for class names */
+@source "../app/**/*.{js,ts,jsx,tsx}";
+@source "../components/**/*.{js,ts,jsx,tsx}";
+@source "../lib/**/*.{js,ts,jsx,tsx}";
+
+@theme {
+  /* ── Colors (existing brand) ── */
+  --color-cream: #fbf7f1;
+  --color-cream-mid: #f4efe7;
+  --color-cream-deep: #ece6dc;
+  --color-black: #0a0a0a;
+  --color-white: #ffffff;
+  --color-brown: #f37021;
+  --color-brown-mid: #d85a0f;
+  --color-brown-light: #beb0a7;
+  --color-amber: #f37021;
+  --color-amber-mid: #d85a0f;
+  --color-amber-light: rgb(243 112 33 / 0.08);
+  --color-amber-glow: rgb(243 112 33 / 0.18);
+  --color-sky: #015699;
+  --color-sky-mid: #013f73;
+  --color-sky-light: rgb(1 86 153 / 0.08);
+  --color-sky-glow: rgb(1 86 153 / 0.18);
+  --color-text-dark: #0a0a0a;
+  --color-text-mid: #4c4c4c;
+  --color-text-muted: #8a8480;
+  --color-text-dim: #cccccc;
+
+  /* ── Typography (matches styles.css — Montserrat shipped; no Gotham files) ── */
+  --font-display: "Montserrat", "Futura", sans-serif;
+  --font-body: "Montserrat", "Futura", sans-serif;
+
+  /* ── Spacing (8pt scale from --sp-*) — prefixed to keep default TW scale ── */
+  --spacing-sp-2: 4px;
+  --spacing-sp-4: 8px;
+  --spacing-sp-6: 12px;
+  --spacing-sp-8: 16px;
+  --spacing-sp-12: 24px;
+  --spacing-sp-16: 32px;
+  --spacing-sp-20: 40px;
+  --spacing-sp-24: 48px;
+  --spacing-sp-32: 64px;
+  --spacing-sp-40: 80px;
+  --spacing-sp-48: 100px;
+  --spacing-sp-56: 120px;
+  --spacing-sp-64: 140px;
+  --spacing-pad-x: 60px;
+  --spacing-nav-h: 78px;
+
+  /* ── Radii ── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
+
+  /* ── Layout ── */
+  --container-site: 1440px;
+
+  /* ── Easing (existing motion tokens) ── */
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-brand: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-brand: cubic-bezier(0.4, 0, 1, 1);
+  --ease-circ: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* ── Durations ── */
+  --duration-xs: 180ms;
+  --duration-sm: 320ms;
+  --duration-md: 560ms;
+  --duration-lg: 800ms;
+  --duration-xl: 1100ms;
+
+  /* ── Animations (ported from styles.css — same timing) ── */
+  --animate-fade-up: fade-up 0.56s var(--ease-expo) both;
+  --animate-hero-letter-pop: hero-letter-pop 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-pulse-brand: pulse-brand 2s ease-in-out infinite;
+  --animate-vehicle-float: vehicle-float 6s ease-in-out infinite;
+  --animate-scroll-line: scroll-line 1.6s ease-in-out infinite;
+  --animate-panel-in: panel-in 0.56s var(--ease-expo) both;
+  --animate-spot-reveal: spot-reveal 0.9s var(--ease-expo) both;
+  --animate-spot-fade-up: spot-fade-up 0.7s var(--ease-expo) both;
+  --animate-news-tile-enter: news-tile-enter 0.7s var(--ease-expo) both;
+  --animate-about-hero-zoom: about-hero-zoom 1.1s var(--ease-expo) both;
+  --animate-about-hero-rise: about-hero-rise 1.1s var(--ease-expo) both;
+  --animate-about-hero-fade-up: about-hero-fade-up 0.8s var(--ease-expo) both;
+  --animate-diff-intro-in: diff-intro-in 0.7s var(--ease-expo) both;
+  --animate-fu-popup: fu-popup 0.55s var(--ease-spring) both;
+  --animate-ov-bounce-in: ov-bounce-in 0.6s var(--ease-spring) both;
+  --animate-v27-scroll-bounce: v27-scroll-bounce 1.9s ease-in-out infinite;
+  --animate-v27-swatch-spin: v27-swatch-spin 0.7s linear infinite;
+  --animate-v27-marquee: v27-marquee 32s linear infinite;
+  --animate-v27-hs-ping: v27-hs-ping 2.2s ease-out infinite;
+  --animate-v27-hs-dot-glow: v27-hs-dot-glow 2s ease-in-out infinite;
+  --animate-d-spin: d-spin 12s linear infinite;
+  --animate-d-float-a: d-float-a 4s ease-in-out infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes hero-letter-pop {
+    0% {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    45% {
+      opacity: 1;
+      transform: scale(1.12);
+    }
+    68% {
+      transform: scale(0.96);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes pulse-brand {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.55;
+    }
+  }
+
+  @keyframes vehicle-float {
+    0%,
+    100% {
+      transform: translateY(-46%);
+    }
+    50% {
+      transform: translateY(calc(-46% - 8px));
+    }
+  }
+
+  @keyframes scroll-line {
+    0% {
+      transform: scaleY(0);
+      transform-origin: top;
+    }
+    50% {
+      transform: scaleY(1);
+      transform-origin: top;
+    }
+    51% {
+      transform-origin: bottom;
+    }
+    100% {
+      transform: scaleY(0);
+      transform-origin: bottom;
+    }
+  }
+
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes spot-reveal {
+    from {
+      clip-path: inset(0 0 100% 0);
+      opacity: 0;
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes spot-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes news-tile-enter {
+    from {
+      opacity: 0;
+      transform: translateY(28px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes about-hero-zoom {
+    from {
+      transform: scale(1.12);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes about-hero-rise {
+    from {
+      transform: translateY(28vh);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes about-hero-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes diff-intro-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fu-popup {
+    from {
+      opacity: 0;
+      transform: scale(0.92) translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes ov-bounce-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes v27-scroll-bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(6px);
+    }
+  }
+
+  @keyframes v27-swatch-spin {
+    from {
+      transform: translate(-50%, -50%) rotate(0);
+    }
+    to {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
+
+  @keyframes v27-marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes v27-hs-ping {
+    0% {
+      transform: scale(1);
+      opacity: 0.75;
+    }
+    65% {
+      transform: scale(2.8);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(2.8);
+      opacity: 0;
+    }
+  }
+
+  @keyframes v27-hs-dot-glow {
+    0%,
+    100% {
+      box-shadow:
+        0 0 0 0 rgba(255, 255, 255, 0.6),
+        0 0 8px rgba(255, 255, 255, 0.5);
+    }
+    50% {
+      box-shadow:
+        0 0 0 5px rgba(255, 255, 255, 0),
+        0 0 22px rgba(255, 255, 255, 0.9);
+    }
+  }
+
+  @keyframes d-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes d-float-a {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-14px);
+    }
+  }
+}

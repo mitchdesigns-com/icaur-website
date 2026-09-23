@@ -32,7 +32,7 @@ export function MaintenanceView({ page }: { page: CmsPage }) {
   const downloads = page.downloads || {};
   const items = list(downloads, "items");
   return (
-    <main id="main">
+    <main id="main" className="font-body">
       <SpotHero hero={page.hero || {}} />
       <section className="svc-book" id="book">
         <div className="svc-book__bg" aria-hidden="true" />
@@ -74,7 +74,7 @@ export function ProgramsView({ page }: { page: CmsPage }) {
   const coverage = page.coverage || {};
   const items = list(coverage, "items");
   return (
-    <main id="main">
+    <main id="main" className="font-body">
       <SpotHero hero={page.hero || {}} />
       <section className="section svc-sub-band svc-sub-band--center" id="programs">
         <div className="container">
@@ -106,7 +106,7 @@ export function ProgramsView({ page }: { page: CmsPage }) {
 export function WarrantyView({ page }: { page: CmsPage }) {
   const coverage = page.coverage || {};
   return (
-    <main id="main">
+    <main id="main" className="font-body">
       <SpotHero hero={page.hero || {}} />
       <DownloadBand
         id="coverage"

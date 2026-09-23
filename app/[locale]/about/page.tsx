@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 
 export const runtime = "edge";
 
+/** About — App Router entry (edge). */
 export async function generateMetadata({ params }: LocaleParams) {
   const { locale } = await params;
   const fallback = await pageMeta(locale, "about");

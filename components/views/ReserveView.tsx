@@ -1,5 +1,6 @@
 import type { CmsPage, CmsVehicleModel, CmsLocation } from "@/lib/cms";
 import { cmsAsset } from "@/lib/cms";
+import { ReserveFormClient } from "@/components/motion/ReserveFormClient";
 import { CmsImg } from "./CmsMedia";
 import { CmsLink, str } from "./shared";
 
@@ -16,8 +17,9 @@ export function ReserveView({ page, models, locations }: Props) {
   const form = page.form || {};
   const bgSrc = cmsAsset(str(hero, "image", RESERVE_BG_FALLBACK) || RESERVE_BG_FALLBACK);
   return (
-    <main id="main">
-      <section className="rv-section" id="reserve">
+    <main id="main" className="font-body antialiased">
+      <ReserveFormClient />
+      <section className="rv-section relative" id="reserve">
         <div
           className="rv-bg"
           aria-hidden="true"

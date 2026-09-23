@@ -202,51 +202,60 @@ function splitHeadlineLetters(headline) {
   const inner   = $('.hero__inner');
   if (!driver || !mask) return;
 
+  let ticking = false;
   function tick() {
+    ticking = false;
     const rect      = driver.getBoundingClientRect();
     const scrolled  = Math.max(0, -rect.top);
     const scrollable = Math.max(driver.offsetHeight - window.innerHeight, 1);
     const p = Math.min(scrolled / scrollable, 1); // 0 → 1
 
-    // Fade in quickly over first 15% of scroll
-    const appear = Math.min(p / 0.15, 1);
+    // Fade in quickly over first 10% of scroll
+    const appear = Math.min(p / 0.10, 1);
 
-    // Reach full scale by 85% of scroll, then hold at scale 1 for the
-    // remaining 15% — gives the user a moment to read "BORN TO PLAY"
-    // before the hero releases and the page continues scrolling.
-    const pScale = Math.min(p / 0.85, 1);
+    // Reach full scale by 70% of scroll, then hold — lands sooner
+    const pScale = Math.min(p / 0.70, 1);
 
     // Scale: 15 (whole viewport = letter stroke = pure video) → 1 (black frame + letter windows)
     const scale = Math.max(15 - pScale * 14, 1);
 
-    mask.style.opacity   = appear;
+    mask.style.opacity   = String(appear);
     mask.style.transform = `scale(${scale})`;
 
-    // Fade out the headline as the BORN/TO PLAY reveal takes over, so they
-    // never visually overlap mid-scroll
+    // Fade headline out as soon as the stencil starts — avoids ghost text
+    // bleeding through the finished "BORN TO PLAY" frame.
     if (inner) {
-      const heroFade = 1 - Math.min(p / 0.12, 1);
+      const heroFade = 1 - Math.min(p / 0.08, 1);
       inner.style.opacity = String(heroFade);
       inner.style.pointerEvents = heroFade < 0.05 ? 'none' : '';
+      inner.style.visibility = heroFade < 0.02 ? 'hidden' : '';
     }
 
     // Overlay stays light — the mask black handles the darkening
     if (overlay) overlay.style.opacity = '0.28';
   }
 
-  window.addEventListener('scroll', tick, { passive: true });
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(tick);
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
   tick(); // run once on load
 })();
 
 
 // ============================================================
 // HERO TEXT FIT — calibrate BORN / TO PLAY to fill viewport width
-// Runs after fonts load + on every resize so it's always perfect
+// Runs ASAP, then again when display fonts settle — never wait only
+// on fonts.ready (that was the long "broken black blocks" window).
 // ============================================================
 (function initHeroTextFit() {
   const mask = $('#heroMaskReveal');
   if (!mask) return;
 
+  let lastKey = '';
   function fit() {
     const lines = $$('.hero__mask-line', mask);
     if (lines.length < 2) return;
@@ -295,18 +304,32 @@ function splitHeadlineLetters(headline) {
     bornFs = Math.min(bornFs, maxBornFsByHeight);
 
     const toplayFs = bornFs * ratio;
+    const key = bornFs.toFixed(2) + ':' + toplayFs.toFixed(2);
+    if (key === lastKey && mask.classList.contains('is-fitted')) return;
+    lastKey = key;
 
     mask.style.fontSize = bornFs + 'px';
     lines[1].style.fontSize = toplayFs + 'px';
+    mask.classList.add('is-fitted');
   }
 
-  // Run once fonts are ready, then on every resize
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(fit);
+  // Immediate fit with fallback metrics, then refine as fonts arrive
+  fit();
+  requestAnimationFrame(() => { fit(); requestAnimationFrame(fit); });
+
+  if (document.fonts) {
+    document.fonts.load('900 48px Montserrat').then(fit).catch(() => {});
+    document.fonts.load('700 48px GothamBold').then(fit).catch(() => {});
+    if (document.fonts.ready) document.fonts.ready.then(fit);
   } else {
-    setTimeout(fit, 500);
+    setTimeout(fit, 120);
   }
-  window.addEventListener('resize', fit, { passive: true });
+
+  let resizeT;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(fit, 80);
+  }, { passive: true });
 })();
 
 
@@ -1583,8 +1606,17 @@ initSvcScroll({
 
   video.muted  = true;
   video.loop   = true;
-  video.playsinline = true;
-  video.play().catch(() => {/* autoplay blocked — silent fail */});
+  video.playsInline = true;
+
+  const play = () => { video.play().catch(() => {}); };
+
+  // Start as soon as the first frame is decodable — don't wait for full buffer
+  if (video.readyState >= 2) play();
+  else {
+    video.addEventListener('loadeddata', play, { once: true });
+    video.addEventListener('canplay', play, { once: true });
+  }
+  play();
 })();
 
 

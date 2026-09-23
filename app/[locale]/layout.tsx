@@ -6,6 +6,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { cmsAsset, getGlobal, seoMetadata } from "@/lib/cms";
 import { asLocale } from "@/lib/pageMeta";
 import { FEEDBACK_WIDGET } from "@/lib/site";
+import "../globals.css";
 
 export const runtime = "edge";
 
@@ -60,8 +61,9 @@ export default async function LocaleLayout({ children, params }: Props) {
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        {/* Discrete weights only — full 100..900 variable range delayed the hero mask fit */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;900&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap"
           rel="stylesheet"
         />
         <link rel="stylesheet" href="/css/styles.css" />

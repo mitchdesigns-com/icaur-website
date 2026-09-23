@@ -37,18 +37,18 @@ export function NewsView({ page, articles, locale }: Props) {
   const showFeatured = Boolean(featured) && (filter === "all" || featured.category === filter);
 
   return (
-    <main id="main">
-      <section className="faq-page-hero news-hero" id="hero">
-        <div className="container" style={{ maxWidth: 720 }}>
-          <p className="eyebrow reveal reveal--up" data-delay="0" style={{ justifyContent: "center" }}>{str(hero, "eyebrow")}</p>
-          <h1 className="reveal reveal--up" data-delay="1">{str(hero, "title")}</h1>
-          <p className="reveal reveal--up" data-delay="2">{str(hero, "intro")}</p>
+    <main id="main" className="bg-white font-body antialiased">
+      <section className="faq-page-hero news-hero relative overflow-hidden bg-white pb-[clamp(72px,9vh,110px)] pt-[clamp(120px,14vh,180px)] text-center" id="hero">
+        <div className="container relative z-10 mx-auto max-w-[720px] px-pad-x">
+          <p className="eyebrow reveal reveal--up justify-center font-display text-[10px] font-bold uppercase tracking-[0.14em] text-text-muted" data-delay="0">{str(hero, "eyebrow")}</p>
+          <h1 className="reveal reveal--up font-display text-[clamp(2.2rem,5vw,3.8rem)] font-bold tracking-[-0.035em] text-black" data-delay="1">{str(hero, "title")}</h1>
+          <p className="reveal reveal--up mx-auto mt-sp-4 max-w-[36rem] text-[15px] leading-relaxed text-text-mid" data-delay="2">{str(hero, "intro")}</p>
         </div>
       </section>
 
-      <section className="section news-filters" id="filters" style={{ padding: 0 }}>
-        <div className="container">
-          <nav className="news-filters__inner" aria-label="Article categories">
+      <section className="section news-filters p-0" id="filters">
+        <div className="container mx-auto max-w-site px-pad-x">
+          <nav className="news-filters__inner flex flex-wrap items-center justify-center gap-2" aria-label="Article categories">
             {FILTERS.map((key) => (
               <button
                 key={key}
@@ -68,7 +68,7 @@ export function NewsView({ page, articles, locale }: Props) {
 
       {showFeatured && featured ? (
         <section className="section news-featured-section" id="featured" key={`${filter}-${featured.slug}`}>
-          <div className="container">
+          <div className="container mx-auto max-w-site px-pad-x">
             <div className="news-featured reveal reveal--up" data-delay="1">
               <CmsLink className="news-featured__img" href={`/news/${featured.slug}`} data-cursor-label="Read">
                 <CmsImg src={featured.coverImage} alt={featured.title || ""} loading="eager" width={800} height={500} variant="card" />
@@ -78,8 +78,8 @@ export function NewsView({ page, articles, locale }: Props) {
                   <span className="news-featured__tag">{categoryLabel(featured.category)}</span>
                   <time dateTime={featured.publishedOn}>{formatDate(featured.publishedOn, locale)}</time>
                 </div>
-                <h2 style={{ marginBottom: "var(--sp-8)" }}>{featured.title}</h2>
-                <p style={{ fontSize: 16, lineHeight: 1.75, color: "var(--text-mid)", marginBottom: "var(--sp-12)" }}>{featured.description}</p>
+                <h2 className="mb-sp-8 font-display text-black">{featured.title}</h2>
+                <p className="mb-sp-12 text-base leading-[1.75] text-text-mid">{featured.description}</p>
                 <CmsLink href={`/news/${featured.slug}`} className="btn btn--dark btn--arrow btn--magnetic">
                   {page.featuredCta || "Read Article"} <span className="arrow">→</span>
                 </CmsLink>
@@ -89,12 +89,12 @@ export function NewsView({ page, articles, locale }: Props) {
         </section>
       ) : null}
 
-      <section className="section news-grid-full" id="articles" style={{ paddingTop: "var(--sp-24)" }}>
-        <div className="container">
+      <section className="section news-grid-full pt-sp-24" id="articles">
+        <div className="container mx-auto max-w-site px-pad-x">
           <div className="media-grid">
             {visible.map((article, index) => (
               <article
-                className="media-card media-card--tile media-card--enter"
+                className="media-card media-card--tile media-card--enter animate-news-tile-enter"
                 data-category={article.category}
                 key={`${filter}-${article.slug || article.title}`}
                 style={{ animationDelay: `${index * 80}ms` }}
@@ -107,8 +107,13 @@ export function NewsView({ page, articles, locale }: Props) {
                   }
                 }}
               >
-                <CmsLink href={`/news/${article.slug}`} className="media-card__img" data-cursor-label="Read">
-                  <CmsImg src={article.coverImage} alt={article.title || ""} loading="lazy" width={400} height={250} variant="thumb" />
+                <CmsLink
+                  href={`/news/${article.slug}`}
+                  className="media-card__img"
+                  data-cursor-label="Read"
+                  aria-label={article.title || "Read article"}
+                >
+                  <CmsImg src={article.coverImage} alt="" loading="lazy" width={400} height={250} variant="thumb" />
                 </CmsLink>
                 <div className="media-card__meta">
                   <span className={`media-card__type${article.category && article.category !== "news" ? ` media-card__type--${article.category}` : ""}`}>
@@ -121,7 +126,7 @@ export function NewsView({ page, articles, locale }: Props) {
             ))}
           </div>
           {hasMore ? (
-            <div style={{ textAlign: "center", marginTop: "var(--sp-32)" }}>
+            <div className="mt-sp-32 text-center">
               <button
                 type="button"
                 className="btn btn--ghost btn--lg"

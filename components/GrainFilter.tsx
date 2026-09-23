@@ -2,7 +2,7 @@ export function GrainFilter() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}
+      className="absolute h-0 w-0 overflow-hidden"
       aria-hidden="true"
     >
       <filter

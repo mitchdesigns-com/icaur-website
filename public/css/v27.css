@@ -108,6 +108,7 @@
   line-height: 1.7; color: rgba(255,255,255,.82); max-width: 40ch;
   margin: 0; opacity: 0;
   text-shadow: 0 1px 16px rgba(0,0,0,.4);
+  text-wrap: wrap;
 }
 /* CTA — sits under the copy at the bottom of the video */
 .v27-hero-bottom {

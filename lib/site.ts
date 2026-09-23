@@ -5,7 +5,7 @@ export type SiteScript = {
 
 export const CORE_SCRIPTS: SiteScript[] = [
   { src: "/js/components.js" },
-  { src: "/js/main.js?v=74" },
+  { src: "/js/main.js?v=75" },
   { src: "/js/transitions.js" },
   { src: "/js/game.js" },
 ];
@@ -42,12 +42,11 @@ export const MODEL_CHROME: { bodyClass: string; scripts: SiteScript[]; styles: s
 };
 
 export const PAGE_CHROME: Record<string, { bodyClass: string; scripts: SiteScript[]; styles?: string[] }> = {
-  home: { bodyClass: "is-loading dark-hero-page", scripts: [...CORE_SCRIPTS, { src: "/js/dot-field.js" }] },
+  home: { bodyClass: "is-loading dark-hero-page", scripts: CORE_SCRIPTS },
   about: {
     bodyClass: "is-loading",
     scripts: [
       ...CORE_SCRIPTS,
-      { src: "/js/about-car.js" },
       { src: "/js/dot-field.js" },
       { src: "/js/doodles.js" },
       { src: "/js/about-thread.js" },
@@ -58,16 +57,16 @@ export const PAGE_CHROME: Record<string, { bodyClass: string; scripts: SiteScrip
   contact: {
     bodyClass: "is-loading",
     styles: ["https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"],
-    scripts: [...CORE_SCRIPTS, ...LEAFLET, { src: "/js/services.js" }, { src: "/js/page/contact.js" }],
+    scripts: [...CORE_SCRIPTS, ...LEAFLET, { src: "/js/services.js" }],
   },
-  faq: { bodyClass: "is-loading", scripts: [...CORE_SCRIPTS, { src: "/js/page/faq.js" }] },
+  faq: { bodyClass: "is-loading", scripts: CORE_SCRIPTS },
   innovation: {
     bodyClass: "is-loading dark-hero-page",
     styles: ["/css/v27.css"],
     scripts: [...CORE_SCRIPTS, ...GSAP_INNOV, { src: "/js/page/innovation.js" }],
   },
-  news: { bodyClass: "is-loading", scripts: [...CORE_SCRIPTS, { src: "/js/page/news.js" }] },
-  reserve: { bodyClass: "is-loading dark-hero-page", scripts: [...CORE_SCRIPTS, { src: "/js/page/reserve.js" }] },
+  news: { bodyClass: "is-loading", scripts: CORE_SCRIPTS },
+  reserve: { bodyClass: "is-loading dark-hero-page", scripts: CORE_SCRIPTS },
   services: {
     bodyClass: "is-loading dark-hero-page",
     styles: ["https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"],

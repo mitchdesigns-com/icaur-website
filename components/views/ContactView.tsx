@@ -1,4 +1,5 @@
 import type { CmsLocation, CmsPage, CmsVehicleModel } from "@/lib/cms";
+import { ContactFormClient } from "@/components/motion/ContactFormClient";
 import { CmsImg } from "./CmsMedia";
 import { CtaVideo, StoreBadges, str } from "./shared";
 
@@ -63,8 +64,9 @@ export function ContactView({ page, locations, models }: Props) {
       ];
 
   return (
-    <main id="main">
-      <section className="rs-section" id="contact">
+    <main id="main" className="font-body antialiased">
+      <ContactFormClient />
+      <section className="rs-section relative" id="contact">
         <div className="rs-bg" aria-hidden="true" />
         <div className="rs-card reveal reveal--up">
           <div className="rs-left">

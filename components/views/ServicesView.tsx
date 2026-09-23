@@ -6,24 +6,24 @@ export function ServicesView({ page }: { page: CmsPage }) {
   const cards = list(page.hub, "cards");
   const findUs = page.findUs || {};
   return (
-    <main id="main">
-      <section className="svc-hero" id="hero">
+    <main id="main" className="font-body antialiased">
+      <section className="svc-hero relative overflow-hidden" id="hero">
         <div className="svc-hero__bg" />
         <div className="svc-hero__grain" aria-hidden="true" />
         <div className="svc-hero__gradient" aria-hidden="true" />
-        <div className="svc-hero__inner">
-          <p className="eyebrow eyebrow--warm reveal reveal--up" data-delay="0">{str(hero, "eyebrow")}</p>
-          <h1 className="svc-hero__h reveal reveal--up" data-delay="1">
+        <div className="svc-hero__inner relative z-10 mx-auto max-w-site px-pad-x">
+          <p className="eyebrow eyebrow--warm reveal reveal--up font-display" data-delay="0">{str(hero, "eyebrow")}</p>
+          <h1 className="svc-hero__h reveal reveal--up font-display" data-delay="1">
             {str(hero, "title")}
             <br />
             {str(hero, "titleMid")} <em>{str(hero, "titleEm")}</em>
           </h1>
-          <p className="svc-hero__sub reveal reveal--up" data-delay="2">{str(hero, "subtitle")}</p>
+          <p className="svc-hero__sub reveal reveal--up font-body text-text-muted" data-delay="2">{str(hero, "subtitle")}</p>
         </div>
       </section>
 
       <section className="section svc-hub" id="explore">
-        <div className="container">
+        <div className="container mx-auto max-w-site px-pad-x">
           <div className="svc-hub__grid">
             {cards.map((card, index) => (
               <CmsLink href={str(card, "href")} className="svc-hub-card reveal reveal--up" data-delay={index} key={str(card, "href")}>

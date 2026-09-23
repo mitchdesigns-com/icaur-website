@@ -100,11 +100,11 @@ export function ModelView({
 
   return (
     <>
-      <div className="eg-dotgrid-wrap" aria-hidden="true" />
-      <div id="v27-canvas-wrap">
+      <div className="eg-dotgrid-wrap font-display" aria-hidden="true" />
+      <div id="v27-canvas-wrap" className="pointer-events-none">
         <canvas id="v27-canvas" />
       </div>
-      <section id="v27-hero">
+      <section id="v27-hero" className="relative">
         <div className="v27-hero-sticky">
           {videoSrc ? (
             <CmsVideo className="v27-hero-video" id="v27HeroVideo" src={videoSrc} mode="hero" aria-hidden="true" />
@@ -116,7 +116,7 @@ export function ModelView({
             <h1 className="v27-hero-h1" id="v27-hero-h1">
               {str(hero, "title")} {logo ? <CmsImg src={logo} alt={mark} className="v27-model-logo-inline" aria-hidden="true" variant="logo" /> : mark}
             </h1>
-            <p className="v27-hero-sub" id="v27-hero-sub">{str(hero, "subtitle")}</p>
+            <p className="v27-hero-sub text-pretty" id="v27-hero-sub">{str(hero, "subtitle")}</p>
           </div>
           <div className="v27-hero-bottom" id="v27-hero-bottom">
             <CmsLink href={str(hero, "ctaHref")} className="v27-cta-btn v27-cta-btn--dark v27-hero-reserve-btn" id="v27-hero-cta">

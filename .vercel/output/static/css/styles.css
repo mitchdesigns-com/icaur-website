@@ -4,22 +4,8 @@
    Colors: Cream #F5EEE5 · Black #0A0A0A · Brown #54342C
    ═══════════════════════════════════════════════════════════ */
 
-/* ─── Gotham Font Declarations ────────────────────────────── */
-@font-face {
-  font-family: 'GothamBold';
-  src: url('../assets/fonts/GothamBold.woff2') format('woff2');
-  font-weight: 700; font-display: swap;
-}
-@font-face {
-  font-family: 'GothamMedium';
-  src: url('../assets/fonts/GothamMedium.woff2') format('woff2');
-  font-weight: 500; font-display: swap;
-}
-@font-face {
-  font-family: 'GothamBook';
-  src: url('../assets/fonts/GothamBook.woff2') format('woff2');
-  font-weight: 400; font-display: swap;
-}
+/* Fonts: Montserrat + Noto Kufi Arabic via Google Fonts in layout.
+   Gotham @font-face removed — woff2 files were never shipped. */
 
 /* ─── Design Tokens ───────────────────────────────────────── */
 :root {
@@ -50,9 +36,9 @@
   --text-muted:   #8A8480;
   --text-dim:     #CCCCCC;
 
-  /* Typography */
-  --f-display: 'GothamBold', 'GothamMedium', 'Montserrat', 'Futura', sans-serif;
-  --f-body:    'GothamBook', 'GothamMedium', 'Montserrat', 'Futura', sans-serif;
+  /* Typography — Montserrat is the shipped face (Gotham files never present) */
+  --f-display: 'Montserrat', 'Futura', sans-serif;
+  --f-body:    'Montserrat', 'Futura', sans-serif;
 
   /* Space scale (8pt) */
   --sp-2:   4px;
@@ -156,15 +142,11 @@ small, .text-sm  { font-size: 14px; }
 .brand-name { text-transform: none; }
 
 /* Eyebrow — playful filled pill.
-   Set LIGHT on purpose: at 11px uppercase the old 700 filled the brand's
-   lowercase i into a slab that read as a capital I. The lightness comes
-   from the FAMILY as much as the number — --f-display leads with
-   GothamBold, where even 400 paints bold, so eyebrows lead with
-   GothamMedium — bolder than Book (which read too faint), still light
-   enough that the i keeps its dot and narrow stem. */
+   Montserrat 600 (Gotham files never shipped). Keep weight light enough
+   that the lowercase i retains its dot at 11px uppercase. */
 .eyebrow {
   display: inline-flex; align-items: center; gap: 10px;
-  font-family: 'GothamMedium', 'Montserrat', 'Futura', sans-serif;
+  font-family: 'Montserrat', 'Futura', sans-serif;
   font-size: 11px; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--amber);
@@ -542,10 +524,6 @@ html.pt-entering > body { opacity: 0; }
   transform: none !important;
 }
 .mobile-menu__sub a:hover { opacity: 1 !important; color: var(--amber) !important; }
-
-/* Extra stagger delays for added nav items */
-.mobile-menu.is-open .mobile-menu__nav li:nth-child(6) a { opacity:1; transform:none; transition-delay:.30s; }
-.mobile-menu.is-open .mobile-menu__nav li:nth-child(7) a { opacity:1; transform:none; transition-delay:.35s; }
 
 /* Actions */
 .nav__actions { display: flex; align-items: center; gap: clamp(4px, 0.45vw, 6px); flex-shrink: 0; }
@@ -983,52 +961,94 @@ html.pt-entering > body { opacity: 0; }
 
 /* ─── Mobile Menu ─────────────────────────────────────────── */
 .mobile-menu {
-  position: fixed; inset: 0; z-index: 990;
+  position: fixed; inset: 0;
+  /* Above .nav (1000) and .qn FAB (8900) — otherwise About is
+     covered by the header and the quick-nav hamburger sits on Reserve */
+  z-index: 9500;
   background: var(--white);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-24);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding:
+    max(64px, calc(20px + env(safe-area-inset-top, 0px)))
+    20px
+    max(24px, calc(16px + env(safe-area-inset-bottom, 0px)));
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   opacity: 0; visibility: hidden; pointer-events: none;
   transition: opacity var(--dur-lg) var(--ease-expo), visibility var(--dur-lg);
 }
 .mobile-menu.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
+/* Hide floating chrome while the drawer owns the screen */
+body:has(.mobile-menu.is-open) .qn,
+body:has(.mobile-menu.is-open) .nav {
+  visibility: hidden;
+  pointer-events: none;
+}
 .mobile-menu__close {
-  position: absolute; top: 24px; right: 28px;
+  position: absolute; top: max(16px, env(safe-area-inset-top, 0px)); right: 20px;
+  z-index: 2;
   font-size: 18px; color: var(--text-mid);
   transition: color var(--dur-xs); padding: 8px;
 }
 .mobile-menu__close:hover { color: var(--black); }
-.mobile-menu__nav ul { display: flex; flex-direction: column; align-items: center; gap: var(--sp-8); }
+.mobile-menu__nav {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  /* Top-align nav list so About is never pushed under the close hit-area */
+  justify-content: flex-start;
+  padding-top: 4px;
+}
+.mobile-menu__nav > ul {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px;
+  width: 100%;
+  margin: 0; padding: 0; list-style: none;
+}
 .mobile-menu__nav a {
-  font-family: var(--f-display); font-size: 30px; font-weight: 800;
+  font-family: var(--f-display); font-size: clamp(20px, 6.2vw, 28px); font-weight: 800;
   letter-spacing: -0.02em; color: var(--black);
-  transition: color var(--dur-xs);
   opacity: 0; transform: translateY(14px);
   transition: color var(--dur-xs), opacity var(--dur-lg) var(--ease-expo), transform var(--dur-lg) var(--ease-expo);
 }
-.mobile-menu.is-open .mobile-menu__nav li:nth-child(1) a { opacity:1; transform:none; transition-delay:.05s; }
-.mobile-menu.is-open .mobile-menu__nav li:nth-child(2) a { opacity:1; transform:none; transition-delay:.10s; }
-.mobile-menu.is-open .mobile-menu__nav li:nth-child(3) a { opacity:1; transform:none; transition-delay:.15s; }
-.mobile-menu.is-open .mobile-menu__nav li:nth-child(4) a { opacity:1; transform:none; transition-delay:.20s; }
-.mobile-menu.is-open .mobile-menu__nav li:nth-child(5) a { opacity:1; transform:none; transition-delay:.25s; }
+/* Direct children only — nested sub-links must not steal nth-child slots */
+.mobile-menu.is-open .mobile-menu__nav > ul > li > a { opacity:1; transform:none; }
+.mobile-menu.is-open .mobile-menu__nav > ul > li:nth-child(1) > a { transition-delay:.05s; }
+.mobile-menu.is-open .mobile-menu__nav > ul > li:nth-child(2) > a { transition-delay:.10s; }
+.mobile-menu.is-open .mobile-menu__nav > ul > li:nth-child(3) > a { transition-delay:.15s; }
+.mobile-menu.is-open .mobile-menu__nav > ul > li:nth-child(4) > a { transition-delay:.20s; }
+.mobile-menu.is-open .mobile-menu__nav > ul > li:nth-child(5) > a { transition-delay:.25s; }
+.mobile-menu.is-open .mobile-menu__nav > ul > li:nth-child(6) > a { transition-delay:.30s; }
+.mobile-menu.is-open .mobile-menu__nav > ul > li:nth-child(7) > a { transition-delay:.35s; }
+.mobile-menu.is-open .mobile-menu__nav > ul > li:nth-child(8) > a { transition-delay:.40s; }
 .mobile-menu__nav a:hover { color: var(--amber); }
 /* Models is a category label, not a link (no /models page) — styled like
    the nav items but muted and non-interactive, with the same reveal */
 .mobile-menu__nav .mobile-menu__label {
   display: block;
-  font-family: var(--f-display); font-size: 30px; font-weight: 800;
+  font-family: var(--f-display); font-size: clamp(20px, 6.2vw, 28px); font-weight: 800;
   letter-spacing: -0.02em; color: var(--text-mid); cursor: default;
   opacity: 0; transform: translateY(14px);
   transition: opacity var(--dur-lg) var(--ease-expo), transform var(--dur-lg) var(--ease-expo);
 }
-.mobile-menu.is-open .mobile-menu__nav li:nth-child(2) .mobile-menu__label { opacity: 1; transform: none; transition-delay: .10s; }
-.mobile-menu.is-open .mobile-menu__nav li:nth-child(3) .mobile-menu__label { opacity: 1; transform: none; transition-delay: .15s; }
+.mobile-menu.is-open .mobile-menu__nav > ul > li > .mobile-menu__label {
+  opacity: 1; transform: none;
+}
+.mobile-menu.is-open .mobile-menu__nav > ul > li:nth-child(2) > .mobile-menu__label { transition-delay: .10s; }
+.mobile-menu.is-open .mobile-menu__nav > ul > li:nth-child(3) > .mobile-menu__label { transition-delay: .15s; }
 /* a label that IS a link (Services) — the inner anchor must not re-hide
    itself inside the already-animated label wrapper */
 .mobile-menu__label a { opacity: 1 !important; transform: none !important; color: var(--black); }
 .mobile-menu__actions {
-  display: flex; flex-direction: column; gap: var(--sp-6); align-items: center;
-  width: min(100%, 360px); padding: 0 var(--pad-x);
-  /* clear the home-indicator strip on notched phones */
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  flex-shrink: 0;
+  display: flex; flex-direction: column; gap: 10px; align-items: center;
+  width: min(100%, 360px); padding: 12px var(--pad-x) 0;
+  margin-top: auto;
 }
 .mobile-menu__actions .btn { width: 100%; justify-content: center; min-height: 48px; }
 /* العربية + Compare, mirroring the desktop pill's actions */
@@ -1121,10 +1141,11 @@ html.pt-entering > body { opacity: 0; }
    HERO — SCROLL MASK REVEAL
    ═══════════════════════════════════════════════════════════ */
 
-/* Tall driver that gives scroll room while hero stays sticky */
+/* Tall driver that gives scroll room while hero stays sticky.
+   Kept shorter so the BORN TO PLAY stencil lands sooner. */
 .hero-scroll-driver {
   position: relative;
-  height: 360vh;
+  height: 220vh;
 }
 
 .hero {
@@ -1134,6 +1155,7 @@ html.pt-entering > body { opacity: 0; }
   background: var(--black);
   overflow: hidden;
   padding-top: 0;
+  isolation: isolate; /* keeps multiply blend from tearing mid-scale */
   /* No flex — inner is absolutely positioned */
 }
 
@@ -1175,7 +1197,9 @@ html.pt-entering > body { opacity: 0; }
   color: #fff;
   mix-blend-mode: multiply;   /* white × video = video; black × video = black */
 
-  font-family: var(--f-display);
+  /* Montserrat first — Gotham files are not shipped; waiting on a missing
+     face delayed the scroll-fit and left broken mid-scale frames. */
+  font-family: 'Montserrat', var(--f-display);
   font-weight: 900;
   font-size: 40vw;
   line-height: 0.88;
@@ -1186,8 +1210,21 @@ html.pt-entering > body { opacity: 0; }
 
   transform: scale(15);
   opacity: 0;
+  visibility: hidden; /* until JS marks .is-fitted after first measure */
   will-change: transform, opacity;
   pointer-events: none;
+  backface-visibility: hidden;
+  transform-origin: center center;
+}
+.hero__mask-reveal.is-fitted {
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll-driver { height: 100vh; }
+  .hero__mask-reveal {
+    display: none;
+  }
 }
 
 /* Each line fills ~100vw independently.
@@ -7366,8 +7403,7 @@ body:has(.post-hero) { background: #fff; }
      hit area without changing the look; sub-links get most of it */
   .mobile-menu__nav a { padding: 6px 14px; display: inline-block; }
   .mobile-menu__sub a { padding: 12px 14px; }
-  .mobile-menu__nav ul { gap: 2px; }
-  .mobile-menu { overflow-y: auto; }
+  .mobile-menu__nav > ul { gap: 2px; }
 
   /* ═══════════════════════════════════════════════════
      COMPACT TYPE — one notch down across the board
@@ -7402,8 +7438,8 @@ body:has(.post-hero) { background: #fff; }
 }
 
 html[lang="ar"] {
-  --f-display: 'Noto Kufi Arabic', 'GothamBold', 'GothamMedium', 'Montserrat', 'Futura', sans-serif;
-  --f-body: 'Noto Kufi Arabic', 'GothamBook', 'GothamMedium', 'Montserrat', 'Futura', sans-serif;
+  --f-display: 'Noto Kufi Arabic', 'Montserrat', 'Futura', sans-serif;
+  --f-body: 'Noto Kufi Arabic', 'Montserrat', 'Futura', sans-serif;
 }
 
 html[lang="ar"] .nav__link,

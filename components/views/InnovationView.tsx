@@ -10,15 +10,15 @@ export function InnovationView({ page }: { page: CmsPage }) {
   const rotates = [-14, 14, -12, 12];
 
   return (
-    <main id="main">
-      <section className="innov-page-hero" id="hero">
+    <main id="main" className="font-body antialiased">
+      <section className="innov-page-hero relative overflow-hidden" id="hero">
         <div className="innov-page-hero__bg" aria-hidden="true">
           <CmsVideo className="innov-page-hero__video" src={hero.videoSrc} poster={hero.posterSrc} mode="hero" />
         </div>
         <div className="innov-page-hero__overlay" aria-hidden="true" />
-        <div className="innov-page-hero__inner">
-          <p className="eyebrow eyebrow--warm reveal reveal--up" data-delay="0">{str(hero, "eyebrow")}</p>
-          <h1 className="innov-page-hero__h reveal reveal--up" data-delay="1">
+        <div className="innov-page-hero__inner relative z-10 mx-auto max-w-site px-pad-x">
+          <p className="eyebrow eyebrow--warm reveal reveal--up font-display" data-delay="0">{str(hero, "eyebrow")}</p>
+          <h1 className="innov-page-hero__h reveal reveal--up font-display" data-delay="1">
             {str(hero, "title")}
             <br />
             <em>{str(hero, "titleEm")}</em>

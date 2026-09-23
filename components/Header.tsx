@@ -406,7 +406,9 @@ async function MobileMenu({
             <ul className="mobile-menu__sub" role="list">
               {cards.map((card) => (
                 <li key={card.slug || card.href}>
-                  <Link href={(card.href || "/models/v27") as never}>{card.alt || card.slug}</Link>
+                  <Link href={(card.href || "/models/v27") as never}>
+                    {card.alt || card.name || card.slug}
+                  </Link>
                 </li>
               ))}
             </ul>

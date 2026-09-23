@@ -107,7 +107,7 @@ export function CmsVideo({
       muted={muted}
       loop={loop}
       playsInline={playsInline}
-      preload={mode === "lazy" ? "none" : "metadata"}
+      preload={mode === "hero" ? "auto" : mode === "lazy" ? "none" : "metadata"}
       {...rest}
     />
   );

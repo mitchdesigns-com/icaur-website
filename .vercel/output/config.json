@@ -71,7 +71,7 @@
       "continue": true
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(.*).json",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(.*).json",
       "dest": "/$1",
       "override": true,
       "continue": true,
@@ -101,7 +101,7 @@
         {
           "type": "header",
           "key": "x-prerender-revalidate",
-          "value": "be925e2015576b25bf0d333e0f4eaaa2"
+          "value": "515d3a462d8311d04123a7c310e7fbfd"
         }
       ],
       "middlewarePath": "middleware",
@@ -118,7 +118,7 @@
           "key": "x-nextjs-data"
         }
       ],
-      "dest": "/_next/data/ZyMqOrpEk45ARsn0Q-a_c/index.json",
+      "dest": "/_next/data/mLPGKt3GCUAsL4_2z0UWO/index.json",
       "continue": true,
       "override": true
     },
@@ -130,7 +130,7 @@
           "key": "x-nextjs-data"
         }
       ],
-      "dest": "/_next/data/ZyMqOrpEk45ARsn0Q-a_c/$1.json",
+      "dest": "/_next/data/mLPGKt3GCUAsL4_2z0UWO/$1.json",
       "continue": true,
       "override": true
     },
@@ -170,7 +170,7 @@
       "handle": "filesystem"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(.*).json",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(.*).json",
       "dest": "/$1",
       "continue": true,
       "has": [
@@ -246,7 +246,7 @@
           "key": "x-nextjs-data"
         }
       ],
-      "dest": "/_next/data/ZyMqOrpEk45ARsn0Q-a_c/index.json",
+      "dest": "/_next/data/mLPGKt3GCUAsL4_2z0UWO/index.json",
       "continue": true
     },
     {
@@ -257,60 +257,76 @@
           "key": "x-nextjs-data"
         }
       ],
-      "dest": "/_next/data/ZyMqOrpEk45ARsn0Q-a_c/$1.json",
+      "dest": "/_next/data/mLPGKt3GCUAsL4_2z0UWO/$1.json",
       "continue": true
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(?<nxtPlocale>[^/]+?)(?:/)?.json$",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)(?:/)?.json$",
       "dest": "/[locale]?nxtPlocale=$nxtPlocale"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(?<nxtPlocale>[^/]+?)/about(?:/)?.json$",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/about(?:/)?.json$",
       "dest": "/[locale]/about?nxtPlocale=$nxtPlocale"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(?<nxtPlocale>[^/]+?)/contact(?:/)?.json$",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/contact(?:/)?.json$",
       "dest": "/[locale]/contact?nxtPlocale=$nxtPlocale"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(?<nxtPlocale>[^/]+?)/faq(?:/)?.json$",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/faq(?:/)?.json$",
       "dest": "/[locale]/faq?nxtPlocale=$nxtPlocale"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(?<nxtPlocale>[^/]+?)/innovation(?:/)?.json$",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/innovation(?:/)?.json$",
       "dest": "/[locale]/innovation?nxtPlocale=$nxtPlocale"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(?<nxtPlocale>[^/]+?)/models/v27(?:/)?.json$",
-      "dest": "/[locale]/models/v27?nxtPlocale=$nxtPlocale"
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/models/(?<nxtPslug>[^/]+?)(?:/)?.json$",
+      "dest": "/[locale]/models/[slug]?nxtPlocale=$nxtPlocale&nxtPslug=$nxtPslug"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(?<nxtPlocale>[^/]+?)/news(?:/)?.json$",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/news(?:/)?.json$",
       "dest": "/[locale]/news?nxtPlocale=$nxtPlocale"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(?<nxtPlocale>[^/]+?)/news/(?<nxtPslug>[^/]+?)(?:/)?.json$",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/news/(?<nxtPslug>[^/]+?)(?:/)?.json$",
       "dest": "/[locale]/news/[slug]?nxtPlocale=$nxtPlocale&nxtPslug=$nxtPslug"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(?<nxtPlocale>[^/]+?)/reserve(?:/)?.json$",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/privacy(?:/)?.json$",
+      "dest": "/[locale]/privacy?nxtPlocale=$nxtPlocale"
+    },
+    {
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/privacy\\-policy(?:/)?.json$",
+      "dest": "/[locale]/privacy-policy?nxtPlocale=$nxtPlocale"
+    },
+    {
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/reserve(?:/)?.json$",
       "dest": "/[locale]/reserve?nxtPlocale=$nxtPlocale"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(?<nxtPlocale>[^/]+?)/services(?:/)?.json$",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/services(?:/)?.json$",
       "dest": "/[locale]/services?nxtPlocale=$nxtPlocale"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(?<nxtPlocale>[^/]+?)/services/maintenance(?:/)?.json$",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/services/maintenance(?:/)?.json$",
       "dest": "/[locale]/services/maintenance?nxtPlocale=$nxtPlocale"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(?<nxtPlocale>[^/]+?)/services/programs(?:/)?.json$",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/services/programs(?:/)?.json$",
       "dest": "/[locale]/services/programs?nxtPlocale=$nxtPlocale"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(?<nxtPlocale>[^/]+?)/services/warranty(?:/)?.json$",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/services/warranty(?:/)?.json$",
       "dest": "/[locale]/services/warranty?nxtPlocale=$nxtPlocale"
+    },
+    {
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/terms(?:/)?.json$",
+      "dest": "/[locale]/terms?nxtPlocale=$nxtPlocale"
+    },
+    {
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(?<nxtPlocale>[^/]+?)/terms\\-and\\-conditions(?:/)?.json$",
+      "dest": "/[locale]/terms-and-conditions?nxtPlocale=$nxtPlocale"
     },
     {
       "src": "^/(?<nxtPlocale>[^/]+?)(?:\\.rsc)(?:/)?$",
@@ -353,12 +369,12 @@
       "dest": "/[locale]/innovation?nxtPlocale=$nxtPlocale"
     },
     {
-      "src": "^/(?<nxtPlocale>[^/]+?)/models/v27(?:\\.rsc)(?:/)?$",
-      "dest": "/[locale]/models/v27.rsc?nxtPlocale=$nxtPlocale"
+      "src": "^/(?<nxtPlocale>[^/]+?)/models/(?<nxtPslug>[^/]+?)(?:\\.rsc)(?:/)?$",
+      "dest": "/[locale]/models/[slug].rsc?nxtPlocale=$nxtPlocale&nxtPslug=$nxtPslug"
     },
     {
-      "src": "^/(?<nxtPlocale>[^/]+?)/models/v27(?:/)?$",
-      "dest": "/[locale]/models/v27?nxtPlocale=$nxtPlocale"
+      "src": "^/(?<nxtPlocale>[^/]+?)/models/(?<nxtPslug>[^/]+?)(?:/)?$",
+      "dest": "/[locale]/models/[slug]?nxtPlocale=$nxtPlocale&nxtPslug=$nxtPslug"
     },
     {
       "src": "^/(?<nxtPlocale>[^/]+?)/news(?:\\.rsc)(?:/)?$",
@@ -375,6 +391,22 @@
     {
       "src": "^/(?<nxtPlocale>[^/]+?)/news/(?<nxtPslug>[^/]+?)(?:/)?$",
       "dest": "/[locale]/news/[slug]?nxtPlocale=$nxtPlocale&nxtPslug=$nxtPslug"
+    },
+    {
+      "src": "^/(?<nxtPlocale>[^/]+?)/privacy(?:\\.rsc)(?:/)?$",
+      "dest": "/[locale]/privacy.rsc?nxtPlocale=$nxtPlocale"
+    },
+    {
+      "src": "^/(?<nxtPlocale>[^/]+?)/privacy(?:/)?$",
+      "dest": "/[locale]/privacy?nxtPlocale=$nxtPlocale"
+    },
+    {
+      "src": "^/(?<nxtPlocale>[^/]+?)/privacy\\-policy(?:\\.rsc)(?:/)?$",
+      "dest": "/[locale]/privacy-policy.rsc?nxtPlocale=$nxtPlocale"
+    },
+    {
+      "src": "^/(?<nxtPlocale>[^/]+?)/privacy\\-policy(?:/)?$",
+      "dest": "/[locale]/privacy-policy?nxtPlocale=$nxtPlocale"
     },
     {
       "src": "^/(?<nxtPlocale>[^/]+?)/reserve(?:\\.rsc)(?:/)?$",
@@ -417,7 +449,23 @@
       "dest": "/[locale]/services/warranty?nxtPlocale=$nxtPlocale"
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(.*).json",
+      "src": "^/(?<nxtPlocale>[^/]+?)/terms(?:\\.rsc)(?:/)?$",
+      "dest": "/[locale]/terms.rsc?nxtPlocale=$nxtPlocale"
+    },
+    {
+      "src": "^/(?<nxtPlocale>[^/]+?)/terms(?:/)?$",
+      "dest": "/[locale]/terms?nxtPlocale=$nxtPlocale"
+    },
+    {
+      "src": "^/(?<nxtPlocale>[^/]+?)/terms\\-and\\-conditions(?:\\.rsc)(?:/)?$",
+      "dest": "/[locale]/terms-and-conditions.rsc?nxtPlocale=$nxtPlocale"
+    },
+    {
+      "src": "^/(?<nxtPlocale>[^/]+?)/terms\\-and\\-conditions(?:/)?$",
+      "dest": "/[locale]/terms-and-conditions?nxtPlocale=$nxtPlocale"
+    },
+    {
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(.*).json",
       "headers": {
         "x-nextjs-matched-path": "/$1"
       },
@@ -425,14 +473,14 @@
       "override": true
     },
     {
-      "src": "^/_next/data/ZyMqOrpEk45ARsn0Q\\-a_c/(.*).json",
+      "src": "^/_next/data/mLPGKt3GCUAsL4_2z0UWO/(.*).json",
       "dest": "__next_data_catchall"
     },
     {
       "handle": "hit"
     },
     {
-      "src": "/_next/static/(?:[^/]+/pages|pages|chunks|runtime|css|image|media|ZyMqOrpEk45ARsn0Q\\-a_c)/.+",
+      "src": "/_next/static/(?:[^/]+/pages|pages|chunks|runtime|css|image|media|mLPGKt3GCUAsL4_2z0UWO)/.+",
       "headers": {
         "cache-control": "public,max-age=31536000,immutable"
       },

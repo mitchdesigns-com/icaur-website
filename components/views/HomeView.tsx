@@ -58,7 +58,9 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
   const modelCards = homeModelCards(page, models);
 
   return (
-    <main id="main">
+    <main id="main" className="font-body antialiased">
+      <link rel="preload" as="image" href="/assets/images/homepage-hero-poster.webp" type="image/webp" />
+      <link rel="preload" as="video" href="/assets/videos/compressed/homepage-hero.mp4" type="video/mp4" />
       <div className="hero-scroll-driver" id="heroScrollDriver">
         <section className="hero" id="hero">
           <div className="hero__bg" aria-hidden="true">
@@ -273,8 +275,14 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
               </div>
               {featured[0] ? (
                 <article className="media-card media-card--lead" id="mediaLead">
-                  <CmsLink href={`/news/${featured[0].slug}`} className="media-card__img" id="mediaLeadImg" data-cursor-label="Read">
-                    <CmsImg src={featured[0].coverImage} alt={featured[0].title} loading="lazy" variant="card" />
+                  <CmsLink
+                    href={`/news/${featured[0].slug}`}
+                    className="media-card__img"
+                    id="mediaLeadImg"
+                    data-cursor-label="Read"
+                    aria-label={featured[0].title}
+                  >
+                    <CmsImg src={featured[0].coverImage} alt="" loading="lazy" variant="card" />
                   </CmsLink>
                   <div className="media-card__meta">
                     <span className={`media-card__type${featured[0].category === "blog" ? " media-card__type--blog" : ""}`}>
@@ -287,8 +295,13 @@ export function HomeView({ page, models, articles, faqs, locale, startsFrom = "S
               ) : null}
               {featured[1] ? (
                 <article className="media-card media-card--big" id="mediaBig">
-                  <CmsLink href={`/news/${featured[1].slug}`} className="media-card__img" data-cursor-label="Read">
-                    <CmsImg src={featured[1].coverImage} alt={featured[1].title} loading="lazy" variant="card" />
+                  <CmsLink
+                    href={`/news/${featured[1].slug}`}
+                    className="media-card__img"
+                    data-cursor-label="Read"
+                    aria-label={featured[1].title}
+                  >
+                    <CmsImg src={featured[1].coverImage} alt="" loading="lazy" variant="card" />
                   </CmsLink>
                   <div className="media-card__meta">
                     <span className={`media-card__type${featured[1].category === "blog" ? " media-card__type--blog" : ""}`}>

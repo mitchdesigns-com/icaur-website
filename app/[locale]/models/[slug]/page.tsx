@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 
 export const runtime = "edge";
 
+/** Models — App Router entry (edge). */
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };

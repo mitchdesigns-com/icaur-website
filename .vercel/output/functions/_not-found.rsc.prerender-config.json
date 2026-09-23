@@ -2,7 +2,7 @@
   "type": "Prerender",
   "expiration": false,
   "group": 1,
-  "bypassToken": "be925e2015576b25bf0d333e0f4eaaa2",
+  "bypassToken": "515d3a462d8311d04123a7c310e7fbfd",
   "experimentalBypassFor": [
     {
       "type": "header",

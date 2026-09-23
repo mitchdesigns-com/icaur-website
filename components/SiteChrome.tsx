@@ -3,9 +3,10 @@ import { Cursor } from "@/components/Cursor";
 import { Footer } from "@/components/Footer";
 import { GrainFilter } from "@/components/GrainFilter";
 import { Header } from "@/components/Header";
-import { LegacyScripts } from "@/components/LegacyScripts";
+import { MotionRuntime } from "@/components/motion/MotionRuntime";
 import { QuickNav } from "@/components/QuickNav";
 import { cmsRuntime, loadChrome, type CmsPage, type CmsVehicleModel } from "@/lib/cms";
+import type { MotionScript } from "@/lib/motion/registry";
 import type { SiteScript } from "@/lib/site";
 import type { ReactNode } from "react";
 
@@ -17,6 +18,14 @@ type Props = {
   styles?: string[];
   page?: CmsPage | CmsVehicleModel | null;
 };
+
+function toMotionScripts(scripts: SiteScript[]): MotionScript[] {
+  return scripts.map((script) => ({
+    id: script.src,
+    src: script.src,
+    type: script.type,
+  }));
+}
 
 export async function SiteChrome({ locale, children, bodyClass, scripts, styles = [], page }: Props) {
   const { global, locations, models, compareRows, compareModels } = await loadChrome(locale);
@@ -39,7 +48,7 @@ export async function SiteChrome({ locale, children, bodyClass, scripts, styles 
           __html: `window.__ICAUR_CMS=${JSON.stringify(runtime)};`,
         }}
       />
-      <LegacyScripts scripts={scripts} />
+      <MotionRuntime scripts={toMotionScripts(scripts)} />
     </>
   );
 }

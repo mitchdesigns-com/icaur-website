@@ -41,7 +41,7 @@ export function AboutView({ page }: { page: CmsPage }) {
   const valueItems = list(values, "items");
 
   return (
-    <main id="main">
+    <main id="main" className="font-body antialiased">
       <section className="spot-hero spot-hero--video" id="hero">
         <CmsVideo className="spot-hero__video" id="aboutHeroVideo" src={hero.videoSrc} poster={hero.posterSrc} mode="hero" aria-hidden="true" />
         <div className="spot-hero__reveal" aria-hidden="true" />
