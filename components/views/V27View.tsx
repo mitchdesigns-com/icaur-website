@@ -3,6 +3,7 @@ import { chargeAtPercent, chargingConfig, modelPageRuntime, type CmsPage, type C
 import { DownloadFile } from "./DownloadFile";
 import { CmsImg, CmsVideo } from "./CmsMedia";
 import { CmsLink, CtaVideo, cmsFile, downloadName, list, num, str } from "./shared";
+import { withReserveModel } from "@/lib/reserveModel";
 
 function PriceValue({ price, unit }: { price: string; unit: string }) {
   if (unit) {
@@ -100,6 +101,8 @@ export function ModelView({
   const galleryMark = str(gallery, "eyebrowMark", mark);
   const exteriorSlides = modelPageRuntime(page)?.exteriorSlides || [];
   const hasExteriorGallery = exteriorSlides.length > 0;
+  const modelSlug = str(record, "slug") || mark.toLowerCase();
+  const reserveCtaHref = withReserveModel(str(hero, "ctaHref", "/reserve"), modelSlug);
 
   return (
     <>
@@ -122,7 +125,7 @@ export function ModelView({
             <p className="v27-hero-sub text-pretty" id="v27-hero-sub">{str(hero, "subtitle")}</p>
           </div>
           <div className="v27-hero-bottom" id="v27-hero-bottom">
-            <CmsLink href={str(hero, "ctaHref")} className="v27-cta-btn v27-cta-btn--dark v27-hero-reserve-btn" id="v27-hero-cta">
+            <CmsLink href={reserveCtaHref} className="v27-cta-btn v27-cta-btn--dark v27-hero-reserve-btn" id="v27-hero-cta">
               {str(hero, "ctaLabel")}
               <svg className="arrow" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M5 12h14M12 5l7 7-7 7" />
@@ -407,7 +410,7 @@ export function ModelView({
         </div>
       </section>
 
-      <CtaVideo cta={page.cta} />
+      <CtaVideo cta={page.cta} reserveModel={modelSlug} />
     </>
   );
 }

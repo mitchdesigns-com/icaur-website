@@ -14,8 +14,15 @@ export async function generateMetadata({ params }: LocaleParams) {
   return seoMetadata(page?.seo, fallback);
 }
 
-export default async function ReservePage({ params }: LocaleParams) {
+export default async function ReservePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ model?: string | string[] }>;
+}) {
   const { locale } = await params;
+  const query = await searchParams;
   applyRequestLocale(locale);
   const [page, models, locations] = await Promise.all([
     getPage("reserve", locale),
@@ -24,9 +31,15 @@ export default async function ReservePage({ params }: LocaleParams) {
   ]);
   if (!page) notFound();
   const chrome = PAGE_CHROME.reserve;
+  const preferredModel = Array.isArray(query.model) ? query.model[0] : query.model;
   return (
     <SiteChrome locale={locale} bodyClass={chrome.bodyClass} scripts={chrome.scripts}>
-      <ReserveView page={page} models={models || []} locations={locations || []} />
+      <ReserveView
+        page={page}
+        models={models || []}
+        locations={locations || []}
+        preferredModel={preferredModel}
+      />
     </SiteChrome>
   );
 }

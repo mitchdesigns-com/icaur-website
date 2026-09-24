@@ -1,5 +1,6 @@
 import type { CmsPage, CmsVehicleModel, CmsLocation } from "@/lib/cms";
 import { cmsAsset } from "@/lib/cms";
+import { modelsMatch } from "@/lib/reserveModel";
 import { ReserveFormClient } from "@/components/motion/ReserveFormClient";
 import { CmsImg } from "./CmsMedia";
 import { CmsLink, str } from "./shared";
@@ -8,17 +9,28 @@ type Props = {
   page: CmsPage;
   models: CmsVehicleModel[];
   locations: CmsLocation[];
+  preferredModel?: string;
 };
 
 const RESERVE_BG_FALLBACK = "/assets/images/ICUAR V27 brochure 03 20.webp";
 
-export function ReserveView({ page, models, locations }: Props) {
+function resolvePreferredSlug(preferred: string | undefined, models: CmsVehicleModel[]): string | null {
+  if (!models.length) return null;
+  if (preferred) {
+    const match = models.find((model) => model.slug && modelsMatch(model.slug, preferred));
+    if (match?.slug) return match.slug;
+  }
+  return models[0]?.slug || null;
+}
+
+export function ReserveView({ page, models, locations, preferredModel }: Props) {
   const hero = page.hero || {};
   const form = page.form || {};
   const bgSrc = cmsAsset(str(hero, "image", RESERVE_BG_FALLBACK) || RESERVE_BG_FALLBACK);
+  const selectedSlug = resolvePreferredSlug(preferredModel, models);
   return (
     <main id="main" className="font-body antialiased">
-      <ReserveFormClient />
+      <ReserveFormClient preferredModel={preferredModel || selectedSlug || undefined} />
       <section className="rv-section relative" id="reserve">
         <div
           className="rv-bg"
@@ -43,19 +55,29 @@ export function ReserveView({ page, models, locations }: Props) {
                 <div className="rv-block">
                   <p className="rv-block-label">{str(form, "chooseModel")}</p>
                   <div className="rv-models" role="radiogroup" aria-label={str(form, "chooseModel")}>
-                    {models.map((model, index) => (
-                      <label className="rv-model" key={model.slug}>
-                        <input type="radio" name="rv-model" value={model.slug} defaultChecked={index === 0} aria-label={model.name} />
-                        <div className="rv-model-img-wrap">
-                          <CmsImg src={model.image} alt={model.name || ""} loading="eager" variant="card" />
-                          <div className="rv-model-overlay" aria-hidden="true" />
-                          <CmsImg src={model.logo} alt={model.name || ""} className="rv-model-logo" variant="logo" />
-                          <span className="rv-model-dot" aria-hidden="true">
-                            <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor" /></svg>
-                          </span>
-                        </div>
-                      </label>
-                    ))}
+                    {models.map((model) => {
+                      const slug = model.slug || "";
+                      const checked = selectedSlug ? slug === selectedSlug : false;
+                      return (
+                        <label className="rv-model" key={slug || model.name}>
+                          <input
+                            type="radio"
+                            name="rv-model"
+                            value={slug}
+                            defaultChecked={checked}
+                            aria-label={model.name}
+                          />
+                          <div className="rv-model-img-wrap">
+                            <CmsImg src={model.image} alt={model.name || ""} loading="eager" variant="card" />
+                            <div className="rv-model-overlay" aria-hidden="true" />
+                            <CmsImg src={model.logo} alt={model.name || ""} className="rv-model-logo" variant="logo" />
+                            <span className="rv-model-dot" aria-hidden="true">
+                              <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor" /></svg>
+                            </span>
+                          </div>
+                        </label>
+                      );
+                    })}
                   </div>
                 </div>
                 <div className="rv-divider" />

@@ -2,6 +2,7 @@ import type { ReactNode, CSSProperties } from "react";
 import { Link } from "@/i18n/navigation";
 import { cmsAsset, cmsHref, type CmsCta } from "@/lib/cms";
 import { mediaUrl } from "@/lib/media";
+import { withReserveModel } from "@/lib/reserveModel";
 import { CmsVideo } from "./CmsMedia";
 
 type CmsLinkProps = {
@@ -31,8 +32,21 @@ export function CmsLink({ href = "/", className, children, ...rest }: CmsLinkPro
   );
 }
 
-export function CtaVideo({ cta, reveal = "blur" }: { cta?: CmsCta | null; reveal?: "blur" | "up" }) {
+export { modelsMatch, normalizeModelToken, withReserveModel } from "@/lib/reserveModel";
+
+export function CtaVideo({
+  cta,
+  reveal = "blur",
+  reserveModel,
+}: {
+  cta?: CmsCta | null;
+  reveal?: "blur" | "up";
+  reserveModel?: string;
+}) {
   if (!cta) return null;
+  const primaryHref = reserveModel
+    ? withReserveModel(cta.primaryHref, reserveModel)
+    : cta.primaryHref || "/reserve";
   return (
     <section className="cta-video" id="cta">
       <CmsVideo
@@ -49,7 +63,7 @@ export function CtaVideo({ cta, reveal = "blur" }: { cta?: CmsCta | null; reveal
         </h2>
         <p className="cta-video__body">{cta.body}</p>
         <div className="cta-video__actions">
-          <CmsLink href={cta.primaryHref || "/reserve"} className="btn btn--filled btn--lg btn--arrow btn--magnetic">
+          <CmsLink href={primaryHref} className="btn btn--filled btn--lg btn--arrow btn--magnetic">
             {cta.primaryLabel} <span className="brand-name">iCAUR</span> <span className="arrow">→</span>
           </CmsLink>
           <CmsLink href={cta.secondaryHref || "/contact"} className="btn btn--outline btn--arrow btn--magnetic">
