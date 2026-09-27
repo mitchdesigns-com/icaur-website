@@ -13,28 +13,28 @@ export async function Footer({ global }: Props) {
   const modelLinks = footer?.modelLinks?.length
     ? footer.modelLinks
     : [
-        { label: "V27", href: "/models/v27" },
-        { label: "O3T", href: "/models/o3t" },
-      ];
+      { label: "V27", href: "/models/v27" },
+      { label: "O3T", href: "/models/o3t" },
+    ];
   const navLinks = footer?.navLinks?.length
     ? footer.navLinks
     : [
-        { label: t("about"), href: "/about" },
-        { label: t("services"), href: "/services" },
-        { label: t("innovation"), href: "/innovation" },
-        { label: t("news"), href: "/news" },
-        { label: t("faq"), href: "/faq" },
-        { label: t("contact"), href: "/contact" },
-      ];
+      { label: t("about"), href: "/about" },
+      { label: t("services"), href: "/services" },
+      { label: t("innovation"), href: "/innovation" },
+      { label: t("news"), href: "/news" },
+      { label: t("faq"), href: "/faq" },
+      { label: t("contact"), href: "/contact" },
+    ];
   const socials = footer?.socials?.length
     ? footer.socials
     : [
-        { name: "facebook", href: "#", ariaLabel: t("facebook") },
-        { name: "instagram", href: "#", ariaLabel: t("instagram") },
-        { name: "twitter", href: "#", ariaLabel: t("twitter") },
-        { name: "linkedin", href: "#", ariaLabel: t("linkedin") },
-        { name: "youtube", href: "#", ariaLabel: t("youtube") },
-      ];
+      { name: "facebook", href: "#", ariaLabel: t("facebook") },
+      { name: "instagram", href: "#", ariaLabel: t("instagram") },
+      { name: "twitter", href: "#", ariaLabel: t("twitter") },
+      { name: "linkedin", href: "#", ariaLabel: t("linkedin") },
+      { name: "youtube", href: "#", ariaLabel: t("youtube") },
+    ];
 
   return (
     <>
@@ -123,7 +123,7 @@ export async function Footer({ global }: Props) {
       </footer>
 
       <div className="footer__outro">
-        <div className="footer__inner">
+        <div className="footer__inner pb-0!">
           <div className="footer__bottom">
             <p className="footer__legal">
               {footer?.copyright || t("copyright")} &nbsp;·&nbsp;{" "}
