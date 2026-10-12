@@ -6401,6 +6401,16 @@ a.reach-tile:hover { transform: translateY(-5px); box-shadow: 0 18px 44px rgba(0
 }
 @media (max-width: 900px) {
   .svc-book__card { max-width: 100%; }
+  /* stack: text card first, man cutout below it (in flow, grounded on the section edge) */
+  .svc-book { min-height: 0; align-items: stretch; padding-top: var(--sp-24); padding-bottom: 0; }
+  #svcBookCard { display: flex; flex-direction: column; }
+  .svc-book__card { padding: clamp(32px, 7vw, 56px) clamp(24px, 6vw, 48px); }
+  .svc-book__pop {
+    order: 1;
+    position: relative; right: auto; bottom: auto;
+    width: min(100%, 420px); height: auto;
+    align-self: center; margin-top: var(--sp-8);
+  }
   .svc-centers .container { grid-template-columns: 1fr; }
   .svc-centers__map { position: static; aspect-ratio: 16/9; }
 }
